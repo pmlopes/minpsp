@@ -1,0 +1,79 @@
+diff -Naur sdk.orig/lib/build.mak sdk/lib/build.mak
+--- sdk.orig/lib/build.mak
++++ sdk/lib/build.mak
+@@ -15,6 +15,12 @@
+ $(error $$(PSPSDK) is undefined.  Use "PSPSDK := $$(shell psp-config --pspsdk-path)" in your Makefile)
+ endif
+ 
++# OS tools
++CP       = $(shell psp-config --pspdev-path)/bin/cp
++RM       = $(shell psp-config --pspdev-path)/bin/rm
++MKDIR    = $(shell psp-config --pspdev-path)/bin/mkdir
++TRUE    = $(shell psp-config --pspdev-path)/bin/true
++
+ CC       = psp-gcc
+ CXX      = psp-g++
+ AS       = psp-gcc
+@@ -152,17 +157,17 @@
+ all: $(EXTRA_TARGETS) $(FINAL_TARGET)
+ 
+ kxploit: $(TARGET).elf $(PSP_EBOOT_SFO)
+-	mkdir -p "$(TARGET)"
++	$(MKDIR) -p "$(TARGET)"
+ 	$(STRIP) $(TARGET).elf -o $(TARGET)/$(PSP_EBOOT)
+-	mkdir -p "$(TARGET)%"
++	$(MKDIR) -p "$(TARGET)%"
+ 	$(PACK_PBP) "$(TARGET)%/$(PSP_EBOOT)" $(PSP_EBOOT_SFO) $(PSP_EBOOT_ICON)  \
+ 		$(PSP_EBOOT_ICON1) $(PSP_EBOOT_UNKPNG) $(PSP_EBOOT_PIC1)  \
+ 		$(PSP_EBOOT_SND0) NULL $(PSP_EBOOT_PSAR)
+ 
+ SCEkxploit: $(TARGET).elf $(PSP_EBOOT_SFO)
+-	mkdir -p "__SCE__$(TARGET)"
++	$(MKDIR) -p "__SCE__$(TARGET)"
+ 	$(STRIP) $(TARGET).elf -o __SCE__$(TARGET)/$(PSP_EBOOT)
+-	mkdir -p "%__SCE__$(TARGET)"
++	$(MKDIR) -p "%__SCE__$(TARGET)"
+ 	$(PACK_PBP) "%__SCE__$(TARGET)/$(PSP_EBOOT)" $(PSP_EBOOT_SFO) $(PSP_EBOOT_ICON)  \
+ 		$(PSP_EBOOT_ICON1) $(PSP_EBOOT_UNKPNG) $(PSP_EBOOT_PIC1)  \
+ 		$(PSP_EBOOT_SND0) NULL $(PSP_EBOOT_PSAR)
+@@ -189,7 +194,7 @@
+ 	$(PACK_PBP) $(PSP_EBOOT) $(PSP_EBOOT_SFO) $(PSP_EBOOT_ICON)  \
+ 		$(PSP_EBOOT_ICON1) $(PSP_EBOOT_UNKPNG) $(PSP_EBOOT_PIC1)  \
+ 		$(PSP_EBOOT_SND0)  $(TARGET)_strip.elf $(PSP_EBOOT_PSAR)
+-	-rm -f $(TARGET)_strip.elf
++	-$(RM) -f $(TARGET)_strip.elf
+ endif
+ 
+ %.prx: %.elf
+@@ -199,6 +204,6 @@
+ 	psp-build-exports -b $< > $@
+ 
+ clean: 
+-	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
++	-$(RM) -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
+ 
+ rebuild: clean all
+diff -Naur sdk.orig/lib/build_prx.mak sdk/lib/build_prx.mak
+--- sdk.orig/lib/build_prx.mak
++++ sdk/lib/build_prx.mak
+@@ -15,6 +15,12 @@
+ $(error $$(PSPSDK) is undefined.  Use "PSPSDK := $$(shell psp-config --pspsdk-path)" in your Makefile)
+ endif
+ 
++# OS tools
++CP       = $(shell psp-config --pspdev-path)/bin/cp
++RM       = $(shell psp-config --pspdev-path)/bin/rm
++MKDIR    = $(shell psp-config --pspdev-path)/bin/mkdir
++TRUE    = $(shell psp-config --pspdev-path)/bin/true
++
+ CC       = psp-gcc
+ CXX      = psp-g++
+ AS       = psp-gcc
+@@ -81,6 +86,6 @@
+ 	psp-build-exports -b $< > $@
+ 
+ clean: $(EXTRA_CLEAN)
+-	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
++	-$(RM) -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
+ 
+ rebuild: clean all

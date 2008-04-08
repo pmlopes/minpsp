@@ -1,0 +1,73 @@
+Index: libpspirkeyb/Makefile
+===================================================================
+--- libpspirkeyb/Makefile	(revision 2366)
++++ libpspirkeyb/Makefile	(working copy)
+@@ -13,9 +13,10 @@
+ include $(PSPSDK)/lib/build.mak
+ 
+ install: all
+-	cp libpspirkeyb.a $(PSPSDK)/lib
+-	cp include/pspirkeyb.h $(PSPSDK)/include
+-	cp include/pspirkeyb_rawkeys.h $(PSPSDK)/include
++	mkdir -p ../../target/psp/sdk/lib ../../target/psp/sdk/include
++	cp libpspirkeyb.a ../../target/psp/sdk/lib
++	cp include/pspirkeyb.h ../../target/psp/sdk/include
++	cp include/pspirkeyb_rawkeys.h ../../target/psp/sdk/include
+ 
+ uninstall:
+ 	rm -f $(PSPSDK)/lib/libpspirkeyb.a
+Index: libpspirkeybprx/Makefile
+===================================================================
+--- libpspirkeybprx/Makefile	(revision 2366)
++++ libpspirkeybprx/Makefile	(working copy)
+@@ -13,8 +13,9 @@
+ include $(PSPSDK)/lib/build.mak
+ 
+ install: all
+-	cp libpspirkeybprx.a $(PSPSDK)/lib
+-	cp include/pspirkeybprx.h $(PSPSDK)/include
++	mkdir -p ../../target/psp/sdk/lib ../../target/psp/sdk/include
++	cp libpspirkeybprx.a ../../target/psp/sdk/lib
++	cp include/pspirkeybprx.h ../../target/psp/sdk/include
+ 
+ uninstall:
+ 	rm -f $(PSPSDK)/lib/libpspirkeybprx.a
+Index: Makefile
+===================================================================
+--- Makefile	(revision 2366)
++++ Makefile	(working copy)
+@@ -30,11 +30,11 @@
+ 
+ install: all
+ 	$(MAKE) -C libpspirkeyb install
+-	mkdir -p $(PSPSDK)/samples/irkeyb
+-	cp -r libpspirkeyb/keymap $(PSPSDK)/samples/irkeyb
+-	cp libpspirkeyb/config/pspirkeyb.ini $(PSPSDK)/samples/irkeyb
+-	cp asciidemo/main.c $(PSPSDK)/samples/irkeyb
+-	cp asciidemo/Makefile.sdk $(PSPSDK)/samples/irkeyb/Makefile
++	mkdir -p ../target/psp/sdk/samples/irkeyb
++	cp -r libpspirkeyb/keymap ../target/psp/sdk/samples/irkeyb
++	cp libpspirkeyb/config/pspirkeyb.ini ../target/psp/sdk/samples/irkeyb
++	cp asciidemo/main.c ../target/psp/sdk/samples/irkeyb
++	cp asciidemo/Makefile.sdk ../target/psp/sdk/samples/irkeyb/Makefile
+ 
+ uninstall:
+ 	$(MAKE) -C libpspirkeyb install
+Index: pspirkeybprx/Makefile
+===================================================================
+--- pspirkeybprx/Makefile	(revision 2366)
++++ pspirkeybprx/Makefile	(working copy)
+@@ -23,9 +23,10 @@
+ include $(PSPSDK)/lib/build.mak
+ 
+ install: all
+-	cp libpspirkeyb.a $(PSPSDK)/lib
+-	cp include/pspirkeyb.h $(PSPSDK)/include
+-	cp include/pspirkeyb_rawkeys.h $(PSPSDK)/include
++	mkdir -p ../../target/psp/sdk/lib ../../target/psp/sdk/include
++	cp libpspirkeyb.a ../../target/psp/sdk/lib
++	cp include/pspirkeyb.h ../../target/psp/sdk/include
++	cp include/pspirkeyb_rawkeys.h ../../target/psp/sdk/include
+ 
+ uninstall:
+ 	rm -f $(PSPSDK)/lib/libpspirkeyb.a

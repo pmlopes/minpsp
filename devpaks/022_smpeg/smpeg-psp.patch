@@ -1,0 +1,19 @@
+Index: Makefile
+===================================================================
+--- Makefile	(revision 3)
++++ Makefile	(working copy)
+@@ -5,12 +5,12 @@
+ PSPSDK=$(shell psp-config --pspsdk-path)
+ 
+ INCDIR = 
+-CFLAGS = $(GLOBAL_CFLAGS) -O2 -Wall -g `$(PSPDEV)/psp/bin/sdl-config --cflags`
++CFLAGS = $(GLOBAL_CFLAGS) -O2 -Wall -g $(shell sdl-config --cflags)
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ ASFLAGS = $(CFLAGS)
+ 
+ LDFLAGS = 
+-LIBS = `$(PSPDEV)/psp/bin/sdl-config --libs`
++LIBS = $(shell sdl-config --libs)
+ 
+ include $(PSPSDK)/lib/build.mak
+ 
