@@ -1,0 +1,15 @@
+Index: config.sub
+===================================================================
+--- config.sub
++++ config.sub	(working copy)
+@@ -876,6 +876,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32
