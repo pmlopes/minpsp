@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	// and how we use vfpu_rand_8888 to generate random colors for the stars
 
 	for (n=0; n<1000; n++) {
-		vfpu_sphere_to_cartesian(vfpu_randf(0.0f, 6.28319f), vfpu_randf(0.0f, 3.14159f), 1000.0f, (ScePspFVector4 *)&(stars[n]));
+		vfpu_sphere_to_cartesian(vfpu_randf(0.0f, 6.28319f), vfpu_randf(0.0f, 3.14159f), 1000.0f, &(stars[n].x), &(stars[n].y), &(stars[n].z));
 		stars[n].c = vfpu_rand_8888(160, 255);
 	}
 

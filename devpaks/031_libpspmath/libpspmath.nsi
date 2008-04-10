@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME libpspmath
-!define VERSION 3
+!define VERSION 4
 !define COMPANY jetcube
 !define URL http://www.jetcube.eu
 

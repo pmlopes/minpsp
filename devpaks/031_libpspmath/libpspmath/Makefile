@@ -28,6 +28,10 @@ OBJS = \
 	vfpu_fmaxf.o \
 	vfpu_ease_in_out.o \
 	vfpu_normalize_vector.o \
+	vfpu_zero_vector.o \
+	vfpu_scale_vector.o \
+	vfpu_add_vector.o \
+	vfpu_envmap_matrix.o \
 	vfpu_sphere_to_cartesian.o \
 	vfpu_quaternion_identity.o \
 	vfpu_quaternion_copy.o \
@@ -37,7 +41,9 @@ OBJS = \
 	vfpu_quaternion_ln.o \
 	vfpu_quaternion_sample_linear.o \
 	vfpu_quaternion_from_euler.o \
-	vfpu_quaternion_to_matrix.o
+	vfpu_quaternion_to_matrix.o \
+	vfpu_quaternion_sample_hermite.o \
+	vfpu_quaternion_hermite_tangent.o
 
 INCDIR = 
 CFLAGS = -O2 -G0 -Wall

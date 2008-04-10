@@ -23,3 +23,16 @@ void vfpu_ortho_matrix(ScePspFMatrix4 *m, float left, float right, float bottom,
 		"sv.q    C130, 48 + %0\n"
 	:"=m"(*m) : "r"(left), "r"(right), "r"(bottom), "r"(top), "r"(near), "r"(far));
 }
+
+
+void vfpu_transform_vector(ScePspFMatrix4 *m, ScePspFVector4 *vin, ScePspFVector4 *vout) {
+	__asm__ volatile (
+		"lv.q    C000, 0  + %1\n"
+		"lv.q    C010, 16 + %1\n"
+		"lv.q    C020, 32 + %1\n"
+		"lv.q    C030, 48 + %1\n"
+		"lv.q    C100, %2\n"
+		"vtfm4.q C110, M000, C100\n"
+		"sv.q    C110, %0\n"
+	:"+m"(*vout): "m"(*m), "m"(*vin));
+}
