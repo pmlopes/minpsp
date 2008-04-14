@@ -4,7 +4,8 @@ LIBNAME=SDL
 
 if [ ! -d $LIBNAME ]
 then
-	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
+#	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
+	svn checkout http://psp.jim.sh/svn/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
 else
 	svn update $LIBNAME
 fi
@@ -27,7 +28,7 @@ if [ ! -f $LIBNAME-devpaktarget ]
 then
 	make install || { echo "Error installing $LIBNAME"; exit 1; }
 	mkdir -p ../target ../target/doc
-	mv ../target/psp/man ../target
+	mv ../target/psp/share/man ../target
 	rm -fR ../target/psp/bin
 	rm -fR ../target/psp/share
 	cp README.PSP ../target/doc/$LIBNAME.txt
