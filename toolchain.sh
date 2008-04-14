@@ -145,19 +145,14 @@ if [ ! -f extracted_archives ]
 then
 	echo "Extracting $BINUTILS"
 	tar -xjf $BUILDSCRIPTDIR/download/$BINUTILS || { echo "Error extracting "$BINUTILS; exit; }
-
 	echo "Extracting $GCC_CORE"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
-
 	echo "Extracting $GCC_GPP"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_GPP || { echo "Error extracting "$GCC_GPP; exit; }
-
 	echo "Extracting $NEWLIB"
 	tar -xzf $BUILDSCRIPTDIR/download/$NEWLIB || { echo "Error extracting "$NEWLIB; exit; }
-
 	echo "Extracting $GDB"
 	tar -xjf $BUILDSCRIPTDIR/download/$GDB || { echo "Error extracting "$GDB; exit; }
-
 	echo "Extracting $MINGW32_MAKE_DIR"
 	mkdir $MINGW32_MAKE_DIR
 	cd $MINGW32_MAKE_DIR
@@ -166,10 +161,8 @@ then
 	
 	echo "Extracting $UNXUTILS"
 	$scriptdir/bin/unzip -q $BUILDSCRIPTDIR/download/$UNXUTILS -d $UNXUTILS_DIR
-	
 	echo "Extracting $MINGW32_GROFF"
 	$scriptdir/bin/unzip -q $BUILDSCRIPTDIR/download/$MINGW32_GROFF -d $MINGW32_GROFF_DIR
-	
 	echo "Extracting $MINGW32_LESS"
 	$scriptdir/bin/unzip -q $BUILDSCRIPTDIR/download/$MINGW32_LESS -d $MINGW32_LESS_DIR
 	echo "Extracting $MINGW32_LESS_DEP"
@@ -208,11 +201,6 @@ then
 	if [ -f $patchdir/newlib-$NEWLIB_VER-PSP.patch ]
 	then
 		patch -p1 -d $NEWLIB_SRCDIR -i $patchdir/newlib-$NEWLIB_VER-PSP.patch || { echo "Error patching newlib"; exit; }
-	fi
-
-	if [ -f $patchdir/gcc-$GCC_VER-MINGW.patch ]
-	then
-		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_VER-MINGW.patch || { echo "Error patching gcc (mingw)"; exit; }
 	fi
 
 	if [ -f $patchdir/gdb-$GDB_VER-MINGW.patch ]

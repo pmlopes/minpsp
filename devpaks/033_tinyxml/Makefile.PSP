@@ -1,0 +1,113 @@
+#****************************************************************************
+#
+# Makefile for TinyXml test.
+# Lee Thomason
+# www.grinninglizard.com
+#
+# This is a GNU make (gmake) makefile
+#****************************************************************************
+PREFIX ?= ../target
+# TINYXML_USE_STL can be used to turn on STL support. NO, then STL
+# will not be used. YES will include the STL files.
+TINYXML_USE_STL := YES
+
+#****************************************************************************
+
+CC     := psp-gcc
+CXX    := psp-g++
+LD     := psp-g++
+AR     := psp-ar cru
+RANLIB := psp-ranlib
+
+CFLAGS   := -Wall -Wno-unknown-pragmas -Wno-format -O3 -G0
+CXXFLAGS := ${RELEASE_CFLAGS} -fno-exceptions -fno-rtti
+LDFLAGS  :=
+LIBS	 :=
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+
+ifeq (YES, ${TINYXML_USE_STL})
+  DEFS := -DTIXML_USE_STL
+else
+  DEFS :=
+endif
+
+#****************************************************************************
+# Include paths
+#****************************************************************************
+
+#INCS := -I/usr/include/g++-2 -I/usr/local/include
+INCS :=
+
+
+#****************************************************************************
+# Makefile code common to all platforms
+#****************************************************************************
+
+CFLAGS   := ${CFLAGS}   ${DEFS}
+CXXFLAGS := ${CXXFLAGS} ${DEFS}
+
+#****************************************************************************
+# Targets of the build
+#****************************************************************************
+
+OUTPUT := libtinyxml.a
+
+all: ${OUTPUT}
+
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+SRCS := tinyxml.cpp tinyxmlparser.cpp tinyxmlerror.cpp tinystr.cpp
+
+# Add on the sources for libraries
+SRCS := ${SRCS}
+
+OBJS := $(addsuffix .o,$(basename ${SRCS}))
+
+#****************************************************************************
+# Output
+#****************************************************************************
+
+libtinyxml.a: ${OBJS}
+	${AR} $@ ${OBJS}
+	${RANLIB} $@
+
+#****************************************************************************
+# common rules
+#****************************************************************************
+
+# Rules for compiling source files to object files
+%.o : %.cpp
+	${CXX} -c ${CXXFLAGS} ${INCS} $< -o $@
+
+%.o : %.c
+	${CC} -c ${CFLAGS} ${INCS} $< -o $@
+
+dist:
+	bash makedistlinux
+
+clean:
+	-rm -f core ${OBJS} ${OUTPUT}
+
+depend:
+	#makedepend ${INCS} ${SRCS}
+
+install:
+	mkdir -p $(PREFIX)/psp/lib $(PREFIX)/psp/include $(PREFIX)/doc/TinyXml $(PREFIX)/psp/sdk/samples/TinyXml
+	cp -fR docs  $(PREFIX)/doc/TinyXml
+	cp -fR readme.txt  $(PREFIX)/doc/TinyXml
+	cp libtinyxml.a $(PREFIX)/psp/lib
+	cp tinyxml.h $(PREFIX)/psp/include
+	cp xmltest.cpp $(PREFIX)/psp/sdk/samples/TinyXml
+	cp *.xml $(PREFIX)/psp/sdk/samples/TinyXml
+	cp *.gif $(PREFIX)/psp/sdk/samples/TinyXml
+	
+tinyxml.o: tinyxml.h tinystr.h
+tinyxmlparser.o: tinyxml.h tinystr.h
+xmltest.o: tinyxml.h tinystr.h
+tinyxmlerror.o: tinyxml.h tinystr.h

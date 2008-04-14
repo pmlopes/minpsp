@@ -18,6 +18,10 @@ Portable handheld videogame system.
 ==========================
  Changelog
 ==========================
+0.7.2
+* Sync to PS2DEV SVN
+* Reduce differences between MinPSPW patches and Official patches
+
 0.7.1
 * builds ASM files without errors due to bad make
 * added true.exe for makefile assertions
