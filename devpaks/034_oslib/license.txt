@@ -1,0 +1,5 @@
+OldSchool Library is a graphical library for the PlayStation Portable. It is intended to help you working on 2D games.
+
+Currently, there is an official forum, hosted by PlayerAdvance.org, and the official topic where it all began is on ps2dev.org.
+
+http://brunni.dev-fr.org
