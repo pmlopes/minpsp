@@ -12,6 +12,7 @@ then
 	../../$BINUTILS_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=$target --disable-nls --disable-shared --disable-debug \
 		--disable-threads --with-gcc --with-gnu-as --with-gnu-ld --with-stabs \
+		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
 			|| { echo "Error configuring binutils"; exit 1; }
 	touch configured-binutils
 fi
@@ -48,6 +49,7 @@ then
 		--target=$target \
 		--with-newlib \
 		--prefix=$INSTALLDIR \
+		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
 			|| { echo "Error configuring gcc"; exit 1; }
 	touch configured-gcc
 fi
@@ -111,6 +113,7 @@ then
 	$BUILDSCRIPTDIR/$NEWLIB_SRCDIR/configure \
 		--target=$target \
 		--prefix=$INSTALLDIR \
+		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
 			|| { echo "Error configuring newlib"; exit 1; }
 	touch configured-newlib
 fi
@@ -179,6 +182,7 @@ if [ ! -f configured-gdb ]
 then
 	../../$GDB_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=$target --disable-nls \
+		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
 			|| { echo "Error configuring gdb"; exit 1; }
 	touch configured-gdb
 fi

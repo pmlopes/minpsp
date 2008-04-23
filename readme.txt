@@ -11,6 +11,8 @@ Portable handheld videogame system.
  TODO
 ==========================
 0.8
+* GCC 4.3.0
+* GDB 6.8
 * make sure debugging works
 * reduce dependency on cygwin
 

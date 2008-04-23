@@ -1,8 +1,10 @@
 #!/bin/sh
-GCC_VER=4.1.2
+GCC_VER=4.3.0
+GMP_VER=4.2
+MPFR_VER=2.3.1
 BINUTILS_VER=2.16.1
 NEWLIB_VER=1.15.0
-GDB_VER=6.7.1
+GDB_VER=6.8
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
@@ -12,6 +14,8 @@ INSTALLDIR="c:/pspsdk"
 
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
+GMP="gmp-$GMP_VER.tar.bz2"
+MPFR="mpfr-$MPFR_VER.tar.bz2"
 BINUTILS="binutils-$BINUTILS_VER.tar.bz2"
 NEWLIB="newlib-$NEWLIB_VER.tar.gz"
 GDB="gdb-$GDB_VER.tar.bz2"
@@ -23,6 +27,8 @@ MINGW32_LESS_DEP="less-$MINGW32_LESS_VER-dep.zip"
 
 GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
 GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
+GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
+MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS"
 NEWLIB_URL="ftp://sources.redhat.com/pub/newlib/$NEWLIB"
 GDB_URL="http://ftp.gnu.org/gnu/gdb/$GDB"
@@ -32,6 +38,8 @@ MINGW32_GROFF_URL="$SF_MIRROR/gnuwin32/$MINGW32_GROFF"
 MINGW32_LESS_URL="$SF_MIRROR/gnuwin32/$MINGW32_LESS"
 MINGW32_LESS_DEP_URL="$SF_MIRROR/gnuwin32/$MINGW32_LESS_DEP"
 
+GMP_SRCDIR="gmp-$GMP_VER"
+MPFR_SRCDIR="mpfr-$MPFR_VER"
 BINUTILS_SRCDIR="binutils-$BINUTILS_VER"
 GCC_SRCDIR="gcc-$GCC_VER"
 GDB_SRCDIR="gdb-$GDB_VER"
@@ -76,6 +84,8 @@ then
 	mkdir -p download
 	cd download
 	$WGET --passive-ftp -c $BINUTILS_URL || { echo "Error: Failed to download "$BINUTILS; exit; }
+	$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
+	$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
 	$WGET -c $GCC_CORE_URL || { echo "Error: Failed to download "$GCC_CORE; exit; }
 	$WGET -c $GCC_GPP_URL || { echo "Error: Failed to download "$GCC_GPP; exit; }
 	$WGET -c $GDB_URL || { echo "Error: Failed to download "$GDB; exit; }
@@ -145,6 +155,10 @@ if [ ! -f extracted_archives ]
 then
 	echo "Extracting $BINUTILS"
 	tar -xjf $BUILDSCRIPTDIR/download/$BINUTILS || { echo "Error extracting "$BINUTILS; exit; }
+	echo "Extracting $GMP"
+	tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
+	echo "Extracting $MPFR"
+	tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
 	echo "Extracting $GCC_CORE"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
 	echo "Extracting $GCC_GPP"
@@ -193,9 +207,9 @@ then
 		patch -p1 -d $BINUTILS_SRCDIR -i $patchdir/binutils-$BINUTILS_VER-PSP.patch || { echo "Error patching binutils"; exit; }
 	fi
 
-	if [ -f $patchdir/gcc-$GCC_TC_VER-PSP.patch ]
+	if [ -f $patchdir/gcc-$GCC_VER-PSP.patch ]
 	then
-		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_TC_VER-PSP.patch || { echo "Error patching gcc"; exit; }
+		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_VER-PSP.patch || { echo "Error patching gcc"; exit; }
 	fi
 
 	if [ -f $patchdir/newlib-$NEWLIB_VER-PSP.patch ]
@@ -203,9 +217,9 @@ then
 		patch -p1 -d $NEWLIB_SRCDIR -i $patchdir/newlib-$NEWLIB_VER-PSP.patch || { echo "Error patching newlib"; exit; }
 	fi
 
-	if [ -f $patchdir/gdb-$GDB_VER-MINGW.patch ]
+	if [ -f $patchdir/gdb-$GDB_VER-PSP.patch ]
 	then
-		patch -p1 -d $GDB_SRCDIR -i $patchdir/gdb-$GDB_VER-MINGW.patch || { echo "Error patching gdb (mingw)"; exit; }
+		patch -p1 -d $GDB_SRCDIR -i $patchdir/gdb-$GDB_VER-PSP.patch || { echo "Error patching gdb (mingw)"; exit; }
 	fi
 
 	touch patched_sources
@@ -214,6 +228,12 @@ fi
 #---------------------------------------------------------------------------------
 # Build and install devkit components
 #---------------------------------------------------------------------------------
+if [ -f $scriptdir/build-gcc-deps.sh ]
+then
+	. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }
+	cd $BUILDSCRIPTDIR
+fi
+
 if [ -f $scriptdir/build-gcc.sh ]
 then
 	. $scriptdir/build-gcc.sh || { echo "Error building toolchain"; exit; }
