@@ -16,6 +16,9 @@ Portable handheld videogame system.
 * make sure debugging works
 * reduce dependency on cygwin
 
+0.7
+* Add support for Java
+
 
 ==========================
  Changelog

@@ -4,10 +4,10 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.7.2
+!define VERSION @MINPSPW_VERSION@
 !define COMPANY jetcube.eu
 !define URL http://www.jetcube.eu
-!define SDKDIR C:\pspsdk_installer
+!define SDKDIR C:\pspsdk-installer
 
 # MUI defines
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\box-install.ico"
@@ -112,7 +112,7 @@ Section -post SEC0006
 	CreateShortCut "$SMPROGRAMS\$StartMenuGroup\PSPSDK API.lnk" "$INSTDIR\doc\pspsdk\index.html" "" "$INSTDIR\doc\pspsdk\index.html" 0
 	
     CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
-    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name) ${VERSION}"
     WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
     WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" Publisher "${COMPANY}"
     WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" URLInfoAbout "${URL}"

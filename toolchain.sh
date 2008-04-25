@@ -1,19 +1,38 @@
 #!/bin/sh
-GCC_VER=4.3.0
-GMP_VER=4.2
-MPFR_VER=2.3.1
+EXPERIMENTAL=no
+WITH_JAVA=yes
+
+if [ "$EXPERIMENTAL" == "yes" ]; then
+	GCC_VER=4.3.0
+	GMP_VER=4.2
+	MPFR_VER=2.3.1
+	GDB_VER=6.8
+	INSTALLDIR="/c/pspsdk430"
+	INSTALLERDIR="/c/pspsdk430-installer"
+	PSPSDK_VERSION=0.8.2
+else
+	GCC_VER=4.1.2
+	# official patches are for version 4.1.0
+	PS2DEV_TC_VER=4.1.0
+	GDB_VER=6.7.1
+	INSTALLDIR="/c/pspsdk"
+	INSTALLERDIR="/c/pspsdk-installer"
+	PSPSDK_VERSION=0.7.3
+fi
+
 BINUTILS_VER=2.16.1
 NEWLIB_VER=1.15.0
-GDB_VER=6.8
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
+
 PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
 SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
-INSTALLDIR="c:/pspsdk"
 
+ECJ="ecj-latest.jar"
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
+GCC_GCJ="gcc-java-$GCC_VER.tar.bz2"
 GMP="gmp-$GMP_VER.tar.bz2"
 MPFR="mpfr-$MPFR_VER.tar.bz2"
 BINUTILS="binutils-$BINUTILS_VER.tar.bz2"
@@ -25,8 +44,10 @@ MINGW32_GROFF="groff-$MINGW32_GROFF_VER-bin.zip"
 MINGW32_LESS="less-$MINGW32_LESS_VER-bin.zip"
 MINGW32_LESS_DEP="less-$MINGW32_LESS_VER-dep.zip"
 
+ECJ_URL="ftp://sources.redhat.com/pub/java/$ECJ"
 GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
 GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
+GCC_GCJ_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GCJ"
 GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
 MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS"
@@ -56,10 +77,11 @@ target=psp
 #---------------------------------------------------------------------------------
 # configuration finished
 #---------------------------------------------------------------------------------
-
-GCC_TC_VER=4.1.0
-GDB_TC_VER=6.4
-
+if [ "$EXPERIMENTAL" == "yes" ]; then
+	echo "**************************************************************"
+	echo "This is an experimental build!"
+	echo "**************************************************************"
+fi
 
 if test "`svn help`"
 then
@@ -84,10 +106,18 @@ then
 	mkdir -p download
 	cd download
 	$WGET --passive-ftp -c $BINUTILS_URL || { echo "Error: Failed to download "$BINUTILS; exit; }
-	$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
-	$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
+	if [ "$EXPERIMENTAL" == "yes" ]; then
+		$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
+		$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
+	fi
 	$WGET -c $GCC_CORE_URL || { echo "Error: Failed to download "$GCC_CORE; exit; }
 	$WGET -c $GCC_GPP_URL || { echo "Error: Failed to download "$GCC_GPP; exit; }
+	if [ "$WITH_JAVA" == "yes" ]; then
+		$WGET -c $GCC_GCJ_URL || { echo "Error: Failed to download "$GCC_GCJ; exit; }
+		if [ "$EXPERIMENTAL" == "yes" ]; then
+			$WGET -O ecj.jar $ECJ_URL || { echo "Error: Failed to download "$ECJ; exit; }
+		fi
+	fi
 	$WGET -c $GDB_URL || { echo "Error: Failed to download "$GDB; exit; }
 	$WGET --passive-ftp -c $NEWLIB_URL || { echo "Error: Failed to download "$NEWLIB; exit; }
 	$WGET -c $MINGW32_MAKE_URL || { echo "Error: Failed to download "$MINGW32_MAKE; exit; }
@@ -155,14 +185,20 @@ if [ ! -f extracted_archives ]
 then
 	echo "Extracting $BINUTILS"
 	tar -xjf $BUILDSCRIPTDIR/download/$BINUTILS || { echo "Error extracting "$BINUTILS; exit; }
-	echo "Extracting $GMP"
-	tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
-	echo "Extracting $MPFR"
-	tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
+	if [ "$EXPERIMENTAL" == "yes" ]; then
+		echo "Extracting $GMP"
+		tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
+		echo "Extracting $MPFR"
+		tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
+	fi
 	echo "Extracting $GCC_CORE"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
 	echo "Extracting $GCC_GPP"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_GPP || { echo "Error extracting "$GCC_GPP; exit; }
+	if [ "$WITH_JAVA" == "yes" ]; then
+		echo "Extracting $GCC_GCJ"
+		tar -xjf $BUILDSCRIPTDIR/download/$GCC_GCJ || { echo "Error extracting "$GCC_GCJ; exit; }
+	fi
 	echo "Extracting $NEWLIB"
 	tar -xzf $BUILDSCRIPTDIR/download/$NEWLIB || { echo "Error extracting "$NEWLIB; exit; }
 	echo "Extracting $GDB"
@@ -196,6 +232,10 @@ else
 fi
 
 cp -f $scriptdir/patches/* $patchdir
+if [ "$EXPERIMENTAL" == "no" ]; then
+	# non experimental means that we use the stock gcc patch
+	cp $patchdir/gcc-$PS2DEV_TC_VER-PSP.patch $patchdir/gcc-$GCC_VER-PSP.patch
+fi
 
 #---------------------------------------------------------------------------------
 # apply patches
@@ -219,7 +259,7 @@ then
 
 	if [ -f $patchdir/gdb-$GDB_VER-PSP.patch ]
 	then
-		patch -p1 -d $GDB_SRCDIR -i $patchdir/gdb-$GDB_VER-PSP.patch || { echo "Error patching gdb (mingw)"; exit; }
+		patch -p1 -d $GDB_SRCDIR -i $patchdir/gdb-$GDB_VER-PSP.patch || { echo "Error patching gdb"; exit; }
 	fi
 
 	touch patched_sources
@@ -228,10 +268,13 @@ fi
 #---------------------------------------------------------------------------------
 # Build and install devkit components
 #---------------------------------------------------------------------------------
-if [ -f $scriptdir/build-gcc-deps.sh ]
-then
-	. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }
-	cd $BUILDSCRIPTDIR
+if [ "$EXPERIMENTAL" == "yes" ]; then
+	# GCC 4.3 needs GMP and MPFR
+	if [ -f $scriptdir/build-gcc-deps.sh ]
+	then
+		. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }
+		cd $BUILDSCRIPTDIR
+	fi
 fi
 
 if [ -f $scriptdir/build-gcc.sh ]
@@ -240,11 +283,12 @@ then
 	cd $BUILDSCRIPTDIR
 fi
 
-if [ -f $scriptdir/build-crtls.sh ]
-then
-	. $scriptdir/build-crtls.sh || { echo "Error building crtls"; exit; }
-	cd $BUILDSCRIPTDIR
-fi
+# useless step
+#if [ -f $scriptdir/build-crtls.sh ]
+#then
+#	. $scriptdir/build-crtls.sh || { echo "Error building crtls"; exit; }
+#	cd $BUILDSCRIPTDIR
+#fi
 
 if [ -f $scriptdir/build-tools.sh ]
 then

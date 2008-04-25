@@ -3,8 +3,6 @@
 #---------------------------------------------------------------------------------
 # create a distro
 #---------------------------------------------------------------------------------
-INSTALLERDIR=$INSTALLDIR/../pspsdk_installer
-
 [ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
 
 cd $INSTALLERDIR
@@ -61,7 +59,7 @@ mv $INSTALLERDIR/base/psp/sdk/samples $INSTALLERDIR/samples/psp/sdk/samples
 # copy nsis scripts to the installer folder
 cp $BUILDSCRIPTDIR/installer/AddToPath.nsh $INSTALLERDIR
 cp $BUILDSCRIPTDIR/installer/licenses.txt $INSTALLERDIR
-cp $BUILDSCRIPTDIR/installer/setup.nsi $INSTALLERDIR
+sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < $BUILDSCRIPTDIR/installer/setup.nsi > $INSTALLERDIR/setup.nsi
 
 echo
 echo "You should now run the NSIS script to build the final installer"

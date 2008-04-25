@@ -3,6 +3,17 @@
 #---------------------------------------------------------------------------------
 # build and install binutils
 #---------------------------------------------------------------------------------
+if [ "$WITH_JAVA" == "yes" ]; then
+	LANGUAGES="c,c++,java"
+	# --enable-libgcj
+	JAVA_FLAGS="--disable-java-awt --without-x --enable-java-gc=boehm --disable-libgcj-debug --disable-interpreter --enable-hash-synchronization"
+else
+	LANGUAGES="c,c++"
+fi
+
+if [ "$EXPERIMENTAL" == "yes" ]; then
+	EXP_FLAGS="--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs"
+fi
 
 mkdir -p $target/binutils
 cd $target/binutils
@@ -11,8 +22,7 @@ if [ ! -f configured-binutils ]
 then
 	../../$BINUTILS_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=$target --disable-nls --disable-shared --disable-debug \
-		--disable-threads --with-gcc --with-gnu-as --with-gnu-ld --with-stabs \
-		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
+		--disable-threads --with-gcc --with-gnu-as --with-gnu-ld --with-stabs $EXP_FLAGS \
 			|| { echo "Error configuring binutils"; exit 1; }
 	touch configured-binutils
 fi
@@ -40,7 +50,7 @@ cd $target/gcc
 if [ ! -f configured-gcc ]
 then
 	CFLAGS=-D__USE_MINGW_ACCESS ../../$GCC_SRCDIR/configure \
-		--enable-languages=c,c++ \
+		--enable-languages=$LANGUAGES \
 		--disable-multilib\
 		--with-gcc --with-gnu-ld --with-gnu-as\
 		--disable-shared --disable-win32-registry --disable-nls\
@@ -49,7 +59,7 @@ then
 		--target=$target \
 		--with-newlib \
 		--prefix=$INSTALLDIR \
-		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
+		$JAVA_FLAGS $EXP_FLAGS \
 			|| { echo "Error configuring gcc"; exit 1; }
 	touch configured-gcc
 fi
@@ -77,7 +87,7 @@ fi
 
 if [ ! -f patch-psp-sdk ]
 then
-	patch -p1 -d pspsdk -i $patchdir/pspsdk-MINGW.patch || { echo "Error patching PSPSDK"; exit; }
+	patch -p1 -d pspsdk -i $patchdir/pspsdk-MINPSPW.patch || { echo "Error patching PSPSDK"; exit; }
 	touch patch-psp-sdk
 fi
 
@@ -113,7 +123,7 @@ then
 	$BUILDSCRIPTDIR/$NEWLIB_SRCDIR/configure \
 		--target=$target \
 		--prefix=$INSTALLDIR \
-		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
+		$EXP_FLAGS \
 			|| { echo "Error configuring newlib"; exit 1; }
 	touch configured-newlib
 fi
@@ -182,7 +192,7 @@ if [ ! -f configured-gdb ]
 then
 	../../$GDB_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=$target --disable-nls \
-		--with-gmp="$BUILDSCRIPTDIR/gcc-libs" --with-mpfr="$BUILDSCRIPTDIR/gcc-libs" \
+		$EXP_FLAGS \
 			|| { echo "Error configuring gdb"; exit 1; }
 	touch configured-gdb
 fi
