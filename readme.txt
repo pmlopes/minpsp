@@ -23,6 +23,10 @@ Portable handheld videogame system.
 ==========================
  Changelog
 ==========================
+0.7.3
+* Sync to SVN 2385
+* HTTP Browser support added to SDK
+
 0.7.2
 * Sync to PS2DEV SVN
 * Reduce differences between MinPSPW patches and Official patches

@@ -1,6 +1,6 @@
 #!/bin/sh
 EXPERIMENTAL=no
-WITH_JAVA=yes
+WITH_JAVA=no
 
 if [ "$EXPERIMENTAL" == "yes" ]; then
 	GCC_VER=4.3.0

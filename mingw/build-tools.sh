@@ -90,6 +90,7 @@ if [ ! -f install-psplinkusb-psp ]
 then
 	mkdir -p $INSTALLDIR/psplink/psp
 	cp -fR scripts $INSTALLDIR/psplink/psp
+	rm -fR $INSTALLDIR/psplink/psp/scripts/.svn
 	cp -fR v1.0 $INSTALLDIR/psplink/psp
 	cp -fR v1.5 $INSTALLDIR/psplink/psp
 	cp -fR v1.5_nocorrupt $INSTALLDIR/psplink/psp
