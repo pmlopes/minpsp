@@ -78,14 +78,15 @@ FunctionEnd
 ; RemoveFromPath - Remove a given dir from the path
 ;     Input: head of the stack
 ;====================================================
-Function un.RemoveFromPath
+!macro RemoveFromPath UN
+Function ${UN}RemoveFromPath
    Exch $0
    Push $1
    Push $2
    Push $3
    Push $4
    
-   Call un.IsNT
+   Call ${UN}IsNT
    Pop $1
    StrCmp $1 1 unRemoveFromPath_NT
       ; Not on NT
@@ -122,7 +123,7 @@ Function un.RemoveFromPath
  
       Push $1
       Push $0
-      Call un.StrStr ; Find $0 in $1
+      Call ${UN}StrStr ; Find $0 in $1
       Pop $0 ; pos of our dir
       IntCmp $0 -1 unRemoveFromPath_done
          ; else, it is in path
@@ -142,6 +143,10 @@ Function un.RemoveFromPath
    Pop $1
    Pop $0
 FunctionEnd
+!macroend
+!insertmacro RemoveFromPath ""
+!insertmacro RemoveFromPath "un."
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Uninstall sutff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -154,7 +159,8 @@ FunctionEnd
 ;                      second in the stack - string to find in
 ;          Output: head of the stack
 ;====================================================
-Function un.StrStr
+!macro StrStr UN
+Function ${UN}StrStr
   Push $0
   Exch
   Pop $0 ; $0 now have the string to find
@@ -190,4 +196,8 @@ Function un.StrStr
     Pop $0
     Pop $1
 FunctionEnd
+!macroend
+!insertmacro StrStr ""
+!insertmacro StrStr "un."
+
 ;====================================================

@@ -59,6 +59,10 @@ Section "!PSP DevKit" SEC0000
     SetOutPath $INSTDIR
     SetOverwrite on
 
+	# clean up any previous installation
+    Push $INSTDIR\bin
+    Call RemoveFromPath
+	
     Push $INSTDIR\bin
     Call AddToPath
 	
@@ -157,6 +161,7 @@ Section /o "-un.SDK Samples" UNSEC0001
 SectionEnd
 
 Section /o "-un.PSP DevKit" UNSEC0000
+	# clean up any previous installation
     Push $INSTDIR\bin
     Call un.RemoveFromPath
 	

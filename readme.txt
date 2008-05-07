@@ -11,8 +11,6 @@ Portable handheld videogame system.
  TODO
 ==========================
 0.8
-* GCC 4.3.0
-* GDB 6.8
 * make sure debugging works
 * reduce dependency on cygwin
 
@@ -23,9 +21,21 @@ Portable handheld videogame system.
 ==========================
  Changelog
 ==========================
+
+0.7.4
+* Sync to SVN 2387
+ - Added sceUtilityLoadModule() and sceUtilityUnloadModule().
+ - Added the remaining stubs and prototypes for sceAudio*, found from various
+   sources including cooleyes, lteixeira, Saotome, cswindle, Fanjita,
+   SilverSpring.
+
 0.7.3
 * Sync to SVN 2385
 * HTTP Browser support added to SDK
+
+0.8.1
+* GCC 4.3.0
+* GDB 6.8
 
 0.7.2
 * Sync to PS2DEV SVN

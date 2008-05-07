@@ -17,7 +17,7 @@ else
 	GDB_VER=6.7.1
 	INSTALLDIR="/c/pspsdk"
 	INSTALLERDIR="/c/pspsdk-installer"
-	PSPSDK_VERSION=0.7.3
+	PSPSDK_VERSION=0.7.4
 fi
 
 BINUTILS_VER=2.16.1
