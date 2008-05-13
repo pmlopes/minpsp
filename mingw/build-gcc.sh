@@ -11,8 +11,11 @@ else
 	LANGUAGES="c,c++"
 fi
 
-if [ "$EXPERIMENTAL" == "yes" ]; then
+LEGACY_FLAGS="--disable-libstdcxx-pch"
+
+if [ "$LEGACY" == "no" ]; then
 	EXP_FLAGS="--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs"
+	LEGACY_FLAGS=
 fi
 
 mkdir -p $target/binutils
@@ -51,11 +54,10 @@ if [ ! -f configured-gcc ]
 then
 	CFLAGS=-D__USE_MINGW_ACCESS ../../$GCC_SRCDIR/configure \
 		--enable-languages=$LANGUAGES \
-		--disable-multilib\
-		--with-gcc --with-gnu-ld --with-gnu-as\
-		--disable-shared --disable-win32-registry --disable-nls\
-		--enable-cxx-flags="-G0" \
-		--disable-libstdcxx-pch \
+		--disable-multilib \
+		--with-gcc --with-gnu-ld --with-gnu-as \
+		--disable-shared --disable-win32-registry --disable-nls \
+		--enable-cxx-flags="-G0" $LEGACY_FLAGS \
 		--target=$target \
 		--with-newlib \
 		--prefix=$INSTALLDIR \

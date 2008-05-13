@@ -1,23 +1,31 @@
 #!/bin/sh
+
+# legacy means that this script will compile a 4.1.x cross compiler series
+# based entirely on ps2dev.org SVN and scripts
+LEGACY=no
+# this will also download a ecj.jar (the eclipse compiler for GCJava 4.3.0).
+# The download is done but the functionality is still missing.
 EXPERIMENTAL=no
+# this will download and build a GCJ compiler however no libgcj (runtime lib)
+# is built.
 WITH_JAVA=no
 
-if [ "$EXPERIMENTAL" == "yes" ]; then
-	GCC_VER=4.3.0
-	GMP_VER=4.2
-	MPFR_VER=2.3.1
-	GDB_VER=6.8
-	INSTALLDIR="/c/pspsdk430"
-	INSTALLERDIR="/c/pspsdk430-installer"
-	PSPSDK_VERSION=0.8.2
-else
+if [ "$LEGACY" == "yes" ]; then
 	GCC_VER=4.1.2
 	# official patches are for version 4.1.0
 	PS2DEV_TC_VER=4.1.0
 	GDB_VER=6.7.1
-	INSTALLDIR="/c/pspsdk"
+	INSTALLDIR="/c/pspsdk-legacy"
 	INSTALLERDIR="/c/pspsdk-installer"
 	PSPSDK_VERSION=0.7.4
+else
+	GCC_VER=4.3.0
+	GMP_VER=4.2
+	MPFR_VER=2.3.1
+	GDB_VER=6.8
+	INSTALLDIR="/c/pspsdk"
+	INSTALLERDIR="/c/pspsdk-installer"
+	PSPSDK_VERSION=0.8.2
 fi
 
 BINUTILS_VER=2.16.1
@@ -77,9 +85,9 @@ target=psp
 #---------------------------------------------------------------------------------
 # configuration finished
 #---------------------------------------------------------------------------------
-if [ "$EXPERIMENTAL" == "yes" ]; then
+if [ "$LEGACY" == "yes" ]; then
 	echo "**************************************************************"
-	echo "This is an experimental build!"
+	echo "This is a LEGACY build (GCC 4.1.2)!"
 	echo "**************************************************************"
 fi
 
@@ -106,7 +114,7 @@ then
 	mkdir -p download
 	cd download
 	$WGET --passive-ftp -c $BINUTILS_URL || { echo "Error: Failed to download "$BINUTILS; exit; }
-	if [ "$EXPERIMENTAL" == "yes" ]; then
+	if [ "$LEGACY" == "no" ]; then
 		$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
 		$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
 	fi
@@ -185,7 +193,7 @@ if [ ! -f extracted_archives ]
 then
 	echo "Extracting $BINUTILS"
 	tar -xjf $BUILDSCRIPTDIR/download/$BINUTILS || { echo "Error extracting "$BINUTILS; exit; }
-	if [ "$EXPERIMENTAL" == "yes" ]; then
+	if [ "$LEGACY" == "no" ]; then
 		echo "Extracting $GMP"
 		tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
 		echo "Extracting $MPFR"
@@ -232,7 +240,7 @@ else
 fi
 
 cp -f $scriptdir/patches/* $patchdir
-if [ "$EXPERIMENTAL" == "no" ]; then
+if [ "$LEGACY" == "yes" ]; then
 	# non experimental means that we use the stock gcc patch
 	cp $patchdir/gcc-$PS2DEV_TC_VER-PSP.patch $patchdir/gcc-$GCC_VER-PSP.patch
 fi
@@ -268,7 +276,7 @@ fi
 #---------------------------------------------------------------------------------
 # Build and install devkit components
 #---------------------------------------------------------------------------------
-if [ "$EXPERIMENTAL" == "yes" ]; then
+if [ "$LEGACY" == "no" ]; then
 	# GCC 4.3 needs GMP and MPFR
 	if [ -f $scriptdir/build-gcc-deps.sh ]
 	then
@@ -282,13 +290,6 @@ then
 	. $scriptdir/build-gcc.sh || { echo "Error building toolchain"; exit; }
 	cd $BUILDSCRIPTDIR
 fi
-
-# useless step
-#if [ -f $scriptdir/build-crtls.sh ]
-#then
-#	. $scriptdir/build-crtls.sh || { echo "Error building crtls"; exit; }
-#	cd $BUILDSCRIPTDIR
-#fi
 
 if [ -f $scriptdir/build-tools.sh ]
 then
