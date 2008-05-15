@@ -52,7 +52,12 @@ cd $target/gcc
 
 if [ ! -f configured-gcc ]
 then
-	CFLAGS=-D__USE_MINGW_ACCESS ../../$GCC_SRCDIR/configure \
+
+	CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
+	BOOT_CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
+	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer -O2" \
+	BOOT_LDFLAGS=-s \
+	../../$GCC_SRCDIR/configure \
 		--enable-languages=$LANGUAGES \
 		--disable-multilib \
 		--with-gcc --with-gnu-ld --with-gnu-as \

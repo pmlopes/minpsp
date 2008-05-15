@@ -13,14 +13,20 @@ Portable handheld videogame system.
 0.8
 * make sure debugging works
 * reduce dependency on cygwin
-
-0.7
 * Add support for Java
 
 
 ==========================
  Changelog
 ==========================
+
+0.8.3
+* Split installer into 2 packages with doc/without doc for size reasons
+* Test the compiler by compiling all the samples in the TC script
+* Vista Support
+
+0.8.2
+* GCC 4.3.0 & GDB 6.8 are the base versions from now on.
 
 0.7.4
 * Sync to SVN 2387
@@ -107,42 +113,45 @@ http://www.jetcube.eu
 
 1) Set up your environment by installing the following software:
 
-Option A)
 * Follow the Install wizard:
-  MSYS-1.0.11-2004.04.30-1.exe
+ - MSYS-1.0.11-2004.04.30-1.exe
+* You also need some common GNU tools, install then wizard:
+ - msysDTK-1.0.1.exe
 * Then unzip the files over your MSYS installation e.g. (C:\msys)
-  MSYS-1.0.11-20071204.tar.bz2
-  bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
-  coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
-* You also need a Compiler I recommend getting the latest 4.2.1
-  and unzip over C:\msys\mingw
- - binutils-2.18.50-20080109.tar.gz
+ - msysCORE-1.0.11-2007.01.19-1.tar.bz2
+ - MSYS-1.0.11-20071204.tar.bz2
+ - bash-3.1-MSYS-1.0.11-1.tar.bz2
+ - coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
+* You also need a Compiler I recommend getting the 4.2.1 (4.3.0 fails to build
+  properly) unzip over C:\msys\mingw
+ - binutils-2.18.50-20080109-2.tar.gz
  - gcc-core-4.2.1-sjlj-2.tar.gz
  - gcc-g++-4.2.1-sjlj-2.tar.gz
  - mingw-runtime-3.14.tar.gz
  - w32api-3.11.tar.gz
-* You also need some common GNU tools, install then wizard:
- - msysDTK-1.0.1.exe
-* Extras you also need:
+* Extras you also need (unzip over C:\msys\bin):
  - wget-1.9.1-mingwPORT.tar.bz2
  - svn-win32-1.4.6.zip
-* Extras you might want:
  - doxygen 1.5.5
- - graphviz
  - pod2man
- - Windows Python 2.5 (for FreeType docs)
+ - texinfo 4.8 bin
+ - texinfo 4.8 dep
+ - flex 2.5.33
+ - regex 0.12
+* Extras you also need (unzip over C:\msys\local):
+ - graphviz
+* Extras you also need to build from sources (unzip over C:\msys\local):
  - autoconf 2.61
  - automake 1.10
- - texinfo 4.8
+ - libtool 1.5.22
+ - libiconv 1.9.2
+* Extras you might want:
+ - Windows Python 2.5 (for FreeType docs)
   install to C:\msys\local
     
 All these files (except the SVN) you can find at the MINGW sourceforge
 site. http://www.sourceforge.net/projects/mingw
   
-Option B)
-* Download a ziped version of the installation described above from
-  my website.
-
 2) Prepare your environment:
 
 This is a MINGW port of the PSP Toolchain, it means you don't
@@ -162,17 +171,3 @@ Open the MSYS shell and run the script, once you've built the
 Toolchain successfully you don't need that shell anymore.
   
 ./toolchain.sh
-
-
-==========================
- What's should be inside?
-==========================
- 
-autoconf 2.61
-automake 1.10
-GNU make 3.79.1
-gawk 3.0.4
-gcc 4.2.1
-g++ 4.2.1
-makeinfo 4.8
-sed 3.02

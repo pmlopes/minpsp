@@ -1,6 +1,12 @@
 #!/bin/sh
 
 #---------------------------------------------------------------------------------
+# validate the compiler
+#---------------------------------------------------------------------------------
+cd $INSTALLDIR
+find psp/sdk/samples -type f -name "Makefile" | xargs $scriptdir/build-sample.sh $1 || exit 1;
+
+#---------------------------------------------------------------------------------
 # create a distro
 #---------------------------------------------------------------------------------
 [ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
@@ -24,7 +30,7 @@ mv $INSTALLERDIR/base/bin/cygncurses-8.dll $INSTALLERDIR/psplink/bin/
 mv $INSTALLERDIR/base/bin/cygreadline6.dll $INSTALLERDIR/psplink/bin/
 mv $INSTALLERDIR/base/bin/cygwin1.dll $INSTALLERDIR/psplink/bin/
 # move psp psplink
-mv $INSTALLERDIR/base/psplink $INSTALLERDIR/psplink
+#mv $INSTALLERDIR/base/psplink $INSTALLERDIR/psplink
 # move the docs
 mv $INSTALLERDIR/base/man $INSTALLERDIR/documentation/man_info/man
 
@@ -60,6 +66,7 @@ mv $INSTALLERDIR/base/psp/sdk/samples $INSTALLERDIR/samples/psp/sdk/samples
 cp $BUILDSCRIPTDIR/installer/AddToPath.nsh $INSTALLERDIR
 cp $BUILDSCRIPTDIR/installer/licenses.txt $INSTALLERDIR
 sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < $BUILDSCRIPTDIR/installer/setup.nsi > $INSTALLERDIR/setup.nsi
+sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < $BUILDSCRIPTDIR/installer/setup-nodoc.nsi > $INSTALLERDIR/setup-nodoc.nsi
 
 echo
 echo "You should now run the NSIS script to build the final installer"
