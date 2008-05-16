@@ -139,6 +139,21 @@ fi
 
 
 #---------------------------------------------------------------------------------
+# find GCC version
+#---------------------------------------------------------------------------------
+GCC_VERSION=$(gcc --version|grep '(GCC) 4.3.0')
+if [ ! "$GCC_VERSION" == "" ]; then
+	echo "**************************************************************"
+	echo "GCC 4.3.0 is known to have problems building GDB, I'll try to "
+	echo "not assume warnings as errors during the build!"
+	echo "**************************************************************"
+	WITH_MINGW_GCC43=yes
+else
+	WITH_MINGW_GCC43=no
+fi
+export WITH_MINGW_GCC43
+
+#---------------------------------------------------------------------------------
 # find proper make
 #---------------------------------------------------------------------------------
 if [ -z "$MAKE" -a -x "$(which gnumake)" ]; then MAKE=$(which gnumake); fi
@@ -150,7 +165,6 @@ if [ -z "$MAKE" ]; then
 fi
 echo use `$MAKE --version|grep Make` as make
 export MAKE
-
   
 #---------------------------------------------------------------------------------
 # find proper gawk

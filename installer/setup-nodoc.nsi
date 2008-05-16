@@ -60,7 +60,9 @@ Section "!PSP DevKit" SEC0000
     SetOverwrite on
 
 	# clean up any previous installation
-    Push $INSTDIR\bin
+    ReadRegStr $0 HKLM "SOFTWARE\PSP DevKit" Path
+    StrCmp $0 '' +3 +1
+    Push $0\bin
     Call RemoveFromPath
 	
     Push $INSTDIR\bin

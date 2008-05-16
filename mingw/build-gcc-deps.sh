@@ -21,6 +21,12 @@ then
 	touch built-gmp
 fi
 
+if [ ! -f check-gmp ]
+then
+	$MAKE check || { echo "Error checking GMP"; exit 1; }
+	touch check-gmp
+fi
+
 if [ ! -f installed-gmp ]
 then
 	$MAKE install || { echo "Error installing GMP"; exit 1; }
@@ -48,6 +54,12 @@ if [ ! -f built-mpfr ]
 then
 	$MAKE || { echo "Error building MPFR"; exit 1; }
 	touch built-mpfr
+fi
+
+if [ ! -f check-mpfr ]
+then
+	$MAKE check || { echo "Error checking MPFR"; exit 1; }
+	touch check-mpfr
 fi
 
 if [ ! -f installed-mpfr ]

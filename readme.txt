@@ -24,6 +24,8 @@ Portable handheld videogame system.
 * Split installer into 2 packages with doc/without doc for size reasons
 * Test the compiler by compiling all the samples in the TC script
 * Vista Support
+* Upgrade MinGW GCC to 4.3.0, this forces the GDB to be build with -Werror
+  disabled.
 
 0.8.2
 * GCC 4.3.0 & GDB 6.8 are the base versions from now on.
@@ -122,11 +124,10 @@ http://www.jetcube.eu
  - MSYS-1.0.11-20071204.tar.bz2
  - bash-3.1-MSYS-1.0.11-1.tar.bz2
  - coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
-* You also need a Compiler I recommend getting the 4.2.1 (4.3.0 fails to build
-  properly) unzip over C:\msys\mingw
+* You also need a Compiler I recommend getting the 4.3 unzip over C:\msys\mingw
  - binutils-2.18.50-20080109-2.tar.gz
- - gcc-core-4.2.1-sjlj-2.tar.gz
- - gcc-g++-4.2.1-sjlj-2.tar.gz
+ - gcc-part-core-4.3.0-20080502-2-mingw32-alpha-bin.tar.gz
+ - gcc-part-c++-4.3.0-20080502-2-mingw32-alpha-bin.tar.gz
  - mingw-runtime-3.14.tar.gz
  - w32api-3.11.tar.gz
 * Extras you also need (unzip over C:\msys\bin):
@@ -147,7 +148,6 @@ http://www.jetcube.eu
  - libiconv 1.9.2
 * Extras you might want:
  - Windows Python 2.5 (for FreeType docs)
-  install to C:\msys\local
     
 All these files (except the SVN) you can find at the MINGW sourceforge
 site. http://www.sourceforge.net/projects/mingw

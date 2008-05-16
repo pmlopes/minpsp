@@ -11,11 +11,16 @@ else
 	LANGUAGES="c,c++"
 fi
 
-LEGACY_FLAGS="--disable-libstdcxx-pch"
+GCC_EXTRA_FLAGS="--disable-libstdcxx-pch"
+GDB_EXTRA_FLAGS=
 
 if [ "$LEGACY" == "no" ]; then
 	EXP_FLAGS="--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs"
-	LEGACY_FLAGS=
+	GCC_EXTRA_FLAGS=
+fi
+
+if [ "$WITH_MINGW_GCC43" == "yes" ]; then
+	GDB_EXTRA_FLAGS="--disable-werror"
 fi
 
 mkdir -p $target/binutils
@@ -199,7 +204,7 @@ if [ ! -f configured-gdb ]
 then
 	../../$GDB_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=$target --disable-nls \
-		$EXP_FLAGS \
+		$EXP_FLAGS $GDB_EXTRA_FLAGS \
 			|| { echo "Error configuring gdb"; exit 1; }
 	touch configured-gdb
 fi
