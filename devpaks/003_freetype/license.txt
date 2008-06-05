@@ -1,4 +1,3 @@
-
 The  FreeType 2  font  engine is  copyrighted  work and  cannot be  used
 legally  without a  software license.   In  order to  make this  project
 usable  to a vast  majority of  developers, we  distribute it  under two
@@ -8,14 +7,14 @@ This means  that *you* must choose  *one* of the  two licenses described
 below, then obey  all its terms and conditions when  using FreeType 2 in
 any of your projects or products.
 
-  - The FreeType License, found in  the file `FTL.TXT', which is similar
+  - The FreeType License, found in  the file 'FTL.TXT', which is similar
     to the original BSD license *with* an advertising clause that forces
     you  to  explicitly cite  the  FreeType  project  in your  product's
     documentation.  All  details are in the license  file.  This license
     is  suited  to products  which  don't  use  the GNU  General  Public
     License.
 
-  - The GNU  General Public License  version 2, found in  `GPL.TXT' (any
+  - The GNU  General Public License  version 2, found in  'GPL.TXT' (any
     later version can be used  also), for programs which already use the
     GPL.  Note  that the  FTL is  incompatible with the  GPL due  to its
     advertisement clause.
@@ -55,15 +54,15 @@ Introduction
   alike.  As a consequence, its main points are that:
 
     o We don't promise that this software works. However, we will be
-      interested in any kind of bug reports. (`as is' distribution)
+      interested in any kind of bug reports. ('as is' distribution)
 
     o You can  use this software for whatever you  want, in parts or
-      full form, without having to pay us. (`royalty-free' usage)
+      full form, without having to pay us. ('royalty-free' usage)
 
     o You may not pretend that  you wrote this software.  If you use
       it, or  only parts of it,  in a program,  you must acknowledge
       somewhere  in  your  documentation  that  you  have  used  the
-      FreeType code. (`credits')
+      FreeType code. ('credits')
 
   We  specifically  permit  and  encourage  the  inclusion  of  this
   software, with  or without modifications,  in commercial products.
@@ -87,16 +86,16 @@ Legal Terms
 0. Definitions
 --------------
 
-  Throughout this license,  the terms `package', `FreeType Project',
-  and  `FreeType  archive' refer  to  the  set  of files  originally
+  Throughout this license,  the terms 'package', 'FreeType Project',
+  and  'FreeType  archive' refer  to  the  set  of files  originally
   distributed  by the  authors  (David Turner,  Robert Wilhelm,  and
-  Werner Lemberg) as the `FreeType Project', be they named as alpha,
+  Werner Lemberg) as the 'FreeType Project', be they named as alpha,
   beta or final release.
 
-  `You' refers to  the licensee, or person using  the project, where
-  `using' is a generic term including compiling the project's source
-  code as  well as linking it  to form a  `program' or `executable'.
-  This  program is  referred to  as  `a program  using the  FreeType
+  'You' refers to  the licensee, or person using  the project, where
+  'using' is a generic term including compiling the project's source
+  code as  well as linking it  to form a  'program' or 'executable'.
+  This  program is  referred to  as  'a program  using the  FreeType
   engine'.
 
   This  license applies  to all  files distributed  in  the original
@@ -113,7 +112,7 @@ Legal Terms
 1. No Warranty
 --------------
 
-  THE FREETYPE PROJECT  IS PROVIDED `AS IS' WITHOUT  WARRANTY OF ANY
+  THE FREETYPE PROJECT  IS PROVIDED 'AS IS' WITHOUT  WARRANTY OF ANY
   KIND, EITHER  EXPRESS OR IMPLIED,  INCLUDING, BUT NOT  LIMITED TO,
   WARRANTIES  OF  MERCHANTABILITY   AND  FITNESS  FOR  A  PARTICULAR
   PURPOSE.  IN NO EVENT WILL ANY OF THE AUTHORS OR COPYRIGHT HOLDERS
@@ -132,7 +131,7 @@ Legal Terms
   herein, subject to the following conditions:
 
     o Redistribution of  source code  must retain this  license file
-      (`FTL.TXT') unaltered; any  additions, deletions or changes to
+      ('FTL.TXT') unaltered; any  additions, deletions or changes to
       the original  files must be clearly  indicated in accompanying
       documentation.   The  copyright   notices  of  the  unaltered,
       original  files must  be  preserved in  all  copies of  source
@@ -158,8 +157,8 @@ Legal Terms
 
   We suggest,  but do not require, that  you use one or  more of the
   following phrases to refer  to this software in your documentation
-  or advertising  materials: `FreeType Project',  `FreeType Engine',
-  `FreeType library', or `FreeType Distribution'.
+  or advertising  materials: 'FreeType Project',  'FreeType Engine',
+  'FreeType library', or 'FreeType Distribution'.
 
   As  you have  not signed  this license,  you are  not  required to
   accept  it.   However,  as  the FreeType  Project  is  copyrighted
@@ -516,13 +515,13 @@ If the program is interactive, make it output a short notice like this
 when it starts in an interactive mode:
 
     Gnomovision version 69, Copyright (C) year  name of author
-    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+    Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type 'show w'.
     This is free software, and you are welcome to redistribute it
-    under certain conditions; type `show c' for details.
+    under certain conditions; type 'show c' for details.
 
-The hypothetical commands `show w' and `show c' should show the appropriate
+The hypothetical commands 'show w' and 'show c' should show the appropriate
 parts of the General Public License.  Of course, the commands you use may
-be called something other than `show w' and `show c'; they could even be
+be called something other than 'show w' and 'show c'; they could even be
 mouse-clicks or menu items--whatever suits your program.
 
 You should also get your employer (if you work as a programmer) or your
@@ -530,7 +529,7 @@ school, if any, to sign a "copyright disclaimer" for the program, if
 necessary.  Here is a sample; alter the names:
 
   Yoyodyne, Inc., hereby disclaims all copyright interest in the program
-  `Gnomovision' (which makes passes at compilers) written by James Hacker.
+  'Gnomovision' (which makes passes at compilers) written by James Hacker.
 
   <signature of Ty Coon>, 1 April 1989
   Ty Coon, President of Vice
