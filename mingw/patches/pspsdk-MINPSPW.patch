@@ -22,6 +22,19 @@ diff -Naur pspsdk.orig/configure.ac pspsdk/configure.ac
  PSPSDK_CXXFLAGS="$PSPSDK_CFLAGS -fno-exceptions -fno-rtti"
  AC_SUBST(PSPSDK_CFLAGS)
  AC_SUBST(PSPSDK_CXXFLAGS)
+diff -Naur pspsdk.orig/src/prof/prof.c pspsdk/src/prof/prof.c
+--- pspsdk.orig/src/prof/prof.c
++++ pspsdk/src/prof/prof.c
+@@ -79,7 +79,8 @@
+ extern int _etext;
+ 
+ /* forward declarations */
+-void gprof_cleanup();
++void gprof_cleanup(void);
++void __mcount(unsigned int, unsigned int);
+ static SceUInt timer_handler(SceUID uid, SceKernelSysClock *c1, SceKernelSysClock *c2, void *common);
+ 
+ /** Initializes pg library
 diff -Naur pspsdk.orig/tools/psp-config.c pspsdk/tools/psp-config.c
 --- pspsdk.orig/tools/psp-config.c
 +++ pspsdk/tools/psp-config.c
