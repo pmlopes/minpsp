@@ -1,24 +1,37 @@
-====================
- What does this do?
-====================
+Welcome to the MINPSPW (Minimalist PSP homebrew SDK for Windows).
+
+With this SDK you are able to code your own applications for the amazing
+device that is the Sony PlayStation Portable. If you finished the installation
+and you are reading this document you are ready to code.
+
+Pick the code examples from the psp/sdk/samples directory and investigate
+the code. To write your own applications, just grab your favourite IDE for
+C/C++ and start right away, use the makefile templates from the samples
+directory and remember that the compiler is based on GNU GCC compiler set
+so no Microsoft extensions are available for you.
+
+
+===============================================================================
+ If you got this as a collection of shell scripts
+===============================================================================
 
 This program will automatically build and install a compiler and other
 tools used in the creation of homebrew software for the Sony Playstation
 Portable handheld videogame system.
 
 
-==========================
+===============================================================================
  TODO
-==========================
+===============================================================================
 0.8
 * make sure debugging works
 * reduce dependency on cygwin
 * Add support for Java
 
 
-==========================
+===============================================================================
  Changelog
-==========================
+===============================================================================
 
 0.8.3
 * Split installer into 2 packages with doc/without doc for size reasons
@@ -83,9 +96,9 @@ Portable handheld videogame system.
 * Started the concept of DEVPAKs
 
 
-==========================
+===============================================================================
  What's different?
-==========================
+===============================================================================
  
 The main difference is that this is a native cross compiler for Microsoft
 Windows Operating Systems.
@@ -96,9 +109,9 @@ instead of the initial release 4.1.0 (this means some bugs were fixed).
 Third, you can run it directly from a Dos Command Prompt BOX or from your
 favourite IDE (Eclipse and Visual Studio Express tested)
   
-==========================
+===============================================================================
  Where do I go from here?
-==========================
+===============================================================================
 
 Visit the following sites to learn more:
 
@@ -109,9 +122,9 @@ My MINGW specific stuff:
 http://www.jetcube.eu
 
 
-==================
+===============================================================================
  How to build it myself?
-==================
+===============================================================================
 
 1) Set up your environment by installing the following software:
 

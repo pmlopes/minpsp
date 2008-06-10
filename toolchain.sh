@@ -3,12 +3,8 @@
 # legacy means that this script will compile a 4.1.x cross compiler series
 # based entirely on ps2dev.org SVN and scripts
 LEGACY=no
-# this will also download a ecj.jar (the eclipse compiler for GCJava 4.3.0).
-# The download is done but the functionality is still missing.
+# enable muti threading during the make phase
 EXPERIMENTAL=no
-# this will download and build a GCJ compiler however no libgcj (runtime lib)
-# is built.
-WITH_JAVA=no
 
 if [ "$LEGACY" == "yes" ]; then
 	GCC_VER=4.1.2
@@ -19,13 +15,21 @@ if [ "$LEGACY" == "yes" ]; then
 	INSTALLERDIR="/c/pspsdk-installer"
 	PSPSDK_VERSION=0.7.4
 else
-	GCC_VER=4.3.0
+	GCC_VER=4.3.1
+	# patch was for 4.3.0
+	GCC_PATCH_VER=4.3.0
 	GMP_VER=4.2
 	MPFR_VER=2.3.1
 	GDB_VER=6.8
 	INSTALLDIR="/c/pspsdk"
 	INSTALLERDIR="/c/pspsdk-installer"
-	PSPSDK_VERSION=0.8.2
+	PSPSDK_VERSION=0.8.3
+fi
+
+if [ "$EXPERIMENTAL" == "yes" ]; then
+	MAKE_THREADS="-j 2"
+else
+	MAKE_THREADS=
 fi
 
 BINUTILS_VER=2.16.1
@@ -33,14 +37,13 @@ NEWLIB_VER=1.15.0
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
+PTHREADS_VER=2-8-0
 
 PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
 SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 
-ECJ="ecj-latest.jar"
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
-GCC_GCJ="gcc-java-$GCC_VER.tar.bz2"
 GMP="gmp-$GMP_VER.tar.bz2"
 MPFR="mpfr-$MPFR_VER.tar.bz2"
 BINUTILS="binutils-$BINUTILS_VER.tar.bz2"
@@ -52,10 +55,8 @@ MINGW32_GROFF="groff-$MINGW32_GROFF_VER-bin.zip"
 MINGW32_LESS="less-$MINGW32_LESS_VER-bin.zip"
 MINGW32_LESS_DEP="less-$MINGW32_LESS_VER-dep.zip"
 
-ECJ_URL="ftp://sources.redhat.com/pub/java/$ECJ"
 GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
 GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
-GCC_GCJ_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GCJ"
 GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
 MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS"
@@ -109,7 +110,7 @@ fi
 
 [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
 
-if [ ! -f downloaded_sources ]
+if [ ! -f download_archives ]
 then
 	mkdir -p download
 	cd download
@@ -120,12 +121,6 @@ then
 	fi
 	$WGET -c $GCC_CORE_URL || { echo "Error: Failed to download "$GCC_CORE; exit; }
 	$WGET -c $GCC_GPP_URL || { echo "Error: Failed to download "$GCC_GPP; exit; }
-	if [ "$WITH_JAVA" == "yes" ]; then
-		$WGET -c $GCC_GCJ_URL || { echo "Error: Failed to download "$GCC_GCJ; exit; }
-		if [ "$EXPERIMENTAL" == "yes" ]; then
-			$WGET -O ecj.jar $ECJ_URL || { echo "Error: Failed to download "$ECJ; exit; }
-		fi
-	fi
 	$WGET -c $GDB_URL || { echo "Error: Failed to download "$GDB; exit; }
 	$WGET --passive-ftp -c $NEWLIB_URL || { echo "Error: Failed to download "$NEWLIB; exit; }
 	$WGET -c $MINGW32_MAKE_URL || { echo "Error: Failed to download "$MINGW32_MAKE; exit; }
@@ -134,7 +129,7 @@ then
 	$WGET -c $MINGW32_LESS_URL || { echo "Error: Failed to download "$MINGW32_LESS; exit; }
 	$WGET -c $MINGW32_LESS_DEP_URL || { echo "Error: Failed to download "$MINGW32_LESS_DEP; exit; }
 	cd ..
-	touch downloaded_sources
+	touch download_archives
 fi
 
 
@@ -158,6 +153,8 @@ export WITH_MINGW_GCC43
 #---------------------------------------------------------------------------------
 if [ -z "$MAKE" -a -x "$(which gnumake)" ]; then MAKE=$(which gnumake); fi
 if [ -z "$MAKE" -a -x "$(which gmake)" ]; then MAKE=$(which gmake); fi
+# msys make 3.81 was updated to support .S and .s distinguish and named cpmake
+if [ -z "$MAKE" -a -x "$(which cpmake)" ]; then MAKE=$(which cpmake); fi
 if [ -z "$MAKE" -a -x "$(which make)" ]; then MAKE=$(which make); fi
 if [ -z "$MAKE" ]; then
 	echo no make found
@@ -217,10 +214,6 @@ then
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
 	echo "Extracting $GCC_GPP"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_GPP || { echo "Error extracting "$GCC_GPP; exit; }
-	if [ "$WITH_JAVA" == "yes" ]; then
-		echo "Extracting $GCC_GCJ"
-		tar -xjf $BUILDSCRIPTDIR/download/$GCC_GCJ || { echo "Error extracting "$GCC_GCJ; exit; }
-	fi
 	echo "Extracting $NEWLIB"
 	tar -xzf $BUILDSCRIPTDIR/download/$NEWLIB || { echo "Error extracting "$NEWLIB; exit; }
 	echo "Extracting $GDB"
@@ -269,9 +262,9 @@ then
 		patch -p1 -d $BINUTILS_SRCDIR -i $patchdir/binutils-$BINUTILS_VER-PSP.patch || { echo "Error patching binutils"; exit; }
 	fi
 
-	if [ -f $patchdir/gcc-$GCC_VER-PSP.patch ]
+	if [ -f $patchdir/gcc-$GCC_PATCH_VER-PSP.patch ]
 	then
-		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_VER-PSP.patch || { echo "Error patching gcc"; exit; }
+		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_PATCH_VER-PSP.patch || { echo "Error patching gcc"; exit; }
 	fi
 
 	if [ -f $patchdir/newlib-$NEWLIB_VER-PSP.patch ]
@@ -279,6 +272,11 @@ then
 		patch -p1 -d $NEWLIB_SRCDIR -i $patchdir/newlib-$NEWLIB_VER-PSP.patch || { echo "Error patching newlib"; exit; }
 	fi
 
+	if [ -f $patchdir/newlib-$NEWLIB_VER-MINPSPW.patch ]
+	then
+		patch -p1 -d $NEWLIB_SRCDIR -i $patchdir/newlib-$NEWLIB_VER-MINPSPW.patch || { echo "Error patching newlib (MINPSPW)"; exit; }
+	fi
+	
 	if [ -f $patchdir/gdb-$GDB_VER-PSP.patch ]
 	then
 		patch -p1 -d $GDB_SRCDIR -i $patchdir/gdb-$GDB_VER-PSP.patch || { echo "Error patching gdb"; exit; }
@@ -291,7 +289,7 @@ fi
 # Build and install devkit components
 #---------------------------------------------------------------------------------
 if [ "$LEGACY" == "no" ]; then
-	# GCC 4.3 needs GMP and MPFR
+	# GCC 4.3 needs GMP and MPFR and pthreads
 	if [ -f $scriptdir/build-gcc-deps.sh ]
 	then
 		. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }

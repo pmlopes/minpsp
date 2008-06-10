@@ -1,22 +1,9 @@
 #!/bin/sh
 
-#---------------------------------------------------------------------------------
-# build and install binutils
-#---------------------------------------------------------------------------------
-if [ "$WITH_JAVA" == "yes" ]; then
-	LANGUAGES="c,c++,java"
-	# --enable-libgcj
-	JAVA_FLAGS="--disable-java-awt --without-x --enable-java-gc=boehm --disable-libgcj-debug --disable-interpreter --enable-hash-synchronization"
-else
-	LANGUAGES="c,c++"
-fi
-
-GCC_EXTRA_FLAGS="--disable-libstdcxx-pch"
-GDB_EXTRA_FLAGS=
+LANGUAGES="c,c++"
 
 if [ "$LEGACY" == "no" ]; then
 	EXP_FLAGS="--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs"
-	GCC_EXTRA_FLAGS=
 fi
 
 if [ "$WITH_MINGW_GCC43" == "yes" ]; then
@@ -37,7 +24,7 @@ fi
 
 if [ ! -f built-binutils ]
 then
-	$MAKE || { echo "Error building binutils"; exit 1; }
+	$MAKE $MAKE_THREADS || { echo "Error building binutils"; exit 1; }
 	touch built-binutils
 fi
 
@@ -67,11 +54,11 @@ then
 		--disable-multilib \
 		--with-gcc --with-gnu-ld --with-gnu-as \
 		--disable-shared --disable-win32-registry --disable-nls \
-		--enable-cxx-flags="-G0" $LEGACY_FLAGS \
+		--enable-cxx-flags="-G0" \
 		--target=$target \
 		--with-newlib \
 		--prefix=$INSTALLDIR \
-		$JAVA_FLAGS $EXP_FLAGS \
+		$EXP_FLAGS \
 			|| { echo "Error configuring gcc"; exit 1; }
 	touch configured-gcc
 fi
@@ -142,7 +129,7 @@ fi
 
 if [ ! -f built-newlib ]
 then
-	$MAKE || { echo "Error building newlib"; exit 1; }
+	$MAKE $MAKE_THREADS || { echo "Error building newlib"; exit 1; }
 	touch built-newlib
 fi
 
@@ -163,7 +150,7 @@ cd $target/gcc
 
 if [ ! -f built-g++ ]
 then
-	$MAKE || { echo "Error building g++"; exit 1; }
+	$MAKE $MAKE_THREADS || { echo "Error building g++"; exit 1; }
 	touch built-g++
 fi
 
@@ -182,7 +169,7 @@ cd pspsdk
 
 if [ ! -f built-sdk ]
 then
-	$MAKE || { echo "ERROR BUILDING PSPSDK"; exit 1; }
+	$MAKE $MAKE_THREADS || { echo "ERROR BUILDING PSPSDK"; exit 1; }
 	touch built-sdk
 fi
 
@@ -211,7 +198,7 @@ fi
 
 if [ ! -f built-gdb ]
 then
-	$MAKE || { echo "Error building gdb"; exit 1; }
+	$MAKE $MAKE_THREADS || { echo "Error building gdb"; exit 1; }
 	touch built-gdb
 fi
 
