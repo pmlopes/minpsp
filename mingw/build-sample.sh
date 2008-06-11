@@ -2,7 +2,7 @@
 if [ "$LEGACY" == "yes" ]; then
 	INSTALLDIR="/c/pspsdk-legacy"
 else
-	INSTALLDIR="/c/pspsdk32"
+	INSTALLDIR="/c/pspsdk"
 fi
 
 while [ $# -gt 0 ]; do
