@@ -23,7 +23,7 @@ else
 	GDB_VER=6.8
 	INSTALLDIR="/c/pspsdk"
 	INSTALLERDIR="/c/pspsdk-installer"
-	PSPSDK_VERSION=0.8.3
+	PSPSDK_VERSION=0.8.4
 fi
 
 if [ "$EXPERIMENTAL" == "yes" ]; then
