@@ -1,0 +1,1181 @@
+Index: Body.cpp
+===================================================================
+--- Body.cpp	(revision 36)
++++ Body.cpp	(working copy)
+@@ -111,7 +111,7 @@
+ 
+ void Body::setMassIndividual(unsigned int index, float mass)
+ {
+-    if ((index >= 0) && (index < mPointMasses.size()))
++    if (index < mPointMasses.size())
+         mPointMasses[index]->Mass = mass;
+ }
+ 
+Index: demo/EBOOT.PBP
+===================================================================
+Cannot display: file marked as a binary type.
+svn:mime-type = application/octet-stream
+Index: demo/main.cpp
+===================================================================
+--- demo/main.cpp	(revision 0)
++++ demo/main.cpp	(revision 0)
+@@ -0,0 +1,445 @@
++#include <stdlib.h> // needed in order to have "exit" function @@@
++#include <math.h>
++
++#include <GL/glut.h>    // Header File For The GLUT Library 
++#include <GL/gl.h>	// Header File For The OpenGL32 Library
++#include <GL/glu.h>	// Header File For The GLu32 Library
++
++#include <vector>
++
++#include "Vector2.h"
++#include "Vector3.h"
++#include "VectorTools.h"
++#include "AABB.h"
++#include "Bitmask.h"
++#include "PointMass.h"
++#include "InternalSpring.h"
++#include "ClosedShape.h"
++#include "Body.h"
++#include "SpringBody.h"
++#include "PressureBody.h"
++#include "World.h"
++
++int mousedown = 0;
++float xMouse, yMouse;
++int window; 
++
++bool mouseD = false;
++bool springy = true;
++bool pressure = true;
++
++World mWorld;
++Body *bod;
++
++std::vector<SpringBody*> springBodies;
++std::vector<PressureBody*> pressureBodies;
++
++ClosedShape *ball,*springI,*box;
++
++PressureBody *pb;
++
++SpringBody *leftB,*rightB,*dragBody;
++
++float dragX,dragY;
++int dragPoint = -1;
++
++/* A general OpenGL initialization function.  Sets all of the initial parameters. */
++void InitGL(int Width, int Height)	        // We call this right after our OpenGL window is created.
++{
++	glClearColor(1.0f, 1.0f, 1.0f, 0.5f);		// This Will Clear The Background Color To Black
++	glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
++	glDepthFunc(GL_LESS);				// The Type Of Depth Test To Do
++	glEnable(GL_DEPTH_TEST);			// Enables Depth Testing
++	glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
++
++	glMatrixMode(GL_PROJECTION);
++	glLoadIdentity();				// Reset The Projection Matrix
++
++	glOrtho(-25,25,-21,21,-2,2);
++
++	glMatrixMode(GL_MODELVIEW);
++
++	ClosedShape *shape1 = new ClosedShape();
++	shape1->begin();
++	shape1->addVertex(Vector2(-20.0f, -1.0f));
++	shape1->addVertex(Vector2(-20.0f, 1.0f));
++	shape1->addVertex(Vector2(20.0f, 1.0f));
++	shape1->addVertex(Vector2(20.0f, -1.0f));
++	shape1->finish();
++
++	bod = new Body(shape1,0.0f,Vector2(0.0f, -19.0f),0.0f,Vector2(1.0f, 1.0f),false);
++	mWorld.addBody(bod);
++
++	//ball shape
++	ball = new ClosedShape();
++	ball->begin();
++	for (int i = 0; i < 360; i += 40)
++    {
++		ball->addVertex(Vector2(cos(VectorTools::ToRadians((float)-i)), sin(VectorTools::ToRadians((float)-i))));
++    }
++	ball->finish();
++
++
++	//I shape
++	springI = new ClosedShape();
++    springI->begin();
++    springI->addVertex(Vector2(-1.5f, 2.0f));
++    springI->addVertex(Vector2(-0.5f, 2.0f));
++    springI->addVertex(Vector2(0.5f, 2.0f));
++    springI->addVertex(Vector2(1.5f, 2.0f));
++    springI->addVertex(Vector2(1.5f, 1.0f));
++    springI->addVertex(Vector2(0.5f, 1.0f));
++    springI->addVertex(Vector2(0.5f, -1.0f));
++    springI->addVertex(Vector2(1.5f, -1.0f));
++    springI->addVertex(Vector2(1.5f, -2.0f));
++    springI->addVertex(Vector2(0.5f, -2.0f));
++    springI->addVertex(Vector2(-0.5f, -2.0f));
++    springI->addVertex(Vector2(-1.5f, -2.0f));
++    springI->addVertex(Vector2(-1.5f, -1.0f));
++    springI->addVertex(Vector2(-0.5f, -1.0f));
++    springI->addVertex(Vector2(-0.5f, 1.0f));
++    springI->addVertex(Vector2(-1.5f, 1.0f));
++    springI->finish();
++
++
++
++	leftB = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(-5, -5), 0.0f, Vector2::One,false);
++	leftB->addInternalSpring(0, 14, 300.0f, 10.0f);
++    leftB->addInternalSpring(1, 14, 300.0f, 10.0f);
++    leftB->addInternalSpring(1, 15, 300.0f, 10.0f);
++    leftB->addInternalSpring(1, 5, 300.0f, 10.0f);
++    leftB->addInternalSpring(2, 14, 300.0f, 10.0f);
++    leftB->addInternalSpring(2, 5, 300.0f, 10.0f);
++    leftB->addInternalSpring(1, 5, 300.0f, 10.0f);
++    leftB->addInternalSpring(14, 5, 300.0f, 10.0f);
++    leftB->addInternalSpring(2, 4, 300.0f, 10.0f);
++    leftB->addInternalSpring(3, 5, 300.0f, 10.0f);
++    leftB->addInternalSpring(14, 6, 300.0f, 10.0f);
++    leftB->addInternalSpring(5, 13, 300.0f, 10.0f);
++    leftB->addInternalSpring(13, 6, 300.0f, 10.0f);
++    leftB->addInternalSpring(12, 10, 300.0f, 10.0f);
++    leftB->addInternalSpring(13, 11, 300.0f, 10.0f);
++    leftB->addInternalSpring(13, 10, 300.0f, 10.0f);
++    leftB->addInternalSpring(13, 9, 300.0f, 10.0f);
++    leftB->addInternalSpring(6, 10, 300.0f, 10.0f);
++    leftB->addInternalSpring(6, 9, 300.0f, 10.0f);
++    leftB->addInternalSpring(6, 8, 300.0f, 10.0f);
++    leftB->addInternalSpring(7, 9, 300.0f, 10.0f);
++
++	// polygons!
++    leftB->addTriangle(0, 15, 1);
++    leftB->addTriangle(1, 15, 14);
++    leftB->addTriangle(1, 14, 5);
++    leftB->addTriangle(1, 5, 2);
++    leftB->addTriangle(2, 5, 4);
++    leftB->addTriangle(2, 4, 3);
++    leftB->addTriangle(14, 13, 6);
++    leftB->addTriangle(14, 6, 5);
++    leftB->addTriangle(12, 11, 10);
++    leftB->addTriangle(12, 10, 13);
++    leftB->addTriangle(13, 10, 9);
++    leftB->addTriangle(13, 9, 6);
++    leftB->addTriangle(6, 9, 8);
++    leftB->addTriangle(6, 8, 7);
++    leftB->finalizeTriangles();
++
++	mWorld.addBody(leftB);
++	springBodies.push_back(leftB);
++   
++	rightB = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(5, -5), 0.0f, Vector2::One,false);
++	rightB->addInternalSpring(0, 14, 300.0f, 10.0f);
++    rightB->addInternalSpring(1, 14, 300.0f, 10.0f);
++    rightB->addInternalSpring(1, 15, 300.0f, 10.0f);
++    rightB->addInternalSpring(1, 5, 300.0f, 10.0f);
++    rightB->addInternalSpring(2, 14, 300.0f, 10.0f);
++    rightB->addInternalSpring(2, 5, 300.0f, 10.0f);
++    rightB->addInternalSpring(1, 5, 300.0f, 10.0f);
++    rightB->addInternalSpring(14, 5, 300.0f, 10.0f);
++    rightB->addInternalSpring(2, 4, 300.0f, 10.0f);
++    rightB->addInternalSpring(3, 5, 300.0f, 10.0f);
++    rightB->addInternalSpring(14, 6, 300.0f, 10.0f);
++    rightB->addInternalSpring(5, 13, 300.0f, 10.0f);
++    rightB->addInternalSpring(13, 6, 300.0f, 10.0f);
++    rightB->addInternalSpring(12, 10, 300.0f, 10.0f);
++    rightB->addInternalSpring(13, 11, 300.0f, 10.0f);
++    rightB->addInternalSpring(13, 10, 300.0f, 10.0f);
++    rightB->addInternalSpring(13, 9, 300.0f, 10.0f);
++    rightB->addInternalSpring(6, 10, 300.0f, 10.0f);
++    rightB->addInternalSpring(6, 9, 300.0f, 10.0f);
++    rightB->addInternalSpring(6, 8, 300.0f, 10.0f);
++    rightB->addInternalSpring(7, 9, 300.0f, 10.0f);
++	// polygons!
++    rightB->addTriangle(0, 15, 1);
++    rightB->addTriangle(1, 15, 14);
++    rightB->addTriangle(1, 14, 5);
++    rightB->addTriangle(1, 5, 2);
++    rightB->addTriangle(2, 5, 4);
++    rightB->addTriangle(2, 4, 3);
++    rightB->addTriangle(14, 13, 6);
++    rightB->addTriangle(14, 6, 5);
++    rightB->addTriangle(12, 11, 10);
++    rightB->addTriangle(12, 10, 13);
++    rightB->addTriangle(13, 10, 9);
++    rightB->addTriangle(13, 9, 6);
++    rightB->addTriangle(6, 9, 8);
++    rightB->addTriangle(6, 8, 7);
++    rightB->finalizeTriangles();
++
++	mWorld.addBody(rightB);
++	springBodies.push_back(rightB);
++}
++
++/* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
++void ReSizeGLScene(int Width, int Height)
++{
++  if (Height==0)				// Prevent A Divide By Zero If The Window Is Too Small
++    Height=1;
++
++  glViewport(0, 0, Width, Height);		// Reset The Current Viewport And Perspective Transformation
++
++  glMatrixMode(GL_PROJECTION);
++  glLoadIdentity();
++
++  glOrtho(-25,25,-21,21,-2,2);
++  glMatrixMode(GL_MODELVIEW);
++}
++
++/* The main drawing function. */
++void DrawGLScene()
++{
++	//physic update
++	for(int i = 0;i < 5;i++)
++		mWorld.update((1.0f/80.0f));
++
++
++	//dragging
++	if (mouseD == true)
++    {
++        if (dragBody != NULL)
++        {
++           PointMass *pm = dragBody->getPointMass(dragPoint);
++			dragBody->setDragForce(VectorTools::calculateSpringForce(pm->Position, pm->Velocity, Vector2(xMouse,yMouse), Vector2::ZERO, 0.0f, 100.0f, 10.0f), dragPoint);
++        }
++    }
++    else
++    {
++        dragBody = NULL;
++        dragPoint = -1;
++    }
++
++	if(mouseD == true)
++	{
++		if(dragBody == NULL)
++		{
++			int body;
++            mWorld.getClosestPointMass(Vector2(xMouse,yMouse), body, dragPoint);
++			if(mWorld.getBody(body)->Type == 2)
++				dragBody = (SpringBody*)mWorld.getBody(body);
++		}
++	}
++
++	//rendering
++	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
++	glLoadIdentity();		
++
++	//floor
++	bod->DrawMe();
++
++	//pressure
++	for(unsigned int i = 0;i < pressureBodies.size();i++)
++		pressureBodies[i]->DrawMe();
++
++	//cursor
++	for(unsigned int i = 0;i < springBodies.size();i++)
++		springBodies[i]->DrawMe();
++	  
++	  
++	//draw pointer
++	glColor3f(1,0,0);
++	glBegin(GL_QUADS);
++		glVertex3f(xMouse-0.2f,yMouse+0.2f,0);
++		glVertex3f(xMouse+0.2f,yMouse+0.2f,0);
++		glVertex3f(xMouse+0.2f,yMouse-0.2f,0);
++		glVertex3f(xMouse-0.2f,yMouse-0.2f,0);
++	glEnd();
++	
++	//draw line from body to cursor
++	if(dragBody != NULL)
++	{
++		Renderer::RenderLine(dragBody->getPointMass(dragPoint)->Position,Vector2(xMouse,yMouse),0,0,1);
++	}
++ 
++  glutSwapBuffers();
++}
++
++/* The function called whenever a key is pressed. */
++// @@@ this function is  modified to use PSP pad
++void keyPressed(unsigned char key, int x, int y) 
++{
++	/*
++	KEY_ASCII(1,'d'),		 PSP_CTRL_TRIANGLE = 0x001000 
++	KEY_ASCII(1,'o'),		 PSP_CTRL_CIRCLE   = 0x002000 
++	KEY_ASCII(1,'x'),		 PSP_CTRL_CROSS    = 0x004000 
++	KEY_ASCII(1,'q'),		 PSP_CTRL_SQUARE   = 0x008000 */
++ 	switch (key) {
++	case 'a':			/* startbutton */ /* If START is pressed, kill everything. */
++
++		exit(0);
++	break;
++	case 'd':
++		mouseD = true;
++		
++	break;
++	case 'q':
++		if(springy == true)
++		{
++			//add pressure body
++						
++			SpringBody *sBody = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(-5.0f, -5.0f), 0.0f, Vector2::One,false);
++			sBody->addInternalSpring(0, 14, 300.0f, 10.0f);
++			sBody->addInternalSpring(1, 14, 300.0f, 10.0f);
++			sBody->addInternalSpring(1, 15, 300.0f, 10.0f);
++			sBody->addInternalSpring(1, 5, 300.0f, 10.0f);
++			sBody->addInternalSpring(2, 14, 300.0f, 10.0f);
++			sBody->addInternalSpring(2, 5, 300.0f, 10.0f);
++			sBody->addInternalSpring(1, 5, 300.0f, 10.0f);
++			sBody->addInternalSpring(14, 5, 300.0f, 10.0f);
++			sBody->addInternalSpring(2, 4, 300.0f, 10.0f);
++			sBody->addInternalSpring(3, 5, 300.0f, 10.0f);
++			sBody->addInternalSpring(14, 6, 300.0f, 10.0f);
++			sBody->addInternalSpring(5, 13, 300.0f, 10.0f);
++			sBody->addInternalSpring(13, 6, 300.0f, 10.0f);
++			sBody->addInternalSpring(12, 10, 300.0f, 10.0f);
++			sBody->addInternalSpring(13, 11, 300.0f, 10.0f);
++			sBody->addInternalSpring(13, 10, 300.0f, 10.0f);
++			sBody->addInternalSpring(13, 9, 300.0f, 10.0f);
++			sBody->addInternalSpring(6, 10, 300.0f, 10.0f);
++			sBody->addInternalSpring(6, 9, 300.0f, 10.0f);
++			sBody->addInternalSpring(6, 8, 300.0f, 10.0f);
++			sBody->addInternalSpring(7, 9, 300.0f, 10.0f);
++
++			// polygons!
++			sBody->addTriangle(0, 15, 1);
++			sBody->addTriangle(1, 15, 14);
++			sBody->addTriangle(1, 14, 5);
++			sBody->addTriangle(1, 5, 2);
++			sBody->addTriangle(2, 5, 4);
++			sBody->addTriangle(2, 4, 3);
++			sBody->addTriangle(14, 13, 6);
++			sBody->addTriangle(14, 6, 5);
++			sBody->addTriangle(12, 11, 10);
++			sBody->addTriangle(12, 10, 13);
++			sBody->addTriangle(13, 10, 9);
++			sBody->addTriangle(13, 9, 6);
++			sBody->addTriangle(6, 9, 8);
++			sBody->addTriangle(6, 8, 7);
++			sBody->finalizeTriangles();
++
++			mWorld.addBody(sBody);
++			springBodies.push_back(sBody);
++
++			springy = false;
++		}
++		break;
++	case 'o':
++		if(pressure == true)
++		{
++			PressureBody * pressureBody = new PressureBody(ball, 1.0f, 50.0f, 10.0f, 1.0f, 300.0f, 20.0f, Vector2(0, -10), 0, Vector2(1.5f,1.5f),false);
++
++			mWorld.addBody(pressureBody);
++			pressureBodies.push_back(pressureBody);
++
++			pressure = false;
++		}
++		break;
++	
++	default:
++		;
++	}
++}
++
++void special(int key, int x, int y)
++{
++	switch(key)
++	{
++		case GLUT_KEY_LEFT:
++			xMouse-=1.0f;
++		break;
++		case GLUT_KEY_RIGHT:
++			xMouse+=1.0f;
++		break;
++		case GLUT_KEY_UP:
++			yMouse+=1.0f;
++		break;
++		case GLUT_KEY_DOWN:
++			yMouse-=1.0f;
++		break;
++		default:
++		;
++	}
++}
++
++void keyup (unsigned char key, int x, int y)
++{
++	switch (key) {
++	case 'd':
++		mouseD = false;
++	break;
++	case 'q':
++		springy = true;
++		break;
++	case 'o':
++		pressure = true;
++		break;
++	default:
++		;
++	}
++}
++
++int main(int argc, char **argv) 
++{  
++  /* Initialize GLUT state - glut will take any command line arguments that pertain to it or 
++     X Windows - look at its documentation at http://reality.sgi.com/mjk/spec3/spec3.html */  
++  glutInit(&argc, argv);  
++
++  /* Select type of Display mode:   
++     Double buffer 
++     RGBA color
++     Alpha components supported 
++     Depth buffer */  
++  glutInitDisplayMode( GLUT_DOUBLE );  
++
++  /* get a 640 x 480 window */
++  glutInitWindowSize(480, 272);  // @@@
++
++  /* the window starts at the upper left corner of the screen */
++  glutInitWindowPosition(0, 0);  
++
++  /* Open a window */  
++  window = glutCreateWindow("Soft Body Test");  
++
++  /* Register the function to do all our OpenGL drawing. */
++  glutDisplayFunc(&DrawGLScene);  
++
++  /* Go fullscreen.  This is as soon as possible. */
++//  glutFullScreen(); @@@ there is no glutFullScreen in pspgl
++
++  /* Even if there are no events, redraw our gl scene. */
++  glutIdleFunc(&DrawGLScene);
++
++  /* Register the function called when our window is resized. */
++  glutReshapeFunc(&ReSizeGLScene);
++
++  /* Register the function called when the keyboard is pressed. */
++  glutKeyboardFunc(&keyPressed);
++  glutKeyboardUpFunc(&keyup);
++  glutSpecialFunc(&special);
++
++  /* Initialize our window. */
++  InitGL(480, 272); // @@@
++  
++  /* Start Event Processing Engine */  
++  glutMainLoop();  
++
++  return 1;
++}
+Index: demo/Makefile
+===================================================================
+--- demo/Makefile	(revision 0)
++++ demo/Makefile	(revision 0)
+@@ -0,0 +1,23 @@
++TARGET = JelloTest
++OBJS = main.o
++
++PSPPATH = $(shell psp-config --psp-prefix)
++
++CFLAGS = -O3 -G0 -Wall
++CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++#BUILD_PRX = 1
++#PSP_FW_VERSION=371
++#PSP_LARGE_MEMORY = 1
++
++INCDIR = $(PSPPATH)/include/Jello
++LIBS =  -lJello -lglut -lGLU -lGL -lpspvfpu -lpspge -lpspsdk -lpspctrl -lpsprtc -lpsppower -lpspgum -lpspgu -lm -lstdc++
++LDFLAGS += -DMODULE_NAME="JelloTest" psp-setup.cpp
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = Soft Body Test
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak
++
+Index: demo/psp-setup.cpp
+===================================================================
+--- demo/psp-setup.cpp	(revision 0)
++++ demo/psp-setup.cpp	(revision 0)
+@@ -0,0 +1,88 @@
++/**
++ *  This file handles all the PSP-specific kernel setup and exit stuff.
++ *
++ *  Is there some general interest for this file, so that we can place it
++ *  somewhere in the compiler toolchain include path? 
++ *
++ *  Usage: Simply add 
++ *            -DMODULE_NAME="your-module-name" psp-setup.c
++ *         to the LFLAGS or LDFLAGS of your project, so that this file is
++ *         compiled in when gcc collects and links the final ELF binary.
++ *
++ *  Options:
++ *         -DMODULE_NAME="name" -- set the name (default NONAME)
++ *         -DMODULE_ATTR=0      -- module attributes (default 0)
++ *         -DVERSION_MAJOR=1    -- version 1.x (default 1)
++ *         -DVERSION_MINOR=0    -- version x.0 (default 0)
++ *
++ *  Note:  The linker flags and library lists need to be placed after this
++ *         entry on the LFLAG or LDFLAGS command line, otherwise gcc won't
++ *         be able to to resolve all symbols.
++ */
++
++#include <pspkerneltypes.h>
++#include <pspuser.h>
++
++#if !defined(MODULE_NAME)
++	#define MODULE_NAME NONAME
++#endif
++
++
++#if !defined(MODULE_VERSION_MAJOR)
++	#define MODULE_VERSION_MAJOR 1
++#endif
++
++
++#if !defined(MODULE_VERSION_MINOR)
++	#define MODULE_VERSION_MINOR 0
++#endif
++
++
++#if !defined(MODULE_ATTR)
++	#define MODULE_ATTR 0
++#endif
++
++
++#define __stringify(s)	__tostring(s)
++#define __tostring(s)	#s
++
++PSP_MODULE_INFO(__stringify(MODULE_NAME), 0, 1, 0);
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++PSP_HEAP_SIZE_KB(12*1024);
++
++
++static
++int exit_callback (int arg1, int arg2, void *common)
++{
++	sceKernelExitGame();
++	return 0;
++}
++
++
++static
++int update_thread (SceSize args, void *argp)
++{
++	int cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
++	sceKernelRegisterExitCallback(cbid);
++	sceKernelSleepThreadCB();
++	return 0;
++}
++
++
++static void setup_callbacks (void) __attribute__((constructor));
++static void setup_callbacks (void)
++{
++	int id;
++
++	if ((id = sceKernelCreateThread("update_thread", update_thread, 0x11, 0xFA0, 0, 0)) >= 0)
++		sceKernelStartThread(id, 0, 0);
++}
++
++
++
++static void back_to_kernel (void) __attribute__((destructor));
++static void back_to_kernel (void)
++{
++	sceKernelExitGame();
++}
++
+Index: main.cpp
+===================================================================
+--- main.cpp	(revision 36)
++++ main.cpp	(working copy)
+@@ -1,445 +0,0 @@
+-#include <stdlib.h> // needed in order to have "exit" function @@@
+-#include <math.h>
+-
+-#include <GL/glut.h>    // Header File For The GLUT Library 
+-#include <GL/gl.h>	// Header File For The OpenGL32 Library
+-#include <GL/glu.h>	// Header File For The GLu32 Library
+-
+-#include <vector>
+-
+-#include "Vector2.h"
+-#include "Vector3.h"
+-#include "VectorTools.h"
+-#include "AABB.h"
+-#include "Bitmask.h"
+-#include "PointMass.h"
+-#include "InternalSpring.h"
+-#include "ClosedShape.h"
+-#include "Body.h"
+-#include "SpringBody.h"
+-#include "PressureBody.h"
+-#include "World.h"
+-
+-int mousedown = 0;
+-float xMouse, yMouse;
+-int window; 
+-
+-bool mouseD = false;
+-bool springy = true;
+-bool pressure = true;
+-
+-World mWorld;
+-Body *bod;
+-
+-std::vector<SpringBody*> springBodies;
+-std::vector<PressureBody*> pressureBodies;
+-
+-ClosedShape *ball,*springI,*box;
+-
+-PressureBody *pb;
+-
+-SpringBody *leftB,*rightB,*dragBody;
+-
+-float dragX,dragY;
+-int dragPoint = -1;
+-
+-/* A general OpenGL initialization function.  Sets all of the initial parameters. */
+-void InitGL(int Width, int Height)	        // We call this right after our OpenGL window is created.
+-{
+-	glClearColor(1.0f, 1.0f, 1.0f, 0.5f);		// This Will Clear The Background Color To Black
+-	glClearDepth(1.0);				// Enables Clearing Of The Depth Buffer
+-	glDepthFunc(GL_LESS);				// The Type Of Depth Test To Do
+-	glEnable(GL_DEPTH_TEST);			// Enables Depth Testing
+-	glShadeModel(GL_SMOOTH);			// Enables Smooth Color Shading
+-
+-	glMatrixMode(GL_PROJECTION);
+-	glLoadIdentity();				// Reset The Projection Matrix
+-
+-	glOrtho(-25,25,-21,21,-2,2);
+-
+-	glMatrixMode(GL_MODELVIEW);
+-
+-	ClosedShape *shape1 = new ClosedShape();
+-	shape1->begin();
+-	shape1->addVertex(Vector2(-20.0f, -1.0f));
+-	shape1->addVertex(Vector2(-20.0f, 1.0f));
+-	shape1->addVertex(Vector2(20.0f, 1.0f));
+-	shape1->addVertex(Vector2(20.0f, -1.0f));
+-	shape1->finish();
+-
+-	bod = new Body(shape1,0.0f,Vector2(0.0f, -19.0f),0.0f,Vector2(1.0f, 1.0f),false);
+-	mWorld.addBody(bod);
+-
+-	//ball shape
+-	ball = new ClosedShape();
+-	ball->begin();
+-	for (int i = 0; i < 360; i += 40)
+-    {
+-		ball->addVertex(Vector2(cos(VectorTools::ToRadians((float)-i)), sin(VectorTools::ToRadians((float)-i))));
+-    }
+-	ball->finish();
+-
+-
+-	//I shape
+-	springI = new ClosedShape();
+-    springI->begin();
+-    springI->addVertex(Vector2(-1.5f, 2.0f));
+-    springI->addVertex(Vector2(-0.5f, 2.0f));
+-    springI->addVertex(Vector2(0.5f, 2.0f));
+-    springI->addVertex(Vector2(1.5f, 2.0f));
+-    springI->addVertex(Vector2(1.5f, 1.0f));
+-    springI->addVertex(Vector2(0.5f, 1.0f));
+-    springI->addVertex(Vector2(0.5f, -1.0f));
+-    springI->addVertex(Vector2(1.5f, -1.0f));
+-    springI->addVertex(Vector2(1.5f, -2.0f));
+-    springI->addVertex(Vector2(0.5f, -2.0f));
+-    springI->addVertex(Vector2(-0.5f, -2.0f));
+-    springI->addVertex(Vector2(-1.5f, -2.0f));
+-    springI->addVertex(Vector2(-1.5f, -1.0f));
+-    springI->addVertex(Vector2(-0.5f, -1.0f));
+-    springI->addVertex(Vector2(-0.5f, 1.0f));
+-    springI->addVertex(Vector2(-1.5f, 1.0f));
+-    springI->finish();
+-
+-
+-
+-	leftB = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(-5, -5), 0.0f, Vector2::One,false);
+-	leftB->addInternalSpring(0, 14, 300.0f, 10.0f);
+-    leftB->addInternalSpring(1, 14, 300.0f, 10.0f);
+-    leftB->addInternalSpring(1, 15, 300.0f, 10.0f);
+-    leftB->addInternalSpring(1, 5, 300.0f, 10.0f);
+-    leftB->addInternalSpring(2, 14, 300.0f, 10.0f);
+-    leftB->addInternalSpring(2, 5, 300.0f, 10.0f);
+-    leftB->addInternalSpring(1, 5, 300.0f, 10.0f);
+-    leftB->addInternalSpring(14, 5, 300.0f, 10.0f);
+-    leftB->addInternalSpring(2, 4, 300.0f, 10.0f);
+-    leftB->addInternalSpring(3, 5, 300.0f, 10.0f);
+-    leftB->addInternalSpring(14, 6, 300.0f, 10.0f);
+-    leftB->addInternalSpring(5, 13, 300.0f, 10.0f);
+-    leftB->addInternalSpring(13, 6, 300.0f, 10.0f);
+-    leftB->addInternalSpring(12, 10, 300.0f, 10.0f);
+-    leftB->addInternalSpring(13, 11, 300.0f, 10.0f);
+-    leftB->addInternalSpring(13, 10, 300.0f, 10.0f);
+-    leftB->addInternalSpring(13, 9, 300.0f, 10.0f);
+-    leftB->addInternalSpring(6, 10, 300.0f, 10.0f);
+-    leftB->addInternalSpring(6, 9, 300.0f, 10.0f);
+-    leftB->addInternalSpring(6, 8, 300.0f, 10.0f);
+-    leftB->addInternalSpring(7, 9, 300.0f, 10.0f);
+-
+-	// polygons!
+-    leftB->addTriangle(0, 15, 1);
+-    leftB->addTriangle(1, 15, 14);
+-    leftB->addTriangle(1, 14, 5);
+-    leftB->addTriangle(1, 5, 2);
+-    leftB->addTriangle(2, 5, 4);
+-    leftB->addTriangle(2, 4, 3);
+-    leftB->addTriangle(14, 13, 6);
+-    leftB->addTriangle(14, 6, 5);
+-    leftB->addTriangle(12, 11, 10);
+-    leftB->addTriangle(12, 10, 13);
+-    leftB->addTriangle(13, 10, 9);
+-    leftB->addTriangle(13, 9, 6);
+-    leftB->addTriangle(6, 9, 8);
+-    leftB->addTriangle(6, 8, 7);
+-    leftB->finalizeTriangles();
+-
+-	mWorld.addBody(leftB);
+-	springBodies.push_back(leftB);
+-   
+-	rightB = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(5, -5), 0.0f, Vector2::One,false);
+-	rightB->addInternalSpring(0, 14, 300.0f, 10.0f);
+-    rightB->addInternalSpring(1, 14, 300.0f, 10.0f);
+-    rightB->addInternalSpring(1, 15, 300.0f, 10.0f);
+-    rightB->addInternalSpring(1, 5, 300.0f, 10.0f);
+-    rightB->addInternalSpring(2, 14, 300.0f, 10.0f);
+-    rightB->addInternalSpring(2, 5, 300.0f, 10.0f);
+-    rightB->addInternalSpring(1, 5, 300.0f, 10.0f);
+-    rightB->addInternalSpring(14, 5, 300.0f, 10.0f);
+-    rightB->addInternalSpring(2, 4, 300.0f, 10.0f);
+-    rightB->addInternalSpring(3, 5, 300.0f, 10.0f);
+-    rightB->addInternalSpring(14, 6, 300.0f, 10.0f);
+-    rightB->addInternalSpring(5, 13, 300.0f, 10.0f);
+-    rightB->addInternalSpring(13, 6, 300.0f, 10.0f);
+-    rightB->addInternalSpring(12, 10, 300.0f, 10.0f);
+-    rightB->addInternalSpring(13, 11, 300.0f, 10.0f);
+-    rightB->addInternalSpring(13, 10, 300.0f, 10.0f);
+-    rightB->addInternalSpring(13, 9, 300.0f, 10.0f);
+-    rightB->addInternalSpring(6, 10, 300.0f, 10.0f);
+-    rightB->addInternalSpring(6, 9, 300.0f, 10.0f);
+-    rightB->addInternalSpring(6, 8, 300.0f, 10.0f);
+-    rightB->addInternalSpring(7, 9, 300.0f, 10.0f);
+-	// polygons!
+-    rightB->addTriangle(0, 15, 1);
+-    rightB->addTriangle(1, 15, 14);
+-    rightB->addTriangle(1, 14, 5);
+-    rightB->addTriangle(1, 5, 2);
+-    rightB->addTriangle(2, 5, 4);
+-    rightB->addTriangle(2, 4, 3);
+-    rightB->addTriangle(14, 13, 6);
+-    rightB->addTriangle(14, 6, 5);
+-    rightB->addTriangle(12, 11, 10);
+-    rightB->addTriangle(12, 10, 13);
+-    rightB->addTriangle(13, 10, 9);
+-    rightB->addTriangle(13, 9, 6);
+-    rightB->addTriangle(6, 9, 8);
+-    rightB->addTriangle(6, 8, 7);
+-    rightB->finalizeTriangles();
+-
+-	mWorld.addBody(rightB);
+-	springBodies.push_back(rightB);
+-}
+-
+-/* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
+-void ReSizeGLScene(int Width, int Height)
+-{
+-  if (Height==0)				// Prevent A Divide By Zero If The Window Is Too Small
+-    Height=1;
+-
+-  glViewport(0, 0, Width, Height);		// Reset The Current Viewport And Perspective Transformation
+-
+-  glMatrixMode(GL_PROJECTION);
+-  glLoadIdentity();
+-
+-  glOrtho(-25,25,-21,21,-2,2);
+-  glMatrixMode(GL_MODELVIEW);
+-}
+-
+-/* The main drawing function. */
+-void DrawGLScene()
+-{
+-	//physic update
+-	for(int i = 0;i < 5;i++)
+-		mWorld.update((1.0f/80.0f));
+-
+-
+-	//dragging
+-	if (mouseD == true)
+-    {
+-        if (dragBody != NULL)
+-        {
+-           PointMass *pm = dragBody->getPointMass(dragPoint);
+-			dragBody->setDragForce(VectorTools::calculateSpringForce(pm->Position, pm->Velocity, Vector2(xMouse,yMouse), Vector2::ZERO, 0.0f, 100.0f, 10.0f), dragPoint);
+-        }
+-    }
+-    else
+-    {
+-        dragBody = NULL;
+-        dragPoint = -1;
+-    }
+-
+-	if(mouseD == true)
+-	{
+-		if(dragBody == NULL)
+-		{
+-			int body;
+-            mWorld.getClosestPointMass(Vector2(xMouse,yMouse), body, dragPoint);
+-			if(mWorld.getBody(body)->Type == 2)
+-				dragBody = (SpringBody*)mWorld.getBody(body);
+-		}
+-	}
+-
+-	//rendering
+-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+-	glLoadIdentity();		
+-
+-	//floor
+-	bod->DrawMe();
+-
+-	//pressure
+-	for(unsigned int i = 0;i < pressureBodies.size();i++)
+-		pressureBodies[i]->DrawMe();
+-
+-	//cursor
+-	for(unsigned int i = 0;i < springBodies.size();i++)
+-		springBodies[i]->DrawMe();
+-	  
+-	  
+-	//draw pointer
+-	glColor3f(1,0,0);
+-	glBegin(GL_QUADS);
+-		glVertex3f(xMouse-0.2f,yMouse+0.2f,0);
+-		glVertex3f(xMouse+0.2f,yMouse+0.2f,0);
+-		glVertex3f(xMouse+0.2f,yMouse-0.2f,0);
+-		glVertex3f(xMouse-0.2f,yMouse-0.2f,0);
+-	glEnd();
+-	
+-	//draw line from body to cursor
+-	if(dragBody != NULL)
+-	{
+-		Renderer::RenderLine(dragBody->getPointMass(dragPoint)->Position,Vector2(xMouse,yMouse),0,0,1);
+-	}
+- 
+-  glutSwapBuffers();
+-}
+-
+-/* The function called whenever a key is pressed. */
+-// @@@ this function is  modified to use PSP pad
+-void keyPressed(unsigned char key, int x, int y) 
+-{
+-	/*
+-	KEY_ASCII(1,'d'),		 PSP_CTRL_TRIANGLE = 0x001000 
+-	KEY_ASCII(1,'o'),		 PSP_CTRL_CIRCLE   = 0x002000 
+-	KEY_ASCII(1,'x'),		 PSP_CTRL_CROSS    = 0x004000 
+-	KEY_ASCII(1,'q'),		 PSP_CTRL_SQUARE   = 0x008000 */
+- 	switch (key) {
+-	case 'a':			/* startbutton */ /* If START is pressed, kill everything. */
+-
+-		exit(0);
+-	break;
+-	case 'd':
+-		mouseD = true;
+-		
+-	break;
+-	case 'q':
+-		if(springy == true)
+-		{
+-			//add pressure body
+-						
+-			SpringBody *sBody = new SpringBody(springI, 1.0f, 150.0f, 5.0f, 300.0f, 15.0f, Vector2(-5.0f, -5.0f), 0.0f, Vector2::One,false);
+-			sBody->addInternalSpring(0, 14, 300.0f, 10.0f);
+-			sBody->addInternalSpring(1, 14, 300.0f, 10.0f);
+-			sBody->addInternalSpring(1, 15, 300.0f, 10.0f);
+-			sBody->addInternalSpring(1, 5, 300.0f, 10.0f);
+-			sBody->addInternalSpring(2, 14, 300.0f, 10.0f);
+-			sBody->addInternalSpring(2, 5, 300.0f, 10.0f);
+-			sBody->addInternalSpring(1, 5, 300.0f, 10.0f);
+-			sBody->addInternalSpring(14, 5, 300.0f, 10.0f);
+-			sBody->addInternalSpring(2, 4, 300.0f, 10.0f);
+-			sBody->addInternalSpring(3, 5, 300.0f, 10.0f);
+-			sBody->addInternalSpring(14, 6, 300.0f, 10.0f);
+-			sBody->addInternalSpring(5, 13, 300.0f, 10.0f);
+-			sBody->addInternalSpring(13, 6, 300.0f, 10.0f);
+-			sBody->addInternalSpring(12, 10, 300.0f, 10.0f);
+-			sBody->addInternalSpring(13, 11, 300.0f, 10.0f);
+-			sBody->addInternalSpring(13, 10, 300.0f, 10.0f);
+-			sBody->addInternalSpring(13, 9, 300.0f, 10.0f);
+-			sBody->addInternalSpring(6, 10, 300.0f, 10.0f);
+-			sBody->addInternalSpring(6, 9, 300.0f, 10.0f);
+-			sBody->addInternalSpring(6, 8, 300.0f, 10.0f);
+-			sBody->addInternalSpring(7, 9, 300.0f, 10.0f);
+-
+-			// polygons!
+-			sBody->addTriangle(0, 15, 1);
+-			sBody->addTriangle(1, 15, 14);
+-			sBody->addTriangle(1, 14, 5);
+-			sBody->addTriangle(1, 5, 2);
+-			sBody->addTriangle(2, 5, 4);
+-			sBody->addTriangle(2, 4, 3);
+-			sBody->addTriangle(14, 13, 6);
+-			sBody->addTriangle(14, 6, 5);
+-			sBody->addTriangle(12, 11, 10);
+-			sBody->addTriangle(12, 10, 13);
+-			sBody->addTriangle(13, 10, 9);
+-			sBody->addTriangle(13, 9, 6);
+-			sBody->addTriangle(6, 9, 8);
+-			sBody->addTriangle(6, 8, 7);
+-			sBody->finalizeTriangles();
+-
+-			mWorld.addBody(sBody);
+-			springBodies.push_back(sBody);
+-
+-			springy = false;
+-		}
+-		break;
+-	case 'o':
+-		if(pressure == true)
+-		{
+-			PressureBody * pressureBody = new PressureBody(ball, 1.0f, 50.0f, 10.0f, 1.0f, 300.0f, 20.0f, Vector2(0, -10), 0, Vector2(1.5f,1.5f),false);
+-
+-			mWorld.addBody(pressureBody);
+-			pressureBodies.push_back(pressureBody);
+-
+-			pressure = false;
+-		}
+-		break;
+-	
+-	default:
+-		;
+-	}
+-}
+-
+-void special(int key, int x, int y)
+-{
+-	switch(key)
+-	{
+-		case GLUT_KEY_LEFT:
+-			xMouse-=1.0f;
+-		break;
+-		case GLUT_KEY_RIGHT:
+-			xMouse+=1.0f;
+-		break;
+-		case GLUT_KEY_UP:
+-			yMouse+=1.0f;
+-		break;
+-		case GLUT_KEY_DOWN:
+-			yMouse-=1.0f;
+-		break;
+-		default:
+-		;
+-	}
+-}
+-
+-void keyup (unsigned char key, int x, int y)
+-{
+-	switch (key) {
+-	case 'd':
+-		mouseD = false;
+-	break;
+-	case 'q':
+-		springy = true;
+-		break;
+-	case 'o':
+-		pressure = true;
+-		break;
+-	default:
+-		;
+-	}
+-}
+-
+-int main(int argc, char **argv) 
+-{  
+-  /* Initialize GLUT state - glut will take any command line arguments that pertain to it or 
+-     X Windows - look at its documentation at http://reality.sgi.com/mjk/spec3/spec3.html */  
+-  glutInit(&argc, argv);  
+-
+-  /* Select type of Display mode:   
+-     Double buffer 
+-     RGBA color
+-     Alpha components supported 
+-     Depth buffer */  
+-  glutInitDisplayMode( GLUT_DOUBLE );  
+-
+-  /* get a 640 x 480 window */
+-  glutInitWindowSize(480, 272);  // @@@
+-
+-  /* the window starts at the upper left corner of the screen */
+-  glutInitWindowPosition(0, 0);  
+-
+-  /* Open a window */  
+-  window = glutCreateWindow("Soft Body Test");  
+-
+-  /* Register the function to do all our OpenGL drawing. */
+-  glutDisplayFunc(&DrawGLScene);  
+-
+-  /* Go fullscreen.  This is as soon as possible. */
+-//  glutFullScreen(); @@@ there is no glutFullScreen in pspgl
+-
+-  /* Even if there are no events, redraw our gl scene. */
+-  glutIdleFunc(&DrawGLScene);
+-
+-  /* Register the function called when our window is resized. */
+-  glutReshapeFunc(&ReSizeGLScene);
+-
+-  /* Register the function called when the keyboard is pressed. */
+-  glutKeyboardFunc(&keyPressed);
+-  glutKeyboardUpFunc(&keyup);
+-  glutSpecialFunc(&special);
+-
+-  /* Initialize our window. */
+-  InitGL(480, 272); // @@@
+-  
+-  /* Start Event Processing Engine */  
+-  glutMainLoop();  
+-
+-  return 1;
+-}
+Index: makefile
+===================================================================
+--- makefile	(revision 36)
++++ makefile	(working copy)
+@@ -1,21 +1,17 @@
+-TARGET = JelloTest
+-OBJS = main.o AABB.o Body.o ClosedShape.o PointMass.o PressureBody.o SpringBody.o Vector2.o Vector3.o VectorTools.o World.o
++TARGET_LIB = libJello.a
++OBJS = AABB.o Body.o ClosedShape.o PointMass.o PressureBody.o SpringBody.o Vector2.o Vector3.o VectorTools.o World.o
+ 
+-CFLAGS = -O3 -G0 -Wall
++PSPSDK = $(shell psp-config --pspsdk-path)
++PSPPATH = $(shell psp-config --psp-prefix)
++
++INCDIR = $(PSPPATH)/include
++CFLAGS = -O2 -G0 -W -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ ASFLAGS = $(CFLAGS)
+ 
+-BUILD_PRX = 1
+-PSP_FW_VERSION=371
+-PSP_LARGE_MEMORY = 1
+-
+-INCDIR = $(PSPPATH)/include 
+-LIBS =  -lglut -lGLU -lGL -lpspvfpu -lpspmath -lpspge -lpspsdk -lpspctrl -lpsprtc -lpsppower -lpspgum -lpspgu -lm -lstdc++
+-LDFLAGS += -DMODULE_NAME="mp3Test" psp-setup.cpp
+-
+-EXTRA_TARGETS = EBOOT.PBP
+-PSP_EBOOT_TITLE = Soft Body Test
+-
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
++install: $(TARGET_LIB)
++	mkdir -p $(PSPPATH)/include/Jello $(PSPPATH)/lib
++	cp *.h $(PSPPATH)/include/Jello
++	cp libJello.a $(PSPPATH)/lib
+Index: psp-setup.cpp
+===================================================================
+--- psp-setup.cpp	(revision 36)
++++ psp-setup.cpp	(working copy)
+@@ -1,88 +0,0 @@
+-/**
+- *  This file handles all the PSP-specific kernel setup and exit stuff.
+- *
+- *  Is there some general interest for this file, so that we can place it
+- *  somewhere in the compiler toolchain include path? 
+- *
+- *  Usage: Simply add 
+- *            -DMODULE_NAME="your-module-name" psp-setup.c
+- *         to the LFLAGS or LDFLAGS of your project, so that this file is
+- *         compiled in when gcc collects and links the final ELF binary.
+- *
+- *  Options:
+- *         -DMODULE_NAME="name" -- set the name (default NONAME)
+- *         -DMODULE_ATTR=0      -- module attributes (default 0)
+- *         -DVERSION_MAJOR=1    -- version 1.x (default 1)
+- *         -DVERSION_MINOR=0    -- version x.0 (default 0)
+- *
+- *  Note:  The linker flags and library lists need to be placed after this
+- *         entry on the LFLAG or LDFLAGS command line, otherwise gcc won't
+- *         be able to to resolve all symbols.
+- */
+-
+-#include <pspkerneltypes.h>
+-#include <pspuser.h>
+-
+-#if !defined(MODULE_NAME)
+-	#define MODULE_NAME NONAME
+-#endif
+-
+-
+-#if !defined(MODULE_VERSION_MAJOR)
+-	#define MODULE_VERSION_MAJOR 1
+-#endif
+-
+-
+-#if !defined(MODULE_VERSION_MINOR)
+-	#define MODULE_VERSION_MINOR 0
+-#endif
+-
+-
+-#if !defined(MODULE_ATTR)
+-	#define MODULE_ATTR 0
+-#endif
+-
+-
+-#define __stringify(s)	__tostring(s)
+-#define __tostring(s)	#s
+-
+-PSP_MODULE_INFO(__stringify(MODULE_NAME), 0, 1, 0);
+-PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
+-PSP_HEAP_SIZE_KB(12*1024);
+-
+-
+-static
+-int exit_callback (int arg1, int arg2, void *common)
+-{
+-	sceKernelExitGame();
+-	return 0;
+-}
+-
+-
+-static
+-int update_thread (SceSize args, void *argp)
+-{
+-	int cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
+-	sceKernelRegisterExitCallback(cbid);
+-	sceKernelSleepThreadCB();
+-	return 0;
+-}
+-
+-
+-static void setup_callbacks (void) __attribute__((constructor));
+-static void setup_callbacks (void)
+-{
+-	int id;
+-
+-	if ((id = sceKernelCreateThread("update_thread", update_thread, 0x11, 0xFA0, 0, 0)) >= 0)
+-		sceKernelStartThread(id, 0, 0);
+-}
+-
+-
+-
+-static void back_to_kernel (void) __attribute__((destructor));
+-static void back_to_kernel (void)
+-{
+-	sceKernelExitGame();
+-}
+-
+Index: World.cpp
+===================================================================
+--- World.cpp	(revision 36)
++++ World.cpp	(working copy)
+@@ -125,7 +125,7 @@
+ 
+ Body *World::getBody(unsigned int index)
+ {
+-    if ((index >= 0) && (index < mBodies.size()))
++    if (index < mBodies.size())
+         return mBodies[index];
+ 
+     return NULL;
