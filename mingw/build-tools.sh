@@ -33,18 +33,9 @@ else
 	svn update psplinkusb
 fi
 
-# PC part doesn't build under mingw
-#cd psplinkusb
-#if [ ! -f build-psplinkusb-pc ]
-#then
-#  $MAKE -f Makefile.clients || { echo "ERROR building PSPLINKUSB"; exit 1; }
-#  touch build-psplinkusb-pc
-#fi
-
 cd $BUILDSCRIPTDIR
 if [ ! -f installed-psplinkusb-pc ]
 then
-#	$MAKE -f Makefile.clients install || { echo "ERROR installing PSPLINKUSB"; exit 1; }
 	# pspsh + usbhostfs_pc
 	cp $scriptdir/bin/pspsh.exe $INSTALLDIR/bin/pspsh.exe || { echo "ERROR Extra Binaries"; exit 1; }
 	cp $scriptdir/bin/usbhostfs_pc.exe $INSTALLDIR/bin/usbhostfs_pc.exe || { echo "ERROR Extra Binaries"; exit 1; }
@@ -55,18 +46,18 @@ then
 	# copy the drivers for windows
 	mkdir -p $INSTALLDIR/bin/driver
 	mkdir -p $INSTALLDIR/bin/driver_x64
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver/libusb0.dll $INSTALLDIR/bin/driver/libusb0.dll || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver/libusb0.sys $INSTALLDIR/bin/driver/libusb0.sys || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver/psp.cat $INSTALLDIR/bin/driver/psp.cat || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver/psp.inf $INSTALLDIR/bin/driver/psp.inf || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver/libusb0.dll $INSTALLDIR/bin/driver/libusb0.dll || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver/libusb0.sys $INSTALLDIR/bin/driver/libusb0.sys || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver/psp.cat $INSTALLDIR/bin/driver/psp.cat || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver/psp.inf $INSTALLDIR/bin/driver/psp.inf || { echo "ERROR Extra Binaries"; exit 1; }
 	# 64 bits (i've no idea if it works)
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/libusb0.dll $INSTALLDIR/bin/driver_x64/libusb0.dll || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/libusb0.sys $INSTALLDIR/bin/driver_x64/libusb0.sys || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/psp.cat $INSTALLDIR/bin/driver_x64/psp.cat || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/psp.inf $INSTALLDIR/bin/driver_x64/psp.inf || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/libusb0_x64.dll $INSTALLDIR/bin/driver_x64/libusb0_x64.dll || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/libusb0_x64.sys $INSTALLDIR/bin/driver_x64/libusb0_x64.sys || { echo "ERROR Extra Binaries"; exit 1; }
-	cp $BUILDSCRIPTDIR/psplinkusb/windows/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64/psp_x64.cat || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/libusb0.dll $INSTALLDIR/bin/driver_x64/libusb0.dll || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/libusb0.sys $INSTALLDIR/bin/driver_x64/libusb0.sys || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/psp.cat $INSTALLDIR/bin/driver_x64/psp.cat || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/psp.inf $INSTALLDIR/bin/driver_x64/psp.inf || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/libusb0_x64.dll $INSTALLDIR/bin/driver_x64/libusb0_x64.dll || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/libusb0_x64.sys $INSTALLDIR/bin/driver_x64/libusb0_x64.sys || { echo "ERROR Extra Binaries"; exit 1; }
+	cp $scriptdir/bin/usb/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64/psp_x64.cat || { echo "ERROR Extra Binaries"; exit 1; }
 	
 	touch installed-psplinkusb-pc
 fi

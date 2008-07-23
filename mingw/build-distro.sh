@@ -57,6 +57,7 @@ cd $BUILDSCRIPTDIR/pspsdk
 make doxygen-doc
 cp -fR doc $INSTALLERDIR/documentation/pspdoc
 rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
+rm -rf $INSTALLERDIR/documentation/pspdoc/doc/.svn
 mv $INSTALLERDIR/documentation/pspdoc/doc/html $INSTALLERDIR/documentation/pspdoc/doc/pspsdk
 
 # move samples
