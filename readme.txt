@@ -23,16 +23,29 @@ Portable handheld videogame system.
 ===============================================================================
  TODO
 ===============================================================================
-0.8
-* make sure debugging works
-* reduce dependency on cygwin
-* Add support for Java
+0.9
+* Patched SDK for missing functions (only declared on the ASM side)
+* Add support for Java (maybe)
 
 
 ===============================================================================
  Changelog
 ===============================================================================
 
+0.8.5
+* Updated PSPLINKUSB
+* patch PSPLINKUSB to support BIG MEMORY
+* Update SDK to latest SVN 2413
+* Debugging works (fully tested)
+* Reduced dependency on cygwin (DLL packed with UPX)
+
+0.8.4
+* Upgrade MinGW GCC to 4.3.1
+* Patched newlib int == int32_t (reduces compile errors) instead of
+  long == int32_t. Since PSP is a 32bit machine both are valid options but
+  int make it more natural.
+* updated SDK to latest SVN 
+  
 0.8.3
 * Split installer into 2 packages with doc/without doc for size reasons
 * Test the compiler by compiling all the samples in the TC script
@@ -103,7 +116,7 @@ Portable handheld videogame system.
 The main difference is that this is a native cross compiler for Microsoft
 Windows Operating Systems.
   
-Second is that the cross compiler uses the latest release of GCC 4.1.2
+Second is that the cross compiler uses the latest release of GCC 4.3.1
 instead of the initial release 4.1.0 (this means some bugs were fixed).
   
 Third, you can run it directly from a Dos Command Prompt BOX or from your

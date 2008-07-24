@@ -1,0 +1,19 @@
+Index: psplinkusb/boot271/Makefile
+===================================================================
+--- psplinkusb/boot271/Makefile	(revision 2413)
++++ psplinkusb/boot271/Makefile	(working copy)
+@@ -1,5 +1,5 @@
+ release: all
+-	mksfo 'PSPLink v3.0 OE' PARAM.SFO
++	mksfoex -d MEMSIZE=1 'PSPLink v3.0 OE' PARAM.SFO
+ 	pack-pbp EBOOT.PBP PARAM.SFO psplink.png NULL NULL NULL NULL psplink_boot.prx NULL
+ 
+ TARGET = psplink_boot
+@@ -13,6 +13,7 @@
+ LIBDIR =
+ LDFLAGS =
+ 
++PSP_LARGE_MEMORY = 1
+ BUILD_PRX = 1
+ 
+ PSPSDK=$(shell psp-config --pspsdk-path)
