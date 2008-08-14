@@ -86,7 +86,7 @@ fi
 
 if [ ! -f patch-psp-sdk ]
 then
-	patch -p1 -d pspsdk -i $patchdir/pspsdk-MINPSPW.patch || { echo "Error patching PSPSDK"; exit; }
+	patch -p0 -d pspsdk -i $patchdir/pspsdk-MINPSPW.patch || { echo "Error patching PSPSDK"; exit; }
 	touch patch-psp-sdk
 fi
 
