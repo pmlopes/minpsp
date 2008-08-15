@@ -1,0 +1,23 @@
+Index: Makefile
+===================================================================
+--- Makefile
++++ Makefile.new
+@@ -122,9 +122,7 @@
+ # Install everything...
+ #
+ 
+-install:	$(TARGETS) install-$(LIBMXML) install-libmxml.a
+-	$(INSTALL_DIR) $(BUILDROOT)$(bindir)
+-	$(INSTALL_BIN) mxmldoc $(BUILDROOT)$(bindir) 
++install:       install-$(LIBMXML) install-libmxml.a
+ 	$(INSTALL_DIR) $(BUILDROOT)$(docdir)
+ 	for file in $(DOCFILES); do \
+ 		$(INSTALL_MAN) $$file $(BUILDROOT)$(docdir); \
+@@ -136,7 +134,6 @@
+ 	$(INSTALL_DIR) $(BUILDROOT)$(mandir)/man1
+ 	$(INSTALL_MAN) doc/mxmldoc.man $(BUILDROOT)$(mandir)/man1/mxmldoc.1
+ 	$(INSTALL_DIR) $(BUILDROOT)$(mandir)/man3
+-	$(INSTALL_MAN) doc/mxml.man $(BUILDROOT)$(mandir)/man3/mxml.3
+ 
+ install-libmxml.a:
+ 	$(INSTALL_DIR) $(BUILDROOT)$(libdir)
