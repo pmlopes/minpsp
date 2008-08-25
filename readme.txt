@@ -31,6 +31,11 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.7
+* Updated SVN
+* Since ps2dev started to use the patches I was hosting, legacy builds are over
+* Updated SDK to build with the flags -Werror and -pedantic
+* Added profiling support to the makefiles 
 
 0.8.5
 * Updated PSPLINKUSB

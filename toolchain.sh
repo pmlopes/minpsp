@@ -1,30 +1,19 @@
 #!/bin/sh
 
-# legacy means that this script will compile a 4.1.x cross compiler series
-# based entirely on ps2dev.org SVN and scripts
-LEGACY=no
 # enable muti threading during the make phase
 EXPERIMENTAL=no
 
-if [ "$LEGACY" == "yes" ]; then
-	GCC_VER=4.1.2
-	# official patches are for version 4.1.0
-	PS2DEV_TC_VER=4.1.0
-	GDB_VER=6.7.1
-	INSTALLDIR="/c/pspsdk-legacy"
-	INSTALLERDIR="/c/pspsdk-installer"
-	PSPSDK_VERSION=0.7.4
-else
-	GCC_VER=4.3.1
-	# patch was for 4.3.0
-	GCC_PATCH_VER=4.3.0
-	GMP_VER=4.2
-	MPFR_VER=2.3.1
-	GDB_VER=6.8
-	INSTALLDIR="/c/pspsdk"
-	INSTALLERDIR="/c/pspsdk-installer"
-	PSPSDK_VERSION=0.8.6
-fi
+#PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
+PS2DEV_SVN="svn://svn.ps2dev.org/psp/trunk/"
+SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
+
+GCC_VER=4.3.1
+GMP_VER=4.2
+MPFR_VER=2.3.1
+GDB_VER=6.8
+INSTALLDIR="/c/pspsdk"
+INSTALLERDIR="/c/pspsdk-installer"
+PSPSDK_VERSION=0.8.7
 
 if [ "$EXPERIMENTAL" == "yes" ]; then
 	MAKE_THREADS="-j 2"
@@ -38,9 +27,6 @@ MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 PTHREADS_VER=2-8-0
-
-PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
-SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
@@ -86,12 +72,6 @@ target=psp
 #---------------------------------------------------------------------------------
 # configuration finished
 #---------------------------------------------------------------------------------
-if [ "$LEGACY" == "yes" ]; then
-	echo "**************************************************************"
-	echo "This is a LEGACY build (GCC 4.1.2)!"
-	echo "**************************************************************"
-fi
-
 if test "`svn help`"
 then
 	SVN="svn"
@@ -115,10 +95,8 @@ then
 	mkdir -p download
 	cd download
 	$WGET --passive-ftp -c $BINUTILS_URL || { echo "Error: Failed to download "$BINUTILS; exit; }
-	if [ "$LEGACY" == "no" ]; then
-		$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
-		$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
-	fi
+	$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
+	$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
 	$WGET -c $GCC_CORE_URL || { echo "Error: Failed to download "$GCC_CORE; exit; }
 	$WGET -c $GCC_GPP_URL || { echo "Error: Failed to download "$GCC_GPP; exit; }
 	$WGET -c $GDB_URL || { echo "Error: Failed to download "$GDB; exit; }
@@ -204,12 +182,10 @@ if [ ! -f extracted_archives ]
 then
 	echo "Extracting $BINUTILS"
 	tar -xjf $BUILDSCRIPTDIR/download/$BINUTILS || { echo "Error extracting "$BINUTILS; exit; }
-	if [ "$LEGACY" == "no" ]; then
-		echo "Extracting $GMP"
-		tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
-		echo "Extracting $MPFR"
-		tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
-	fi
+	echo "Extracting $GMP"
+	tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
+	echo "Extracting $MPFR"
+	tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
 	echo "Extracting $GCC_CORE"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
 	echo "Extracting $GCC_GPP"
@@ -247,10 +223,6 @@ else
 fi
 
 cp -f $scriptdir/patches/* $patchdir
-if [ "$LEGACY" == "yes" ]; then
-	# non experimental means that we use the stock gcc patch
-	cp $patchdir/gcc-$PS2DEV_TC_VER-PSP.patch $patchdir/gcc-$GCC_VER-PSP.patch
-fi
 
 #---------------------------------------------------------------------------------
 # apply patches
@@ -262,9 +234,9 @@ then
 		patch -p1 -d $BINUTILS_SRCDIR -i $patchdir/binutils-$BINUTILS_VER-PSP.patch || { echo "Error patching binutils"; exit; }
 	fi
 
-	if [ -f $patchdir/gcc-$GCC_PATCH_VER-PSP.patch ]
+	if [ -f $patchdir/gcc-$GCC_VER-PSP.patch ]
 	then
-		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_PATCH_VER-PSP.patch || { echo "Error patching gcc"; exit; }
+		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_VER-PSP.patch || { echo "Error patching gcc"; exit; }
 	fi
 
 	if [ -f $patchdir/newlib-$NEWLIB_VER-PSP.patch ]
@@ -288,13 +260,11 @@ fi
 #---------------------------------------------------------------------------------
 # Build and install devkit components
 #---------------------------------------------------------------------------------
-if [ "$LEGACY" == "no" ]; then
-	# GCC 4.3 needs GMP and MPFR and pthreads
-	if [ -f $scriptdir/build-gcc-deps.sh ]
-	then
-		. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }
-		cd $BUILDSCRIPTDIR
-	fi
+# GCC 4.3 needs GMP and MPFR
+if [ -f $scriptdir/build-gcc-deps.sh ]
+then
+	. $scriptdir/build-gcc-deps.sh || { echo "Error building toolchain"; exit; }
+	cd $BUILDSCRIPTDIR
 fi
 
 if [ -f $scriptdir/build-gcc.sh ]

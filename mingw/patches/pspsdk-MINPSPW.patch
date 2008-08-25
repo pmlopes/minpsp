@@ -1,6 +1,6 @@
 Index: aminclude.am
 ===================================================================
---- aminclude.am	(revision 2417)
+--- aminclude.am	(revision 2424)
 +++ aminclude.am	(working copy)
 @@ -167,7 +167,7 @@
  doxygen-doc: doxygen-run $(DX_PS_GOAL) $(DX_PDF_GOAL)
@@ -13,7 +13,7 @@ Index: aminclude.am
  DX_CLEANFILES = \
 Index: configure.ac
 ===================================================================
---- configure.ac	(revision 2417)
+--- configure.ac	(revision 2424)
 +++ configure.ac	(working copy)
 @@ -66,7 +66,7 @@
  AC_SUBST(PSPSDK_LIBDIR)
@@ -26,7 +26,7 @@ Index: configure.ac
  AC_SUBST(PSPSDK_CXXFLAGS)
 Index: src/atrac3/pspatrac3.h
 ===================================================================
---- src/atrac3/pspatrac3.h	(revision 2417)
+--- src/atrac3/pspatrac3.h	(revision 2424)
 +++ src/atrac3/pspatrac3.h	(working copy)
 @@ -18,6 +18,53 @@
  extern "C" {
@@ -139,7 +139,7 @@ Index: src/atrac3/pspatrac3.h
  #endif
 Index: src/ctrl/pspctrl.h
 ===================================================================
---- src/ctrl/pspctrl.h	(revision 2417)
+--- src/ctrl/pspctrl.h	(revision 2424)
 +++ src/ctrl/pspctrl.h	(working copy)
 @@ -103,9 +103,13 @@
  } SceCtrlData;
@@ -186,7 +186,7 @@ Index: src/ctrl/pspctrl.h
  /**
 Index: src/ctrl/pspctrl_kernel.h
 ===================================================================
---- src/ctrl/pspctrl_kernel.h	(revision 2417)
+--- src/ctrl/pspctrl_kernel.h	(revision 2424)
 +++ src/ctrl/pspctrl_kernel.h	(working copy)
 @@ -27,14 +27,14 @@
   *
@@ -235,7 +235,7 @@ Index: src/ctrl/pspctrl_kernel.h
  #endif
 Index: src/ctrl/sceCtrl_driver.S
 ===================================================================
---- src/ctrl/sceCtrl_driver.S	(revision 2417)
+--- src/ctrl/sceCtrl_driver.S	(revision 2424)
 +++ src/ctrl/sceCtrl_driver.S	(working copy)
 @@ -69,13 +69,13 @@
  	IMPORT_FUNC	"sceCtrl_driver",0x6841BE1A,sceCtrlSetRapidFire
@@ -256,7 +256,7 @@ Index: src/ctrl/sceCtrl_driver.S
  	IMPORT_FUNC	"sceCtrl_driver",0xA7144800,sceCtrlSetIdleCancelThreshold
 Index: src/debug/scr_printf.c
 ===================================================================
---- src/debug/scr_printf.c	(revision 2417)
+--- src/debug/scr_printf.c	(revision 2424)
 +++ src/debug/scr_printf.c	(working copy)
 @@ -356,6 +356,9 @@
  		c = buff[i];
@@ -270,7 +270,7 @@ Index: src/debug/scr_printf.c
  						Y ++;
 Index: src/display/pspdisplay.h
 ===================================================================
---- src/display/pspdisplay.h	(revision 2417)
+--- src/display/pspdisplay.h	(revision 2424)
 +++ src/display/pspdisplay.h	(working copy)
 @@ -19,6 +19,10 @@
  extern "C" {
@@ -337,7 +337,7 @@ Index: src/display/pspdisplay.h
  #endif
 Index: src/ge/pspge.h
 ===================================================================
---- src/ge/pspge.h	(revision 2417)
+--- src/ge/pspge.h	(revision 2424)
 +++ src/ge/pspge.h	(working copy)
 @@ -39,6 +39,14 @@
  	void *finish_arg;
@@ -422,9 +422,9 @@ Index: src/ge/pspge.h
  #endif
 Index: src/gu/pspgu.h
 ===================================================================
---- src/gu/pspgu.h	(revision 2417)
+--- src/gu/pspgu.h	(revision 2424)
 +++ src/gu/pspgu.h	(working copy)
-@@ -419,7 +419,7 @@
+@@ -429,7 +429,7 @@
  **/
  void sceGuTerm(void);
  
@@ -433,7 +433,7 @@ Index: src/gu/pspgu.h
  void sceGuContinue(void);
  
  /**
-@@ -445,7 +445,7 @@
+@@ -455,7 +455,7 @@
    * @param signal - Signal to trigger
    * @param behavior - Behavior type
  **/
@@ -442,7 +442,7 @@ Index: src/gu/pspgu.h
  
  /**
    * Send raw float-command to the GE
-@@ -520,7 +520,7 @@
+@@ -530,7 +530,7 @@
    * @param id - Finish callback id (16-bit)
    * @returns Size of finished display list
  **/
@@ -451,7 +451,7 @@ Index: src/gu/pspgu.h
  
  /**
    * Call previously generated display-list
-@@ -708,7 +708,7 @@
+@@ -723,7 +723,7 @@
    *
    * @param status - Bit-mask (0-21) containing the status of all 22 states
  **/
@@ -460,7 +460,7 @@ Index: src/gu/pspgu.h
  
  /**
    * Query status on all 22 available states
-@@ -962,7 +962,7 @@
+@@ -977,7 +977,7 @@
  **/
  void sceGuBlendFunc(int op, int src, int dest, unsigned int srcfix, unsigned int destfix);
  
@@ -469,7 +469,7 @@ Index: src/gu/pspgu.h
  
  /**
    *
-@@ -1270,7 +1270,7 @@
+@@ -1285,7 +1285,7 @@
    * This will stall the rendering pipeline until the current image upload initiated by
    * sceGuCopyImage() has completed.
  **/
@@ -480,7 +480,7 @@ Index: src/gu/pspgu.h
    * Set if the texture should repeat or clamp
 Index: src/gu/sceGuFinish.c
 ===================================================================
---- src/gu/sceGuFinish.c	(revision 2417)
+--- src/gu/sceGuFinish.c	(revision 2424)
 +++ src/gu/sceGuFinish.c	(working copy)
 @@ -44,7 +44,7 @@
  	return size;
@@ -493,7 +493,7 @@ Index: src/gu/sceGuFinish.c
  	{
 Index: src/gu/sceGuMaterial.c
 ===================================================================
---- src/gu/sceGuMaterial.c	(revision 2417)
+--- src/gu/sceGuMaterial.c	(revision 2424)
 +++ src/gu/sceGuMaterial.c	(working copy)
 @@ -8,7 +8,7 @@
  
@@ -506,15 +506,15 @@ Index: src/gu/sceGuMaterial.c
  	{
 Index: src/gu/sceGuSendList.c
 ===================================================================
---- src/gu/sceGuSendList.c	(revision 2417)
+--- src/gu/sceGuSendList.c	(revision 2424)
 +++ src/gu/sceGuSendList.c	(working copy)
-@@ -15,18 +15,17 @@
+@@ -16,18 +16,17 @@
  {
  	gu_settings.signal_offset = 0;
  
 -	// TODO: figure out this structure
 -	unsigned int s[2];
--	s[0] = 8;
+-	s[0] = 8; // size of struct?
 -	s[1] = (unsigned int)context;
 +	PspGeListOptParam opt;
 +	opt.size = sizeof(PspGeListOptParam);
@@ -534,7 +534,7 @@ Index: src/gu/sceGuSendList.c
  	ge_list_executed[1] = list_id;
 Index: src/gu/sceGuSetAllStatus.c
 ===================================================================
---- src/gu/sceGuSetAllStatus.c	(revision 2417)
+--- src/gu/sceGuSetAllStatus.c	(revision 2424)
 +++ src/gu/sceGuSetAllStatus.c	(working copy)
 @@ -8,7 +8,7 @@
  
@@ -547,7 +547,7 @@ Index: src/gu/sceGuSetAllStatus.c
  	for (i = 0; i < 22; ++i)
 Index: src/gu/sceGuSignal.c
 ===================================================================
---- src/gu/sceGuSignal.c	(revision 2417)
+--- src/gu/sceGuSignal.c	(revision 2424)
 +++ src/gu/sceGuSignal.c	(working copy)
 @@ -8,7 +8,7 @@
  
@@ -560,7 +560,7 @@ Index: src/gu/sceGuSignal.c
  	sendCommandi(12,0);
 Index: src/kernel/pspimpose_driver.h
 ===================================================================
---- src/kernel/pspimpose_driver.h	(revision 2417)
+--- src/kernel/pspimpose_driver.h	(revision 2424)
 +++ src/kernel/pspimpose_driver.h	(working copy)
 @@ -38,6 +38,9 @@
  #define PSP_IMPOSE_UMD_POPUP_ENABLED 1
@@ -590,7 +590,7 @@ Index: src/kernel/pspimpose_driver.h
  #endif
 Index: src/mpeg/pspmpeg.h
 ===================================================================
---- src/mpeg/pspmpeg.h	(revision 2417)
+--- src/mpeg/pspmpeg.h	(revision 2424)
 +++ src/mpeg/pspmpeg.h	(working copy)
 @@ -20,6 +20,12 @@
  extern "C" {
@@ -625,7 +625,7 @@ Index: src/mpeg/pspmpeg.h
  	ScePVoid			pData;
 Index: src/prof/prof.c
 ===================================================================
---- src/prof/prof.c	(revision 2417)
+--- src/prof/prof.c	(revision 2424)
 +++ src/prof/prof.c	(working copy)
 @@ -79,7 +79,8 @@
  extern int _etext;
@@ -639,20 +639,152 @@ Index: src/prof/prof.c
  /** Initializes pg library
 Index: src/umd/sceUmd.S
 ===================================================================
---- src/umd/sceUmd.S	(revision 2417)
+--- src/umd/sceUmd.S	(revision 2424)
 +++ src/umd/sceUmd.S	(working copy)
-@@ -60,7 +60,7 @@
- 	IMPORT_FUNC	"sceUmd",0x6A41ED25,sceUmdGetSuspendResumeMode
+@@ -6,106 +6,106 @@
+ 	IMPORT_START	"sceUmd",0x00090000
+ #endif
+ #ifdef F_sceUmd_0001
+-	IMPORT_FUNC	"sceUmd",0x075F1E0B,sceUmd_075F1E0B
++	IMPORT_FUNC	"sceUmd",0x075F1E0B,sceUmd_075F1E0B
+ #endif
+ #ifdef F_sceUmd_0002
+-	IMPORT_FUNC	"sceUmd",0x086DDC0D,sceUmd_086DDC0D
++	IMPORT_FUNC	"sceUmd",0x086DDC0D,sceUmd_086DDC0D
+ #endif
+ #ifdef F_sceUmd_0003
+-	IMPORT_FUNC	"sceUmd",0x230666E3,sceUmdSetDriveStatus
++	IMPORT_FUNC	"sceUmd",0x230666E3,sceUmdSetDriveStatus
+ #endif
+ #ifdef F_sceUmd_0004
+-	IMPORT_FUNC	"sceUmd",0x27A764A1,sceUmd_27A764A1
++	IMPORT_FUNC	"sceUmd",0x27A764A1,sceUmd_27A764A1
+ #endif
+ #ifdef F_sceUmd_0005
+-	IMPORT_FUNC	"sceUmd",0x2D81508D,sceUmd_2D81508D
++	IMPORT_FUNC	"sceUmd",0x2D81508D,sceUmd_2D81508D
+ #endif
+ #ifdef F_sceUmd_0006
+-	IMPORT_FUNC	"sceUmd",0x319ED97C,sceUmd_319ED97C
++	IMPORT_FUNC	"sceUmd",0x319ED97C,sceUmd_319ED97C
+ #endif
+ #ifdef F_sceUmd_0007
+-	IMPORT_FUNC	"sceUmd",0x340B7686,sceUmdGetDiscInfo
++	IMPORT_FUNC	"sceUmd",0x340B7686,sceUmdGetDiscInfo
+ #endif
+ #ifdef F_sceUmd_0008
+-	IMPORT_FUNC	"sceUmd",0x3925CBD8,sceUmd_3925CBD8
++	IMPORT_FUNC	"sceUmd",0x3925CBD8,sceUmd_3925CBD8
+ #endif
+ #ifdef F_sceUmd_0009
+-	IMPORT_FUNC	"sceUmd",0x3D0DECD5,sceUmd_3D0DECD5
++	IMPORT_FUNC	"sceUmd",0x3D0DECD5,sceUmd_3D0DECD5
+ #endif
+ #ifdef F_sceUmd_0010
+-	IMPORT_FUNC	"sceUmd",0x46EBB729,sceUmdCheckMedium
++	IMPORT_FUNC	"sceUmd",0x46EBB729,sceUmdCheckMedium
+ #endif
+ #ifdef F_sceUmd_0011
+-	IMPORT_FUNC	"sceUmd",0x4832ABF3,sceUmd_4832ABF3
++	IMPORT_FUNC	"sceUmd",0x4832ABF3,sceUmd_4832ABF3
+ #endif
+ #ifdef F_sceUmd_0012
+-	IMPORT_FUNC	"sceUmd",0x4A9E5E29,sceUmdWaitDriveStatCB
++	IMPORT_FUNC	"sceUmd",0x4A9E5E29,sceUmdWaitDriveStatCB
+ #endif
+ #ifdef F_sceUmd_0013
+-	IMPORT_FUNC	"sceUmd",0x4BA25F4A,sceUmd_4BA25F4A
++	IMPORT_FUNC	"sceUmd",0x4BA25F4A,sceUmd_4BA25F4A
+ #endif
+ #ifdef F_sceUmd_0014
+-	IMPORT_FUNC	"sceUmd",0x4C952ACF,sceUmdSetSuspendResumeMode
++	IMPORT_FUNC	"sceUmd",0x4C952ACF,sceUmdSetSuspendResumeMode
+ #endif
+ #ifdef F_sceUmd_0015
+-	IMPORT_FUNC	"sceUmd",0x5469DC37,sceUmd_5469DC37
++	IMPORT_FUNC	"sceUmd",0x5469DC37,sceUmd_5469DC37
+ #endif
+ #ifdef F_sceUmd_0016
+-	IMPORT_FUNC	"sceUmd",0x56202973,sceUmdWaitDriveStatWithTimer
++	IMPORT_FUNC	"sceUmd",0x56202973,sceUmdWaitDriveStatWithTimer
+ #endif
+ #ifdef F_sceUmd_0017
+-	IMPORT_FUNC	"sceUmd",0x659587F7,sceUmd_659587F7
++	IMPORT_FUNC	"sceUmd",0x659587F7,sceUmd_659587F7
+ #endif
+ #ifdef F_sceUmd_0018
+-	IMPORT_FUNC	"sceUmd",0x6A41ED25,sceUmdGetSuspendResumeMode
++	IMPORT_FUNC	"sceUmd",0x6A41ED25,sceUmdGetSuspendResumeMode
  #endif
  #ifdef F_sceUmd_0019
 -	IMPORT_FUNC	"sceUmd",0x6AF9B50A,sceUmd_6AF9B50A
 +	IMPORT_FUNC	"sceUmd",0x6AF9B50A,sceUmdCancelWaitDriveStat
  #endif
  #ifdef F_sceUmd_0020
- 	IMPORT_FUNC	"sceUmd",0x71F81482,sceUmd_71F81482
+-	IMPORT_FUNC	"sceUmd",0x71F81482,sceUmd_71F81482
++	IMPORT_FUNC	"sceUmd",0x71F81482,sceUmd_71F81482
+ #endif
+ #ifdef F_sceUmd_0021
+-	IMPORT_FUNC	"sceUmd",0x7850F057,sceUmd_7850F057
++	IMPORT_FUNC	"sceUmd",0x7850F057,sceUmd_7850F057
+ #endif
+ #ifdef F_sceUmd_0022
+-	IMPORT_FUNC	"sceUmd",0x87533940,sceUmdReplaceProhibit
++	IMPORT_FUNC	"sceUmd",0x87533940,sceUmdReplaceProhibit
+ #endif
+ #ifdef F_sceUmd_0023
+-	IMPORT_FUNC	"sceUmd",0x8EF08FCE,sceUmdWaitDriveStat
++	IMPORT_FUNC	"sceUmd",0x8EF08FCE,sceUmdWaitDriveStat
+ #endif
+ #ifdef F_sceUmd_0024
+-	IMPORT_FUNC	"sceUmd",0x9B22AED7,sceUmd_9B22AED7
++	IMPORT_FUNC	"sceUmd",0x9B22AED7,sceUmd_9B22AED7
+ #endif
+ #ifdef F_sceUmd_0025
+-	IMPORT_FUNC	"sceUmd",0xAE53DC2D,sceUmdClearDriveStatus
++	IMPORT_FUNC	"sceUmd",0xAE53DC2D,sceUmdClearDriveStatus
+ #endif
+ #ifdef F_sceUmd_0026
+-	IMPORT_FUNC	"sceUmd",0xAEE7404D,sceUmdRegisterUMDCallBack
++	IMPORT_FUNC	"sceUmd",0xAEE7404D,sceUmdRegisterUMDCallBack
+ #endif
+ #ifdef F_sceUmd_0027
+-	IMPORT_FUNC	"sceUmd",0xBBB5F05C,sceUmd_BBB5F05C
++	IMPORT_FUNC	"sceUmd",0xBBB5F05C,sceUmd_BBB5F05C
+ #endif
+ #ifdef F_sceUmd_0028
+-	IMPORT_FUNC	"sceUmd",0xBD2BDE07,sceUmdUnRegisterUMDCallBack
++	IMPORT_FUNC	"sceUmd",0xBD2BDE07,sceUmdUnRegisterUMDCallBack
+ #endif
+ #ifdef F_sceUmd_0029
+-	IMPORT_FUNC	"sceUmd",0xC6183D47,sceUmdActivate
++	IMPORT_FUNC	"sceUmd",0xC6183D47,sceUmdActivate
+ #endif
+ #ifdef F_sceUmd_0030
+-	IMPORT_FUNC	"sceUmd",0xCBE9F02A,sceUmdReplacePermit
++	IMPORT_FUNC	"sceUmd",0xCBE9F02A,sceUmdReplacePermit
+ #endif
+ #ifdef F_sceUmd_0031
+-	IMPORT_FUNC	"sceUmd",0xD01B2DC6,sceUmd_D01B2DC6
++	IMPORT_FUNC	"sceUmd",0xD01B2DC6,sceUmd_D01B2DC6
+ #endif
+ #ifdef F_sceUmd_0032
+-	IMPORT_FUNC	"sceUmd",0xD45D1FE6,sceUmdGetDriveStatus
++	IMPORT_FUNC	"sceUmd",0xD45D1FE6,sceUmdGetDriveStatus
+ #endif
+ #ifdef F_sceUmd_0033
+-	IMPORT_FUNC	"sceUmd",0xE83742BA,sceUmdDeactivate
++	IMPORT_FUNC	"sceUmd",0xE83742BA,sceUmdDeactivate
+ #endif
+ #ifdef F_sceUmd_0034
+-	IMPORT_FUNC	"sceUmd",0xEB56097E,sceUmd_EB56097E
++	IMPORT_FUNC	"sceUmd",0xEB56097E,sceUmd_EB56097E
+ #endif
+ #ifdef F_sceUmd_0035
+ 	IMPORT_FUNC	"sceUmd",0xF8352373,sceUmd_F8352373
 Index: src/user/sceImpose.S
 ===================================================================
---- src/user/sceImpose.S	(revision 2417)
+--- src/user/sceImpose.S	(revision 2424)
 +++ src/user/sceImpose.S	(working copy)
 @@ -24,7 +24,7 @@
  	IMPORT_FUNC	"sceImpose",0x72189C48,sceImposeSetUMDPopup
@@ -665,7 +797,7 @@ Index: src/user/sceImpose.S
  	IMPORT_FUNC	"sceImpose",0x8F6E3518,sceImposeGetBacklightOffTime
 Index: src/vsh/scePaf.S
 ===================================================================
---- src/vsh/scePaf.S	(revision 2417)
+--- src/vsh/scePaf.S	(revision 2424)
 +++ src/vsh/scePaf.S	(working copy)
 @@ -1803,13 +1803,13 @@
  	IMPORT_FUNC	"scePaf",0xFBC76D05,sce_png_read
@@ -768,7 +900,7 @@ Index: src/vsh/scePaf.S
  #ifdef F_scePaf_0665
 Index: tools/psp-config.c
 ===================================================================
---- tools/psp-config.c	(revision 2417)
+--- tools/psp-config.c	(revision 2424)
 +++ tools/psp-config.c	(working copy)
 @@ -1,3 +1,6 @@
 +#if defined(__MINGW32__) && !defined(__CYGWIN__)
