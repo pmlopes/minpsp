@@ -1,32 +1,23 @@
 #!/bin/sh
 
-# enable muti threading during the make phase
-EXPERIMENTAL=no
-
-#PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
-PS2DEV_SVN="svn://svn.ps2dev.org/psp/trunk/"
+PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
+#PS2DEV_SVN="svn://svn.ps2dev.org/psp/trunk/"
 SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 
-GCC_VER=4.3.1
-GMP_VER=4.2
+GCC_VER=4.3.2
+GCC_TC_VERSION=4.3.1
+GMP_VER=4.2.3
 MPFR_VER=2.3.1
 GDB_VER=6.8
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
 PSPSDK_VERSION=0.8.7
 
-if [ "$EXPERIMENTAL" == "yes" ]; then
-	MAKE_THREADS="-j 2"
-else
-	MAKE_THREADS=
-fi
-
 BINUTILS_VER=2.16.1
 NEWLIB_VER=1.15.0
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
-PTHREADS_VER=2-8-0
 
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
@@ -234,9 +225,9 @@ then
 		patch -p1 -d $BINUTILS_SRCDIR -i $patchdir/binutils-$BINUTILS_VER-PSP.patch || { echo "Error patching binutils"; exit; }
 	fi
 
-	if [ -f $patchdir/gcc-$GCC_VER-PSP.patch ]
+	if [ -f $patchdir/gcc-$GCC_TC_VERSION-PSP.patch ]
 	then
-		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_VER-PSP.patch || { echo "Error patching gcc"; exit; }
+		patch -p1 -d $GCC_SRCDIR -i $patchdir/gcc-$GCC_TC_VERSION-PSP.patch || { echo "Error patching gcc"; exit; }
 	fi
 
 	if [ -f $patchdir/newlib-$NEWLIB_VER-PSP.patch ]

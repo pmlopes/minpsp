@@ -1,9 +1,5 @@
 #!/bin/sh
-if [ "$LEGACY" == "yes" ]; then
-	INSTALLDIR="/c/pspsdk-legacy"
-else
-	INSTALLDIR="/c/pspsdk"
-fi
+INSTALLDIR=`pwd`
 
 while [ $# -gt 0 ]; do
 	# reset to home
@@ -15,4 +11,3 @@ while [ $# -gt 0 ]; do
 	make clean
 	shift;
 done
-

@@ -64,12 +64,6 @@ fi
 
 cd $BUILDSCRIPTDIR
 
-if [ ! -f patched_usblinkusb ]
-then
-	patch -p1 -d psplinkusb -i $patchdir/psplinkusb.patch || { echo "Error patching psplinkusb"; exit; }
-	touch patched_usblinkusb
-fi
-
 cd psplinkusb
 
 if [ ! -f build-psplinkusb-psp ]

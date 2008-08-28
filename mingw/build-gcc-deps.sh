@@ -17,7 +17,7 @@ fi
 
 if [ ! -f built-gmp ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building GMP"; exit 1; }
+	$MAKE -j 2 || { echo "Error building GMP"; exit 1; }
 	touch built-gmp
 fi
 
@@ -52,7 +52,7 @@ fi
 
 if [ ! -f built-mpfr ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building MPFR"; exit 1; }
+	$MAKE -j 2 || { echo "Error building MPFR"; exit 1; }
 	touch built-mpfr
 fi
 

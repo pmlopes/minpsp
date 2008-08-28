@@ -25,7 +25,6 @@ Portable handheld videogame system.
 ===============================================================================
 0.9
 * Patched SDK for missing functions (only declared on the ASM side)
-* Add support for Java (maybe)
 
 
 ===============================================================================
@@ -34,8 +33,12 @@ Portable handheld videogame system.
 0.8.7
 * Updated SVN
 * Since ps2dev started to use the patches I was hosting, legacy builds are over
-* Updated SDK to build with the flags -Werror and -pedantic
-* Added profiling support to the makefiles 
+* Update GCC 4.3.2
+* Update GMP 4.2.3
+
+0.8.6
+* Update SDK to latest SVN 2418
+* Some tweak on the SDK
 
 0.8.5
 * Updated PSPLINKUSB
@@ -83,7 +86,7 @@ Portable handheld videogame system.
 0.7.1
 * builds ASM files without errors due to bad make
 * added true.exe for makefile assertions
-* GDB was keept out of 0.7 by mistache
+* GDB was kept out of 0.7 by mistake
 
 0.7
 * Removed the dependency on groff, less, cp, mkdir, rm on the script,
@@ -121,11 +124,8 @@ Portable handheld videogame system.
 The main difference is that this is a native cross compiler for Microsoft
 Windows Operating Systems.
   
-Second is that the cross compiler uses the latest release of GCC 4.3.1
-instead of the initial release 4.1.0 (this means some bugs were fixed).
-  
-Third, you can run it directly from a Dos Command Prompt BOX or from your
-favourite IDE (Eclipse and Visual Studio Express tested)
+Second, you can run it directly from a DOS Command Prompt BOX or from your
+favorite IDE (Eclipse and Visual Studio Express tested)
   
 ===============================================================================
  Where do I go from here?

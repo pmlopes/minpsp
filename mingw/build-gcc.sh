@@ -21,7 +21,7 @@ fi
 
 if [ ! -f built-binutils ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building binutils"; exit 1; }
+	$MAKE -j 2 || { echo "Error building binutils"; exit 1; }
 	touch built-binutils
 fi
 
@@ -49,8 +49,7 @@ then
 	../../$GCC_SRCDIR/configure \
 		--enable-languages=$LANGUAGES \
 		--disable-multilib \
-		--with-gcc --with-gnu-ld --with-gnu-as \
-		--disable-shared --disable-win32-registry --disable-nls \
+		--disable-shared --disable-win32-registry \
 		--enable-cxx-flags="-G0" \
 		--target=$target \
 		--with-newlib \
@@ -79,12 +78,6 @@ then
 	svn checkout $PS2DEV_SVN/pspsdk || { echo "ERROR GETTING PSPSDK"; exit 1; }
 else
 	svn update pspsdk
-fi
-
-if [ ! -f patch-psp-sdk ]
-then
-	patch -p0 -d pspsdk -i $patchdir/pspsdk-MINPSPW.patch || { echo "Error patching PSPSDK"; exit; }
-	touch patch-psp-sdk
 fi
 
 cd pspsdk
@@ -126,7 +119,7 @@ fi
 
 if [ ! -f built-newlib ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building newlib"; exit 1; }
+	$MAKE -j 2 || { echo "Error building newlib"; exit 1; }
 	touch built-newlib
 fi
 
@@ -147,7 +140,7 @@ cd $target/gcc
 
 if [ ! -f built-g++ ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building g++"; exit 1; }
+	$MAKE -j 2 || { echo "Error building g++"; exit 1; }
 	touch built-g++
 fi
 
@@ -166,7 +159,7 @@ cd pspsdk
 
 if [ ! -f built-sdk ]
 then
-	$MAKE $MAKE_THREADS || { echo "ERROR BUILDING PSPSDK"; exit 1; }
+	$MAKE -j 2 || { echo "ERROR BUILDING PSPSDK"; exit 1; }
 	touch built-sdk
 fi
 
@@ -196,7 +189,7 @@ fi
 
 if [ ! -f built-gdb ]
 then
-	$MAKE $MAKE_THREADS || { echo "Error building gdb"; exit 1; }
+	$MAKE -j 2 || { echo "Error building gdb"; exit 1; }
 	touch built-gdb
 fi
 
