@@ -57,9 +57,6 @@ UNXUTILS_DIR="UnxUtils"
 MINGW32_GROFF_DIR="groff-$MINGW32_GROFF_VER"
 MINGW32_LESS_DIR="less-$MINGW32_LESS_VER"
 
-builddir=psp
-target=psp
-
 #---------------------------------------------------------------------------------
 # configuration finished
 #---------------------------------------------------------------------------------
@@ -277,8 +274,8 @@ then
 	# strip has trouble using wildcards so do it this way instead
 	#---------------------------------------------------------------------------------
 	for f in	$INSTALLDIR/bin/* \
-				$INSTALLDIR/$target/bin/* \
-				$INSTALLDIR/libexec/gcc/$target/$GCC_VER/*
+				$INSTALLDIR/psp/bin/* \
+				$INSTALLDIR/libexec/gcc/psp/$GCC_VER/*
 	do
 		strip $f
 	done
@@ -286,8 +283,8 @@ then
 	#---------------------------------------------------------------------------------
 	# strip debug info from libraries
 	#---------------------------------------------------------------------------------
-	find $INSTALLDIR/lib/gcc -name *.a -exec $target-strip -d {} \;
-	find $INSTALLDIR/$target -name *.a -exec $target-strip -d {} \;
+	find $INSTALLDIR/lib/gcc -name *.a -exec psp-strip -d {} \;
+	find $INSTALLDIR/$target -name *.a -exec psp-strip -d {} \;
 
 	# strip corrupts this dll, so get it again
 	cp $scriptdir/bin/cygwin1.dll $INSTALLDIR/bin/cygwin1.dll

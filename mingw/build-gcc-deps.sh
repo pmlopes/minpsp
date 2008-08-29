@@ -4,8 +4,8 @@
 # build and install GMP
 #---------------------------------------------------------------------------------
 
-mkdir -p $target/gmp
-cd $target/gmp
+mkdir -p psp/gmp
+cd psp/gmp
 
 if [ ! -f configured-gmp ]
 then
@@ -17,7 +17,7 @@ fi
 
 if [ ! -f built-gmp ]
 then
-	$MAKE -j 2 || { echo "Error building GMP"; exit 1; }
+	$MAKE || { echo "Error building GMP"; exit 1; }
 	touch built-gmp
 fi
 
@@ -39,8 +39,8 @@ cd $BUILDSCRIPTDIR
 # build and install MPFR
 #---------------------------------------------------------------------------------
 
-mkdir -p $target/mpfr
-cd $target/mpfr
+mkdir -p psp/mpfr
+cd psp/mpfr
 
 if [ ! -f configured-mpfr ]
 then
@@ -52,7 +52,7 @@ fi
 
 if [ ! -f built-mpfr ]
 then
-	$MAKE -j 2 || { echo "Error building MPFR"; exit 1; }
+	$MAKE || { echo "Error building MPFR"; exit 1; }
 	touch built-mpfr
 fi
 

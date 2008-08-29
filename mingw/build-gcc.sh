@@ -6,14 +6,14 @@ if [ "$WITH_MINGW_GCC43" == "yes" ]; then
 	GDB_EXTRA_FLAGS="--disable-werror"
 fi
 
-mkdir -p $target/binutils
-cd $target/binutils
+mkdir -p psp/binutils
+cd psp/binutils
 
 if [ ! -f configured-binutils ]
 then
 	../../$BINUTILS_SRCDIR/configure \
-		--prefix=$INSTALLDIR --target=$target --disable-nls --disable-shared --disable-debug \
-		--disable-threads --with-gcc --with-gnu-as --with-gnu-ld --with-stabs \
+		--prefix=$INSTALLDIR --target=psp \
+		--enable-install-libbfd \
 		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
 			|| { echo "Error configuring binutils"; exit 1; }
 	touch configured-binutils
@@ -21,7 +21,7 @@ fi
 
 if [ ! -f built-binutils ]
 then
-	$MAKE -j 2 || { echo "Error building binutils"; exit 1; }
+	$MAKE || { echo "Error building binutils"; exit 1; }
 	touch built-binutils
 fi
 
@@ -36,23 +36,19 @@ cd $BUILDSCRIPTDIR
 #---------------------------------------------------------------------------------
 # build and install just the c compiler
 #---------------------------------------------------------------------------------
-mkdir -p $target/gcc
-cd $target/gcc
+mkdir -p psp/gcc
+cd psp/gcc
 
 if [ ! -f configured-gcc ]
 then
-
-	CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
-	BOOT_CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
-	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer -O2" \
-	BOOT_LDFLAGS=-s \
+	CFLAGS_FOR_TARGET="-G0" \
 	../../$GCC_SRCDIR/configure \
 		--enable-languages=$LANGUAGES \
-		--disable-multilib \
-		--disable-shared --disable-win32-registry \
+		--disable-win32-registry \
 		--enable-cxx-flags="-G0" \
-		--target=$target \
+		--target=psp \
 		--with-newlib \
+		--without-headers --disable-libssp \
 		--prefix=$INSTALLDIR \
 		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
 			|| { echo "Error configuring gcc"; exit 1; }
@@ -104,13 +100,13 @@ cd $BUILDSCRIPTDIR
 #---------------------------------------------------------------------------------
 # build and install newlib
 #---------------------------------------------------------------------------------
-mkdir -p $target/newlib
-cd $target/newlib
+mkdir -p psp/newlib
+cd psp/newlib
 
 if [ ! -f configured-newlib ]
 then
 	$BUILDSCRIPTDIR/$NEWLIB_SRCDIR/configure \
-		--target=$target \
+		--target=psp \
 		--prefix=$INSTALLDIR \
 		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
 			|| { echo "Error configuring newlib"; exit 1; }
@@ -119,7 +115,7 @@ fi
 
 if [ ! -f built-newlib ]
 then
-	$MAKE -j 2 || { echo "Error building newlib"; exit 1; }
+	$MAKE || { echo "Error building newlib"; exit 1; }
 	touch built-newlib
 fi
 
@@ -136,11 +132,11 @@ cd $BUILDSCRIPTDIR
 # build and install the final compiler
 #---------------------------------------------------------------------------------
 
-cd $target/gcc
+cd psp/gcc
 
 if [ ! -f built-g++ ]
 then
-	$MAKE -j 2 || { echo "Error building g++"; exit 1; }
+	$MAKE || { echo "Error building g++"; exit 1; }
 	touch built-g++
 fi
 
@@ -159,7 +155,7 @@ cd pspsdk
 
 if [ ! -f built-sdk ]
 then
-	$MAKE -j 2 || { echo "ERROR BUILDING PSPSDK"; exit 1; }
+	$MAKE || { echo "ERROR BUILDING PSPSDK"; exit 1; }
 	touch built-sdk
 fi
 
@@ -174,13 +170,13 @@ cd $BUILDSCRIPTDIR
 #---------------------------------------------------------------------------------
 # build and install the debugger
 #---------------------------------------------------------------------------------
-mkdir -p $target/gdb
-cd $target/gdb
+mkdir -p psp/gdb
+cd psp/gdb
 
 if [ ! -f configured-gdb ]
 then
 	../../$GDB_SRCDIR/configure \
-		--prefix=$INSTALLDIR --target=$target --disable-nls \
+		--prefix=$INSTALLDIR --target=psp --disable-nls \
 		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
 		$GDB_EXTRA_FLAGS \
 			|| { echo "Error configuring gdb"; exit 1; }
@@ -189,7 +185,7 @@ fi
 
 if [ ! -f built-gdb ]
 then
-	$MAKE -j 2 || { echo "Error building gdb"; exit 1; }
+	$MAKE || { echo "Error building gdb"; exit 1; }
 	touch built-gdb
 fi
 

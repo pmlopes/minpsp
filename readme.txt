@@ -35,6 +35,7 @@ Portable handheld videogame system.
 * Since ps2dev started to use the patches I was hosting, legacy builds are over
 * Update GCC 4.3.2
 * Update GMP 4.2.3
+* Bring GCC builds as close as possible to the official *nix ones
 
 0.8.6
 * Update SDK to latest SVN 2418
