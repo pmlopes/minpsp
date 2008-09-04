@@ -69,3 +69,28 @@ then
 fi
 
 cd $BUILDSCRIPTDIR
+
+#---------------------------------------------------------------------------------
+# build and install pthreads-w32
+#---------------------------------------------------------------------------------
+
+cd $PTHREADS_SRCDIR
+
+if [ ! -f built-pthreads ]
+then
+	$MAKE clean GC-static || { echo "Error building PTHREADS"; exit 1; }
+	touch built-pthreads
+fi
+
+if [ ! -f installed-pthreads ]
+then
+	mkdir -p $BUILDSCRIPTDIR/gcc-libs/lib $BUILDSCRIPTDIR/gcc-libs/include
+	
+	cp libpthreadGC2.a $BUILDSCRIPTDIR/gcc-libs/lib/libpthread.a
+	cp pthread.h $BUILDSCRIPTDIR/gcc-libs/include/pthread.h
+	cp semaphore.h $BUILDSCRIPTDIR/gcc-libs/include/semaphore.h
+	cp sched.h $BUILDSCRIPTDIR/gcc-libs/include/sched.h
+	touch installed-pthreads
+fi
+
+cd $BUILDSCRIPTDIR

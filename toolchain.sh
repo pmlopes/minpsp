@@ -2,12 +2,14 @@
 
 PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
 #PS2DEV_SVN="svn://svn.ps2dev.org/psp/trunk/"
-SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
+#SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
+SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
 GCC_VER=4.3.2
 GCC_TC_VERSION=4.3.1
 GMP_VER=4.2.3
 MPFR_VER=2.3.1
+PTHREADS_VER=2-8-0
 GDB_VER=6.8
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -23,6 +25,7 @@ GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
 GMP="gmp-$GMP_VER.tar.bz2"
 MPFR="mpfr-$MPFR_VER.tar.bz2"
+PTHREADS="pthreads-w32-$PTHREADS_VER-release.tar.gz"
 BINUTILS="binutils-$BINUTILS_VER.tar.bz2"
 NEWLIB="newlib-$NEWLIB_VER.tar.gz"
 GDB="gdb-$GDB_VER.tar.bz2"
@@ -36,6 +39,7 @@ GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
 GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
 GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
 MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
+PTHREADS_URL="ftp://sourceware.org/pub/pthreads-win32/$PTHREADS"
 BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS"
 NEWLIB_URL="ftp://sources.redhat.com/pub/newlib/$NEWLIB"
 GDB_URL="http://ftp.gnu.org/gnu/gdb/$GDB"
@@ -47,6 +51,7 @@ MINGW32_LESS_DEP_URL="$SF_MIRROR/gnuwin32/$MINGW32_LESS_DEP"
 
 GMP_SRCDIR="gmp-$GMP_VER"
 MPFR_SRCDIR="mpfr-$MPFR_VER"
+PTHREADS_SRCDIR="pthreads-w32-$PTHREADS_VER-release"
 BINUTILS_SRCDIR="binutils-$BINUTILS_VER"
 GCC_SRCDIR="gcc-$GCC_VER"
 GDB_SRCDIR="gdb-$GDB_VER"
@@ -85,6 +90,7 @@ then
 	$WGET --passive-ftp -c $BINUTILS_URL || { echo "Error: Failed to download "$BINUTILS; exit; }
 	$WGET -c $GMP_URL || { echo "Error: Failed to download "$GMP; exit; }
 	$WGET -c $MPFR_URL || { echo "Error: Failed to download "$MPFR; exit; }
+	$WGET --passive-ftp -c $PTHREADS_URL || { echo "Error: Failed to download "$PTHREADS; exit; }
 	$WGET -c $GCC_CORE_URL || { echo "Error: Failed to download "$GCC_CORE; exit; }
 	$WGET -c $GCC_GPP_URL || { echo "Error: Failed to download "$GCC_GPP; exit; }
 	$WGET -c $GDB_URL || { echo "Error: Failed to download "$GDB; exit; }
@@ -174,6 +180,8 @@ then
 	tar -xjf $BUILDSCRIPTDIR/download/$GMP || { echo "Error extracting "$GMP; exit; }
 	echo "Extracting $MPFR"
 	tar -xjf $BUILDSCRIPTDIR/download/$MPFR || { echo "Error extracting "$MPFR; exit; }
+	echo "Extracting $PTHREADS"
+	tar -xzf $BUILDSCRIPTDIR/download/$PTHREADS || { echo "Error extracting "$PTHREADS; exit; }
 	echo "Extracting $GCC_CORE"
 	tar -xjf $BUILDSCRIPTDIR/download/$GCC_CORE || { echo "Error extracting "$GCC_CORE; exit; }
 	echo "Extracting $GCC_GPP"

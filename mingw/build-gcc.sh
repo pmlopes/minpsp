@@ -41,10 +41,13 @@ cd psp/gcc
 
 if [ ! -f configured-gcc ]
 then
+	CFLAGS="-D__USE_MINGW_ACCESS" \
 	CFLAGS_FOR_TARGET="-G0" \
+	CXXFLAGS="-mthreads -D__USE_MINGW_ACCESS" \
 	../../$GCC_SRCDIR/configure \
 		--enable-languages=$LANGUAGES \
 		--disable-win32-registry \
+		--enable-threads=posix \
 		--enable-cxx-flags="-G0" \
 		--target=psp \
 		--with-newlib \
