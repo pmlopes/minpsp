@@ -152,31 +152,31 @@ http://www.jetcube.eu
 * You also need some common GNU tools, install then wizard:
  - msysDTK-1.0.1.exe
 * Then unzip the files over your MSYS installation e.g. (C:\msys)
- - msysCORE-1.0.11-2007.01.19-1.tar.bz2
- - MSYS-1.0.11-20071204.tar.bz2
- - bash-3.1-MSYS-1.0.11-1.tar.bz2
  - coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
+ - MSYS-1.0.11-20080821-dll.tar.gz.gz
+ - msysCORE-1.0.11-20080826.tar.gz
+ - mingw-utils-0.3.tar.gz
 * You also need a Compiler I recommend getting the 4.3 unzip over C:\msys\mingw
  - binutils-2.18.50-20080109-2.tar.gz
- - gcc-part-core-4.3.0-20080502-2-mingw32-alpha-bin.tar.gz
- - gcc-part-c++-4.3.0-20080502-2-mingw32-alpha-bin.tar.gz
+ - gcc-4.3.2-tdm-1-core.tar.gz
+ - gcc-4.3.2-tdm-1-g++.tar.gz
  - mingw-runtime-3.14.tar.gz
  - w32api-3.11.tar.gz
-* Extras you also need (unzip over C:\msys\bin):
- - wget-1.9.1-mingwPORT.tar.bz2
- - svn-win32-1.4.6.zip
- - doxygen 1.5.5
+* Extras you also need (unzip over C:\msys\local\):
+ - wget-1.10.1-bin.zip
+ - wget-1.10.1-dep.zip
+ - svn-win32-1.5.2.zip
+ - doxygen 1.5.6
  - pod2man
  - texinfo 4.8 bin
  - texinfo 4.8 dep
- - flex 2.5.33
- - regex 0.12
+ - flex 2.5.4a
 * Extras you also need (unzip over C:\msys\local):
- - graphviz
+ - graphviz 2.16.1
 * Extras you also need to build from sources (unzip over C:\msys\local):
- - autoconf 2.61
- - automake 1.10
- - libtool 1.5.22
+ - autoconf 2.62
+ - automake 1.10.1
+ - libtool 1.5.26
  - libiconv 1.9.2
 * Extras you might want:
  - Windows Python 2.5 (for FreeType docs)

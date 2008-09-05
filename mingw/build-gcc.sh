@@ -1,7 +1,5 @@
 #!/bin/sh
 
-LANGUAGES="c,c++"
-
 if [ "$WITH_MINGW_GCC43" == "yes" ]; then
 	GDB_EXTRA_FLAGS="--disable-werror"
 fi
@@ -14,7 +12,7 @@ then
 	../../$BINUTILS_SRCDIR/configure \
 		--prefix=$INSTALLDIR --target=psp \
 		--enable-install-libbfd \
-		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
+		--with-gmp=/usr/local --with-mpfr=/usr/local \
 			|| { echo "Error configuring binutils"; exit 1; }
 	touch configured-binutils
 fi
@@ -42,18 +40,17 @@ cd psp/gcc
 if [ ! -f configured-gcc ]
 then
 	CFLAGS="-D__USE_MINGW_ACCESS" \
-	CFLAGS_FOR_TARGET="-G0" \
 	CXXFLAGS="-mthreads -D__USE_MINGW_ACCESS" \
+	CFLAGS_FOR_TARGET="-G0" \
 	../../$GCC_SRCDIR/configure \
-		--enable-languages=$LANGUAGES \
+		--enable-languages="c,c++" \
 		--disable-win32-registry \
 		--enable-threads=posix \
 		--enable-cxx-flags="-G0" \
 		--target=psp \
 		--with-newlib \
-		--without-headers --disable-libssp \
 		--prefix=$INSTALLDIR \
-		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
+		--with-gmp=/usr/local --with-mpfr=/usr/local \
 			|| { echo "Error configuring gcc"; exit 1; }
 	touch configured-gcc
 fi
@@ -111,7 +108,7 @@ then
 	$BUILDSCRIPTDIR/$NEWLIB_SRCDIR/configure \
 		--target=psp \
 		--prefix=$INSTALLDIR \
-		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
+		--with-gmp=/usr/local --with-mpfr=/usr/local \
 			|| { echo "Error configuring newlib"; exit 1; }
 	touch configured-newlib
 fi
@@ -179,8 +176,8 @@ cd psp/gdb
 if [ ! -f configured-gdb ]
 then
 	../../$GDB_SRCDIR/configure \
-		--prefix=$INSTALLDIR --target=psp --disable-nls \
-		--with-gmp=$BUILDSCRIPTDIR/gcc-libs --with-mpfr=$BUILDSCRIPTDIR/gcc-libs \
+		--prefix=$INSTALLDIR --target=psp \
+		--with-gmp=/usr/local --with-mpfr=/usr/local \
 		$GDB_EXTRA_FLAGS \
 			|| { echo "Error configuring gdb"; exit 1; }
 	touch configured-gdb
