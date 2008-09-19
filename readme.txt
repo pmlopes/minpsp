@@ -35,7 +35,9 @@ Portable handheld videogame system.
 * Since ps2dev started to use the patches I was hosting, legacy builds are over
 * Update GCC 4.3.2
 * Update GMP 4.2.3
-* Bring GCC builds as close as possible to the official *nix ones
+* Updated the Msys/MinGW environment. I had to reinstall and it was a mess. 
+* Updated the scripts to a single one that seems not to crash with cyg_heap
+   commit exception. (less FDs required)
 
 0.8.6
 * Update SDK to latest SVN 2418
@@ -145,61 +147,86 @@ http://www.jetcube.eu
  How to build it myself?
 ===============================================================================
 
-1) Set up your environment by installing the following software:
+Initial builds were made in a custom Msys/MinGW environment. Keeping this env
+up to date was a terrible task since there were conflicts constantly between
+updated dlls and tools.
 
-* Follow the Install wizard:
- - MSYS-1.0.11-2004.04.30-1.exe
-* You also need some common GNU tools, install then wizard:
- - msysDTK-1.0.1.exe
-* Then unzip the files over your MSYS installation e.g. (C:\msys)
- - coreutils-5.97-MSYS-1.0.11-snapshot.tar.bz2
- - MSYS-1.0.11-20080821-dll.tar.gz.gz
- - msysCORE-1.0.11-20080826.tar.gz
- - mingw-utils-0.3.tar.gz
-* You also need a Compiler I recommend getting the 4.3 unzip over C:\msys\mingw
- - binutils-2.18.50-20080109-2.tar.gz
- - gcc-4.3.2-tdm-1-core.tar.gz
- - gcc-4.3.2-tdm-1-g++.tar.gz
- - mingw-runtime-3.14.tar.gz
- - w32api-3.11.tar.gz
-* Extras you also need (unzip over C:\msys\local\):
- - wget-1.10.1-bin.zip
- - wget-1.10.1-dep.zip
- - svn-win32-1.5.2.zip
- - doxygen 1.5.6
- - pod2man
- - texinfo 4.8 bin
- - texinfo 4.8 dep
- - flex 2.5.4a
-* Extras you also need (unzip over C:\msys\local):
- - graphviz 2.16.1
-* Extras you also need to build from sources (unzip over C:\msys\local):
- - autoconf 2.62
- - automake 1.10.1
- - libtool 1.5.26
- - libiconv 1.9.2
-* Extras you might want:
- - Windows Python 2.5 (for FreeType docs)
-    
-All these files (except the SVN) you can find at the MINGW sourceforge
-site. http://www.sourceforge.net/projects/mingw
-  
-2) Prepare your environment:
+1st Download latest MinGW version and install it:
+http://downloads.sf.net/mingw/MinGW-5.1.4.exe Choose c:\msys\mingw as 
+installation directory. Select "candidate" package version and check the g++
+option on the packages list.
 
-This is a MINGW port of the PSP Toolchain, it means you don't
-need a emulation layer (cygwin) and that you will be able to
-run your tools from a common DOS Command Prompt.
-  
-The limitations are however that some of the tools in these
-installers are badly outdated and some patching need to be done
-to the current scripts/patches.
-  
-Make sure you also have subversion installed and you can call
-it from the command line: e.g. svn --version
-  
-3) Run the toolchain script:
+2nd Download latest MSYS and install it:
+http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11-2004.04.30-1.exe
+Chose c:\msys as installation directory. Leave all other options unchanged.
+During the postinstall script, please carefully answer all questions. 
+Important: Do not skip questions with enter.
 
-Open the MSYS shell and run the script, once you've built the
-Toolchain successfully you don't need that shell anymore.
-  
+Note: Users of 64-bit Windows variants have to change the startmenu shortcut.
+Change it to c:\WINDOWS\SysWOW64\cmd.exe /C c:\dev\msys\msys.bat (adjust path
+to Windows directory as needed)
+
+3rd Download and install MSYS Developer Toolkit executable:
+http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe
+Install to c:\msys as well.
+
+4th Start msys. Type in the following commands:
+
+echo "export LDFLAGS=-L/local/lib" > ~/.profile
+echo "export CPPFLAGS=-I/local/include" >> ~/.profile
+exit
+
+5th Download wget:
+http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-bin.zip
+http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-dep.zip
+Unzip to C:\msys\local
+
+6th Download the following files to your local home:
+wget http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2
+wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.4.tar.bz2 
+wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.62.tar.bz2
+wget ftp://ftp.gnu.org/gnu/automake/automake-1.10.1.tar.bz2
+wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.11.1.tar.gz
+
+7th install the download software:
+cd /
+tar -xvjf /c/dev/download/m4-1.4.7-MSYS.tar.bz2
+
+cd ~
+tar -xvjf libtool-2.2.4.tar.bz2
+cd libtool-2.2.4
+./configure --disable-ltdl-install
+make
+make install
+
+cd ~
+tar -xvjf autoconf-2.62.tar.bz2
+cd autoconf-2.62
+./configure
+make
+make install
+
+cd ~
+tar -xvjf automake-1.10.1.tar.bz2
+cd automake-1.10.1
+./configure
+make
+make install
+
+cd ~
+tar -xvzf libiconv-1.11.1.tar.gz
+cd libiconv-1.11.1
+./configure --disable-shared --enable-static
+make
+make install
+
+8th Install other packages we need
+  - doxygen 1.5.6
+  - pod2man
+  - graphviz 2.16.1
+  - texinfo 4.8
+  - svn
+
+To build run the toolchain script:
+
 ./toolchain.sh
