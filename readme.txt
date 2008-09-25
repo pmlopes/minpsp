@@ -30,6 +30,9 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.8
+* Added Objective-C support to the toochain. And a sample.
+
 0.8.7
 * Updated SVN
 * Since ps2dev started to use the patches I was hosting, legacy builds are over

@@ -18,7 +18,7 @@ GDB_VER=6.8
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
-PSPSDK_VERSION=0.8.7
+PSPSDK_VERSION=0.8.8
 
 BINUTILS_VER=2.16.1
 NEWLIB_VER=1.15.0
@@ -28,6 +28,7 @@ MINGW32_LESS_VER=394
 
 GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
 GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
+GCC_OBJC="gcc-objc-$GCC_VER.tar.bz2"
 GMP="gmp-$GMP_VER.tar.bz2"
 MPFR="mpfr-$MPFR_VER.tar.bz2"
 ZLIB="zlib-$ZLIB_VER.tar.gz"
@@ -43,6 +44,7 @@ MINGW32_LESS_DEP="less-$MINGW32_LESS_VER-dep.zip"
 
 GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
 GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
+GCC_OBJC_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_OBJC"
 GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
 MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
 ZLIB_URL="http://www.zlib.net/$ZLIB"
@@ -84,6 +86,19 @@ function checkTool {
 	if [ -z $1 ]; then
 		die "Please make sure you have '"$1"' installed."
 	fi
+}
+
+#arg1 file
+#arg2 from
+#arg3 to
+function installFile {
+	cp $2/$1 $INSTALLDIR/$3/$1 || die "Failed to install file "$1
+}
+
+#arg1 from
+#arg2 to
+function installDir {
+	cp -fR $1 $INSTALLDIR/$2 || die "Failed to install dir "$1
 }
 
 # arg1 base
@@ -203,12 +218,14 @@ function buildBinutils {
 function buildBaseCompiler {
 	downloadHTTP psp $GCC_CORE $GCC_CORE_URL
 	downloadHTTP psp $GCC_GPP $GCC_GPP_URL
+	downloadHTTP psp $GCC_OBJC $GCC_OBJC_URL
 	
 	if [ ! -d psp/$GCC_SRCDIR ]
 	then
 		cd psp
 		tar -xjf $GCC_CORE || die "extracting "$GCC_CORE
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
+		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VERSION-PSP.patch || die "patching gcc"
 		cd ..
 	fi
@@ -216,12 +233,12 @@ function buildBaseCompiler {
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 		
-	CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
-	BOOT_CFLAGS="-O2 -fomit-frame-pointer -D__USE_MINGW_ACCESS" \
-	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer -O2" \
+	CFLAGS="-fomit-frame-pointer -D__USE_MINGW_ACCESS -G0" \
+	BOOT_CFLAGS="-fomit-frame-pointer -D__USE_MINGW_ACCESS" \
+	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer" \
 	BOOT_LDFLAGS=-s \
 	../../$GCC_SRCDIR/configure \
-			--enable-languages="c,c++" \
+			--enable-languages="c,c++,objc" \
 			--disable-multilib \
 			--disable-shared \
 			--disable-win32-registry \
@@ -241,6 +258,7 @@ function bootstrapSDK {
 	then
 		cd psp
 		svn checkout $PS2DEV_SVN/pspsdk || die "getting pspsdk"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 		cd pspsdk
 		./bootstrap || die "running pspsdk bootstrap"
 		cd ../..
@@ -281,8 +299,8 @@ function buildNewlib {
 
 function buildFinalCompiler {
 	cd psp/build/$GCC_SRCDIR
-	make || die "building g++"
-	make install || die "installing g++"
+	make || die "building final compiler"
+	make install || die "installing final compiler"
 	cd ../../..
 }
 
@@ -324,10 +342,10 @@ function installExtraBinaries {
 	then
 		cd deps
 		../mingw/bin/unzip -q $UNXUTILS -d $UNXUTILS_DIR
-		cp $UNXUTILS_DIR/usr/local/wbin/cp.exe $INSTALLDIR/bin/cp.exe || die "cp"
-		cp $UNXUTILS_DIR/usr/local/wbin/rm.exe $INSTALLDIR/bin/rm.exe || die "rm"
-		cp $UNXUTILS_DIR/usr/local/wbin/mkdir.exe $INSTALLDIR/bin/mkdir.exe || die "mkdir"
-		cp $UNXUTILS_DIR/usr/local/wbin/sed.exe $INSTALLDIR/bin/sed.exe || die "sed"
+		installFile cp.exe $UNXUTILS_DIR/usr/local/wbin bin
+		installFile rm.exe $UNXUTILS_DIR/usr/local/wbin bin
+		installFile mkdir.exe $UNXUTILS_DIR/usr/local/wbin bin
+		installFile sed.exe $UNXUTILS_DIR/usr/local/wbin bin
 		cd ..
 	fi
 	
@@ -339,8 +357,8 @@ function installExtraBinaries {
 		mkdir $MINGW32_MAKE_DIR
 		cd $MINGW32_MAKE_DIR
 		tar -xzf ../$MINGW32_MAKE || die "extracting "$MINGW32_MAKE
-		cp make.exe $INSTALLDIR/bin/make.exe || die "make"
-		cp info/*.* $INSTALLDIR/info || die "info"
+		installFile make.exe . bin
+		installDir info .
 		cd ../..
 	fi
 	
@@ -348,7 +366,7 @@ function installExtraBinaries {
 	gcc -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
 	strip -s $INSTALLDIR/bin/true.exe
 	# visual studio support
-	cp mingw/bin/vsmake.bat $INSTALLDIR/bin/vsmake.bat || die "vsmake"
+	installFile vsmake.bat mingw/bin bin
 }
 
 function installPSPLinkUSB {
@@ -360,27 +378,27 @@ function installPSPLinkUSB {
 		svn update psplinkusb
 	fi
 	# pspsh + usbhostfs_pc
-	cp ../mingw/bin/pspsh.exe $INSTALLDIR/bin/pspsh.exe || die "pspsh"
-	cp ../mingw/bin/usbhostfs_pc.exe $INSTALLDIR/bin/usbhostfs_pc.exe || die "usbhostfs_pc"
-	cp ../mingw/bin/cygncurses-8.dll $INSTALLDIR/bin/cygncurses-8.dll || die "cygncurses-8.dll"
-	cp ../mingw/bin/cygreadline6.dll $INSTALLDIR/bin/cygreadline6.dll || die "cygreadline6.dll"
-	cp ../mingw/bin/cygwin1.dll $INSTALLDIR/bin/cygwin1.dll || die "cygwin1.dll"
+	installFile pspsh.exe ../mingw/bin bin
+	installFile usbhostfs_pc.exe ../mingw/bin bin
+	installFile cygncurses-8.dll ../mingw/bin bin
+	installFile cygreadline6.dll ../mingw/bin bin
+	installFile cygwin1.dll ../mingw/bin bin
 	
 	# copy the drivers for windows
 	mkdir -p $INSTALLDIR/bin/driver
 	mkdir -p $INSTALLDIR/bin/driver_x64
-	cp ../mingw/bin/usb/driver/libusb0.dll $INSTALLDIR/bin/driver/libusb0.dll || die "libusb0.dll"
-	cp ../mingw/bin/usb/driver/libusb0.sys $INSTALLDIR/bin/driver/libusb0.sys || die "libusb0.sys"
-	cp ../mingw/bin/usb/driver/psp.cat $INSTALLDIR/bin/driver/psp.cat || die "psp.cat"
-	cp ../mingw/bin/usb/driver/psp.inf $INSTALLDIR/bin/driver/psp.inf || die "psp.inf"
+	installFile libusb0.dll ../mingw/bin/usb/driver bin/driver
+	installFile libusb0.sys ../mingw/bin/usb/driver bin/driver
+	installFile psp.cat ../mingw/bin/usb/driver bin/driver
+	installFile psp.inf ../mingw/bin/usb/driver bin/driver
 	# 64 bits (i've no idea if it works)
-	cp ../mingw/bin/usb/driver_x64/libusb0.dll $INSTALLDIR/bin/driver_x64/libusb0.dll || die "libusb0.dll x64"
-	cp ../mingw/bin/usb/driver_x64/libusb0.sys $INSTALLDIR/bin/driver_x64/libusb0.sys || die "libusb0.sys x64"
-	cp ../mingw/bin/usb/driver_x64/psp.cat $INSTALLDIR/bin/driver_x64/psp.cat || die "psp.cat x64"
-	cp ../mingw/bin/usb/driver_x64/psp.inf $INSTALLDIR/bin/driver_x64/psp.inf || die "psp.inf x64"
-	cp ../mingw/bin/usb/driver_x64/libusb0_x64.dll $INSTALLDIR/bin/driver_x64/libusb0_x64.dll || die "libusb0_x64.dll"
-	cp ../mingw/bin/usb/driver_x64/libusb0_x64.sys $INSTALLDIR/bin/driver_x64/libusb0_x64.sys || die "libusb0_x64.sys"
-	cp ../mingw/bin/usb/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64/psp_x64.cat || die "psp_x64.cat"
+	installFile libusb0.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile libusb0.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile psp.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile psp.inf ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile libusb0_x64.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile libusb0_x64.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
+	installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
 	
 	cd psplinkusb
 	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"
@@ -389,14 +407,14 @@ function installPSPLinkUSB {
 	cd release
 
 	mkdir -p $INSTALLDIR/psplink/psp
-	cp -fR scripts $INSTALLDIR/psplink/psp
+	installDir scripts psplink/psp
 	rm -fR $INSTALLDIR/psplink/psp/scripts/.svn
-	cp -fR v1.0 $INSTALLDIR/psplink/psp
-	cp -fR v1.5 $INSTALLDIR/psplink/psp
-	cp -fR v1.5_nocorrupt $INSTALLDIR/psplink/psp
-	cp LICENSE $INSTALLDIR/psplink
-	cp psplink_manual.pdf $INSTALLDIR/psplink
-	cp README $INSTALLDIR/psplink
+	installDir v1.0 psplink/psp
+	installDir v1.5 psplink/psp
+	installDir v1.5_nocorrupt psplink/psp
+	installFile LICENSE . psplink
+	installFile psplink_manual.pdf . psplink
+	installFile README . psplink
 	touch install-psplinkusb-psp
 	
 	cd ..
@@ -406,7 +424,7 @@ function installPSPLinkUSB {
 	
 	cd release_oe
 
-	cp -fR psplink $INSTALLDIR/psplink/psp/oe
+	installDir psplink psplink/psp/oe
 	
 	cd ../../..
 }
@@ -421,13 +439,13 @@ function installMan {
 	then
 		cd deps
 		../mingw/bin/unzip -q $MINGW32_GROFF -d $MINGW32_GROFF_DIR
-		cp $MINGW32_GROFF_DIR/bin/groff.exe $INSTALLDIR/bin/groff.exe || die "groff"
-		cp $MINGW32_GROFF_DIR/bin/grotty.exe $INSTALLDIR/bin/grotty.exe || die "grotty"
-		cp $MINGW32_GROFF_DIR/bin/troff.exe $INSTALLDIR/bin/troff.exe || die "troff"
+		installFile groff.exe $MINGW32_GROFF_DIR/bin bin
+		installFile grotty.exe $MINGW32_GROFF_DIR/bin bin
+		installFile troff.exe $MINGW32_GROFF_DIR/bin bin
 		mkdir -p $INSTALLDIR/share
 		
-		cp -fR $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font $INSTALLDIR/share
-		cp -fR $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac $INSTALLDIR/share
+		installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font share
+		installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac share
 		cd ..
 	fi
 
@@ -436,16 +454,16 @@ function installMan {
 		cd deps
 		../mingw/bin/unzip -q $MINGW32_LESS -d $MINGW32_LESS_DIR
 		../mingw/bin/unzip -q $MINGW32_LESS_DEP -d $MINGW32_LESS_DIR
-		cp $MINGW32_LESS_DIR/bin/less.exe $INSTALLDIR/bin/less.exe || die "less"
-		cp $MINGW32_LESS_DIR/bin/pcre3.dll $INSTALLDIR/bin/pcre3.dll || die "prce3.dll"
-		cp ../mingw/bin/man.bat $INSTALLDIR/bin/man.bat || die "man"
+		installFile less.exe $MINGW32_LESS_DIR/bin bin
+		installFile pcre3.dll $MINGW32_LESS_DIR/bin bin
+		installFile man.bat ../mingw/bin bin
 		cd ..
 	fi
 }
 
 function installInfo {
-	cp mingw/bin/info.bat $INSTALLDIR/bin/info.bat || die "info"
-	cp mingw/bin/ginfo.exe $INSTALLDIR/bin/ginfo.exe || die "ginfo"
+	installFile info.bat mingw/bin bin
+	installFile ginfo.exe mingw/bin bin
 }
 
 function stripBinaries {
@@ -467,7 +485,7 @@ function stripBinaries {
 	find $INSTALLDIR/psp -name *.a -exec psp-strip -d {} \;
 
 	# strip corrupts this dll, so get it again
-	cp mingw/bin/cygwin1.dll $INSTALLDIR/bin/cygwin1.dll
+	installFile cygwin1.dll mingw/bin bin
 }
 
 function patchCMD {
