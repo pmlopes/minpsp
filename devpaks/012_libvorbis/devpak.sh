@@ -8,7 +8,6 @@ svnGetPS2DEV $LIBNAME
 
 AC_VERSION=$(autoconf --version | grep 2.56)
 AM_VERSION=$(automake --version | grep 1.7)
-UUENCODE=/usr/local_/bin/uuencode
 
 if [ ! "$AC_VERSION" == "autoconf (GNU Autoconf) 2.56" ]; then
 	if [ ! "$AM_VERSION" == "automake (GNU automake) 1.7.1" ]; then
