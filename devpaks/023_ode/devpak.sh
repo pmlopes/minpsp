@@ -25,7 +25,9 @@ cp -v include/drawstuff/*.h ../target/psp/include/drawstuff
 cp -v ode/doc/ode.* ../target/doc/ode
 cp -v ode/doc/pix/*.jpg ../target/doc/ode/pix
 cp README ../target/doc/$LIBNAME.txt
-	
+
+cd ..
+
 makeInstaller $LIBNAME $VERSION pspgl 2264
 
 echo "Run the NSIS script now!"
