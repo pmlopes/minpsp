@@ -1,34 +1,24 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=SDL_ttf
+VERSION=2.0.7
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-else
-	svn update $LIBNAME
-fi
+svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-configured ]
-then
-	./autogen.sh
-	AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --with-freetype-prefix=$(psp-config --pspdev-path) --without-x || { exit 1; }
-	touch $LIBNAME-configured
-fi
 
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
+./autogen.sh
+AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --with-freetype-prefix=$(psp-config --pspdev-path) --without-x || { exit 1; }
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	make install || { echo "Error installing $LIBNAME"; exit 1; }
-	mkdir -p ../target/doc
-	cp README ../target/doc/SDL_ttf.txt
-	touch $LIBNAME-devpaktarget
-fi
+make || { echo "Error building $LIBNAME"; exit 1; }
+
+make install || { echo "Error installing $LIBNAME"; exit 1; }
+mkdir -p ../target/doc
+cp README ../target/doc/SDL_ttf.txt
+
+cd ..
+
+makeInstaller $LIBNAME $VERSION freetype 2.1.10 SDL 1.2.9
 
 echo "Run the NSIS script now!"

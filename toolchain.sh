@@ -18,7 +18,7 @@ GDB_VER=6.8
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
-PSPSDK_VERSION=0.8.8
+PSPSDK_VERSION=0.8.9
 
 BINUTILS_VER=2.16.1
 NEWLIB_VER=1.15.0
@@ -200,7 +200,6 @@ function buildBinutils {
 	../../$BINUTILS_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
-			--disable-nls \
 			--disable-shared \
 			--disable-debug \
 			--disable-threads \
@@ -238,7 +237,7 @@ function buildBaseCompiler {
 	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer" \
 	BOOT_LDFLAGS=-s \
 	../../$GCC_SRCDIR/configure \
-			--enable-languages="c,c++,objc" \
+			--enable-languages="c,c++,objc,obj-c++" \
 			--disable-multilib \
 			--disable-shared \
 			--disable-win32-registry \
@@ -327,7 +326,6 @@ function buildGDB {
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
-			--disable-nls \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
 	make || die "building gdb"

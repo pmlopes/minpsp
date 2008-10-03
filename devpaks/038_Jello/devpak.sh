@@ -1,13 +1,10 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=Jello
+VERSION=0.0.1
 
-if [ ! -d PSP_JellyPhysic ]
-then
-	svn checkout http://jphysicmod.googlecode.com/svn/trunk/PSP_JellyPhysic || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-else
-	svn update PSP_JellyPhysic
-fi
+svnGet PSP_JellyPhysic http://jphysicmod.googlecode.com/svn/trunk/PSP_JellyPhysic
 
 if [ ! -f $LIBNAME-patched ]
 then
@@ -17,19 +14,14 @@ fi
 
 cd PSP_JellyPhysic
 
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
+make || { echo "Error building $LIBNAME"; exit 1; }
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	mkdir -p ../target/psp/include/Jello ../target/psp/lib
-	cp *.h ../target/psp/include/Jello
-	cp libJello.a ../target/psp/lib
+mkdir -p ../target/psp/include/Jello ../target/psp/lib
+cp *.h ../target/psp/include/Jello
+cp libJello.a ../target/psp/lib
 	
-	touch $LIBNAME-devpaktarget
-fi
+cd ..
+
+makeInstaller $LIBNAME $VERSION pspgl 2264
 
 echo "Run the NSIS script now!"

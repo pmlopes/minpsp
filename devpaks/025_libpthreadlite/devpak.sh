@@ -1,29 +1,23 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=libpthreadlite
+VERSION=2336
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-#else
-#	svn update $LIBNAME
-fi
+svnGetPS2DEV $LIBNAME
+
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
-	cp pthreadlite.h ../target/psp/include
-	cp libpthreadlite.a ../target/psp/lib
-	cp README ../target/doc/pthreadlite.txt
+make || { echo "Error building $LIBNAME"; exit 1; }
+
+mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
+cp pthreadlite.h ../target/psp/include
+cp libpthreadlite.a ../target/psp/lib
+cp README ../target/doc/pthreadlite.txt
 	
-	touch $LIBNAME-devpaktarget
-fi
+cd ..
+
+makeInstaller $LIBNAME $VERSION
 
 echo "Run the NSIS script now!"

@@ -1,11 +1,14 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=intraFont
 PKG=$LIBNAME\_0.22
+VERSION=0.22
+
+downloadHTTP http://www.psp-programming.com/benhur $PKG.zip
 
 if [ ! -d $LIBNAME ]
 then
-	wget http://www.psp-programming.com/benhur/$PKG.zip
 	../../mingw/bin/unzip -q $PKG.zip
 fi
 
@@ -16,18 +19,13 @@ then
 fi
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	make install || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-devpaktarget
-fi
+make || { echo "Error building $LIBNAME"; exit 1; }
+
+make install || { echo "Error building $LIBNAME"; exit 1; }
 
 cd ..
+
+makeInstaller $LIBNAME $VERSION
 
 echo "Run the NSIS script now!"

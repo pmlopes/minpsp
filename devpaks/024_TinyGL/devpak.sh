@@ -1,13 +1,10 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=TinyGL
+VERSION=0.4
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-#else
-#	svn update $LIBNAME
-fi
+svnGetPS2DEV $LIBNAME
 
 if [ ! -f $LIBNAME-patched ]
 then
@@ -16,20 +13,16 @@ then
 fi
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	mkdir -p ../target/psp/include/GL ../target/psp/lib ../target/doc
-	cp include/GL/*.h ../target/psp/include/GL
-	cp lib/*.a ../target/psp/lib
-	cp README ../target/doc/$LIBNAME.txt
-	
-	touch $LIBNAME-devpaktarget
-fi
+make || { echo "Error building $LIBNAME"; exit 1; }
+
+mkdir -p ../target/psp/include/GL ../target/psp/lib ../target/doc
+cp include/GL/*.h ../target/psp/include/GL
+cp lib/*.a ../target/psp/lib
+cp README ../target/doc/$LIBNAME.txt
+
+cd ..
+
+makeInstaller $LIBNAME $VERSION SDL 1.2.9
 
 echo "Run the NSIS script now!"

@@ -30,6 +30,10 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.9
+* Added Objective-C++ support to the toochain.
+* Updated SVN to include latest SceMP3 lib stubs and headers
+
 0.8.8
 * Added Objective-C support to the toochain. And a sample.
 
@@ -185,6 +189,7 @@ http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-dep.zip
 Unzip to C:\msys\local
 
 6th Download the following files to your local home:
+wget http://downloads.sourceforge.net/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
 wget http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2
 wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.4.tar.bz2 
 wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.62.tar.bz2
@@ -193,42 +198,46 @@ wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.11.1.tar.gz
 
 7th install the download software:
 cd /
-tar -xvjf /c/dev/download/m4-1.4.7-MSYS.tar.bz2
+tar -xvjf ~/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
+tar -xvjf ~/m4-1.4.7-MSYS.tar.bz2
 
 cd ~
-tar -xvjf libtool-2.2.4.tar.bz2
+tar -xvjf libtool-1.5.24.tar.bz2
 cd libtool-2.2.4
 ./configure --disable-ltdl-install
 make
 make install
 
-cd ~
-tar -xvjf autoconf-2.62.tar.bz2
+cd ..
+tar -xvjf autoconf-2.61.tar.bz2
 cd autoconf-2.62
 ./configure
 make
 make install
 
-cd ~
+cd ..
 tar -xvjf automake-1.10.1.tar.bz2
 cd automake-1.10.1
 ./configure
 make
 make install
 
-cd ~
+cd ..
 tar -xvzf libiconv-1.11.1.tar.gz
 cd libiconv-1.11.1
 ./configure --disable-shared --enable-static
 make
 make install
 
-8th Install other packages we need
+8th Install other packages we need (into C:\msys\local)
   - doxygen 1.5.6
   - pod2man
   - graphviz 2.16.1
   - texinfo 4.8
-  - svn
+  - svn 1.5.2
+
+9th Install Python 2.5.2 (later may work but not tested)
+  - Python 2.5.2 (Use the windows installer) Then add to the PATH
 
 To build run the toolchain script:
 

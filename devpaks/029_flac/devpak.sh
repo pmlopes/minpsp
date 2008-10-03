@@ -1,11 +1,14 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=flac-1.2.1
+VERSION=1.2.1
+
+downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/flac $LIBNAME.tar.gz
 
 if [ ! -d $LIBNAME ]
 then
-#	wget http://surfnet.dl.sourceforge.net/sourceforge/flac/$LIBNAME.tar.gz
-	tar -zxf $LIBNAME.tar.gz
+	tar -zxf $LIBNAME.tar.gz || { echo "Failed to download "$1; exit 1; }
 fi
 
 if [ ! -f $LIBNAME-patched ]
@@ -15,28 +18,24 @@ then
 fi
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-build ]
-then
-	CFLAGS="-ffast-math -fsigned-char -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --enable-maintainer-mode --host=psp --prefix=$(pwd)/../target/psp --with-ogg=$(psp-config --psp-prefix)
-	cd src/libFLAC
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	cd ../../include/FLAC
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	cd ../..
-	touch $LIBNAME-build
-fi
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	cd src/libFLAC
-	make install || { echo "Error building $LIBNAME"; exit 1; }
-	cd ../../include/FLAC
-	make install || { echo "Error building $LIBNAME"; exit 1; }
-	cd ../..
-	mkdir -p ../target/doc/$LIBNAME
-	cp -fR doc/html/* ../target/doc/$LIBNAME
+CFLAGS="-ffast-math -fsigned-char -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --enable-maintainer-mode --host=psp --prefix=$(pwd)/../target/psp --with-ogg=$(psp-config --psp-prefix)
+cd src/libFLAC
+make || { echo "Error building $LIBNAME"; exit 1; }
+cd ../../include/FLAC
+make || { echo "Error building $LIBNAME"; exit 1; }
+cd ../..
+
+cd src/libFLAC
+make install || { echo "Error building $LIBNAME"; exit 1; }
+cd ../../include/FLAC
+make install || { echo "Error building $LIBNAME"; exit 1; }
+cd ../..
+mkdir -p ../target/doc/$LIBNAME
+cp -fR doc/html/* ../target/doc/$LIBNAME
+
+cd ..
 	
-	touch $LIBNAME-devpaktarget
-fi
+makeInstaller $LIBNAME $VERSION libogg 1.1.2
 
 echo "Run the NSIS script now!"

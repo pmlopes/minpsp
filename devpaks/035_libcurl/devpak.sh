@@ -1,44 +1,26 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=libcurl
+VERSION=7.15.1
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout http://psp.jim.sh/svn/pspware/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-else
-	svn update $LIBNAME
-fi
+svnGetPSPWARE $LIBNAME
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-configured ]
-then
-	LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" \
-	 	LIBS="-lc -lpspnet_inet -lpspnet_resolver -lpspuser" \
-	 	./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
-	touch $LIBNAME-configured
-fi
 
-if [ ! -f $LIBNAME-build ]
-then
-	make CFLAGS=-G0 || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
+LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspnet_inet -lpspnet_resolver -lpspuser" ./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	make install || { echo "Error installing $LIBNAME"; exit 1; }
-	touch $LIBNAME-devpaktarget
-fi
+make CFLAGS=-G0 || { echo "Error building $LIBNAME"; exit 1; }
+
+make install || { echo "Error installing $LIBNAME"; exit 1; }
 
 cd ..
-if [ ! -f $LIBNAME-config-native ]
-then
-	mkdir -p target/bin
-	rm -fR target/psp/bin
-	gcc -o target/bin/curl-config curl-config.c || exit 1
-	strip -s target/bin/curl-config.exe
-	touch $LIBNAME-config-native
-fi
 
+mkdir -p target/bin
+rm -fR target/psp/bin
+gcc -o target/bin/curl-config curl-config.c || exit 1
+strip -s target/bin/curl-config.exe
+
+makeInstaller $LIBNAME $VERSION
 
 echo "Run the NSIS script now!"

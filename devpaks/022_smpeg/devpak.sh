@@ -1,13 +1,10 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=smpeg-psp
+VERSION=0.4.5
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-else
-	svn update $LIBNAME
-fi
+svnGet $LIBNAME http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
 
 if [ ! -f $LIBNAME-patched ]
 then
@@ -16,20 +13,16 @@ then
 fi
 
 cd $LIBNAME
-if [ ! -f $LIBNAME-build ]
-then
-	make || { echo "Error building $LIBNAME"; exit 1; }
-	touch $LIBNAME-build
-fi
 
-if [ ! -f $LIBNAME-devpaktarget ]
-then
-	mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
-	cp -v libsmpeg.a ../target/psp/lib
-	cp -v *.h ../target/psp/include
-	cp README ../target/doc/$LIBNAME.txt
+make || { echo "Error building $LIBNAME"; exit 1; }
+
+mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
+cp -v libsmpeg.a ../target/psp/lib
+cp -v *.h ../target/psp/include
+cp README ../target/doc/$LIBNAME.txt
 	
-	touch $LIBNAME-devpaktarget
-fi
+cd ..
+
+makeInstaller $LIBNAME $VERSION SDL 1.2.9
 
 echo "Run the NSIS script now!"

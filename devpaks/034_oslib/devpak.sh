@@ -1,12 +1,10 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=OSlib
+VERSION=2.10
 
-if [ ! -d $LIBNAME ]
-then
-	wget http://brunni.dev-fr.org/dl/psp/OSLib_210_src.rar
-#	../../mingw/bin/unzip -q oslib.zip
-fi
+downloadHTTP http://brunni.dev-fr.org/dl/psp OSLib_210_src.rar
 
 cp Doxyfile $LIBNAME/$LIBNAME
 cd $LIBNAME/$LIBNAME
@@ -31,4 +29,9 @@ doxygen
 
 cp -fR ../../target/doc/oslib/html/* ../../target/doc/oslib
 rm -fR ../../target/doc/oslib/html
+
+cd ../..
+
+makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 libmikmod 3.1.11
+
 echo "Run the NSIS script now!"

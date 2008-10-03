@@ -2,12 +2,7 @@
 
 LIBNAME=mikmodlib
 
-if [ ! -d $LIBNAME ]
-then
-	svn checkout svn://svn.pspdev.org/psp/trunk/$LIBNAME || { echo "ERROR GETTING $LIBNAME"; exit 1; }
-#else
-#	svn update $LIBNAME
-fi
+svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 if [ ! -f $LIBNAME-build ]
