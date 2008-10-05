@@ -4,8 +4,9 @@
 # configuration
 #---------------------------------------------------------------------------------
 
-#PS2DEV_SVN="svn://svn.ps2dev.org/psp/trunk/"
-PS2DEV_SVN="http://psp.jim.sh/svn/psp/trunk/"
+PS2DEVSVN_URL="svn://svn.pspdev.org/psp/trunk"
+PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
+
 #SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
@@ -85,6 +86,17 @@ function die {
 function checkTool {
 	if [ -z $1 ]; then
 		die "Please make sure you have '"$1"' installed."
+	fi
+}
+
+# Gets the sources from the PS2DEV SVN reppo, on failure tries to fallback to JimParis mirror
+#arg1 devpak
+function svnGetPS2DEV() {
+	if [ ! -d $1 ]
+	then
+		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
+	else
+		svn update $2 $3 $1
 	fi
 }
 
@@ -172,12 +184,7 @@ function installMPFR {
 
 function downloadPatches {
 	cd psp
-	if [ ! -d patches ]
-	then
-		svn checkout $PS2DEV_SVN/psptoolchain/patches || die "Getting toolchain patches"
-	else
-		svn update patches
-	fi
+	svnGetPS2DEV psptoolchain/patches
 
 	cp ../mingw/patches/* patches || die "adding MinPSPW patches"
 	cd ..
@@ -256,13 +263,13 @@ function bootstrapSDK {
 	if [ ! -d psp/pspsdk ]
 	then
 		cd psp
-		svn checkout $PS2DEV_SVN/pspsdk || die "getting pspsdk"
+		svnGetPS2DEV $PS2DEV_SVN/pspsdk
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 		cd pspsdk
 		./bootstrap || die "running pspsdk bootstrap"
 		cd ../..
 	else
-		svn update pspsdk
+		svnGetPS2DEV $PS2DEV_SVN/pspsdk
 	fi
 	
 	mkdir -p psp/build/pspsdk
@@ -369,12 +376,8 @@ function installExtraBinaries {
 
 function installPSPLinkUSB {
 	cd psp
-	if [ ! -d psplinkusb ]
-	then
-		svn checkout $PS2DEV_SVN/psplinkusb || die "getting psplinkusb"
-	else
-		svn update psplinkusb
-	fi
+	svnGetPS2DEV $PS2DEV_SVN/psplinkusb
+	
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
 	installFile usbhostfs_pc.exe ../mingw/bin bin
