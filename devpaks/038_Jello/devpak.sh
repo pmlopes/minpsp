@@ -6,12 +6,6 @@ VERSION=0.0.1
 
 svnGet PSP_JellyPhysic http://jphysicmod.googlecode.com/svn/trunk/PSP_JellyPhysic
 
-if [ ! -f $LIBNAME-patched ]
-then
-	patch -p0 -d PSP_JellyPhysic -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
-	touch $LIBNAME-patched
-fi
-
 cd PSP_JellyPhysic
 
 make || { echo "Error building $LIBNAME"; exit 1; }

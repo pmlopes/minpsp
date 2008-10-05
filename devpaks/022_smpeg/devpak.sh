@@ -6,12 +6,6 @@ VERSION=0.4.5
 
 svnGet $LIBNAME http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
 
-if [ ! -f $LIBNAME-patched ]
-then
-	patch -p0 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
-	touch $LIBNAME-patched
-fi
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
