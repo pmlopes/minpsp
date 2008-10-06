@@ -13,7 +13,7 @@ function svnGet() {
 	if [ ! -d $1 ]
 	then
 		svn checkout $2 $3 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ ! -f $1.patch ]
+		if [ -f $1.patch ]
 		then
 			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
 		fi
@@ -28,7 +28,7 @@ function svnGetPS2DEV() {
 	if [ ! -d $1 ]
 	then
 		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ ! -f $1.patch ]
+		if [ -f $1.patch ]
 		then
 			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
 		fi
@@ -43,6 +43,10 @@ function svnGetPSPWARE() {
 	if [ ! -d $1 ]
 	then
 		svn checkout $PSPWARESVN_URL/$1 || svn checkout $PSPWARESVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
+		if [ -f $1.patch ]
+		then
+			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
+		fi
 	else
 		svn update $1
 	fi

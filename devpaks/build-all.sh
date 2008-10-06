@@ -13,24 +13,18 @@ function buildAndInstallDevPak() {
 	cd $BASE || exit 1
 }
 
-buildAndInstallDevPak 001 zlib
-buildAndInstallDevPak 002 bzip2
-buildAndInstallDevPak 003 freetype
-buildAndInstallDevPak 004 jpeg
-buildAndInstallDevPak 005 libbulletml
-buildAndInstallDevPak 006 libmad
-buildAndInstallDevPak 007 libmikmod
-buildAndInstallDevPak 008 libogg
-buildAndInstallDevPak 009 libpng
-buildAndInstallDevPak 010 libpspvram
-buildAndInstallDevPak 011 libTremor
-
-# need to remove /msys/local from the path only for the next lib
-OLDPATH=$PATH
-PATH=$(echo $PATH | sed 's/.\/usr\/local\/bin://g')
+#buildAndInstallDevPak 001 zlib
+#buildAndInstallDevPak 002 bzip2
+#buildAndInstallDevPak 003 freetype
+#buildAndInstallDevPak 004 jpeg
+#buildAndInstallDevPak 005 libbulletml
+#buildAndInstallDevPak 006 libmad
+#buildAndInstallDevPak 007 libmikmod
+#buildAndInstallDevPak 008 libogg
+#buildAndInstallDevPak 009 libpng
+#buildAndInstallDevPak 010 libpspvram
+#buildAndInstallDevPak 011 libTremor
 buildAndInstallDevPak 012 libvorbis
-PATH=$OLDPATH
-
 buildAndInstallDevPak 013 lua
 buildAndInstallDevPak 014 pspgl
 buildAndInstallDevPak 015 pspirkeyb
