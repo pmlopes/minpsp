@@ -1,0 +1,50 @@
+Index: configure.in
+===================================================================
+--- configure.in	(revision 2432)
++++ configure.in	(working copy)
+@@ -127,16 +127,8 @@
+ [  --enable-jpg            support loading JPG images [default=yes]],
+               , enable_jpg=yes)
+ if test x$enable_jpg = xyes; then
+-    AC_CHECK_LIB(jpeg, jpeg_CreateDecompress, have_libjpeg=yes)
+-    if test x$have_libjpeg = xyes; then
+-        CFLAGS="$CFLAGS -DLOAD_JPG"
+-        IMG_LIBS="$IMG_LIBS -ljpeg"
+-    else
+-        AC_MSG_WARN([
+-*** Unable to find JPEG library (http://www.ijg.org/)
+-])
+-        AC_MSG_WARN([JPG image loading disabled])
+-    fi
++    CFLAGS="$CFLAGS -DLOAD_JPG"
++	IMG_LIBS="$IMG_LIBS -ljpeg"
+ fi
+ AC_ARG_ENABLE(lbm,
+ [  --enable-lbm            support loading LBM images [default=yes]],
+@@ -154,24 +146,8 @@
+ [  --enable-png            support loading PNG images [default=yes]],
+               , enable_png=yes)
+ if test x$enable_png = xyes; then
+-    AC_CHECK_LIB(png, png_create_read_struct, have_libpng=yes, , -lz)
+-    if test x$have_libpng != xyes; then
+-        AC_MSG_WARN([
+-*** Unable to find PNG library (http://www.libpng.org/pub/png/libpng.html)
+-])
+-    fi
+-    AC_CHECK_LIB(z, uncompress, have_libz=yes)
+-    if test x$have_libz != xyes; then
+-        AC_MSG_WARN([
+-*** Unable to find Zlib library (http://www.gzip.org/zlib/)
+-])
+-    fi
+-    if test x$have_libpng = xyes -a x$have_libz = xyes; then
+-        CFLAGS="$CFLAGS -DLOAD_PNG"
+-        IMG_LIBS="$IMG_LIBS -lpng -lz"
+-    else
+-        AC_MSG_WARN([PNG image loading disabled])
+-    fi
++    CFLAGS="$CFLAGS -DLOAD_PNG"
++	IMG_LIBS="$IMG_LIBS -lpng -lz"
+ fi
+ AC_ARG_ENABLE(pnm,
+ [  --enable-pnm            support loading PNM images [default=yes]],
