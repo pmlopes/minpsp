@@ -124,6 +124,11 @@ function makeInstaller() {
 	echo "		cd \$SDKPATH"																	>> $NIXINSTALLER
 	echo "		tar xjfv /tmp/$1-$2.tar.bz2"													>> $NIXINSTALLER
 	echo "		rm /tmp/$1-$2.tar.bz2"															>> $NIXINSTALLER
+	# post installl
+	if [ ! "$POSTINSTALL" == "" ]
+	then
+		echo "		"$POSTINSTALL 																>> $NIXINSTALLER
+	fi
 	# register devpak
 	echo "		echo $1-$2 >> \$SDKPATH/psp/sdk/devpaks"										>> $NIXINSTALLER
 	# done

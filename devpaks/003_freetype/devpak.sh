@@ -20,9 +20,13 @@ cp docs/reference/*.html $(pwd)/../target/doc/$LIBNAME
 cd ..
 
 mkdir -p target/bin
+cp freetype-config target/bin
+POSTINSTALL="chmod a+x \$SDKPATH/bin/freetype-config"
+
+makeInstaller $LIBNAME $VERSION
+rm target/bin/freetype-config
+
 gcc -o target/bin/freetype-config freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\" || exit 1
 strip -s target/bin/freetype-config.exe
-
-makeInstaller $LIBNAME $VERSION zlib 1.2.2
 
 echo "Run the NSIS script now!"

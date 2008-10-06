@@ -207,13 +207,7 @@ function buildBinutils {
 	../../$BINUTILS_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
-			--disable-shared \
-			--disable-debug \
-			--disable-threads \
-			--with-gcc \
-			--with-gnu-as \
-			--with-gnu-ld \
-			--with-stabs \
+			--enable-install-libbfd \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring binutils"
 	make || die "Error building binutils"
@@ -239,18 +233,16 @@ function buildBaseCompiler {
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 		
-	CFLAGS="-fomit-frame-pointer -D__USE_MINGW_ACCESS -G0" \
-	BOOT_CFLAGS="-fomit-frame-pointer -D__USE_MINGW_ACCESS" \
-	BOOT_CXXFLAGS="-mthreads -fno-omit-frame-pointer" \
+	CFLAGS="-D__USE_MINGW_ACCESS -G0" \
+	BOOT_CFLAGS="-D__USE_MINGW_ACCESS" \
 	BOOT_LDFLAGS=-s \
 	../../$GCC_SRCDIR/configure \
 			--enable-languages="c,c++,objc,obj-c++" \
-			--disable-multilib \
-			--disable-shared \
 			--disable-win32-registry \
 			--enable-cxx-flags="-G0" \
 			--target=psp \
 			--with-newlib \
+			--disable-libssp \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"

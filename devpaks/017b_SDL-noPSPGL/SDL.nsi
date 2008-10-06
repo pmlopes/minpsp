@@ -3,7 +3,7 @@ Name "SDL DevPak"
 SetCompressor /SOLID lzma
 
 # Defines
-!define UNIX_NAME SDL
+!define UNIX_NAME SDL-noPSPGL
 !define VERSION 1.2.9
 !define COMPANY jetcube
 !define URL http://www.jetcube.eu
@@ -46,12 +46,6 @@ Section -Main SEC0000
     # check for core dependency
     StrCmp $0 '' +1 +3
     MessageBox MB_OK|MB_ICONSTOP 'PSP DevKit missing'
-    Quit
-    # check for internal dependencies
-    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" pspgl
-    # check for core dependency
-    StrCmp $1 '2264' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak pspgl (2264) missing'
     Quit
     # install
     SetOutPath $0

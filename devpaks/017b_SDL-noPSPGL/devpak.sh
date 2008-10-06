@@ -8,7 +8,7 @@ svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 ./autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp --disable-video-opengl
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -25,7 +25,7 @@ mkdir -p target/bin
 cp sdl-config target/bin
 POSTINSTALL="chmod a+x \$SDKPATH/bin/sdl-config"
 
-makeInstaller $LIBNAME $VERSION  pspgl 2264
+makeInstaller $LIBNAME-noPSPGL $VERSION
 rm target/bin/sdl-config
 
 gcc -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"1.2.9\" sdl-config.c || exit 1
