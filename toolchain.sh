@@ -257,6 +257,7 @@ function bootstrapSDK {
 		cd psp
 		svnGetPS2DEV $PS2DEV_SVN/pspsdk
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-doc.patch || die "patching pspsdk (Doxygen DOCS)"
 		cd pspsdk
 		./bootstrap || die "running pspsdk bootstrap"
 		cd ../..

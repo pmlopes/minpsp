@@ -1,0 +1,2795 @@
+Index: pspsdk/src/atrac3/pspatrac3.h
+===================================================================
+--- pspsdk/src/atrac3/pspatrac3.h	(revision 2432)
++++ pspsdk/src/atrac3/pspatrac3.h	(working copy)
+@@ -24,7 +24,7 @@
+  * @param buf - the buffer holding the atrac3 data, including the RIFF/WAVE header.
+  * @param bufsize - the size of the buffer pointed by buf
+  *
+- * @returns the new atrac ID, or < 0 on error 
++ * @return the new atrac ID, or < 0 on error 
+ */
+ int sceAtracSetDataAndGetID(void *buf, SceSize bufsize);
+ 
+@@ -39,7 +39,7 @@
+  *  or the remaining (not decoded yet) frames at memory if not all at3 data is on memory
+  *
+  * 
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+ */
+ int sceAtracDecodeData(int atracID, u16 *outSamples, int *outN, int *outEnd, int *outRemainFrame);
+@@ -51,7 +51,7 @@
+  * @param outRemainFrame - pointer to a integer that receives either -1 if all at3 data is already on memory, 
+  *  or the remaining (not decoded yet) frames at memory if not all at3 data is on memory 
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+ */
+ int sceAtracGetRemainFrame(int atracID, int *outRemainFrame);
+@@ -63,7 +63,7 @@
+  * @param availableBytes - Number of bytes available at the writePointer location
+  * @param readOffset - Offset where to seek into the atrac file before reading
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+ */
+ 
+@@ -74,7 +74,7 @@
+  * @param atracID - the atrac ID
+  * @param bytesToAdd - Number of bytes read into location given by sceAtracGetStreamDataInfo().
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+ */
+ int sceAtracAddStreamData(int atracID, unsigned int bytesToAdd);
+ 
+@@ -84,7 +84,7 @@
+  * @param atracID - the atracID
+  * @param outBitrate - pointer to a integer that receives the bitrate in kbps
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+ */
+ int sceAtracGetBitrate(int atracID, int *outBitrate);
+@@ -95,7 +95,7 @@
+  * @param atracID - the atracID
+  * @param nloops - the number of loops to set
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+ */
+ int sceAtracSetLoopNum(int atracID, int nloops);
+@@ -105,7 +105,7 @@
+  *
+  * @param atracID - the atrac ID to release
+  *
+- * @returns < 0 on error
++ * @return < 0 on error
+  *
+ */
+ int sceAtracReleaseAtracID(int atracID);
+@@ -116,7 +116,7 @@
+  * @param atracID - the atrac ID
+  * @param outN - pointer to receives the number of samples of the next frame.
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+  */
+ int sceAtracGetNextSample(int atracID, int *outN);
+@@ -127,7 +127,7 @@
+  * @param atracID - the atrac ID
+  * @param outMax  - pointer to a integer that receives the maximum number of samples.
+  *
+- * @returns < 0 on error, otherwise 0
++ * @return < 0 on error, otherwise 0
+  *
+  */
+ int sceAtracGetMaxSample(int atracID, int *outMax); 
+Index: pspsdk/src/audio/pspaudio.h
+===================================================================
+--- pspsdk/src/audio/pspaudio.h	(revision 2432)
++++ pspsdk/src/audio/pspaudio.h	(working copy)
+@@ -79,7 +79,7 @@
+   *                      (use the ::PSP_AUDIO_SAMPLE_ALIGN macro to align it).
+   * @param format - The output format to use for the channel.  One of ::PspAudioFormats.
+   *
+-  * @returns The channel number on success, an error code if less than 0.
++  * @return The channel number on success, an error code if less than 0.
+   */
+ int sceAudioChReserve(int channel, int samplecount, int format);
+ 
+@@ -88,7 +88,7 @@
+   *
+   * @param channel - The channel to release.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioChRelease(int channel);
+ 
+@@ -101,7 +101,7 @@
+   *
+   * @param buf - Pointer to the PCM data to output.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutput(int channel, int vol, void *buf);
+ 
+@@ -114,7 +114,7 @@
+   *
+   * @param buf - Pointer to the PCM data to output.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutputBlocking(int channel, int vol, void *buf);
+ 
+@@ -129,7 +129,7 @@
+   *
+   * @param buf - Pointer to the PCM data to output.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutputPanned(int channel, int leftvol, int rightvol, void *buf);
+ 
+@@ -144,7 +144,7 @@
+   *
+   * @param buf - Pointer to the PCM data to output.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutputPannedBlocking(int channel, int leftvol, int rightvol, void *buf);
+ 
+@@ -153,7 +153,7 @@
+   *
+   * @param channel - The channel number.
+   *
+-  * @returns Number of samples to be played, an error if less than 0.
++  * @return Number of samples to be played, an error if less than 0.
+   */
+ int sceAudioGetChannelRestLen(int channel);
+ 
+@@ -162,16 +162,17 @@
+   *
+   * @param channel - The channel number.
+   *
+-  * @returns Number of samples to be played, an error if less than 0.
++  * @return Number of samples to be played, an error if less than 0.
+   */
+ int sceAudioGetChannelRestLength(int channel);
+ 
+ /**
+   * Change the output sample count, after it's already been reserved
+   *
++  * @param channel - The channel number.
+   * @param samplecount - The number of samples to output in one output call.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioSetChannelDataLen(int channel, int samplecount);
+ 
+@@ -182,7 +183,7 @@
+   *
+   * @param format - One of ::PspAudioFormats
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioChangeChannelConfig(int channel, int format);
+ 
+@@ -195,7 +196,7 @@
+   *
+   * @param rightvol - The right volume.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioChangeChannelVolume(int channel, int leftvol, int rightvol);
+ 
+@@ -206,14 +207,14 @@
+   *
+   * @param samplecount - The number of samples to output in one output call (min 17, max 4111).
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutput2Reserve(int samplecount);
+ 
+ /**
+   * Release the audio output
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutput2Release(void);
+ 
+@@ -222,7 +223,7 @@
+   *
+   * @param samplecount - The number of samples to output in one output call (min 17, max 4111).
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutput2ChangeLength(int samplecount);
+ 
+@@ -233,14 +234,14 @@
+   *
+   * @param buf - Pointer to the PCM data.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioOutput2OutputBlocking(int vol, void *buf);
+ 
+ /**
+   * Get count of unplayed samples remaining
+   *
+-  * @returns Number of samples to be played, an error if less than 0.
++  * @return Number of samples to be played, an error if less than 0.
+   */
+ int sceAudioOutput2GetRestSample(void);
+ 
+@@ -251,16 +252,16 @@
+   *
+   * @param freq - The frequency. One of 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11050, 8000.
+   *
+-  * @params channels - Number of channels. Pass 2 (stereo).
++  * @param channels - Number of channels. Pass 2 (stereo).
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioSRCChReserve(int samplecount, int freq, int channels);
+ 
+ /**
+   * Release the audio output
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioSRCChRelease(void);
+ 
+@@ -271,7 +272,7 @@
+   *
+   * @param buf - Pointer to the PCM data to output.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioSRCOutputBlocking(int vol, void *buf);
+ 
+@@ -284,7 +285,7 @@
+   *
+   * @param unknown2 - Unknown. Pass 0.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioInputInit(int unknown1, int gain, int unknown2);
+ 
+@@ -293,7 +294,7 @@
+   *
+   * @param params - A pointer to a ::pspAudioInputParams struct.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioInputInitEx(pspAudioInputParams *params);
+ 
+@@ -306,7 +307,7 @@
+   *
+   * @param buf - Pointer to where the audio data will be stored.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioInputBlocking(int samplecount, int freq, void *buf);
+ 
+@@ -319,28 +320,28 @@
+   *
+   * @param buf - Pointer to where the audio data will be stored.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioInput(int samplecount, int freq, void *buf);
+ 
+ /**
+   * Get the number of samples that were acquired
+   *
+-  * @returns Number of samples acquired, an error if less than 0.
++  * @return Number of samples acquired, an error if less than 0.
+   */
+ int sceAudioGetInputLength(void);
+ 
+ /**
+   * Wait for non-blocking audio input to complete
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioWaitInputEnd(void);
+ 
+ /**
+   * Poll for non-blocking audio input status
+   *
+-  * @returns 0 if input has completed, 1 if not completed or an error if less than 0.
++  * @return 0 if input has completed, 1 if not completed or an error if less than 0.
+   */
+ int sceAudioPollInputEnd(void);
+ 
+Index: pspsdk/src/audio/pspaudio_kernel.h
+===================================================================
+--- pspsdk/src/audio/pspaudio_kernel.h	(revision 2432)
++++ pspsdk/src/audio/pspaudio_kernel.h	(working copy)
+@@ -37,7 +37,7 @@
+   *
+   * @param frequency - Sampling frequency to set audio output to - either 44100 or 48000.
+   *
+-  * @returns 0 on success, an error if less than 0.
++  * @return 0 on success, an error if less than 0.
+   */
+ int sceAudioSetFrequency(int frequency);
+ /*@}*/
+Index: pspsdk/src/ctrl/pspctrl.h
+===================================================================
+--- pspsdk/src/ctrl/pspctrl.h	(revision 2432)
++++ pspsdk/src/ctrl/pspctrl.h	(working copy)
+@@ -114,7 +114,7 @@
+  *
+  * @param cycle - Cycle.  Normally set to 0.
+  *
+- * @returns The previous cycle setting.
++ * @return The previous cycle setting.
+  */
+ int sceCtrlSetSamplingCycle(int cycle);
+ 
+@@ -123,7 +123,7 @@
+  *
+  * @param pcycle - Return value.
+  *
+- * @returns 0.
++ * @return 0.
+  */
+ int sceCtrlGetSamplingCycle(int *pcycle);
+ 
+@@ -132,7 +132,7 @@
+  *
+  * @param mode - One of ::PspCtrlMode.
+  *
+- * @returns The previous mode.
++ * @return The previous mode.
+  */
+ int sceCtrlSetSamplingMode(int mode);
+ 
+@@ -141,7 +141,7 @@
+  *
+  * @param pmode - Return value.
+  *
+- * @returns 0.
++ * @return 0.
+  */
+ int sceCtrlGetSamplingMode(int *pmode);
+ 
+@@ -176,14 +176,14 @@
+ /**
+  * Set analog threshold relating to the idle timer.
+  *
+- * @param idlerest - Movement needed by the analog to reset the idle timer.
++ * @param idlereset - Movement needed by the analog to reset the idle timer.
+  * @param idleback - Movement needed by the analog to bring the PSP back from an idle state.
+  *
+  * Set to -1 for analog to not cancel idle timer.
+  * Set to 0 for idle timer to be cancelled even if the analog is not moved.
+  * Set between 1 - 128 to specify the movement on either axis needed by the analog to fire the event.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceCtrlSetIdleCancelThreshold(int idlereset, int idleback);
+ 
+@@ -193,7 +193,7 @@
+  * @param idlerest - Movement needed by the analog to reset the idle timer.
+  * @param idleback - Movement needed by the analog to bring the PSP back from an idle state.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceCtrlGetIdleCancelThreshold(int *idlerest, int *idleback);
+ 
+Index: pspsdk/src/ctrl/pspctrl_kernel.h
+===================================================================
+--- pspsdk/src/ctrl/pspctrl_kernel.h	(revision 2432)
++++ pspsdk/src/ctrl/pspctrl_kernel.h	(working copy)
+@@ -39,7 +39,7 @@
+ /**
+  * Get button mask mode
+  *
+- * @mask - The bitmask to check
++ * @param mask - The bitmask to check
+  *
+  * @return 0 no setting, 1 set in button mask, 2 set in button set
+  */
+Index: pspsdk/src/debug/pspdebug.h
+===================================================================
+--- pspsdk/src/debug/pspdebug.h	(revision 2432)
++++ pspsdk/src/debug/pspdebug.h	(working copy)
+@@ -54,7 +54,7 @@
+   * to perform the printf instead of using vsnprintf, use normal printf for
+   * user mode.
+   *
+-  * @param fmt - Format string to print
++  * @param format - Format string to print
+   * @param ... - Arguments
+   */
+ void pspDebugScreenKprintf(const char *format, ...) __attribute__((format(printf,1,2)));
+@@ -161,7 +161,7 @@
+   * @param results - List of points to store the results of the trace, (up to max)
+   * @param max - Maximum number of back traces
+   *
+-  * @returns The number of frames stored in results.
++  * @return The number of frames stored in results.
+ */
+ int pspDebugGetStackTrace(unsigned int* results, int max);
+ 
+Index: pspsdk/src/display/pspdisplay.h
+===================================================================
+--- pspsdk/src/display/pspdisplay.h	(revision 2432)
++++ pspsdk/src/display/pspdisplay.h	(working copy)
+@@ -58,7 +58,7 @@
+  * @param width - Width of screen in pixels.
+  * @param height - Height of screen in pixels.
+  *
+- * @returns ???
++ * @return ???
+  */
+ int sceDisplaySetMode(int mode, int width, int height);
+ 
+Index: pspsdk/src/ge/pspge.h
+===================================================================
+--- pspsdk/src/ge/pspge.h	(revision 2432)
++++ pspsdk/src/ge/pspge.h	(working copy)
+@@ -48,14 +48,14 @@
+ /**
+  * Get the size of VRAM.
+  *
+- * @returns The size of VRAM (in bytes).
++ * @return The size of VRAM (in bytes).
+  */
+ unsigned int sceGeEdramGetSize(void);
+ 
+ /**
+   * Get the address of VRAM.
+   *
+-  * @returns A pointer to the base of VRAM.
++  * @return A pointer to the base of VRAM.
+   */
+ void * sceGeEdramGetAddr(void);
+ 
+@@ -64,7 +64,7 @@
+  *
+  * @param cmd - The GE command register to retrieve.
+  *
+- * @returns The value of the GE command.
++ * @return The value of the GE command.
+  */
+ unsigned int sceGeGetCmd(int cmd);
+ 
+@@ -94,7 +94,7 @@
+  * @param type - One of ::PspGeMatrixTypes.
+  * @param matrix - Pointer to a variable to store the matrix.
+  *
+- * @returns ???
++ * @return ???
+  */
+ int sceGeGetMtx(int type, void *matrix);
+ 
+@@ -103,7 +103,7 @@
+  *
+  * @param context - Pointer to a ::PspGeContext.
+  *
+- * @returns ???
++ * @return ???
+  */
+ int sceGeSaveContext(PspGeContext *context);
+ 
+@@ -112,7 +112,7 @@
+  *
+  * @param context - Pointer to a ::PspGeContext.
+  *
+- * @returns ???
++ * @return ???
+  */
+ int sceGeRestoreContext(const PspGeContext *context);
+ 
+@@ -147,7 +147,7 @@
+  *
+  * @param qid - The ID of the queue.
+  *
+- * @returns ???
++ * @return ???
+  */
+ int sceGeListDeQueue(int qid);
+ 
+@@ -177,7 +177,7 @@
+   * @param qid - The queue ID of the list to sync.
+   * @param syncType - Specifies the condition to wait on.  One of ::PspGeSyncType.
+   * 
+-  * @returns ???
++  * @return ???
+   */
+ int sceGeListSync(int qid, int syncType);
+ 
+@@ -186,7 +186,7 @@
+   * 
+   * @param syncType - Specifies the condition to wait on.  One of ::PspGeSyncType.
+   * 
+-  * @returns ???
++  * @return ???
+   */
+ int sceGeDrawSync(int syncType);
+ 
+Index: pspsdk/src/gu/pspgu.h
+===================================================================
+--- pspsdk/src/gu/pspgu.h	(revision 2432)
++++ pspsdk/src/gu/pspgu.h	(working copy)
+@@ -368,7 +368,7 @@
+   *   - GU_FALSE (0) - Turns display off
+   *
+   * @param state - Turn display on or off
+-  * @returns State of the display prior to this call
++  * @return State of the display prior to this call
+ **/
+ int sceGuDisplay(int state);
+ 
+@@ -441,7 +441,7 @@
+   *
+   * @param signal - Signal index to install a handler for
+   * @param callback - Callback to call when signal index is triggered
+-  * @returns The old callback handler
++  * @return The old callback handler
+ **/
+ void* sceGuSetCallback(int signal, void (*callback)(int));
+ 
+@@ -485,7 +485,7 @@
+   * list again.
+   *
+   * @param size - How much memory to allocate
+-  * @returns Memory-block ready for use
++  * @return Memory-block ready for use
+ **/
+ void* sceGuGetMemory(int size);
+ 
+@@ -515,7 +515,7 @@
+   *
+   * This also restores control back to whatever context that was active prior to this call.
+   *
+-  * @returns Size of finished display list
++  * @return Size of finished display list
+ **/
+ int sceGuFinish(void);
+ 
+@@ -528,7 +528,7 @@
+   * context-type.
+   *
+   * @param id - Finish callback id (16-bit)
+-  * @returns Size of finished display list
++  * @return Size of finished display list
+ **/
+ int sceGuFinishId(unsigned int id);
+ 
+@@ -550,7 +550,7 @@
+ /**
+   * Check how large the current display-list is
+   *
+-  * @returns The size of the current display list
++  * @return The size of the current display list
+ **/
+ int sceGuCheckList(void);
+ 
+@@ -570,7 +570,7 @@
+ /**
+   * Swap display and draw buffer
+   *
+-  * @returns Pointer to the new drawbuffer
++  * @return Pointer to the new drawbuffer
+ **/
+ void* sceGuSwapBuffers(void);
+ 
+@@ -598,7 +598,7 @@
+   *
+   * @param mode - What to wait for
+   * @param what - What to sync to
+-  * @returns Unknown at this time
++  * @return Unknown at this time
+ **/
+ int sceGuSync(int mode, int what);
+ 
+@@ -712,7 +712,7 @@
+   * Look at sceGuEnable() for a list of states
+   *
+   * @param state - Which state to query about
+-  * @returns Wether state is enabled or not
++  * @return Wether state is enabled or not
+ **/
+ int sceGuGetStatus(int state);
+ 
+@@ -730,7 +730,7 @@
+   *
+   * Look at sceGuEnable() for a list of states
+   *
+-  * @returns Status of all 22 states as a bitmask (0-21)
++  * @return Status of all 22 states as a bitmask (0-21)
+ **/
+ int sceGuGetAllStatus(void);
+ 
+Index: pspsdk/src/kernel/pspaudiorouting.h
+===================================================================
+--- pspsdk/src/kernel/pspaudiorouting.h	(revision 2432)
++++ pspsdk/src/kernel/pspaudiorouting.h	(working copy)
+@@ -17,14 +17,14 @@
+  *
+  * @param mode The routing mode to set (0 or 1)
+  *
+- * @returns the previous routing mode, or < 0 on error
++ * @return the previous routing mode, or < 0 on error
+ */
+ int sceAudioRoutingSetMode( int mode );
+ 
+ /**
+  * Get routing mode.
+  *
+- * @returns the current routing mode.
++ * @return the current routing mode.
+ */
+ int sceAudioRoutingGetMode();
+ 
+Index: pspsdk/src/kernel/pspinit.h
+===================================================================
+--- pspsdk/src/kernel/pspinit.h	(revision 2432)
++++ pspsdk/src/kernel/pspinit.h	(working copy)
+@@ -42,14 +42,14 @@
+ /**
+  * Gets the api type 
+  *
+- * @returns the api type in which the system has booted
++ * @return the api type in which the system has booted
+ */
+ int sceKernelInitApitype();
+ 
+ /**
+  * Gets the filename of the executable to be launched after all modules of the api.
+  *
+- * @returns filename of executable or NULL if no executable found.
++ * @return filename of executable or NULL if no executable found.
+ */
+ char *sceKernelInitFileName();
+ 
+@@ -57,14 +57,14 @@
+  *
+  * Gets the device in which the application was launched.
+  *
+- * @returns the device code, one of PSPBootFrom values.
++ * @return the device code, one of PSPBootFrom values.
+ */
+ int sceKernelBootFrom();
+ 
+ /**
+  * Get the key configuration in which the system has booted.
+  *
+- * @returns the key configuration code, one of PSPKeyConfig values 
++ * @return the key configuration code, one of PSPKeyConfig values 
+ */
+ int InitForKernel_7233B5BC();
+ 
+Index: pspsdk/src/kernel/psploadcore.h
+===================================================================
+--- pspsdk/src/kernel/psploadcore.h	(revision 2432)
++++ pspsdk/src/kernel/psploadcore.h	(working copy)
+@@ -103,7 +103,7 @@
+  *
+  * @param modname - The name of the module.
+  *
+- * @returns Pointer to the ::SceModule structure if found, otherwise NULL.
++ * @return Pointer to the ::SceModule structure if found, otherwise NULL.
+  */
+ SceModule * sceKernelFindModuleByName(const char *modname);
+ 
+@@ -112,7 +112,7 @@
+  *
+  * @param addr - Address somewhere within the module.
+  *
+- * @returns Pointer to the ::SceModule structure if found, otherwise NULL.
++ * @return Pointer to the ::SceModule structure if found, otherwise NULL.
+  */
+ SceModule * sceKernelFindModuleByAddress(unsigned int addr);
+ 
+@@ -121,14 +121,14 @@
+  *
+  * @param modid - The UID of the module.
+  *
+- * @returns Pointer to the ::SceModule structure if found, otherwise NULL.
++ * @return Pointer to the ::SceModule structure if found, otherwise NULL.
+  */
+ SceModule * sceKernelFindModuleByUID(SceUID modid);
+ 
+ /**
+  * Return the count of loaded modules.
+  *
+- * @returns The count of loaded modules.
++ * @return The count of loaded modules.
+  */
+ int sceKernelModuleCount(void);
+ 
+Index: pspsdk/src/kernel/psploadexec_kernel.h
+===================================================================
+--- pspsdk/src/kernel/psploadexec_kernel.h	(revision 2432)
++++ pspsdk/src/kernel/psploadexec_kernel.h	(working copy)
+@@ -56,7 +56,7 @@
+  * @param buf - Pointer to a buffer containing the module to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecBufferPlain(SceSize bufsize, void *buf, struct SceKernelLoadExecParam *param);
+ #endif
+@@ -66,7 +66,7 @@
+  *
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL
+  *
+- * @returns < 0 on some errors.
++ * @return < 0 on some errors.
+  *
+  * @note - when called in game mode it will have the same effect that sceKernelExitGame
+  *
+@@ -79,7 +79,7 @@
+  *
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL
+  *
+- * @returns < 0 on some errors.
++ * @return < 0 on some errors.
+  *
+  * @note - when called in game mode it will have the same effect that sceKernelExitGame
+  * @note2: available since firmware 2.00.
+@@ -94,7 +94,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecVSHDisc(const char *file, struct SceKernelLoadExecVSHParam *param);
+ 
+@@ -105,7 +105,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecVSHDiscUpdater(const char *file, struct SceKernelLoadExecVSHParam *param);
+ 
+@@ -116,7 +116,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecVSHMs1(const char *file, struct SceKernelLoadExecVSHParam *param);
+ 
+@@ -127,7 +127,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecVSHMs2(const char *file, struct SceKernelLoadExecVSHParam *param);
+ 
+@@ -138,7 +138,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+ */
+ int sceKernelLoadExecVSHMs3(const char *file, struct SceKernelLoadExecVSHParam *param);
+ 
+@@ -150,7 +150,7 @@
+  * @param file - The file to execute.
+  * @param param - Pointer to a ::SceKernelLoadExecVSHParam structure, or NULL.
+  *
+- * @returns < 0 on some errors. 
++ * @return < 0 on some errors. 
+  * @note - Available since firmware 3.00
+ */
+ int sceKernelLoadExecVSHMs4(const char *file, struct SceKernelLoadExecVSHParam *param);
+Index: pspsdk/src/kernel/pspmodulemgr_kernel.h
+===================================================================
+--- pspsdk/src/kernel/pspmodulemgr_kernel.h	(revision 2432)
++++ pspsdk/src/kernel/pspmodulemgr_kernel.h	(working copy)
+@@ -55,7 +55,7 @@
+  * @param flags - Unused, always 0.
+  * @param option - Pointer to an optional ::SceKernelLMOption structure.
+  *
+- * @returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
++ * @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ SceUID sceKernelLoadModuleBuffer(void *buf, SceSize bufsize, int flags, SceKernelLMOption *option);
+ 
+Index: pspsdk/src/kernel/pspsysmem_kernel.h
+===================================================================
+--- pspsdk/src/kernel/pspsysmem_kernel.h	(revision 2432)
++++ pspsdk/src/kernel/pspsysmem_kernel.h	(working copy)
+@@ -45,7 +45,7 @@
+  * @param pid  - The partition id
+  * @param info - Pointer to the ::PspSysmemPartitionInfo structure
+  *
+- * @returns 0 on success.
++ * @return 0 on success.
+  */
+ int sceKernelQueryMemoryPartitionInfo(int pid, PspSysmemPartitionInfo *info);
+ 
+@@ -54,7 +54,7 @@
+  *
+  * @param pid - The partition id
+  *
+- * @returns The total amount of free memory, in bytes.
++ * @return The total amount of free memory, in bytes.
+  */
+ SceSize sceKernelPartitionTotalFreeMemSize(int pid);
+ 
+@@ -63,7 +63,7 @@
+  *
+  * @param pid - The partition id
+  *
+- * @returns The size of the largest free memory block, in bytes.
++ * @return The size of the largest free memory block, in bytes.
+  */
+ SceSize sceKernelPartitionMaxFreeMemSize(int pid);
+ 
+@@ -101,7 +101,7 @@
+  * @param unk - Unknown, probably some flag or type, pass 1.
+  * @param name - Name assigned to the new heap.
+  *
+- * @returns The UID of the new heap, or if less than 0 an error. 
++ * @return The UID of the new heap, or if less than 0 an error. 
+ */
+ SceUID sceKernelCreateHeap(SceUID partitionid, SceSize size, int unk, const char *name);
+ 
+@@ -111,7 +111,7 @@
+  * @param heapid - The UID of the heap to allocate from.
+  * @param size - The number of bytes to allocate.
+  *
+- * @returns The address of the allocated memory block, or NULL on error.
++ * @return The address of the allocated memory block, or NULL on error.
+ */
+ void *sceKernelAllocHeapMemory(SceUID heapid, SceSize size);
+ 
+@@ -121,7 +121,7 @@
+  * @param heapid - The UID of the heap where block belongs.
+  * @param block - The block of memory to free from the heap.
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceKernelFreeHeapMemory(SceUID heapid, void *block);
+ 
+@@ -130,7 +130,7 @@
+  *
+  * @param heapid - The UID of the heap to delete.
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+ */
+ int sceKernelDeleteHeap(SceUID heapid);
+ 
+@@ -139,7 +139,7 @@
+  *
+  * @param heapid - The UID of the heap
+  *
+- * @returns the free size of the heap, in bytes. < 0 on error.
++ * @return the free size of the heap, in bytes. < 0 on error.
+ */
+ SceSize sceKernelHeapTotalFreeSize(SceUID heapid);
+ 
+Index: pspsdk/src/mp3/pspmp3.h
+===================================================================
+--- pspsdk/src/mp3/pspmp3.h	(revision 2432)
++++ pspsdk/src/mp3/pspmp3.h	(working copy)
+@@ -44,7 +44,7 @@
+  *
+  * @param args - Pointer to SceMp3InitArg structure
+  *
+- * @returns sceMp3 handle on success, < 0 on error.
++ * @return sceMp3 handle on success, < 0 on error.
+  */
+ SceInt32 sceMp3ReserveMp3Handle(SceMp3InitArg* args);
+ 
+@@ -53,21 +53,21 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3ReleaseMp3Handle(SceInt32 handle);
+ 
+ /**
+  * sceMp3InitResource
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3InitResource();
+ 
+ /**
+  * sceMp3TermResource
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3TermResource();
+ 
+@@ -76,7 +76,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3Init(SceInt32 handle);
+ 
+@@ -86,7 +86,7 @@
+  * @param handle - sceMp3 handle
+  * @param dst - Pointer to destination pcm samples buffer
+  *
+- * @returns number of bytes in decoded pcm buffer, < 0 on error.
++ * @return number of bytes in decoded pcm buffer, < 0 on error.
+  */
+ SceInt32 sceMp3Decode(SceInt32 handle, SceShort16** dst);
+ 
+@@ -98,7 +98,7 @@
+  * @param towrite - Space remaining in stream data buffer
+  * @param srcpos - Position in source stream to start reading from
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3GetInfoToAddStreamData(SceInt32 handle, SceUChar8** dst, SceInt32* towrite, SceInt32* srcpos);
+ 
+@@ -108,7 +108,7 @@
+  * @param handle - sceMp3 handle
+  * @param size - number of bytes added to the stream data buffer
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3NotifyAddStreamData(SceInt32 handle, SceInt32 size);
+ 
+@@ -117,7 +117,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns 1 if more stream data is needed, < 0 on error.
++ * @return 1 if more stream data is needed, < 0 on error.
+  */
+ SceInt32 sceMp3CheckStreamDataNeeded(SceInt32 handle);
+ 
+@@ -127,7 +127,7 @@
+  * @param handle - sceMp3 handle
+  * @param loop - Number of loops
+  *
+- * @returns 0 if success, < 0 on error.
++ * @return 0 if success, < 0 on error.
+  */
+ SceInt32 sceMp3SetLoopNum(SceInt32 handle, SceInt32 loop);
+ 
+@@ -136,7 +136,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Number of loops
++ * @return Number of loops
+  */
+ SceInt32 sceMp3GetLoopNum(SceInt32 handle);
+ 
+@@ -145,7 +145,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Number of decoded samples
++ * @return Number of decoded samples
+  */
+ SceInt32 sceMp3GetSumDecodedSample(SceInt32 handle);
+ 
+@@ -154,7 +154,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Number of max samples to output
++ * @return Number of max samples to output
+  */
+ SceInt32 sceMp3GetMaxOutputSample(SceInt32 handle);
+ 
+@@ -163,7 +163,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Sampling rate of the mp3
++ * @return Sampling rate of the mp3
+  */
+ SceInt32 sceMp3GetSamplingRate(SceInt32 handle);
+ 
+@@ -172,7 +172,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Bitrate of the mp3
++ * @return Bitrate of the mp3
+  */
+ SceInt32 sceMp3GetBitRate(SceInt32 handle);
+ 
+@@ -181,7 +181,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns Number of channels of the mp3
++ * @return Number of channels of the mp3
+  */
+ SceInt32 sceMp3GetMp3ChannelNum(SceInt32 handle);
+ 
+@@ -190,7 +190,7 @@
+  *
+  * @param handle - sceMp3 handle
+  *
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ SceInt32 sceMp3ResetPlayPosition(SceInt32 handle); 
+ 
+Index: pspsdk/src/mpeg/pspjpeg.h
+===================================================================
+--- pspsdk/src/mpeg/pspjpeg.h	(revision 2432)
++++ pspsdk/src/mpeg/pspjpeg.h	(working copy)
+@@ -21,14 +21,14 @@
+ /**
+  * Inits the MJpeg library 
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceJpegInitMJpeg(void);
+ 
+ /**
+  * Finishes the MJpeg library
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceJpegFinishMJpeg(void);
+ 
+@@ -38,14 +38,14 @@
+  * @param width - The width of the frame
+  * @param height - The height of the frame
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceJpegCreateMJpeg(int width, int height);
+ 
+ /**
+  * Deletes the current decoder context.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceJpegDeleteMJpeg(void);
+ 
+@@ -58,7 +58,7 @@
+  *				       It should have a size of (width * height * 4).
+  * @param unk - Unknown, pass 0
+  *
+- * @returns (width * 65536) + height on success, < 0 on error 
++ * @return (width * 65536) + height on success, < 0 on error 
+ */
+ int sceJpegDecodeMJpeg(u8 *jpegbuf,	SceSize size, void *rgba, u32 unk);
+ 
+Index: pspsdk/src/mpeg/pspmpeg.h
+===================================================================
+--- pspsdk/src/mpeg/pspmpeg.h	(revision 2432)
++++ pspsdk/src/mpeg/pspmpeg.h	(working copy)
+@@ -95,7 +95,7 @@
+ /**
+  * sceMpegInit
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegInit();
+ 
+@@ -109,7 +109,7 @@
+  *
+  * @param iPackets - number of packets in the ringbuffer
+  *
+- * @returns < 0 if error else ringbuffer data size.
++ * @return < 0 if error else ringbuffer data size.
+  */
+ SceInt32 sceMpegRingbufferQueryMemSize(SceInt32 iPackets);
+ 
+@@ -123,7 +123,7 @@
+  * @param Callback - ringbuffer callback
+  * @param pCBparam - param passed to callback
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegRingbufferConstruct(SceMpegRingbuffer* Ringbuffer, SceInt32 iPackets, ScePVoid pData, SceInt32 iSize, sceMpegRingbufferCB Callback, ScePVoid pCBparam);
+ 
+@@ -139,7 +139,7 @@
+  *
+  * @param Ringbuffer - pointer to a sceMpegRingbuffer struct
+  *
+- * @returns < 0 if error else number of free packets in the ringbuffer.
++ * @return < 0 if error else number of free packets in the ringbuffer.
+  */
+ SceInt32 sceMpegRingbufferAvailableSize(SceMpegRingbuffer* Ringbuffer);
+ 
+@@ -150,7 +150,7 @@
+  * @param iNumPackets - num packets to put into the ringbuffer
+  * @param iAvailable - free packets in the ringbuffer, should be sceMpegRingbufferAvailableSize()
+  *
+- * @returns < 0 if error else number of packets.
++ * @return < 0 if error else number of packets.
+  */
+ SceInt32 sceMpegRingbufferPut(SceMpegRingbuffer* Ringbuffer, SceInt32 iNumPackets, SceInt32 iAvailable);
+ 
+@@ -159,7 +159,7 @@
+  *
+  * @param iUnk - Unknown, set to 0
+  *
+- * @returns < 0 if error else decoder data size.
++ * @return < 0 if error else decoder data size.
+  */
+ SceInt32 sceMpegQueryMemSize(int iUnk);
+ 
+@@ -174,7 +174,7 @@
+  * @param iUnk1 - unknown, set to 0
+  * @param iUnk2 - unknown, set to 0
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegCreate(SceMpeg* Mpeg, ScePVoid pData, SceInt32 iSize, SceMpegRingbuffer* Ringbuffer, SceInt32 iFrameWidth, SceInt32 iUnk1, SceInt32 iUnk2);
+ 
+@@ -192,7 +192,7 @@
+  * @param pBuffer - pointer to file header
+  * @param iOffset - will contain stream offset in bytes, usually 2048
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegQueryStreamOffset(SceMpeg* Mpeg, ScePVoid pBuffer, SceInt32* iOffset);
+ 
+@@ -202,7 +202,7 @@
+  * @param pBuffer - pointer to file header
+  * @param iSize - will contain stream size in bytes
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegQueryStreamSize(ScePVoid pBuffer, SceInt32* iSize);
+ 
+@@ -213,7 +213,7 @@
+  * @param iStreamID - stream id, 0 for video, 1 for audio
+  * @param iUnk - unknown, set to 0
+  *
+- * @returns 0 if error.
++ * @return 0 if error.
+  */
+ SceMpegStream* sceMpegRegistStream(SceMpeg* Mpeg, SceInt32 iStreamID, SceInt32 iUnk);
+ 
+@@ -228,14 +228,14 @@
+ /**
+  * sceMpegFlushAllStreams
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegFlushAllStream(SceMpeg* Mpeg);
+ 
+ /**
+  * sceMpegMallocAvcEsBuf
+  *
+- * @returns 0 if error else pointer to buffer.
++ * @return 0 if error else pointer to buffer.
+  */
+ ScePVoid sceMpegMallocAvcEsBuf(SceMpeg* Mpeg);
+ 
+@@ -252,7 +252,7 @@
+  * @param iEsSize - will contain size of Es
+  * @param iOutSize - will contain size of decoded data
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegQueryAtracEsSize(SceMpeg* Mpeg, SceInt32* iEsSize, SceInt32* iOutSize);
+ 
+@@ -263,7 +263,7 @@
+  * @param pEsBuffer - prevously allocated Es buffer
+  * @param pAu - will contain pointer to Au
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegInitAu(SceMpeg* Mpeg, ScePVoid pEsBuffer, SceMpegAu* pAu);
+ 
+@@ -275,7 +275,7 @@
+  * @param pAu - will contain pointer to Au
+  * @param iUnk - unknown
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegGetAvcAu(SceMpeg* Mpeg, SceMpegStream* pStream, SceMpegAu* pAu, SceInt32* iUnk);
+ 
+@@ -284,7 +284,7 @@
+  *
+  * @param Mpeg - SceMpeg handle
+  * @param pMode - pointer to SceMpegAvcMode struct defining the decode mode (pixelformat)
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegAvcDecodeMode(SceMpeg* Mpeg, SceMpegAvcMode* pMode);
+ 
+@@ -297,7 +297,7 @@
+  * @param pBuffer - buffer that will contain the decoded frame
+  * @param iInit - will be set to 0 on first call, then 1
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegAvcDecode(SceMpeg* Mpeg, SceMpegAu* pAu, SceInt32 iFrameWidth, ScePVoid pBuffer, SceInt32* iInit);
+ 
+@@ -307,9 +307,9 @@
+  * @param Mpeg - SceMpeg handle
+  * @param iFrameWidth - output buffer width, set to 512 if writing to framebuffer
+  * @param pBuffer - buffer that will contain the decoded frame
+- * @param iFrameNum - frame number
++ * @param iStatus - frame number
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegAvcDecodeStop(SceMpeg* Mpeg, SceInt32 iFrameWidth, ScePVoid pBuffer, SceInt32* iStatus);
+ 
+@@ -321,7 +321,7 @@
+  * @param pAu - will contain pointer to Au
+  * @param pUnk - unknown
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegGetAtracAu(SceMpeg* Mpeg, SceMpegStream* pStream, SceMpegAu* pAu, ScePVoid pUnk);
+ 
+@@ -333,7 +333,7 @@
+  * @param pBuffer - buffer that will contain the decoded frame
+  * @param iInit - set this to 1 on first call
+  *
+- * @returns 0 if success.
++ * @return 0 if success.
+  */
+ SceInt32 sceMpegAtracDecode(SceMpeg* Mpeg, SceMpegAu* pAu, ScePVoid pBuffer, SceInt32 iInit);
+ 
+Index: pspsdk/src/net/psphttp.h
+===================================================================
+--- pspsdk/src/net/psphttp.h	(revision 2432)
++++ pspsdk/src/net/psphttp.h	(working copy)
+@@ -29,14 +29,14 @@
+  * Init the http library.
+  *
+  * @param unknown1 - Memory pool size? Pass 20000
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpInit(unsigned int unknown1);
+ 
+ /**
+  * Terminate the http library.
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpEnd(void);
+ 
+@@ -46,7 +46,7 @@
+  * @param agent - User agent
+  * @param unknown1 - Pass 1
+  * @param unknown2 - Pass 0
+- * @returns A template ID on success, < 0 on error.
++ * @return A template ID on success, < 0 on error.
+  */
+ int sceHttpCreateTemplate(char *agent, int unknown1, int unknown2);
+ 
+@@ -54,7 +54,7 @@
+  * Delete a http template.
+  *
+  * @param templateid - ID of the template created by sceHttpCreateTemplate
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDeleteTemplate(int templateid);
+ 
+@@ -66,7 +66,7 @@
+  * @param unknown1 - Pass "http"
+  * @param port - Port to connect on
+  * @param unknown2 - Pass 0
+- * @returns A connection ID on success, < 0 on error.
++ * @return A connection ID on success, < 0 on error.
+  */
+ int sceHttpCreateConnection(int templateid, char *host, char *unknown1, unsigned short port, int unknown2);
+ 
+@@ -76,7 +76,7 @@
+  * @param templateid - ID of the template created by sceHttpCreateTemplate
+  * @param url - url to connect to
+  * @param unknown1 - Pass 0
+- * @returns A connection ID on success, < 0 on error.
++ * @return A connection ID on success, < 0 on error.
+  */
+ int sceHttpCreateConnectionWithURL(int templateid, const char *url, int unknown1);
+ 
+@@ -84,7 +84,7 @@
+  * Delete a http connection.
+  *
+  * @param connectionid - ID of the connection created by sceHttpCreateConnection or sceHttpCreateConnectionWithURL
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDeleteConnection(int connectionid);
+ 
+@@ -95,7 +95,7 @@
+  * @param method - One of ::PspHttpMethod
+  * @param path - Path to access
+  * @param contentlength - Length of the content (POST method only)
+- * @returns A request ID on success, < 0 on error.
++ * @return A request ID on success, < 0 on error.
+  */
+ int sceHttpCreateRequest(int connectionid, PspHttpMethod method, char *path, SceULong64 contentlength);
+ 
+@@ -106,7 +106,7 @@
+  * @param method - One of ::PspHttpMethod
+  * @param url - url to access
+  * @param contentlength - Length of the content (POST method only)
+- * @returns A request ID on success, < 0 on error.
++ * @return A request ID on success, < 0 on error.
+  */
+ int sceHttpCreateRequestWithURL(int connectionid, PspHttpMethod method, char *url, SceULong64 contentlength);
+ 
+@@ -114,7 +114,7 @@
+  * Delete a http request.
+  *
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDeleteRequest(int requestid);
+ 
+@@ -124,7 +124,7 @@
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+  * @param data - For POST methods specify a pointer to the post data, otherwise pass NULL
+  * @param datasize - For POST methods specify the size of the post data, otherwise pass 0
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSendRequest(int requestid, void *data, unsigned int datasize);
+ 
+@@ -132,7 +132,7 @@
+  * Abort a http request.
+  *
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpAbortRequest(int requestid);
+ 
+@@ -142,7 +142,7 @@
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+  * @param data - Buffer for the response data to be stored
+  * @param datasize - Size of the buffer 
+- * @returns The size read into the data buffer, 0 if there is no more data, < 0 on error.
++ * @return The size read into the data buffer, 0 if there is no more data, < 0 on error.
+  */
+ int sceHttpReadData(int requestid, void *data, unsigned int datasize);
+ 
+@@ -151,7 +151,7 @@
+  *
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+  * @param contentlength - The size of the content
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpGetContentLength(int requestid, SceULong64 *contentlength);
+ 
+@@ -160,7 +160,7 @@
+  *
+  * @param requestid - ID of the request created by sceHttpCreateRequest or sceHttpCreateRequestWithURL
+  * @param statuscode - The status code from the host (200 is ok, 404 is not found etc)
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpGetStatusCode(int requestid, int *statuscode);
+ 
+@@ -169,7 +169,7 @@
+  *
+  * @param id - ID of the template or connection 
+  * @param timeout - Timeout value in microseconds
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSetResolveTimeOut(int id, unsigned int timeout);
+ 
+@@ -178,7 +178,7 @@
+  *
+  * @param id - ID of the template or connection 
+  * @param count - Number of retries
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSetResolveRetry(int id, int count);
+ 
+@@ -187,7 +187,7 @@
+  *
+  * @param id - ID of the template, connection or request 
+  * @param timeout - Timeout value in microseconds
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSetConnectTimeOut(int id, unsigned int timeout);
+ 
+@@ -196,7 +196,7 @@
+  *
+  * @param id - ID of the template, connection or request 
+  * @param timeout - Timeout value in microseconds
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSetSendTimeOut(int id, unsigned int timeout);
+ 
+@@ -205,7 +205,7 @@
+  *
+  * @param id - ID of the template or connection 
+  * @param timeout - Timeout value in microseconds
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSetRecvTimeOut(int id, unsigned int timeout);
+ 
+@@ -213,7 +213,7 @@
+  * Enable keep alive
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpEnableKeepAlive(int id);
+ 
+@@ -221,7 +221,7 @@
+  * Disable keep alive
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDisableKeepAlive(int id);
+ 
+@@ -229,7 +229,7 @@
+  * Enable redirect
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpEnableRedirect(int id);
+ 
+@@ -237,7 +237,7 @@
+  * Disable redirect
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDisableRedirect(int id);
+ 
+@@ -245,7 +245,7 @@
+  * Enable cookie
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpEnableCookie(int id);
+ 
+@@ -253,21 +253,21 @@
+  * Disable cookie
+  *
+  * @param id - ID of the template or connection 
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDisableCookie(int id);
+ 
+ /**
+  * Save cookie
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpSaveSystemCookie(void);
+ 
+ /**
+  * Load cookie
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpLoadSystemCookie(void);
+ 
+@@ -278,7 +278,7 @@
+  * @param name - Name of the content
+  * @param value - Value of the content
+  * @param unknown1 - Pass 0
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpAddExtraHeader(int id, char *name, char *value, int unknown1);
+ 
+@@ -287,7 +287,7 @@
+  *
+  * @param id - ID of the template, connection or request 
+  * @param name - Name of the content
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceHttpDeleteHeader(int id, const char *name);
+ 
+@@ -299,14 +299,14 @@
+  * @param unknown3 - Pass 0
+  * @param unknown4 - Pass 0
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+ */
+ int sceHttpsInit(int unknown1, int unknown2, int unknown3, int unknown4);
+ 
+ /**
+  * Terminate the https library
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+ */
+ int sceHttpsEnd(void);
+ 
+@@ -315,7 +315,7 @@
+  *
+  * @param unknown1 - Pass 0
+  * @param unknown2 - Pass 0
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+ */
+ int sceHttpsLoadDefaultCert(int unknown1, int unknown2);
+ 
+Index: pspsdk/src/net/pspnet_adhocctl.h
+===================================================================
+--- pspsdk/src/net/pspnet_adhocctl.h	(revision 2432)
++++ pspsdk/src/net/pspnet_adhocctl.h	(working copy)
+@@ -167,7 +167,7 @@
+  * Connect to the Adhoc control game mode (as a client)
+  *
+  * @param name - The name of the connection (maximum 8 alphanumeric characters).
+- * @param host - The mac address of the host.
++ * @param hostmac - The mac address of the host.
+  * @param timeout - Timeout in microseconds.
+  * @param unknown - pass 0.
+  *
+@@ -195,7 +195,7 @@
+  * Get a list of peers
+  *
+  * @param length - The length of the list.
+- * @param host - An allocated area of size length.
++ * @param buf - An allocated area of size length.
+  *
+  * @return 0 on success, < 0 on error.
+  */
+Index: pspsdk/src/net/pspnet_adhocmatching.h
+===================================================================
+--- pspsdk/src/net/pspnet_adhocmatching.h	(revision 2432)
++++ pspsdk/src/net/pspnet_adhocmatching.h	(working copy)
+@@ -240,7 +240,7 @@
+  *
+  * @param matchingid - The ID returned from ::sceNetAdhocMatchingCreate
+  * @param length - The length of the list.
+- * @param host - An allocated area of size length.
++ * @param buf - An allocated area of size length.
+  *
+  * @return 0 on success, < 0 on error.
+  */
+Index: pspsdk/src/net/pspssl.h
+===================================================================
+--- pspsdk/src/net/pspssl.h	(revision 2432)
++++ pspsdk/src/net/pspssl.h	(working copy)
+@@ -22,14 +22,14 @@
+  *
+  * @param unknown1 - Memory size? Pass 0x28000
+  *
+- * @returns 0 on success
++ * @return 0 on success
+ */
+ int sceSslInit(int unknown1);
+ 
+ /**
+  * Terminate the ssl library.
+  *
+- * @returns 0 on success
++ * @return 0 on success
+ */
+ int sceSslEnd(void);
+ 
+@@ -38,7 +38,7 @@
+  *
+  * @param memory - Pointer where the maximum memory used value will be stored.
+  *
+- * @returns 0 on success
++ * @return 0 on success
+ */
+ int sceSslGetUsedMemoryMax(unsigned int *memory);
+ 
+@@ -47,7 +47,7 @@
+  *
+  * @param memory - Pointer where the current memory used value will be stored.
+  *
+- * @returns 0 on success
++ * @return 0 on success
+ */
+ int sceSslGetUsedMemoryCurrent(unsigned int *memory);
+ 
+Index: pspsdk/src/power/psppower.h
+===================================================================
+--- pspsdk/src/power/psppower.h	(revision 2432)
++++ pspsdk/src/power/psppower.h	(working copy)
+@@ -69,7 +69,7 @@
+  * @param slot - slot of the callback in the list, 0 to 15, pass -1 to get an auto assignment.
+  * @param cbid - callback id from calling sceKernelCreateCallback
+  *
+- * @returns 0 on success, the slot number if -1 is passed, < 0 on error.
++ * @return 0 on success, the slot number if -1 is passed, < 0 on error.
+  */
+ int scePowerRegisterCallback(int slot, SceUID cbid);
+ 
+@@ -78,28 +78,28 @@
+  *
+  * @param slot - slot of the callback
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int scePowerUnregisterCallback(int slot);
+ 
+ /**
+  * Check if unit is plugged in
+  *
+- * @returns 1 if plugged in, 0 if not plugged in, < 0 on error.
++ * @return 1 if plugged in, 0 if not plugged in, < 0 on error.
+  */
+ int scePowerIsPowerOnline(void);
+ 
+ /**
+  * Check if a battery is present
+  *
+- * @returns 1 if battery present, 0 if battery not present, < 0 on error.
++ * @return 1 if battery present, 0 if battery not present, < 0 on error.
+  */
+ int scePowerIsBatteryExist(void);
+ 
+ /**
+  * Check if the battery is charging
+  *
+- * @returns 1 if battery charging, 0 if battery not charging, < 0 on error.
++ * @return 1 if battery charging, 0 if battery not charging, < 0 on error.
+  */
+ int scePowerIsBatteryCharging(void);
+ 
+@@ -111,21 +111,21 @@
+ /**
+  * Check if the battery is low
+  *
+- * @returns 1 if the battery is low, 0 if the battery is not low, < 0 on error.
++ * @return 1 if the battery is low, 0 if the battery is not low, < 0 on error.
+  */
+ int scePowerIsLowBattery(void);
+ 
+ /**
+  * Get battery life as integer percent
+  *
+- * @returns Battery charge percentage (0-100), < 0 on error.
++ * @return Battery charge percentage (0-100), < 0 on error.
+  */
+ int scePowerGetBatteryLifePercent(void);
+ 
+ /**
+  * Get battery life as time
+  *
+- * @returns Battery life in minutes, < 0 on error.
++ * @return Battery life in minutes, < 0 on error.
+  */
+ int scePowerGetBatteryLifeTime(void);
+ 
+@@ -158,37 +158,37 @@
+ 
+ /**
+  * Alias for scePowerGetCpuClockFrequencyInt
+- * @returns frequency as int
++ * @return frequency as int
+  */
+ int scePowerGetCpuClockFrequency(void);
+ 
+ /**
+  * Get CPU Frequency as Integer
+- * @returns frequency as int
++ * @return frequency as int
+  */
+ int scePowerGetCpuClockFrequencyInt(void);
+ 
+ /**
+  * Get CPU Frequency as Float
+- * @returns frequency as float
++ * @return frequency as float
+  */
+ float scePowerGetCpuClockFrequencyFloat(void);
+ 
+ /**
+  * Alias for scePowerGetBusClockFrequencyInt
+- * @returns frequency as int
++ * @return frequency as int
+  */
+ int scePowerGetBusClockFrequency(void);
+ 
+ /**
+  * Get Bus fequency as Integer
+- * @returns frequency as int
++ * @return frequency as int
+  */
+ int scePowerGetBusClockFrequencyInt(void);
+ 
+ /**
+  * Get Bus frequency as Float
+- * @returns frequency as float
++ * @return frequency as float
+  */
+ float scePowerGetBusClockFrequencyFloat(void);
+ 
+@@ -215,7 +215,7 @@
+  *
+  * @param unknown - pass 0
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int scePowerLock(int unknown);
+ 
+@@ -224,7 +224,7 @@
+  *
+  * @param unknown - pass 0
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int scePowerUnlock(int unknown);
+ 
+@@ -234,7 +234,7 @@
+  *
+  * @param type - Either PSP_POWER_TICK_ALL, PSP_POWER_TICK_SUSPEND or PSP_POWER_TICK_DISPLAY
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int scePowerTick(int type);
+ 
+Index: pspsdk/src/registry/pspreg.h
+===================================================================
+--- pspsdk/src/registry/pspreg.h	(revision 2432)
++++ pspsdk/src/registry/pspreg.h	(working copy)
+@@ -100,7 +100,7 @@
+ /**
+  * Remove a registry dir
+  *
+- * @param hd - The open registry dir handle
++ * @param h - The open registry dir handle
+  * @param name - The name of the key
+  *
+  * @return 0 on success, < 0 on error
+@@ -222,7 +222,7 @@
+ /**
+  * Remove a registry (HONESTLY, DO NOT USE)
+  *
+- * @ret - Filled out registry parameter
++ * @param reg - Filled out registry parameter
+  *
+  * @return 0 on success, < 0 on error
+  */
+Index: pspsdk/src/sdk/pspsdk.h
+===================================================================
+--- pspsdk/src/sdk/pspsdk.h	(revision 2432)
++++ pspsdk/src/sdk/pspsdk.h	(working copy)
+@@ -58,7 +58,7 @@
+ /**
+  * Patch the sceModuleManager module to nullify LoadDeviceCheck() calls.
+  *
+- * @returns 0 on success, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 on success, otherwise one of ::PspKernelErrorCodes.
+  *
+  * @note This function must be called while running in kernel mode.  The program
+  * must also be linked against the pspkernel library.
+@@ -70,7 +70,7 @@
+  *
+  * @note This function must be called while running in kernel mode.
+  *
+- * @returns 0 on success, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkInstallNoPlainModuleCheckPatch(void);
+ 
+@@ -79,7 +79,7 @@
+  *
+  * @note This function must be called while running in kernel mode
+  *
+- * @returns 0 on success
++ * @return 0 on success
+  */
+ int pspSdkInstallKernelLoadModulePatch(void);
+ 
+@@ -89,7 +89,7 @@
+  * @param filename - Path to the module.
+  * @param mpid - Memory parition ID to use to load the module int.
+  *
+- * @returns - The UID of the module on success, otherwise one of ::PspKernelErrorCodes.
++ * @return - The UID of the module on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ SceUID pspSdkLoadStartModule(const char *filename, int mpid);
+ 
+@@ -101,7 +101,7 @@
+  * @param argc - Number of arguments to pass to start module
+  * @param argv - Array of arguments
+  *
+- * @returns - The UID of the module on success, otherwise one of ::PspKernelErrorCodes.
++ * @return - The UID of the module on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ SceUID pspSdkLoadStartModuleWithArgs(const char *filename, int mpid, int argc, char * const argv[]);
+ 
+@@ -116,14 +116,14 @@
+  * Load Inet related modules.
+  * @note You must be in kernel mode to execute this function.
+  *
+- * @returns - 0 on success, otherwise one of ::PspKernelErrorCodes.
++ * @return - 0 on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkLoadInetModules();
+ 
+ /**
+  * Initialize Inet related modules.
+  *
+- * @returns - 0 on success, otherwise one of ::PspKernelErrorCodes.
++ * @return - 0 on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkInetInit();
+ 
+@@ -139,7 +139,7 @@
+  * @param pUID - If the thread with the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the thread with the given name is found, it's ::SceKernelThreadInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferThreadStatusByName(const char *name, SceUID *pUID, SceKernelThreadInfo *pInfo);
+ 
+@@ -150,7 +150,7 @@
+  * @param pUID - If the sema with the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the sema with the given name is found, it's ::SceKernelSemaInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferSemaStatusByName(const char *name, SceUID *pUID, SceKernelSemaInfo *pInfo);
+ 
+@@ -161,7 +161,7 @@
+  * @param pUID - If the event flag with the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the event flag with the given name is found, it's ::SceKernelEventFlagInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferEventFlagStatusByName(const char *name, SceUID *pUID, SceKernelEventFlagInfo *pInfo);
+ 
+@@ -172,7 +172,7 @@
+  * @param pUID - If the message box with the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the message box with the given name is found, it's ::SceKernelMbxInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferMboxStatusByName(const char *name, SceUID *pUID, SceKernelMbxInfo *pInfo);
+ 
+@@ -183,7 +183,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelVplInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferVplStatusByName(const char *name, SceUID *pUID, SceKernelVplInfo *pInfo);
+ 
+@@ -194,7 +194,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelFplInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferFplStatusByName(const char *name, SceUID *pUID, SceKernelFplInfo *pInfo);
+ 
+@@ -205,7 +205,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelMppInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferMppStatusByName(const char *name, SceUID *pUID, SceKernelMppInfo *pInfo);
+ 
+@@ -216,7 +216,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelMppInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferCallbackStatusByName(const char *name, SceUID *pUID, SceKernelCallbackInfo *pInfo);
+ 
+@@ -227,7 +227,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelVTimerInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferVTimerStatusByName(const char *name, SceUID *pUID, SceKernelVTimerInfo *pInfo);
+ 
+@@ -238,7 +238,7 @@
+  * @param pUID - If the given name is found, it's ::SceUID is stored here.
+  * @param pInfo - If the given name is found, it's ::SceKernelThreadEventHandlerInfo data is stored here.
+  *
+- * @returns 0 if successful, otherwise one of ::PspKernelErrorCodes.
++ * @return 0 if successful, otherwise one of ::PspKernelErrorCodes.
+  */
+ int pspSdkReferThreadEventHandlerStatusByName(const char *name, SceUID *pUID, SceKernelThreadEventHandlerInfo *pInfo);
+ 
+Index: pspsdk/src/usb/pspusbcam.h
+===================================================================
+--- pspsdk/src/usb/pspusbcam.h	(revision 2432)
++++ pspsdk/src/usb/pspusbcam.h	(working copy)
+@@ -251,7 +251,7 @@
+  *
+  * @param param - pointer to a ::PspUsbCamSetupStillParam 
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetupStill(PspUsbCamSetupStillParam *param);
+ 
+@@ -260,7 +260,7 @@
+  *
+  * @param param - pointer to a ::PspUsbCamSetupStillParamEx 
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetupStillEx(PspUsbCamSetupStillExParam *param);
+ 
+@@ -271,7 +271,7 @@
+  * @param buf - The buffer that receives the image jpeg data
+  * @param size - The size of the buffer.
+  *
+- * @returns size of acquired image on success, < 0 on error
++ * @return size of acquired image on success, < 0 on error
+ */
+ int sceUsbCamStillInputBlocking(u8 *buf, SceSize size);
+ 
+@@ -283,21 +283,21 @@
+  * @param buf - The buffer that receives the image jpeg data
+  * @param size - The size of the buffer.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamStillInput(u8 *buf, SceSize size);
+ 
+ /** 
+  * Waits untils still input has been finished.
+  *
+- * @returns the size of the acquired image on sucess, < 0 on error
++ * @return the size of the acquired image on sucess, < 0 on error
+ */
+ int sceUsbCamStillWaitInputEnd(void);
+ 
+ /**
+  * Polls the status of still input completion.
+  *
+- * @returns the size of the acquired image if still input has ended, 
++ * @return the size of the acquired image if still input has ended, 
+  * 0 if the input has not ended, < 0 on error.
+ */
+ int sceUsbCamStillPollInputEnd(void);
+@@ -305,14 +305,14 @@
+ /** 
+  * Cancels the still input.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamStillCancelInput(void);
+ 
+ /**
+  * Gets the size of the acquired still image.
+  *
+- * @returns the size of the acquired image on success, < 0 on error
++ * @return the size of the acquired image on success, < 0 on error
+ */
+ int sceUsbCamStillGetInputLength(void);
+ 
+@@ -323,7 +323,7 @@
+  * @param workarea - Pointer to a buffer used as work area by the driver.
+  * @param wasize - Size of the work area.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetupVideo(PspUsbCamSetupVideoParam *param, void *workarea, int wasize);
+ 
+@@ -334,21 +334,21 @@
+  * @param workarea - Pointer to a buffer used as work area by the driver.
+  * @param wasize - Size of the work area.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetupVideoEx(PspUsbCamSetupVideoExParam *param, void *workarea, int wasize);
+ 
+ /**
+  * Starts video input from the camera.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamStartVideo(void);
+ 
+ /**
+  * Stops video input from the camera.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamStopVideo(void);
+ 
+@@ -359,7 +359,7 @@
+  * @param buf - The buffer that receives the frame jpeg data
+  * @param size - The size of the buffer.
+  *
+- * @returns size of acquired frame on success, < 0 on error
++ * @return size of acquired frame on success, < 0 on error
+ */
+ int sceUsbCamReadVideoFrameBlocking(u8 *buf, SceSize size);
+ 
+@@ -371,21 +371,21 @@
+  * @param buf - The buffer that receives the frame jpeg data
+  * @param size - The size of the buffer.
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamReadVideoFrame(u8 *buf, SceSize size);
+ 
+ /** 
+  * Waits untils the current frame has been read.
+  *
+- * @returns the size of the acquired frame on sucess, < 0 on error
++ * @return the size of the acquired frame on sucess, < 0 on error
+ */
+ int sceUsbCamWaitReadVideoFrameEnd(void);
+ 
+ /**
+  * Polls the status of video frame read completion.
+  *
+- * @returns the size of the acquired frame if it has been read, 
++ * @return the size of the acquired frame if it has been read, 
+  * 0 if the frame has not yet been read, < 0 on error.
+ */
+ int sceUsbCamPollReadVideoFrameEnd(void);
+@@ -393,7 +393,7 @@
+ /**
+  * Gets the size of the acquired frame.
+  *
+- * @returns the size of the acquired frame on success, < 0 on error
++ * @return the size of the acquired frame on success, < 0 on error
+ */
+ int sceUsbCamGetReadVideoFrameSize(void);
+ 
+@@ -402,7 +402,7 @@
+  *
+  * @param saturation - The saturation (0-255)
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetSaturation(int saturation);
+ 
+@@ -411,7 +411,7 @@
+  *
+  * @param brightness - The brightness (0-255)
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetBrightness(int brightness);
+ 
+@@ -420,7 +420,7 @@
+  *
+  * @param contrast - The contrast (0-255)
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetContrast(int contrast);
+ 
+@@ -429,7 +429,7 @@
+  *
+  * @param sharpness - The sharpness (0-255)
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetSharpness(int sharpness);
+ 
+@@ -438,7 +438,7 @@
+  *
+  * @param effectmode - The effect mode, one of ::PspUsbCamEffectMode
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetImageEffectMode(int effectmode);
+ 
+@@ -447,7 +447,7 @@
+  *
+  * @param ev - The exposure level, one of ::PspUsbCamEVLevel
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetEvLevel(int ev);
+ 
+@@ -456,7 +456,7 @@
+  *
+  * @param reverseflags - The reverse flags, zero or more of ::PspUsbCamReverseFlags
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetReverseMode(int reverseflags);
+ 
+@@ -465,7 +465,7 @@
+  *
+  * @param zoom - The zoom level starting by 10. (10 = 1X, 11 = 1.1X, etc)
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamSetZoom(int zoom);
+ 
+@@ -474,7 +474,7 @@
+  *
+  * @param saturation - pointer to a variable that receives the current saturation
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetSaturation(int *saturation);
+ 
+@@ -483,7 +483,7 @@
+  *
+  * @param brightness - pointer to a variable that receives the current brightness
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetBrightness(int *brightness);
+ 
+@@ -492,16 +492,16 @@
+  *
+  * @param contrast - pointer to a variable that receives the current contrast
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetContrast(int *contrast);
+ 
+ /**
+  * Gets the current sharpness
+  *
+- * @param brightness - pointer to a variable that receives the current sharpness
++ * @param sharpness - pointer to a variable that receives the current sharpness
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetSharpness(int *sharpness);
+ 
+@@ -510,7 +510,7 @@
+  *
+  * @param effectmode - pointer to a variable that receives the current effect mode
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetImageEffectMode(int *effectmode);
+ 
+@@ -519,7 +519,7 @@
+  *
+  * @param ev - pointer to a variable that receives the current exposure level
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetEvLevel(int *ev);
+ 
+@@ -528,7 +528,7 @@
+  *
+  * @param reverseflags - pointer to a variable that receives the current reverse mode flags
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetReverseMode(int *reverseflags);
+ 
+@@ -537,7 +537,7 @@
+  *
+  * @param zoom - pointer to a variable that receives the current zoom
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamGetZoom(int *zoom);
+ 
+@@ -547,21 +547,21 @@
+  *
+  * @param on - 1 to set the automatical reversal of the image, 0 to set it off
+  *
+- * @returns 0 on success, < 0 on error
++ * @return 0 on success, < 0 on error
+ */
+ int sceUsbCamAutoImageReverseSW(int on);
+ 
+ /**
+  * Gets the state of the autoreversal of the image.
+  *
+- * @returns 1 if it is set to automatic, 0 otherwise
++ * @return 1 if it is set to automatic, 0 otherwise
+ */
+ int sceUsbCamGetAutoImageReverseState(void);
+ 
+ /**
+  * Gets the direction of the camera lens
+  *
+- * @returns 1 if the camera is "looking to you", 0 if the camera
++ * @return 1 if the camera is "looking to you", 0 if the camera
+  * is "looking to the other side".
+ */
+ int sceUsbCamGetLensDirection(void);
+Index: pspsdk/src/user/pspintrman.h
+===================================================================
+--- pspsdk/src/user/pspintrman.h	(revision 2432)
++++ pspsdk/src/user/pspintrman.h	(working copy)
+@@ -72,7 +72,7 @@
+ /**
+  * Suspend all interrupts.
+  *
+- * @returns The current state of the interrupt controller, to be used with ::sceKernelCpuResumeIntr().
++ * @return The current state of the interrupt controller, to be used with ::sceKernelCpuResumeIntr().
+  */
+ unsigned int sceKernelCpuSuspendIntr(void);
+ 
+@@ -95,14 +95,14 @@
+  *
+  * @param flags - The value returned from ::sceKernelCpuSuspendIntr().
+  *
+- * @returns 1 if flags indicate that interrupts were not suspended, 0 otherwise.
++ * @return 1 if flags indicate that interrupts were not suspended, 0 otherwise.
+  */
+ int sceKernelIsCpuIntrSuspended(unsigned int flags);
+ 
+ /**
+  * Determine if interrupts are enabled or disabled.
+  *
+- * @returns 1 if interrupts are currently enabled.
++ * @return 1 if interrupts are currently enabled.
+  */
+ int sceKernelIsCpuIntrEnable(void);
+ 
+Index: pspsdk/src/user/pspmodulemgr.h
+===================================================================
+--- pspsdk/src/user/pspmodulemgr.h	(revision 2432)
++++ pspsdk/src/user/pspmodulemgr.h	(working copy)
+@@ -63,7 +63,7 @@
+   * @param flags - Unused, always 0 .
+   * @param option  - Pointer to a mod_param_t structure. Can be NULL.
+   *
+-  * @returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
++  * @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+   */
+ SceUID sceKernelLoadModule(const char *path, int flags, SceKernelLMOption *option);
+ 
+@@ -75,7 +75,7 @@
+   * @param flags - Unused, set to 0.
+   * @param option  - Pointer to a mod_param_t structure. Can be NULL.
+   *
+-  * @returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
++  * @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+   */
+ SceUID sceKernelLoadModuleMs(const char *path, int flags, SceKernelLMOption *option);
+ 
+@@ -86,7 +86,7 @@
+  * @param flags - Unused, always 0.
+  * @param option - Pointer to an optional ::SceKernelLMOption structure.
+  *
+- * @returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
++ * @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ SceUID sceKernelLoadModuleByID(SceUID fid, int flags, SceKernelLMOption *option);
+ 
+@@ -101,7 +101,7 @@
+  * @param flags - Unused, always 0.
+  * @param option - Pointer to an optional ::SceKernelLMOption structure.
+  *
+- * @returns The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
++ * @return The UID of the loaded module on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ SceUID sceKernelLoadModuleBufferUsbWlan(SceSize bufsize, void *buf, int flags, SceKernelLMOption *option);
+ 
+@@ -127,7 +127,7 @@
+  * @param status - Return value of the module's module_stop() routine.
+  * @param option - Pointer to an optional ::SceKernelSMOption structure.
+  *
+- * @returns ??? on success, otherwise one of ::PspKernelErrorCodes.
++ * @return ??? on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int sceKernelStopModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option);
+ 
+@@ -136,7 +136,7 @@
+  *
+  * @param modid - The UID of the module to unload.
+  *
+- * @returns ??? on success, otherwise one of ::PspKernelErrorCodes.
++ * @return ??? on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int sceKernelUnloadModule(SceUID modid);
+ 
+@@ -159,7 +159,7 @@
+  * @param status - Return value from module_stop().
+  * @param option - Pointer to an optional ::SceKernelSMOption structure.
+  *
+- * @returns ??? on success, otherwise one of ::PspKernelErrorCodes.
++ * @return ??? on success, otherwise one of ::PspKernelErrorCodes.
+  */
+ int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option);
+ 
+Index: pspsdk/src/user/pspsysmem.h
+===================================================================
+--- pspsdk/src/user/pspsysmem.h	(revision 2432)
++++ pspsdk/src/user/pspsysmem.h	(working copy)
+@@ -51,7 +51,7 @@
+  * @param size - Size of the memory block, in bytes.
+  * @param addr - If type is PSP_SMEM_Addr, then addr specifies the lowest address allocate the block from.
+  *
+- * @returns The UID of the new block, or if less than 0 an error.
++ * @return The UID of the new block, or if less than 0 an error.
+  */
+ SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr);
+ 
+@@ -60,7 +60,7 @@
+  *
+  * @param blockid - UID of the block to free.
+  *
+- * @returns ? on success, less than 0 on error.
++ * @return ? on success, less than 0 on error.
+  */
+ int sceKernelFreePartitionMemory(SceUID blockid);
+ 
+@@ -69,28 +69,28 @@
+  *
+  * @param blockid - UID of the memory block.
+  *
+- * @returns The lowest address belonging to the memory block.
++ * @return The lowest address belonging to the memory block.
+  */
+ void * sceKernelGetBlockHeadAddr(SceUID blockid);
+ 
+ /**
+  * Get the total amount of free memory.
+  *
+- * @returns The total amount of free memory, in bytes.
++ * @return The total amount of free memory, in bytes.
+  */
+ SceSize sceKernelTotalFreeMemSize(void);
+ 
+ /**
+  * Get the size of the largest free memory block.
+  *
+- * @returns The size of the largest free memory block, in bytes.
++ * @return The size of the largest free memory block, in bytes.
+  */
+ SceSize sceKernelMaxFreeMemSize(void);
+ 
+ /**
+  * Get the firmware version.
+  * 
+- * @returns The firmware version.
++ * @return The firmware version.
+  * 0x01000300 on v1.00 unit,
+  * 0x01050001 on v1.50 unit,
+  * 0x01050100 on v1.51 unit,
+Index: pspsdk/src/user/pspthreadman.h
+===================================================================
+--- pspsdk/src/user/pspthreadman.h	(revision 2432)
++++ pspsdk/src/user/pspthreadman.h	(working copy)
+@@ -206,7 +206,7 @@
+  *
+  * @param thid - UID of the thread to terminate.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelTerminateThread(SceUID thid);
+ 
+@@ -215,7 +215,7 @@
+  *
+  * @param thid - UID of the thread to terminate and delete.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelTerminateDeleteThread(SceUID thid);
+ 
+@@ -259,7 +259,7 @@
+  *
+  * @param thid - UID of the thread to wake.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelWakeupThread(SceUID thid);
+ 
+@@ -268,7 +268,7 @@
+  *
+  * @param thid - UID of the thread to cancel.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelCancelWakeupThread(SceUID thid);
+ 
+@@ -277,7 +277,7 @@
+  *
+  * @param thid - UID of the thread to suspend.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelSuspendThread(SceUID thid);
+ 
+@@ -286,7 +286,7 @@
+  *
+  * @param thid - UID of the thread to resume.
+  *
+- * @returns Success if >= 0, an error if < 0.
++ * @return Success if >= 0, an error if < 0.
+  */
+ int sceKernelResumeThread(SceUID thid);
+ 
+@@ -359,7 +359,7 @@
+  * @param unknown - Set to 0.
+  * @param attr - The thread attributes to modify.  One of ::PspThreadAttributes.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceKernelChangeCurrentThreadAttr(int unknown, SceUInt attr);
+ 
+@@ -463,7 +463,7 @@
+  * @param thid - UID of the thread to retrive status.
+  * @param status - Pointer to a ::SceKernelThreadRunStatus struct to receive the runtime status.
+  *
+- * @returns 0 if successful, otherwise the error code.
++ * @return 0 if successful, otherwise the error code.
+  */
+ int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status);
+ 
+@@ -586,7 +586,7 @@
+  * @param semaid - UID of the semaphore to retrieve info for.
+  * @param info - Pointer to a ::SceKernelSemaInfo struct to receive the info.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceKernelReferSemaStatus(SceUID semaid, SceKernelSemaInfo *info);
+ 
+@@ -881,7 +881,7 @@
+  * @param mbxid - UID of the messagebox to retrieve info for.
+  * @param info - Pointer to a ::SceKernelMbxInfo struct to receive the info.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceKernelReferMbxStatus(SceUID mbxid, SceKernelMbxInfo *info);
+ 
+@@ -1719,9 +1719,9 @@
+  * Register a thread event handler
+  *
+  * @param name - Name for the thread event handler
+- * @param threadId - Thread ID to monitor
++ * @param threadID - Thread ID to monitor
++ * @param mask - Bit mask for what events to handle (only lowest 4 bits valid)
+  * @param handler - Pointer to a ::SceKernelThreadEventHandler function
+- * @param mask - Bit mask for what events to handle (only lowest 4 bits valid)
+  * @param common - Common pointer
+  *
+  * @return The UID of the create event handler, < 0 on error
+Index: pspsdk/src/utility/psputility_gamesharing.h
+===================================================================
+--- pspsdk/src/utility/psputility_gamesharing.h	(revision 2432)
++++ pspsdk/src/utility/psputility_gamesharing.h	(working copy)
+@@ -54,7 +54,7 @@
+  * Init the game sharing
+  *
+  * @param params - game sharing parameters
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceUtilityGameSharingInitStart(pspUtilityGameSharingParams *params);
+ 
+Index: pspsdk/src/utility/psputility_htmlviewer.h
+===================================================================
+--- pspsdk/src/utility/psputility_htmlviewer.h	(revision 2432)
++++ pspsdk/src/utility/psputility_htmlviewer.h	(working copy)
+@@ -160,7 +160,7 @@
+  *
+  * @param params - html viewer parameters
+  *
+- * @returns 0 on success, < 0 on error.
++ * @return 0 on success, < 0 on error.
+  */
+ int sceUtilityHtmlViewerInitStart(pspUtilityHtmlViewerParam *params);
+ 
+Index: pspsdk/src/utility/psputility_msgdialog.h
+===================================================================
+--- pspsdk/src/utility/psputility_msgdialog.h	(revision 2432)
++++ pspsdk/src/utility/psputility_msgdialog.h	(working copy)
+@@ -64,7 +64,7 @@
+  * Create a message dialog
+  *
+  * @param params - dialog parameters
+- * @returns 0 on success
++ * @return 0 on success
+  */
+ int sceUtilityMsgDialogInitStart(pspUtilityMsgDialogParams *params);
+ 
+Index: pspsdk/src/utility/psputility_netparam.h
+===================================================================
+--- pspsdk/src/utility/psputility_netparam.h	(revision 2432)
++++ pspsdk/src/utility/psputility_netparam.h	(working copy)
+@@ -55,7 +55,7 @@
+  * Check existance of a Net Configuration
+  *
+  * @param id - id of net Configuration (1 to n)
+- * @returns 0 on success, 
++ * @return 0 on success, 
+  */
+ int sceUtilityCheckNetParam(int id);
+ 
+@@ -66,7 +66,7 @@
+  * (0 returns valid but seems to be a copy of the last config requested)
+  * @param param - which parameter to get
+  * @param data - parameter data
+- * @returns 0 on success, 
++ * @return 0 on success, 
+  */
+ int sceUtilityGetNetParam(int conf, int param, netData *data);
+ 
+@@ -95,7 +95,7 @@
+  * Copies a Network Configuration to another
+  *
+  * @param src - Source Net Configuration number (0 to n)
+- * @param src - Destination Net Configuration number (0 to n)
++ * @param dest - Destination Net Configuration number (0 to n)
+  *
+  * @return 0 on success
+  */
+Index: pspsdk/src/utility/psputility_osk.h
+===================================================================
+--- pspsdk/src/utility/psputility_osk.h	(revision 2432)
++++ pspsdk/src/utility/psputility_osk.h	(working copy)
+@@ -145,7 +145,7 @@
+  *
+  * @param params - OSK parameters.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceUtilityOskInitStart(SceUtilityOskParams* params);
+ 
+@@ -154,7 +154,7 @@
+  *
+  * poll sceUtilityOskGetStatus() until it returns PSP_UTILITY_DIALOG_NONE.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceUtilityOskShutdownStart(void);
+ 
+@@ -163,14 +163,14 @@
+  *
+  * @param n - Unknown, pass 1.
+  *
+- * @returns < 0 on error.
++ * @return < 0 on error.
+  */
+ int sceUtilityOskUpdate(int n);
+ 
+ /**
+  * Get the status of a on-screen keyboard currently active.
+  *
+- * @returns the current status of the keyboard. See ::pspUtilityDialogState for details.
++ * @return the current status of the keyboard. See ::pspUtilityDialogState for details.
+  */
+ int sceUtilityOskGetStatus(void);
+ 
+Index: pspsdk/src/utility/psputility_savedata.h
+===================================================================
+--- pspsdk/src/utility/psputility_savedata.h	(revision 2432)
++++ pspsdk/src/utility/psputility_savedata.h	(working copy)
+@@ -145,7 +145,7 @@
+  * check if the operation is completed
+  *
+  * @param params - savedata parameters
+- * @returns 0 on success
++ * @return 0 on success
+  */
+ int sceUtilitySavedataInitStart(SceUtilitySavedataParam * params);
+ 
+@@ -153,7 +153,7 @@
+  * Check the current status of the saving/loading/shutdown process
+  * Continue calling this to check current status of the process
+  * before calling this call also sceUtilitySavedataUpdate
+- * @returns 2 if the process is still being processed.
++ * @return 2 if the process is still being processed.
+  * 3 on save/load success, then you can call sceUtilitySavedataShutdownStart.
+  * 4 on complete shutdown.
+  */
+Index: pspsdk/src/utility/psputility_sysparam.h
+===================================================================
+--- pspsdk/src/utility/psputility_sysparam.h	(revision 2432)
++++ pspsdk/src/utility/psputility_sysparam.h	(working copy)
+@@ -102,7 +102,7 @@
+  *
+  * @param id - which parameter to set
+  * @param value - integer value to set
+- * @returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
++ * @return 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
+  */
+ int sceUtilitySetSystemParamInt(int id, int value);
+ 
+@@ -111,7 +111,7 @@
+  *
+  * @param id - which parameter to set
+  * @param str - char * value to set
+- * @returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
++ * @return 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
+  */
+ int sceUtilitySetSystemParamString(int id, const char *str);
+ 
+@@ -120,7 +120,7 @@
+  *
+  * @param id - which parameter to get
+  * @param value - pointer to integer value to place result in
+- * @returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
++ * @return 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
+  */
+ int sceUtilityGetSystemParamInt( int id, int *value );
+ 
+@@ -130,7 +130,7 @@
+  * @param id - which parameter to get
+  * @param str - char * buffer to place result in
+  * @param len - length of str buffer
+- * @returns 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
++ * @return 0 on success, PSP_SYSTEMPARAM_RETVAL_FAIL on failure
+  */
+ int sceUtilityGetSystemParamString(int id, char *str, int len);
+ 
+Index: pspsdk/src/vsh/pspchnnlsv.h
+===================================================================
+--- pspsdk/src/vsh/pspchnnlsv.h	(revision 2432)
++++ pspsdk/src/vsh/pspchnnlsv.h	(working copy)
+@@ -48,7 +48,7 @@
+  *
+  * @param ctx - Context
+  * @param mode - Cipher mode
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_E7833020(pspChnnlsvContext1 *ctx, int mode);
+ 	
+@@ -58,7 +58,7 @@
+  * @param ctx - Context
+  * @param data - Data (aligned to 0x10)
+  * @param len - Length (aligned to 0x10)
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_F21A1FCA(pspChnnlsvContext1 *ctx, unsigned char *data, int len);
+ 
+@@ -68,7 +68,7 @@
+  * @param ctx - Context
+  * @param hash - Hash output (aligned to 0x10, 0x10 bytes long)
+  * @param cryptkey - Crypt key or NULL.
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_C4C494F8(pspChnnlsvContext1 *ctx, 
+ 			unsigned char *hash, unsigned char *cryptkey);
+@@ -81,7 +81,7 @@
+  * @param mode2 - Encrypt mode (1 = encrypting, 2 = decrypting)
+  * @param hashkey - Key out
+  * @param cipherkey - Key in
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_ABFDFC8B(pspChnnlsvContext2 *ctx, int mode1, int mode2,
+ 			unsigned char *hashkey, unsigned char *cipherkey);
+@@ -92,7 +92,7 @@
+  * @param ctx - Context
+  * @param data - Data (aligned to 0x10)
+  * @param len - Length (aligned to 0x10)
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_850A7FA1(pspChnnlsvContext2 *ctx, unsigned char *data, int len);
+ 
+@@ -100,7 +100,7 @@
+  * Check integrity
+  *
+  * @param ctx - Context
+- * @returns < 0 on error
++ * @return < 0 on error
+  */
+ int sceChnnlsv_21BE78B4(pspChnnlsvContext2 *ctx);
+ 

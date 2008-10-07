@@ -32,7 +32,9 @@ Portable handheld videogame system.
 ===============================================================================
 0.8.9
 * Added Objective-C++ support to the toochain.
-* Updated SVN to include latest SceMP3 lib stubs and headers
+* Updated SDK docs to build without errors
+* dot fixed now images in the docs are readable
+* Shrunk the installer
 
 0.8.8
 * Added Objective-C support to the toochain. And a sample.
