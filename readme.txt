@@ -165,6 +165,9 @@ http://downloads.sf.net/mingw/MinGW-5.1.4.exe Choose c:\msys\mingw as
 installation directory. Select "candidate" package version and check the g++
 option on the packages list.
 
+Optionally install GDB
+http://downloads.sf.net/mingw/gdb-5.2.1-1.exe
+
 2nd Download latest MSYS and install it:
 http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11-2004.04.30-1.exe
 Chose c:\msys as installation directory. Leave all other options unchanged.
@@ -204,15 +207,15 @@ tar -xvjf ~/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
 tar -xvjf ~/m4-1.4.7-MSYS.tar.bz2
 
 cd ~
-tar -xvjf libtool-1.5.24.tar.bz2
-cd libtool-2.2.4
-./configure --disable-ltdl-install
+tar -xvzf libtool-1.5.24.tar.gz
+cd libtool-1.5.24
+./configure
 make
 make install
 
 cd ..
 tar -xvjf autoconf-2.61.tar.bz2
-cd autoconf-2.62
+cd autoconf-2.61
 ./configure
 make
 make install
@@ -232,11 +235,12 @@ make
 make install
 
 8th Install other packages we need (into C:\msys\local)
-  - doxygen 1.5.6
+  - doxygen 1.5.7.1
   - pod2man
-  - graphviz 2.16.1
+  - dot 1.16
   - texinfo 4.8
   - svn 1.5.2
+  - flex-2.5.4a-1
 
 9th Install Python 2.5.2 (later may work but not tested)
   - Python 2.5.2 (Use the windows installer) Then add to the PATH
