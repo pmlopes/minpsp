@@ -547,6 +547,7 @@ function prepareDistro {
 	cd ../../..
 	rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
 	rm -rf $INSTALLERDIR/documentation/pspdoc/doc/.svn
+	rm -rf `find $INSTALLERDIR/documentation/pspdoc/doc -name "*.dot"`
 	mv $INSTALLERDIR/documentation/pspdoc/doc/html $INSTALLERDIR/documentation/pspdoc/doc/pspsdk
 
 	# move samples
