@@ -92,11 +92,11 @@ function checkTool {
 # Gets the sources from the PS2DEV SVN reppo, on failure tries to fallback to JimParis mirror
 #arg1 devpak
 function svnGetPS2DEV() {
-	if [ ! -d $1 ]
+	if [ ! -d $(basename $1) ]
 	then
 		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
 	else
-		svn update $2 $3 $1
+		svn update $2 $3 $(basename $1)
 	fi
 }
 
@@ -215,6 +215,7 @@ function buildBinutils {
 	cd ../../..
 }
 
+# build a compiler so we can bootstrap the SDK and the newlib
 function buildBaseCompiler {
 	downloadHTTP psp $GCC_CORE $GCC_CORE_URL
 	downloadHTTP psp $GCC_GPP $GCC_GPP_URL
@@ -233,9 +234,8 @@ function buildBaseCompiler {
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 		
-	CFLAGS="-D__USE_MINGW_ACCESS -G0" \
-	BOOT_CFLAGS="-D__USE_MINGW_ACCESS" \
-	BOOT_LDFLAGS=-s \
+	CFLAGS_FOR_TARGET="-G0" \
+	LDFLAGS="-s" \
 	../../$GCC_SRCDIR/configure \
 			--enable-languages="c,c++,objc,obj-c++" \
 			--disable-win32-registry \
@@ -245,7 +245,9 @@ function buildBaseCompiler {
 			--disable-libssp \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring gcc"
+			--with-mpfr=/usr/local \
+			--enable-c99 \
+			--enable-long-long || die "configuring gcc"
 	make all-gcc || die "building gcc"
 	make install-gcc || die "installing gcc"
 	cd ../../..
@@ -255,15 +257,17 @@ function bootstrapSDK {
 	if [ ! -d psp/pspsdk ]
 	then
 		cd psp
-		svnGetPS2DEV $PS2DEV_SVN/pspsdk
+		svnGetPS2DEV pspsdk
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 		patch -p1 -d pspsdk -i ../patches/pspsdk-doc.patch || die "patching pspsdk (Doxygen DOCS)"
-		cd pspsdk
-		./bootstrap || die "running pspsdk bootstrap"
-		cd ../..
+		cd ..
 	else
-		svnGetPS2DEV $PS2DEV_SVN/pspsdk
+		svnGetPS2DEV pspsdk
 	fi
+	
+	cd psp/pspsdk
+	./bootstrap || die "running pspsdk bootstrap"
+	cd ../..
 	
 	mkdir -p psp/build/pspsdk
 	cd psp/build/pspsdk
@@ -340,12 +344,15 @@ function installExtraBinaries {
 	then
 		cd deps
 		../mingw/bin/unzip -q $UNXUTILS -d $UNXUTILS_DIR
-		installFile cp.exe $UNXUTILS_DIR/usr/local/wbin bin
-		installFile rm.exe $UNXUTILS_DIR/usr/local/wbin bin
-		installFile mkdir.exe $UNXUTILS_DIR/usr/local/wbin bin
-		installFile sed.exe $UNXUTILS_DIR/usr/local/wbin bin
 		cd ..
 	fi
+	
+	cd deps
+	installFile cp.exe $UNXUTILS_DIR/usr/local/wbin bin
+	installFile rm.exe $UNXUTILS_DIR/usr/local/wbin bin
+	installFile mkdir.exe $UNXUTILS_DIR/usr/local/wbin bin
+	installFile sed.exe $UNXUTILS_DIR/usr/local/wbin bin
+	cd ..
 	
 	downloadHTTP deps $MINGW32_MAKE $MINGW32_MAKE_URL
 	
@@ -355,10 +362,13 @@ function installExtraBinaries {
 		mkdir $MINGW32_MAKE_DIR
 		cd $MINGW32_MAKE_DIR
 		tar -xzf ../$MINGW32_MAKE || die "extracting "$MINGW32_MAKE
-		installFile make.exe . bin
-		installDir info .
 		cd ../..
 	fi
+	
+	cd deps/$MINGW32_MAKE_DIR
+	installFile make.exe . bin
+	installDir info .
+	cd ../..
 	
 	# true for some samples (namely minifire asm demo)
 	gcc -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
@@ -369,7 +379,7 @@ function installExtraBinaries {
 
 function installPSPLinkUSB {
 	cd psp
-	svnGetPS2DEV $PS2DEV_SVN/psplinkusb
+	svnGetPS2DEV psplinkusb
 	
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
@@ -433,26 +443,32 @@ function installMan {
 	then
 		cd deps
 		../mingw/bin/unzip -q $MINGW32_GROFF -d $MINGW32_GROFF_DIR
-		installFile groff.exe $MINGW32_GROFF_DIR/bin bin
-		installFile grotty.exe $MINGW32_GROFF_DIR/bin bin
-		installFile troff.exe $MINGW32_GROFF_DIR/bin bin
-		mkdir -p $INSTALLDIR/share
-		
-		installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font share
-		installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac share
 		cd ..
 	fi
 
+	cd deps
+	installFile groff.exe $MINGW32_GROFF_DIR/bin bin
+	installFile grotty.exe $MINGW32_GROFF_DIR/bin bin
+	installFile troff.exe $MINGW32_GROFF_DIR/bin bin
+	mkdir -p $INSTALLDIR/share
+	
+	installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font share
+	installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac share
+	cd ..
+	
 	if [ ! -d deps/$MINGW32_LESS_DIR ]
 	then
 		cd deps
 		../mingw/bin/unzip -q $MINGW32_LESS -d $MINGW32_LESS_DIR
 		../mingw/bin/unzip -q $MINGW32_LESS_DEP -d $MINGW32_LESS_DIR
-		installFile less.exe $MINGW32_LESS_DIR/bin bin
-		installFile pcre3.dll $MINGW32_LESS_DIR/bin bin
-		installFile man.bat ../mingw/bin bin
 		cd ..
 	fi
+	
+	cd deps
+	installFile less.exe $MINGW32_LESS_DIR/bin bin
+	installFile pcre3.dll $MINGW32_LESS_DIR/bin bin
+	installFile man.bat ../mingw/bin bin
+	cd ..
 }
 
 function installInfo {
@@ -547,7 +563,7 @@ function prepareDistro {
 	cd ../../..
 	rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
 	rm -rf $INSTALLERDIR/documentation/pspdoc/doc/.svn
-	rm -rf `find $INSTALLERDIR/documentation/pspdoc/doc -name "*.dot"`
+	rm -f $INSTALLERDIR/documentation/pspdoc/doc/html/*.dot
 	mv $INSTALLERDIR/documentation/pspdoc/doc/html $INSTALLERDIR/documentation/pspdoc/doc/pspsdk
 
 	# move samples
@@ -610,6 +626,7 @@ buildGDB
 #---------------------------------------------------------------------------------
 
 installExtraBinaries
+exit
 installPSPLinkUSB
 installMan
 installInfo
