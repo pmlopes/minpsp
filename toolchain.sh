@@ -208,9 +208,10 @@ function buildBinutils {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
+			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring binutils"
-	make || die "Error building binutils"
+	make CFLAGS="-O2" LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
 }
@@ -234,8 +235,6 @@ function buildBaseCompiler {
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 		
-	CFLAGS_FOR_TARGET="-G0" \
-	LDFLAGS="-s" \
 	../../$GCC_SRCDIR/configure \
 			--enable-languages="c,c++,objc,obj-c++" \
 			--disable-win32-registry \
@@ -243,12 +242,11 @@ function buildBaseCompiler {
 			--target=psp \
 			--with-newlib \
 			--disable-libssp \
+			--disable-debug \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local \
-			--enable-c99 \
-			--enable-long-long || die "configuring gcc"
-	make all-gcc || die "building gcc"
+			--with-mpfr=/usr/local || die "configuring gcc"
+	make CFLAGS="-O2" LDFLAGS="-s" all-gcc || die "building gcc"
 	make install-gcc || die "installing gcc"
 	cd ../../..
 }
@@ -293,16 +291,17 @@ function buildNewlib {
 	../../$NEWLIB_SRCDIR/configure \
 			--target=psp \
 			--prefix=$INSTALLDIR \
+			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring newlib"
-	make || die "building newlib"
+	make CFLAGS="-O2" LDFLAGS="-s" || die "building newlib"
 	make install || die "installing newlib"
 	cd ../../..
 }
 
 function buildFinalCompiler {
 	cd psp/build/$GCC_SRCDIR
-	make || die "building final compiler"
+	make CFLAGS="-O2" LDFLAGS="-s" || die "building final compiler"
 	make install || die "installing final compiler"
 	cd ../../..
 }
@@ -330,9 +329,10 @@ function buildGDB {
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
+			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
-	make || die "building gdb"
+	make CFLAGS="-O2" LDFLAGS="-s" || die "building gdb"
 	make install || die "installing gdb"
 	cd ../../..
 }
@@ -476,28 +476,6 @@ function installInfo {
 	installFile ginfo.exe mingw/bin bin
 }
 
-function stripBinaries {
-	#---------------------------------------------------------------------------------
-	# strip binaries
-	# strip has trouble using wildcards so do it this way instead
-	#---------------------------------------------------------------------------------
-	for f in	$INSTALLDIR/bin/* \
-				$INSTALLDIR/psp/bin/* \
-				$INSTALLDIR/libexec/gcc/psp/$GCC_VER/*
-	do
-		strip $f
-	done
-
-	#---------------------------------------------------------------------------------
-	# strip debug info from libraries
-	#---------------------------------------------------------------------------------
-	find $INSTALLDIR/lib/gcc -name *.a -exec psp-strip -d {} \;
-	find $INSTALLDIR/psp -name *.a -exec psp-strip -d {} \;
-
-	# strip corrupts this dll, so get it again
-	installFile cygwin1.dll mingw/bin bin
-}
-
 function patchCMD {
 	patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/psp/patches/pspsdk-CMD.patch || die "patching makefiles for Win CMD shell"
 }
@@ -626,16 +604,9 @@ buildGDB
 #---------------------------------------------------------------------------------
 
 installExtraBinaries
-exit
 installPSPLinkUSB
 installMan
 installInfo
-
-#---------------------------------------------------------------------------------
-# strip binaries
-#---------------------------------------------------------------------------------
-
-stripBinaries
 
 #---------------------------------------------------------------------------------
 # patch SDK to run without msys
