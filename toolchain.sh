@@ -252,23 +252,22 @@ function buildBaseCompiler {
 }
 
 function bootstrapSDK {
-	if [ ! -d psp/pspsdk ]
+	cd psp
+	if [ ! -d pspsdk ]
 	then
-		cd psp
 		svnGetPS2DEV pspsdk
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 		patch -p1 -d pspsdk -i ../patches/pspsdk-doc.patch || die "patching pspsdk (Doxygen DOCS)"
-		cd ..
 	else
 		svnGetPS2DEV pspsdk
 	fi
 	
-	cd psp/pspsdk
+	cd pspsdk
 	./bootstrap || die "running pspsdk bootstrap"
-	cd ../..
+	cd ..
 	
-	mkdir -p psp/build/pspsdk
-	cd psp/build/pspsdk
+	mkdir -p build/pspsdk
+	cd build/pspsdk
 	../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
 	make install-data || die "installing pspsdk headers"
 	cd ../../..
