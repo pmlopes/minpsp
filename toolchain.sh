@@ -203,15 +203,16 @@ function buildBinutils {
 	
 	mkdir -p psp/build/$BINUTILS_SRCDIR
 	cd psp/build/$BINUTILS_SRCDIR
-		
+	
 	../../$BINUTILS_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
+			--disable-shared \
 			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring binutils"
-	make CFLAGS="-O2" LDFLAGS="-s" || die "Error building binutils"
+	make LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
 }
@@ -229,6 +230,7 @@ function buildBaseCompiler {
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VERSION-PSP.patch || die "patching gcc"
+		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VERSION-MINPSPW.patch || die "patching gcc"
 		cd ..
 	fi
 
@@ -242,11 +244,12 @@ function buildBaseCompiler {
 			--target=psp \
 			--with-newlib \
 			--disable-libssp \
+			--disable-shared \
 			--disable-debug \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
-	make CFLAGS="-O2" LDFLAGS="-s" all-gcc || die "building gcc"
+	make LDFLAGS="-s" all-gcc || die "building gcc"
 	make install-gcc || die "installing gcc"
 	cd ../../..
 }
@@ -268,6 +271,7 @@ function bootstrapSDK {
 	
 	mkdir -p build/pspsdk
 	cd build/pspsdk
+	
 	../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
 	make install-data || die "installing pspsdk headers"
 	cd ../../..
@@ -287,29 +291,36 @@ function buildNewlib {
 	
 	mkdir -p psp/build/$NEWLIB_SRCDIR
 	cd psp/build/$NEWLIB_SRCDIR
+
 	../../$NEWLIB_SRCDIR/configure \
 			--target=psp \
 			--prefix=$INSTALLDIR \
+			--disable-shared \
 			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring newlib"
-	make CFLAGS="-O2" LDFLAGS="-s" || die "building newlib"
+	make LDFLAGS="-s" || die "building newlib"
 	make install || die "installing newlib"
 	cd ../../..
 }
 
 function buildFinalCompiler {
 	cd psp/build/$GCC_SRCDIR
-	make CFLAGS="-O2" LDFLAGS="-s" || die "building final compiler"
+	
+	make || die "building final compiler"
 	make install || die "installing final compiler"
 	cd ../../..
 }
 
 function buildSDK {
 	cd psp/build/pspsdk
-	make || die "building pspsdk"
+	make LDFLAGS="-s" || die "building pspsdk"
 	make install || die "installing pspsdk"
 	cd ../../..
+}
+
+function validateSDK {
+	find $INSTALLDIR/psp/sdk/samples -type f -name "Makefile" | xargs $(pwd)/mingw/build-sample.sh $1 || exit 1;
 }
 
 function buildGDB {
@@ -325,13 +336,16 @@ function buildGDB {
 	
 	mkdir -p psp/build/$GDB_SRCDIR
 	cd psp/build/$GDB_SRCDIR
+	
+	LDFLAGS="-s" \
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
+			--disable-shared \
 			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
-	make CFLAGS="-O2" LDFLAGS="-s" || die "building gdb"
+	make || die "building gdb"
 	make install || die "installing gdb"
 	cd ../../..
 }
@@ -483,14 +497,6 @@ function prepareDistro {
 	# add release notes
 	cp readme.txt $INSTALLDIR/readme.txt
 	
-	#---------------------------------------------------------------------------------
-	# validate the compiler
-	#---------------------------------------------------------------------------------	
-	find $INSTALLDIR/psp/sdk/samples -type f -name "Makefile" | xargs $(pwd)/mingw/build-sample.sh $1 || exit 1;
-
-	#---------------------------------------------------------------------------------
-	# create a distro
-	#---------------------------------------------------------------------------------
 	[ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
 
 	mkdir -p $INSTALLERDIR/base
@@ -596,6 +602,8 @@ bootstrapSDK
 buildNewlib
 buildFinalCompiler
 buildSDK
+validateSDK
+exit
 buildGDB
 
 #---------------------------------------------------------------------------------
