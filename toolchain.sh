@@ -208,8 +208,6 @@ function buildBinutils {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
-			--disable-shared \
-			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring binutils"
 	make LDFLAGS="-s" || die "Error building binutils"
@@ -230,7 +228,6 @@ function buildBaseCompiler {
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VERSION-PSP.patch || die "patching gcc"
-		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VERSION-MINPSPW.patch || die "patching gcc"
 		cd ..
 	fi
 
@@ -243,9 +240,7 @@ function buildBaseCompiler {
 			--enable-cxx-flags="-G0" \
 			--target=psp \
 			--with-newlib \
-			--disable-libssp \
 			--disable-shared \
-			--disable-debug \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
@@ -295,8 +290,6 @@ function buildNewlib {
 	../../$NEWLIB_SRCDIR/configure \
 			--target=psp \
 			--prefix=$INSTALLDIR \
-			--disable-shared \
-			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring newlib"
 	make LDFLAGS="-s" || die "building newlib"
@@ -305,9 +298,11 @@ function buildNewlib {
 }
 
 function buildFinalCompiler {
+	
+	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 	
-	make || die "building final compiler"
+	make CFLAGS_FOR_TARGET="-G0 -g -O2" LDFLAGS="-s" || die "building final compiler"
 	make install || die "installing final compiler"
 	cd ../../..
 }
@@ -337,15 +332,12 @@ function buildGDB {
 	mkdir -p psp/build/$GDB_SRCDIR
 	cd psp/build/$GDB_SRCDIR
 	
-	LDFLAGS="-s" \
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
-			--disable-shared \
-			--disable-debug \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
-	make || die "building gdb"
+	make LDFLAGS="-s" || die "building gdb"
 	make install || die "installing gdb"
 	cd ../../..
 }
@@ -384,8 +376,7 @@ function installExtraBinaries {
 	cd ../..
 	
 	# true for some samples (namely minifire asm demo)
-	gcc -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
-	strip -s $INSTALLDIR/bin/true.exe
+	gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
 	# visual studio support
 	installFile vsmake.bat mingw/bin bin
 }
@@ -603,7 +594,6 @@ buildNewlib
 buildFinalCompiler
 buildSDK
 validateSDK
-exit
 buildGDB
 
 #---------------------------------------------------------------------------------
