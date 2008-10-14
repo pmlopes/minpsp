@@ -216,7 +216,7 @@ function buildBinutils {
 }
 
 # build a compiler so we can bootstrap the SDK and the newlib
-function buildBaseCompiler {
+function buildXGCC {
 	downloadHTTP psp $GCC_CORE $GCC_CORE_URL
 	downloadHTTP psp $GCC_GPP $GCC_GPP_URL
 	downloadHTTP psp $GCC_OBJC $GCC_OBJC_URL
@@ -297,7 +297,7 @@ function buildNewlib {
 	cd ../../..
 }
 
-function buildFinalCompiler {
+function buildGCC {
 	
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
@@ -588,10 +588,10 @@ export PATH=$PATH:$TOOLPATH/bin
 #---------------------------------------------------------------------------------
 
 buildBinutils
-buildBaseCompiler
+buildXGCC
 bootstrapSDK
 buildNewlib
-buildFinalCompiler
+buildGCC
 buildSDK
 validateSDK
 buildGDB
