@@ -22,7 +22,7 @@ INSTALLERDIR="/c/pspsdk-installer"
 PSPSDK_VERSION=0.8.9
 
 BINUTILS_VER=2.16.1
-NEWLIB_VER=1.15.0
+NEWLIB_VER=1.16.0
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
@@ -244,7 +244,7 @@ function buildXGCC {
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
-	make LDFLAGS="-s" all-gcc || die "building gcc"
+	make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
 	make install-gcc || die "installing gcc"
 	cd ../../..
 }
@@ -502,6 +502,8 @@ function prepareDistro {
 	mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
 	mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
 	# move binary psplinkusb
+	mv $INSTALLERDIR/base/bin/driver $INSTALLERDIR/psplink/bin/
+	mv $INSTALLERDIR/base/bin/driver_x64 $INSTALLERDIR/psplink/bin/
 	mv $INSTALLERDIR/base/bin/pspsh.exe $INSTALLERDIR/psplink/bin/
 	mv $INSTALLERDIR/base/bin/usbhostfs_pc.exe $INSTALLERDIR/psplink/bin/
 	mv $INSTALLERDIR/base/bin/cygncurses-8.dll $INSTALLERDIR/psplink/bin/
