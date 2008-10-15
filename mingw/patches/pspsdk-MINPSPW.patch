@@ -1,3 +1,16 @@
+Index: src/libc/libcglue.c
+===================================================================
+--- src/libc/libcglue.c	(revision 2432)
++++ src/libc/libcglue.c	(working copy)
+@@ -42,7 +42,7 @@
+ 
+ /* If we're being built for PSPSDK's libc this function isn't defined. */
+ #ifdef F_glue_gettimeofday
+-int gettimeofday(struct timeval *tp, struct timezone *tzp)
++int gettimeofday(struct timeval *tp, void *tzp)
+ {
+ 	return sceKernelLibcGettimeofday(tp, tzp);
+ }
 Index: pspsdk/src/base/build.mak
 ===================================================================
 --- pspsdk/src/base/build.mak	(revision 2432)
