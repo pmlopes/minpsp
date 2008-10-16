@@ -242,6 +242,7 @@ function buildXGCC {
 			--with-newlib \
 			--disable-shared \
 			--prefix=$INSTALLDIR \
+			--enable-sjlj-exceptions \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
 	make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
@@ -255,7 +256,7 @@ function bootstrapSDK {
 	then
 		svnGetPS2DEV pspsdk
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
-		patch -p1 -d pspsdk -i ../patches/pspsdk-doc.patch || die "patching pspsdk (Doxygen DOCS)"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
 	else
 		svnGetPS2DEV pspsdk
 	fi
@@ -279,7 +280,7 @@ function buildNewlib {
 	then
 		cd psp
 		tar -xzf $NEWLIB || die "extracting "$NEWLIB
-		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-PSP.patch || die "patching newlib"
+#		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-PSP.patch || die "Error patching newlib"
 		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-MINPSPW.patch || die "Error patching newlib (MINPSPW)"
 		cd ..
 	fi
