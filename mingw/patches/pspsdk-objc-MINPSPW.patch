@@ -108,23 +108,23 @@ Index: pspsdk/src/samples/obj-c/main.m
 +
 +int main(void)
 +{
++	/* Non Objective-C code to allow the app to end */
++	pspDebugScreenInit();
++	SceCtrlData pad;
++	
++	/* Objective-C code */
 +	id myGreeter;
 +	myGreeter=[Greeter new];
 +
 +	[myGreeter greet];
-+
 +	[myGreeter free];
 +
-+	/* Non Objective-C code to allow the app to end */
-+	SceCtrlData pad;
-+	
 +	printf("\nPress X to quit.\n");
 +	for (;;)
 +	{
 +		sceCtrlReadBufferPositive(&pad, 1);
 +		if (pad.Buttons & PSP_CTRL_CROSS)
 +			break;
-+		sceDisplayWaitVblankStart();
 +	}
 +	sceKernelExitGame();
 +	
