@@ -10,68 +10,30 @@ PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 #SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
-GCC_VER=4.3.2
-GCC_TC_VERSION=4.3.1
+# gcc deps versions
+ZLIB_VER=1.2.3
 GMP_VER=4.2.3
 MPFR_VER=2.3.2
-ZLIB_VER=1.2.3
+
+# sdk versions
+BINUTILS_VER=2.16.1
+GCC_VER=4.3.2
+GCC_TC_VERSION=4.3.1
+NEWLIB_VER=1.16.0
+
+#debugger version
 GDB_VER=6.8
 
-INSTALLDIR="/c/pspsdk"
-INSTALLERDIR="/c/pspsdk-installer"
-PSPSDK_VERSION=0.8.9
-
-BINUTILS_VER=2.16.1
-NEWLIB_VER=1.16.0
+#extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
-GCC_CORE="gcc-core-$GCC_VER.tar.bz2"
-GCC_GPP="gcc-g++-$GCC_VER.tar.bz2"
-GCC_OBJC="gcc-objc-$GCC_VER.tar.bz2"
-GMP="gmp-$GMP_VER.tar.bz2"
-MPFR="mpfr-$MPFR_VER.tar.bz2"
-ZLIB="zlib-$ZLIB_VER.tar.gz"
+# package version
+PSPSDK_VERSION=0.8.10
 
-BINUTILS="binutils-$BINUTILS_VER.tar.bz2"
-NEWLIB="newlib-$NEWLIB_VER.tar.gz"
-GDB="gdb-$GDB_VER.tar.bz2"
-MINGW32_MAKE="make-$MINGW32_MAKE_VER.tar.gz"
-UNXUTILS="UnxUtils.zip"
-MINGW32_GROFF="groff-$MINGW32_GROFF_VER-bin.zip"
-MINGW32_LESS="less-$MINGW32_LESS_VER-bin.zip"
-MINGW32_LESS_DEP="less-$MINGW32_LESS_VER-dep.zip"
-
-GCC_CORE_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_CORE"
-GCC_GPP_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_GPP"
-GCC_OBJC_URL="http://ftp.gnu.org/gnu/gcc/gcc-$GCC_VER/$GCC_OBJC"
-GMP_URL="http://ftp.gnu.org/gnu/gmp/$GMP"
-MPFR_URL="http://www.mpfr.org/mpfr-current/$MPFR"
-ZLIB_URL="http://www.zlib.net/$ZLIB"
-
-BINUTILS_URL="http://ftp.gnu.org/gnu/binutils/$BINUTILS"
-NEWLIB_URL="ftp://sources.redhat.com/pub/newlib/$NEWLIB"
-GDB_URL="http://ftp.gnu.org/gnu/gdb/$GDB"
-MINGW32_MAKE_URL="$SF_MIRROR/mingw/$MINGW32_MAKE"
-UNXUTILS_URL="$SF_MIRROR/unxutils/$UNXUTILS"
-MINGW32_GROFF_URL="$SF_MIRROR/gnuwin32/$MINGW32_GROFF"
-MINGW32_LESS_URL="$SF_MIRROR/gnuwin32/$MINGW32_LESS"
-MINGW32_LESS_DEP_URL="$SF_MIRROR/gnuwin32/$MINGW32_LESS_DEP"
-
-GMP_SRCDIR="gmp-$GMP_VER"
-MPFR_SRCDIR="mpfr-$MPFR_VER"
-ZLIB_SRCDIR="zlib-$ZLIB_VER"
-
-BINUTILS_SRCDIR="binutils-$BINUTILS_VER"
-GCC_SRCDIR="gcc-$GCC_VER"
-GDB_SRCDIR="gdb-$GDB_VER"
-NEWLIB_SRCDIR="newlib-$NEWLIB_VER"
-
-MINGW32_MAKE_DIR="make-$MINGW32_MAKE_VER"
-UNXUTILS_DIR="UnxUtils"
-MINGW32_GROFF_DIR="groff-$MINGW32_GROFF_VER"
-MINGW32_LESS_DIR="less-$MINGW32_LESS_VER"
+INSTALLDIR="/c/pspsdk"
+INSTALLERDIR="/c/pspsdk-installer"
 
 #---------------------------------------------------------------------------------
 # functions
@@ -120,7 +82,7 @@ function downloadHTTP {
 	if [ ! -f $1/$2 ]
 	then
 		cd $1
-		wget -c $3 || die "Failed to download "$2
+		wget -c $3/$2 || die "Failed to download "$2
 		cd ..
 	fi
 
@@ -130,20 +92,36 @@ function downloadFTP {
 	if [ ! -f $1/$2 ]
 	then
 		cd $1
-		wget --passive-ftp -c $3 || die "Failed to download "$2
+		wget --passive-ftp -c $3/$2 || die "Failed to download "$2
 		cd ..
 	fi
 
 }
 
+#arg1 base path
+#arg2 devpak folder number
+#arg3 devpak
+#arg4 installer path
+function buildAndInstallDevPak() {
+	cd $1 || exit 1
+	cd $2_$3 || exit 1
+	#./devpak.sh || exit 1
+	#cd $(psp-config --pspdev-path) || exit 1
+	#tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+	cd $4 || exit 1
+	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+}
+
 function installZlib {
 	if [ ! -f /mingw/include/zlib.h ]
 	then
-		downloadHTTP deps $ZLIB $ZLIB_URL
+		ZLIB="zlib-"$ZLIB_VER".tar.gz"
+
+		downloadHTTP deps $ZLIB "http://www.zlib.net"
 		cd deps
 		tar -xzf $ZLIB || die "extracting "$ZLIB
 
-		cd $ZLIB_SRCDIR
+		cd "zlib-"$ZLIB_VER
 		make CC=gcc || die "building "$ZLIB
 		make install prefix=/mingw || die "installing "$ZLIB
 		cd ../..
@@ -153,11 +131,13 @@ function installZlib {
 function installGMP {
 	if [ ! -f /usr/local/include/gmp.h ]
 	then
-		downloadHTTP deps $GMP $GMP_URL
+		GMP="gmp-"$GMP_VER".tar.bz2"
+		
+		downloadHTTP deps $GMP "http://ftp.gnu.org/gnu/gmp"
 		cd deps
 		tar -xjf $GMP || die "extracting "$GMP
 
-		cd $GMP_SRCDIR
+		cd "gmp-"$GMP_VER
 		./configure --prefix=/usr/local || die "configuring "$GMP
 		make || die "building "$GMP
 		make check || die "checking "$GMP
@@ -169,11 +149,13 @@ function installGMP {
 function installMPFR {
 	if [ ! -f /usr/local/include/mpfr.h ]
 	then
-		downloadHTTP deps $MPFR $MPFR_URL
+		MPFR="mpfr-"$MPFR_VER".tar.bz2"
+		
+		downloadHTTP deps $MPFR "http://www.mpfr.org/mpfr-current"
 		cd deps
 		tar -xjf $MPFR || die "extracting "$MPFR
 
-		cd $MPFR_SRCDIR
+		cd "mpfr-"$MPFR_VER
 		./configure --prefix=/usr/local --with-gmp=/usr/local || die "configuring "$MPFR
 		make || die "building "$MPFR
 		make check || die "checking "$MPFR
@@ -191,7 +173,10 @@ function downloadPatches {
 }
 
 function buildBinutils {
-	downloadFTP psp $BINUTILS $BINUTILS_URL
+	BINUTILS="binutils-"$BINUTILS_VER".tar.bz2"
+	BINUTILS_SRCDIR="binutils-"$BINUTILS_VER
+	
+	downloadFTP psp $BINUTILS "http://ftp.gnu.org/gnu/binutils"
 	
 	if [ ! -d psp/$BINUTILS_SRCDIR ]
 	then
@@ -217,9 +202,15 @@ function buildBinutils {
 
 # build a compiler so we can bootstrap the SDK and the newlib
 function buildXGCC {
-	downloadHTTP psp $GCC_CORE $GCC_CORE_URL
-	downloadHTTP psp $GCC_GPP $GCC_GPP_URL
-	downloadHTTP psp $GCC_OBJC $GCC_OBJC_URL
+	GCC_CORE="gcc-core-"$GCC_VER".tar.bz2"
+	GCC_GPP="gcc-g++-"$GCC_VER".tar.bz2"
+	GCC_OBJC="gcc-objc-"$GCC_VER".tar.bz2"
+	
+	GCC_SRCDIR="gcc-"$GCC_VER
+	
+	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
 	
 	if [ ! -d psp/$GCC_SRCDIR ]
 	then
@@ -242,7 +233,6 @@ function buildXGCC {
 			--with-newlib \
 			--disable-shared \
 			--prefix=$INSTALLDIR \
-			--enable-sjlj-exceptions \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
 	make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
@@ -274,7 +264,10 @@ function bootstrapSDK {
 }
 
 function buildNewlib {
-	downloadFTP psp $NEWLIB $NEWLIB_URL
+	NEWLIB="newlib-$NEWLIB_VER.tar.gz"
+	NEWLIB_SRCDIR="newlib-"$NEWLIB_VER
+	
+	downloadFTP psp $NEWLIB "ftp://sources.redhat.com/pub/newlib"
 	
 	if [ ! -d psp/$NEWLIB_SRCDIR ]
 	then
@@ -300,9 +293,7 @@ function buildNewlib {
 
 function buildGCC {
 	
-	mkdir -p psp/build/$GCC_SRCDIR
-	cd psp/build/$GCC_SRCDIR
-	
+	cd psp/build/"gcc-"$GCC_VER
 	make CFLAGS_FOR_TARGET="-G0 -g -O2" LDFLAGS="-s" || die "building final compiler"
 	make install || die "installing final compiler"
 	cd ../../..
@@ -320,7 +311,10 @@ function validateSDK {
 }
 
 function buildGDB {
-	downloadHTTP psp $GDB $GDB_URL
+	GDB="gdb-"$GDB_VER".tar.bz2"
+	GDB_SRCDIR="gdb-"$GDB_VER
+
+	downloadHTTP psp $GDB "http://ftp.gnu.org/gnu/gdb"
 	
 	if [ ! -d psp/$GDB_SRCDIR ]
 	then
@@ -344,7 +338,10 @@ function buildGDB {
 }
 
 function installExtraBinaries {
-	downloadHTTP deps $UNXUTILS $UNXUTILS_URL
+	UNXUTILS="UnxUtils.zip"
+	UNXUTILS_DIR="UnxUtils"
+	
+	downloadHTTP deps $UNXUTILS $SF_MIRROR"/unxutils"
 	
 	if [ ! -d deps/$UNXUTILS_DIR ]
 	then
@@ -360,7 +357,10 @@ function installExtraBinaries {
 	installFile sed.exe $UNXUTILS_DIR/usr/local/wbin bin
 	cd ..
 	
-	downloadHTTP deps $MINGW32_MAKE $MINGW32_MAKE_URL
+	MINGW32_MAKE="make-"$MINGW32_MAKE_VER".tar.gz"
+	MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
+
+	downloadHTTP deps $MINGW32_MAKE $SF_MIRROR"/mingw"
 	
 	if [ ! -d deps/$MINGW32_MAKE_DIR ]
 	then
@@ -440,9 +440,16 @@ function installPSPLinkUSB {
 
 function installMan {
 
-	downloadHTTP deps $MINGW32_GROFF $MINGW32_GROFF_URL
-	downloadHTTP deps $MINGW32_LESS $MINGW32_LESS_URL
-	downloadHTTP deps $MINGW32_LESS_DEP $MINGW32_LESS_DEP_URL
+	MINGW32_GROFF="groff-"$MINGW32_GROFF_VER"-bin.zip"
+	MINGW32_GROFF_DIR="groff-"$MINGW32_GROFF_VER
+
+	MINGW32_LESS="less-"$MINGW32_LESS_VER"-bin.zip"
+	MINGW32_LESS_DEP="less-"$MINGW32_LESS_VER"-dep.zip"
+	MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
+
+	downloadHTTP deps $MINGW32_GROFF $SF_MIRROR"/gnuwin32"
+	downloadHTTP deps $MINGW32_LESS $SF_MIRROR"/gnuwin32"
+	downloadHTTP deps $MINGW32_LESS_DEP $SF_MIRROR"/gnuwin32"
 	
 	if [ ! -d deps/$MINGW32_GROFF_DIR ]
 	then
@@ -551,9 +558,42 @@ function prepareDistro {
 	cp installer/licenses.txt $INSTALLERDIR
 	sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup.nsi > $INSTALLERDIR/setup.nsi
 	sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup-nodoc.nsi > $INSTALLERDIR/setup-nodoc.nsi
+}
 
-	echo
-	echo "You should now run the NSIS script to build the final installer"
+function buildBaseDevpaks {
+	# create the base set of devpaks
+	mkdir -p $INSTALLERDIR/devpaks
+	DEVPAK_TARGET=$INSTALLERDIR/devpaks
+	BASE=$(pwd)/devpaks
+	
+	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
+	gcc -s -o $DEVPAK_TARGET/bin/freetype-config $BASE/003_freetype/freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\" || exit 1
+	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
+	gcc -s -o $DEVPAK_TARGET/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"1.2.9\" $BASE/017_SDL/sdl-config.c || exit 1
+	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
+
+	rm $DEVPAK_TARGET/bin/freetype-config
+	rm $DEVPAK_TARGET/bin/sdl-config
 }
 
 #---------------------------------------------------------------------------------
@@ -585,7 +625,6 @@ downloadPatches
 TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
 export PATH=$PATH:$TOOLPATH/bin
-
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
@@ -619,3 +658,7 @@ patchCMD
 #---------------------------------------------------------------------------------
 
 prepareDistro
+buildBaseDevpaks
+
+echo
+echo "Run the devpak script to add DEVPAKs to the Full SDK"

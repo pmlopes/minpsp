@@ -30,6 +30,34 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.10
+* Update to Newlib 1.16
+* Pack the libraries into the Installer
+  - zlib
+  - bzip2
+  - freetype
+  - jpeg
+  - libbulletml
+  - libmad
+  - libmikmod
+  - libogg
+  - libpng
+  - libpspvram
+  - libTremor
+  - libvorbis
+  - lua
+  - pspgl
+  - pspirkeyb
+  - sqlite
+  - SDL
+  - SDL_gfx
+  - SDL_image
+  - SDL_mixer
+  - SDL_ttf
+  - smpeg
+  - zziplib
+ * Fix the Objective-C sample since it didn't show anything.
+
 0.8.9
 * Added Objective-C++ support to the toochain.
 * Updated SDK docs to build without errors
@@ -194,7 +222,7 @@ http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-dep.zip
 Unzip to C:\msys\local
 
 6th Download the following files to your local home:
-wget http://downloads.sourceforge.net/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
+wget http://downloads.sourceforge.net/mingw/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
 wget http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2
 wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.4.tar.bz2 
 wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.62.tar.bz2

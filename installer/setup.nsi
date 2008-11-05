@@ -93,21 +93,52 @@ Section "HTML Documentation" SEC0003
     WriteRegStr HKLM "${REGKEY}\Components" "HTML Documentation" 1
 SectionEnd
 
-Section /o "Visual Studio Support" SEC0004
+Section "Basic Devpaks" SEC0004
+    SetOutPath $INSTDIR
+    SetOverwrite on
+    File /r ${SDKDIR}\devpaks\*
+    WriteRegStr HKLM "${REGKEY}\Components" "Basic Devpaks" 1
+	
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" zlib 1.2.2
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" bzip2 1.0.4
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" freetype 2.1.10
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" jpeg 6.2
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libbulletml 0.0.5
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libmad 0.15.1
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libmikmod 3.1.11
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libogg 1.1.2
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libpng 1.2.8
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libpspvram 2227
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libTremor 1.0.2
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libvorbis 1.1.2
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" lua 5.1
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" pspgl 2264
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" pspirkeyb 0.0.4
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" sqlite 3.3.17
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL 1.2.9
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_gfx 2.0.13
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_image 1.2.4
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_mixer 1.2.6
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_ttf 2.0.7
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" smpeg-psp 0.4.5
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" zziplib 0.13.38
+SectionEnd
+
+Section /o "Visual Studio Support" SEC0005
     SetOutPath $INSTDIR
     SetOverwrite on
     File /r ${SDKDIR}\vstudio\*
     WriteRegStr HKLM "${REGKEY}\Components" "Visual Studio Support" 1
 SectionEnd
 
-Section /o "Man/Info pages" SEC0005
+Section /o "Man/Info pages" SEC0006
     SetOutPath $INSTDIR
     SetOverwrite on
     File /r ${SDKDIR}\documentation\man_info\*
     WriteRegStr HKLM "${REGKEY}\Components" "Man/Info pages" 1
 SectionEnd
 
-Section -post SEC0006
+Section -post SEC0007
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
     SetOutPath $INSTDIR
 
@@ -142,12 +173,19 @@ done${UNSECTION_ID}:
 !macroend
 
 # Uninstaller sections
-Section /o "-un.Man/Info pages" UNSEC0005
+Section /o "-un.Man/Info pages" UNSEC0006
     DeleteRegValue HKLM "${REGKEY}\Components" "Man/Info pages"
 SectionEnd
 
-Section /o "-un.Visual Studio Support" UNSEC0004
+Section /o "-un.Visual Studio Support" UNSEC0005
     DeleteRegValue HKLM "${REGKEY}\Components" "Visual Studio Support"
+SectionEnd
+
+Section /o "-un.Basic Devpaks" UNSEC0004
+	# delete all devpaks since all files will be deleted after all
+	DeleteRegKey HKLM "SOFTWARE\PSP DevKit\devpak"
+	
+    DeleteRegValue HKLM "${REGKEY}\Components" "Basic Devpaks"
 SectionEnd
 
 Section /o "-un.HTML Documentation" UNSEC0003
@@ -171,7 +209,7 @@ Section /o "-un.PSP DevKit" UNSEC0000
     DeleteRegValue HKLM "${REGKEY}\Components" "PSP DevKit"
 SectionEnd
 
-Section -un.post UNSEC0006
+Section -un.post UNSEC0007
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Readme ${VERSION}.lnk"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\PSPSDK API.lnk"
@@ -200,8 +238,9 @@ Function un.onInit
     !insertmacro SELECT_UNSECTION "PSP Samples" ${UNSEC0001}
     !insertmacro SELECT_UNSECTION "PSP link" ${UNSEC0002}
     !insertmacro SELECT_UNSECTION "HTML Documentation" ${UNSEC0003}
-	!insertmacro SELECT_UNSECTION "Visual Studio Support" ${UNSEC0004}
-	!insertmacro SELECT_UNSECTION "Man/Info pages" ${UNSEC0005}
+	!insertmacro SELECT_UNSECTION "Basic Devpaks" ${UNSEC0004}
+	!insertmacro SELECT_UNSECTION "Visual Studio Support" ${UNSEC0005}
+	!insertmacro SELECT_UNSECTION "Man/Info pages" ${UNSEC0006}
 FunctionEnd
 
 # Section Descriptions
@@ -210,6 +249,7 @@ FunctionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0001} "Bundle of Samples shipped with the current PSP SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0002} "Utilities for debugging"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0003} "HTML Documentation for the SDK"
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Only needed if you want the Compiler Man pages, man readed included"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "zlib bzip2 freetype jpeg libbulletml libmad libmikmod libogg libpng libpspvram libTremor libvorbis lua pspgl pspirkeyb sqlite SDL SDL_gfx SDL_image SDL_mixer SDL_ttf smpeg-psp zziplib"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0006} "Only needed if you want the Compiler Man pages, man readed included"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
