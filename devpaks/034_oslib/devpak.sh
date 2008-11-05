@@ -6,8 +6,13 @@ VERSION=2.10
 
 downloadHTTP http://brunni.dev-fr.org/dl/psp OSLib_210_src.rar
 
-cp Doxyfile $LIBNAME/$LIBNAME
-cd $LIBNAME/$LIBNAME
+if [ ! -d OSLib_210_src ]
+then
+	../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
+fi
+
+cp Doxyfile OSLib_210_src/$LIBNAME
+cd OSLib_210_src/$LIBNAME
 make lib
 
 mkdir -p ../../target/psp/include/oslib ../../target/psp/lib ../../target/doc/$LIBNAME

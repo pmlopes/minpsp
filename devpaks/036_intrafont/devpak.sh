@@ -14,7 +14,7 @@ fi
 
 if [ ! -f $LIBNAME-patched ]
 then
-	patch -p0 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
+	patch -p1 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
 	touch $LIBNAME-patched
 fi
 

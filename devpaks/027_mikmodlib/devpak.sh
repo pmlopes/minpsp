@@ -1,6 +1,8 @@
 #!/bin/sh
+. ../util/util.sh
 
 LIBNAME=mikmodlib
+VERSION=3.0
 
 svnGetPS2DEV $LIBNAME
 
@@ -19,5 +21,9 @@ then
 	cp docs/*.doc ../target/doc/$LIBNAME
 	cp docs/*.txt ../target/doc/$LIBNAME
 fi
+
+cd ..
+
+makeInstaller $LIBNAME $VERSION
 
 echo "Run the NSIS script now!"

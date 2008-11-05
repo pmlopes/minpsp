@@ -1,23 +1,23 @@
 #!/bin/sh
 . ../util/util.sh
 
-LIBNAME=giflib-4.1.6
+LIBNAME=giflib
 VERSION=4.1.6
 
-downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/giflib $LIBNAME.tar.bz2
+downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/giflib $LIBNAME-$VERSION.tar.bz2
 
 if [ ! -d $LIBNAME ]
 then
-	tar -jxf $LIBNAME.tar.gz || { echo "Failed to download "$1; exit 1; }
+	tar -jxf $LIBNAME-$VERSION.tar.bz2 || { echo "Failed to download "$1; exit 1; }
 fi
 
 if [ ! -f $LIBNAME-patched ]
 then
-	patch -p0 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
+	patch -p0 -d $LIBNAME-$VERSION -i ../$LIBNAME-$VERSION.patch || { echo "Error patching $LIBNAME"; exit; }
 	touch $LIBNAME-patched
 fi
 
-cd $LIBNAME
+cd $LIBNAME-$VERSION
 
 CFLAGS="-ffast-math -fsigned-char -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 cd lib

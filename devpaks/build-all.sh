@@ -13,35 +13,33 @@ function buildAndInstallDevPak() {
 	cd $BASE || exit 1
 }
 
-#buildAndInstallDevPak 001 zlib
-#buildAndInstallDevPak 002 bzip2
-#buildAndInstallDevPak 003 freetype
-#buildAndInstallDevPak 004 jpeg
-#buildAndInstallDevPak 005 libbulletml
-#buildAndInstallDevPak 006 libmad
-#buildAndInstallDevPak 007 libmikmod
-#buildAndInstallDevPak 008 libogg
-#buildAndInstallDevPak 009 libpng
-#buildAndInstallDevPak 010 libpspvram
-#buildAndInstallDevPak 011 libTremor
-#buildAndInstallDevPak 012 libvorbis
-#buildAndInstallDevPak 013 lua
-#buildAndInstallDevPak 014 pspgl
-#buildAndInstallDevPak 015 pspirkeyb
-#buildAndInstallDevPak 016 sqlite
-#buildAndInstallDevPak 017 SDL
-#buildAndInstallDevPak 017b SDL-noPSPGL
-#buildAndInstallDevPak 018 SDL_gfx
+buildAndInstallDevPak 001 zlib
+buildAndInstallDevPak 002 bzip2
+buildAndInstallDevPak 003 freetype
+buildAndInstallDevPak 004 jpeg
+buildAndInstallDevPak 005 libbulletml
+buildAndInstallDevPak 006 libmad
+buildAndInstallDevPak 007 libmikmod
+buildAndInstallDevPak 008 libogg
+buildAndInstallDevPak 009 libpng
+buildAndInstallDevPak 010 libpspvram
+buildAndInstallDevPak 011 libTremor
+buildAndInstallDevPak 012 libvorbis
+buildAndInstallDevPak 013 lua
+buildAndInstallDevPak 014 pspgl
+buildAndInstallDevPak 015 pspirkeyb
+buildAndInstallDevPak 016 sqlite
+buildAndInstallDevPak 017 SDL
+buildAndInstallDevPak 018 SDL_gfx
 buildAndInstallDevPak 019 SDL_image
 buildAndInstallDevPak 020 SDL_mixer
 buildAndInstallDevPak 021 SDL_ttf
 buildAndInstallDevPak 022 smpeg
 buildAndInstallDevPak 023 ode
-buildAndInstallDevPak 024 TinyGL
 buildAndInstallDevPak 025 libpthreadlite
 buildAndInstallDevPak 026 cal3D
 buildAndInstallDevPak 027 mikmodlib
-buildAndInstallDevPak 028 cpplibs
+#buildAndInstallDevPak 028 cpplibs
 buildAndInstallDevPak 029 flac
 buildAndInstallDevPak 030 giflib
 buildAndInstallDevPak 031 libpspmath
@@ -54,3 +52,11 @@ buildAndInstallDevPak 037 libaac
 buildAndInstallDevPak 038 Jello
 buildAndInstallDevPak 039 zziplib
 buildAndInstallDevPak 040 Mini-XML
+
+buildAndInstallDevPak 017b SDL-noPSPGL
+buildAndInstallDevPak 024 TinyGL
+
+buildAndInstallDevPak 014b pspgl-TV
+buildAndInstallDevPak 017c SDL-TV
+
+echo "You should now run the NSIS script to build the final installer"
