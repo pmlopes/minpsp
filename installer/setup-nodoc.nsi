@@ -38,7 +38,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile pspsdk-setup-${VERSION}-nodoc.exe
+OutFile pspsdk-setup-${VERSION}-sdk-only.exe
 InstallDir C:\pspsdk
 CRCCheck on
 XPStyle on

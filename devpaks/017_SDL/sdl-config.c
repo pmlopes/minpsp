@@ -264,7 +264,7 @@ void print_path(char *name)
 				break;
 			case SDL_CONFIG_LIB:
 			case SDL_CONFIG_STATIC_LIB :
-				printf("-L%s%cpsp%clib -lSDLmain -lSDL -lm -L%s%cpsp%csdk%clib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-L%s%cpsp%clib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s%cpsp%csdk%clib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
 				break;
 			default : fprintf(stderr, "Error, invalida configuration mode\n");
 					  break;

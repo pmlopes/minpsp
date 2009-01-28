@@ -6,6 +6,8 @@ VERSION=0.10.0
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 
 LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp || { echo "Error building $LIBNAME"; exit 1; }

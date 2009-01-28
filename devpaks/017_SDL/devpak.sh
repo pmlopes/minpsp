@@ -6,6 +6,8 @@ VERSION=1.2.9
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 ./autogen.sh
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp

@@ -1,13 +1,331 @@
-Index: pspsdk/src/libc/libcglue.c
+Index: config.h.in
 ===================================================================
---- pspsdk/src/libc/libcglue.c	(revision 2432)
-+++ pspsdk/src/libc/libcglue.c	(working copy)
-@@ -42,7 +42,7 @@
+--- config.h.in	(revision 2451)
++++ config.h.in	(working copy)
+@@ -70,9 +70,13 @@
+ /* Version number of package */
+ #undef VERSION
  
- /* If we're being built for PSPSDK's libc this function isn't defined. */
- #ifdef F_glue_gettimeofday
--int gettimeofday(struct timeval *tp, struct timezone *tzp)
-+int gettimeofday(struct timeval *tp, void *tzp)
- {
- 	return sceKernelLibcGettimeofday(tp, tzp);
+-/* Define to 1 if your processor stores words with the most significant byte
+-   first (like Motorola and SPARC, unlike Intel and VAX). */
+-#undef WORDS_BIGENDIAN
++/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
++   significant byte first (like Motorola and SPARC, unlike Intel and VAX). */
++#if defined __BIG_ENDIAN__
++# define WORDS_BIGENDIAN 1
++#elif ! defined __LITTLE_ENDIAN__
++# undef WORDS_BIGENDIAN
++#endif
+ 
+ /* Define to empty if `const' does not conform to ANSI C. */
+ #undef const
+Index: src/atrac3/pspatrac3.h
+===================================================================
+--- src/atrac3/pspatrac3.h	(revision 2451)
++++ src/atrac3/pspatrac3.h	(working copy)
+@@ -18,6 +18,58 @@
+ extern "C" {
+ #endif
+ 
++/** Identify the CODEC */
++typedef enum PspAttracCodecTypes {
++	PSP_ATRAC_AT3PLUS 	= 0x00001000,
++	PSP_ATRAC_AT3 		= 0x00001001
++} PspAttracCodecTypes;
++
++/** ATRAC3 Error Codes */
++enum PspAtract3ErrorCodes {
++	PSP_ATRAC_SUCCESS						= 0,
++	PSP_ATRAC_ERROR_PARAM_FAIL				= 0x80630001,
++	PSP_ATRAC_ERROR_API_FAIL				= 0x80630002,
++	PSP_ATRAC_ERROR_NO_ATRACID				= 0x80630003,
++	PSP_ATRAC_ERROR_BAD_CODECTYPE			= 0x80630004,
++	PSP_ATRAC_ERROR_BAD_ATRACID				= 0x80630005,
++	PSP_ATRAC_ERROR_UNKNOWN_FORMAT			= 0x80630006,
++	PSP_ATRAC_ERROR_UNMATCH_FORMAT			= 0x80630007,
++	PSP_ATRAC_ERROR_BAD_DATA				= 0x80630008,
++	PSP_ATRAC_ERROR_ALLDATA_IS_ONMEMORY		= 0x80630009,
++	PSP_ATRAC_ERROR_UNSET_DATA				= 0x80630010,
++	PSPE_ATRAC_ERROR_READSIZE_IS_TOO_SMALL	= 0x80630011,
++	PSP_ATRAC_ERROR_NEED_SECOND_BUFFER		= 0x80630012,
++	PSP_ATRAC_ERROR_READSIZE_OVER_BUFFER	= 0x80630013,
++	PSP_ATRAC_ERROR_NOT_4BYTE_ALIGNMENT		= 0x80630014,
++	PSP_ATRAC_ERROR_BAD_SAMPLE				= 0x80630015,
++	PSP_ATRAC_ERROR_WRITEBYTE_FIRST_BUFFER	= 0x80630016,
++	PSP_ATRAC_ERROR_WRITEBYTE_SECOND_BUFFER	= 0x80630017,
++	PSP_ATRAC_ERROR_ADD_DATA_IS_TOO_BIG		= 0x80630018,
++	PSP_ATRAC_ERROR_UNSET_PARAM				= 0x80630021,
++	PSP_ATRAC_ERROR_NONEED_SECOND_BUFFER	= 0x80630022,
++	PSP_ATRAC_ERROR_NODATA_IN_BUFFER		= 0x80630023,
++	PSP_ATRAC_ERROR_ALLDATA_WAS_DECODED		= 0x80630024
++};
++
++/** Remain Frame typical Status */
++enum PspAtract3RemainFrameStatus {
++	PSP_ATRAC_ALLDATA_IS_ON_MEMORY				= -1,
++	PSP_ATRAC_NONLOOP_STREAM_DATA_IS_ON_MEMORY	= -2,
++	PSP_ATRAC_LOOP_STREAM_DATA_IS_ON_MEMORY		= -3
++};
++
++typedef struct {
++	SceUChar8 *pucWritePositionFirstBuf;
++	SceUInt32 uiWritableByteFirstBuf;
++	SceUInt32 uiMinWriteByteFirstBuf;
++	SceUInt32 uiReadPositionFirstBuf;
++
++	SceUChar8 *pucWritePositionSecondBuf;
++	SceUInt32 uiWritableByteSecondBuf;
++	SceUInt32 uiMinWriteByteSecondBuf;
++	SceUInt32 uiReadPositionSecondBuf;
++} PspBufferInfo;
++
+ /**
+  * Creates a new Atrac ID from the specified data
+  *
+@@ -132,6 +184,29 @@
+  */
+ int sceAtracGetMaxSample(int atracID, int *outMax); 
+ 
++/**
++ * Gets the Atrac ID
++ *
++ * @param codecType - the CODEC type
++ * 
++ * @return < 0 on error, otherwise the ID
++ *
++ */
++int sceAtracGetAtracID(int codecType);
++
++// missing API
++int sceAtracSetHalfwayBuffer(int atracID, SceUChar8	*pucBufferAddr, SceUInt32 uiReadByte, SceUInt32 uiBufferByte);
++int sceAtracSetHalfwayBufferAndGetID(SceUChar8 *pucBufferAddr, SceUInt32 uiReadByte, SceUInt32 uiBufferByte);
++int sceAtracGetSecondBufferInfo(SceInt32 atracID, SceUInt32 *puiPosition, SceUInt32 *puiDataByte);
++int sceAtracSetSecondBuffer(SceInt32 atracID, SceUChar8 *pucSecondBufferAddr,SceUInt32 uiSecondBufferByte);
++int sceAtracGetNextDecodePosition(SceInt32 atracID, SceUInt32 *puiSamplePosition);
++int sceAtracGetSoundSample(SceInt32 atracID, SceInt32 *piEndSample, SceInt32 *piLoopStartSample, SceInt32 *piLoopEndSample);
++int sceAtracGetChannel(SceInt32 atracID, SceUInt32 *puiChannel);
++int sceAtracGetLoopStatus(SceInt32 atracID, SceInt32 *piLoopNum, SceUInt32 *puiLoopStatus);
++int sceAtracGetBufferInfoForReseting(SceInt32 atracID, SceUInt32 uiSample, PspBufferInfo *pBufferInfo);
++int sceAtracResetPlayPosition(SceInt32 atracID, SceUInt32 uiSample, SceUInt32 uiWriteByteFirstBuf, SceUInt32 uiWriteByteSecondBuf);
++int sceAtracGetInternalErrorInfo(SceInt32 atracID, SceInt32 *piResult);
++
+ #ifdef __cplusplus
  }
+ #endif
+Index: src/display/pspdisplay.h
+===================================================================
+--- src/display/pspdisplay.h	(revision 2451)
++++ src/display/pspdisplay.h	(working copy)
+@@ -122,6 +122,13 @@
+  */
+ int sceDisplayWaitVblankCB(void);
+ 
++// Missing API
++float sceDisplayGetFramePerSec(void);
++int sceDisplayIsForeground(void);
++int sceDisplayIsVblank(void);
++int sceDisplayGetCurrentHcount(void);
++int sceDisplayGetAccumulatedHcount(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+Index: src/display/pspdisplay_kernel.h
+===================================================================
+--- src/display/pspdisplay_kernel.h	(revision 2451)
++++ src/display/pspdisplay_kernel.h	(working copy)
+@@ -65,6 +65,13 @@
+  */
+ void sceDisplayGetBrightness(int *level,int *unk1);
+ 
++// Missing API
++float sceDisplayGetFramePerSec(void);
++int sceDisplayIsForeground(void);
++int sceDisplayIsVblank(void);
++int sceDisplayGetCurrentHcount(void);
++int sceDisplayGetAccumulatedHcount(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+Index: src/ge/pspge.h
+===================================================================
+--- src/ge/pspge.h	(revision 2451)
++++ src/ge/pspge.h	(working copy)
+@@ -171,6 +171,11 @@
+ 	PSP_GE_LIST_CANCEL_DONE
+ } PspGeSyncType;
+ 
++/** Drawing queue interruption parameter */
++typedef struct PspGeBreakParam {
++	unsigned int	buf[4];
++} PspGeBreakParam;
++
+ /**
+   * Wait for syncronisation of a list.
+   *
+@@ -206,6 +211,13 @@
+   */
+ int sceGeUnsetCallback(int cbid);
+ 
++// Missing API
++int sceGeEdramSetAddrTranslation(int width);
++/** Interrupt drawing queue */
++int sceGeBreak(int mode, PspGeBreakParam *pParam);
++/** Restart drawing queue */
++int sceGeContinue(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+Index: src/kernel/psputilsforkernel.h
+===================================================================
+--- src/kernel/psputilsforkernel.h	(revision 2451)
++++ src/kernel/psputilsforkernel.h	(working copy)
+@@ -51,7 +51,7 @@
+  *
+  * @return 0 = not cached, 1 = cache
+  */
+-int  sceKernelDcacheProbe(void *addr);
++int sceKernelDcacheProbe(void *addr);
+ 
+ /**
+  * Invalidate the entire instruction cache
+@@ -71,8 +71,12 @@
+  *
+  * @return 0 = not cached, 1 = cache
+  */
+-int  sceKernelIcacheProbe(const void *addr);
++int sceKernelIcacheProbe(const void *addr);
+ 
++// Missing API
++unsigned char sceKernelGetGPI(void);
++void sceKernelSetGPO(unsigned char gpo);
++
+ #ifdef __cplusplus
+ }
+ #endif
+Index: src/mpeg/pspmpeg.h
+===================================================================
+--- src/mpeg/pspmpeg.h	(revision 2451)
++++ src/mpeg/pspmpeg.h	(working copy)
+@@ -92,6 +92,20 @@
+ 
+ } SceMpegAvcMode;
+ 
++typedef struct {
++	SceInt32	iDecodeResult;
++	SceUInt32	uiRecoveryPoint;
++
++	SceUInt32	uiHorizontalSize;
++	SceUInt32	uiVerticalSize;
++	SceUInt32	uiFrameCropLeftOffset;
++	SceUInt32	uiFrameCropRightOffset;
++	SceUInt32	uiFrameCropTopOffset;
++	SceUInt32	uiFrameCropBottomOffset;
++	SceUInt32	uiDisplayFrameNum;
++} SceMpegAvcDecodeDetailInfo;
++
++
+ /**
+  * sceMpegInit
+  *
+@@ -337,6 +351,13 @@
+  */
+ SceInt32 sceMpegAtracDecode(SceMpeg* Mpeg, SceMpegAu* pAu, ScePVoid pBuffer, SceInt32 iInit);
+ 
++// Missing API
++SceInt32 sceMpegQueryPcmEsSize(SceMpeg *mp, SceInt32 *iEsSize, SceInt32 *iOutSize);
++SceInt32 sceMpegChangeGetAuMode(SceMpeg *mp, SceMpegStream *pStream, SceMpegAuMode iAuMode);
++SceInt32 sceMpegGetPcmAu(SceMpeg *mp, SceMpegStream *pStream, SceMpegAu *pAu, SceInt32 *iAttr);
++SceInt32 sceMpegFlushStream(SceMpeg *mp, SceMpegStream *pStream);
++SceInt32 sceMpegAvcDecodeDetail(SceMpeg *mp, SceMpegAvcDecodeDetailInfo *pDetail);
++
+ #ifdef __cplusplus
+ }
+ #endif
+Index: src/net/psphttp.h
+===================================================================
+--- src/net/psphttp.h	(revision 2451)
++++ src/net/psphttp.h	(working copy)
+@@ -25,6 +25,19 @@
+ 	
+ } PspHttpMethod;
+ 
++typedef enum {
++	SCE_HTTP_AUTH_BASIC,
++	SCE_HTTP_AUTH_DIGEST
++} PspHttpAuthType;
++
++typedef int (*PspHttpPasswordCB)(int request, PspHttpAuthType auth_type, const unsigned char *realm, unsigned char *username, unsigned char *password, SceBool need_entity, unsigned char **entity_body, SceSize *entity_size, SceBool *save);
++
++/* Memory function types */
++typedef void *(*PspHttpMallocFunction)(SceSize size);
++typedef void *(*PspHttpReallocFunction)(void *p, SceSize size);
++typedef void (*PspHttpFreeFunction)(void *p);
++
++
+ /**
+  * Init the http library.
+  *
+@@ -319,6 +332,21 @@
+ */
+ int sceHttpsLoadDefaultCert(int unknown1, int unknown2);
+ 
++// Missing API
++int	sceHttpSetAuthInfoCB(int id, PspHttpPasswordCB cbfunc);
++int sceHttpEnableCache(int id);
++int sceHttpEndCache(void);
++int sceHttpEnableAuth(int id);
++int sceHttpInitCache(SceSize max_size);
++int sceHttpDisableAuth(int id);
++int	sceHttpSetResHeaderMaxSize(int id, unsigned int header_size);
++int sceHttpDisableCache(int id);
++int sceHttpGetNetworkErrno(int request, int *err_num);
++int	sceHttpGetProxy(int id, int *activate_flag,int *mode, unsigned char *proxy_host, SceSize len, unsigned short *proxy_port);
++int	sceHttpGetAllHeader(int request, unsigned char **header, unsigned int *header_size);
++int	sceHttpSetProxy(int id, int activate_flag, int mode, const unsigned char *new_proxy_host, unsigned short new_proxy_port);
++int sceHttpSetMallocFunction(PspHttpMallocFunction malloc_func, PspHttpFreeFunction free_func, PspHttpReallocFunction realloc_func);
++
+ #if defined(__cplusplus)
+ };
+ #endif
+Index: src/net/pspnet_adhoc.h
+===================================================================
+--- src/net/pspnet_adhoc.h	(revision 2451)
++++ src/net/pspnet_adhoc.h	(working copy)
+@@ -33,6 +33,12 @@
+  */
+ int sceNetAdhocTerm(void);
+ 
++// Missing API
++//int sceNetAdhocPollSocket( struct SceNetAdhocPollSd *sds, int nsds, unsigned int timeout, int flag );
++int sceNetAdhocSetSocketAlert(int id, int flag );
++int sceNetAdhocGetSocketAlert(int id, int *flag );
++
++
+ /**
+  * Create a PDP object.
+  *
+Index: src/net/pspnet_inet.h
+===================================================================
+--- src/net/pspnet_inet.h	(revision 2451)
++++ src/net/pspnet_inet.h	(working copy)
+@@ -40,6 +40,17 @@
+ int sceNetInetGetErrno(void);
+ #endif /* DOXYGEN */
+ 
++// Missing API
++//int	sceNetInetGetpeername (int, struct SceNetInetSockaddr *, SceNetInetSocklen_t *);
++//int	sceNetInetGetsockname (int, struct SceNetInetSockaddr *, SceNetInetSocklen_t *);
++//int	sceNetInetPoll (struct SceNetInetPollfd *, SceNetInetNfds_t, int);
++//int	sceNetInetRecvmsg (int, struct SceNetInetMsghdr *, int);
++//int	sceNetInetSelect(int nfds, SceNetInetFdSet *readfds, SceNetInetFdSet *writefds, SceNetInetFdSet *exceptfds, struct SceNetInetTimeval *timeout);
++//int	sceNetInetSendmsg (int, const struct SceNetInetMsghdr *, int);
++int sceNetInetSocketAbort(int s);
++int	sceNetInetGetTcpcbstat(int *, void *);
++int sceNetInetGetUdpcbstat(int *, void *);
++
+ #ifdef __cplusplus
+ }
+ #endif

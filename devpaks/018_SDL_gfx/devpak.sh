@@ -6,6 +6,8 @@ VERSION=2.0.13
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 
 ./autogen.sh

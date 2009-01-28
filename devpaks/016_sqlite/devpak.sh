@@ -6,6 +6,8 @@ VERSION=3.3.17
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 export PSPDEV=$(psp-config --pspdev-path)
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp

@@ -30,6 +30,11 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.11
+* GMP updated to 4.2.4
+* GCC updated to 4.3.3
+* SDK updated to latest SVN
+
 0.8.10
 * Update to Newlib 1.16
 * Pack the libraries into the Installer
@@ -194,7 +199,7 @@ installation directory. Select "candidate" package version and check the g++
 option on the packages list.
 
 Optionally install GDB
-http://downloads.sf.net/mingw/gdb-5.2.1-1.exe
+http://downloads.sf.net/mingw/gdb-6.3-2.exe
 
 2nd Download latest MSYS and install it:
 http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11-2004.04.30-1.exe
@@ -210,29 +215,38 @@ to Windows directory as needed)
 http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe
 Install to c:\msys as well.
 
-4th Start msys. Type in the following commands:
-
-echo "export LDFLAGS=-L/local/lib" > ~/.profile
-echo "export CPPFLAGS=-I/local/include" >> ~/.profile
-exit
-
-5th Download wget:
+4th Download wget:
 http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-bin.zip
 http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-dep.zip
 Unzip to C:\msys\local
 
-6th Download the following files to your local home:
+5th Download the following files to your local home, open the MSys shell and
+execute:
 wget http://downloads.sourceforge.net/mingw/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
 wget http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2
-wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.4.tar.bz2 
+wget ftp://ftp.gnu.org/gnu/libtool/libtool-1.5.24.tar.gz 
 wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.62.tar.bz2
 wget ftp://ftp.gnu.org/gnu/automake/automake-1.10.1.tar.bz2
 wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.11.1.tar.gz
 
-7th install the download software:
+6th install the download software:
 cd /
 tar -xvjf ~/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
 tar -xvjf ~/m4-1.4.7-MSYS.tar.bz2
+
+cd ~
+tar -xvjf autoconf-2.62.tar.bz2
+cd autoconf-2.62
+./configure
+make
+make install
+
+cd ~
+tar -xvjf automake-1.10.1.tar.bz2
+cd automake-1.10.1
+./configure
+make
+make install
 
 cd ~
 tar -xvzf libtool-1.5.24.tar.gz
@@ -241,28 +255,14 @@ cd libtool-1.5.24
 make
 make install
 
-cd ..
-tar -xvjf autoconf-2.61.tar.bz2
-cd autoconf-2.61
-./configure
-make
-make install
-
-cd ..
-tar -xvjf automake-1.10.1.tar.bz2
-cd automake-1.10.1
-./configure
-make
-make install
-
-cd ..
+cd ~
 tar -xvzf libiconv-1.11.1.tar.gz
 cd libiconv-1.11.1
 ./configure --disable-shared --enable-static
 make
 make install
 
-8th Install other packages we need (into C:\msys\local)
+7th Install other packages we need (into C:\msys\local)
   - doxygen 1.5.7.1
   - pod2man
   - dot 1.16
@@ -270,8 +270,11 @@ make install
   - svn 1.5.2
   - flex-2.5.4a-1
 
-9th Install Python 2.5.2 (later may work but not tested)
-  - Python 2.5.2 (Use the windows installer) Then add to the PATH
+8th Install Python 2.5.4 (later may work but not tested)
+  - Python 2.5.4 (Use the windows installer) Then add to the PATH
+  - Add it to the MSys PATH by adding the line:
+     SET PATH=%PATH%;C:\Python25
+    In the beginning of the MSYS.BAT file
 
 To build run the toolchain script:
 

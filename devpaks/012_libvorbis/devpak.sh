@@ -22,6 +22,8 @@ if [ ! "$AC_VERSION" == "autoconf (GNU Autoconf) 2.56" ]; then
 	exit 1
 fi
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 
 AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp || { echo "Error configuring $LIBNAME"; exit 1; }

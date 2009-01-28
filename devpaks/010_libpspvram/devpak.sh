@@ -6,6 +6,8 @@ VERSION=2227
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }

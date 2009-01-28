@@ -74,6 +74,16 @@ function addDep() {
 }
 
 #arg1 libname
+#arg2 version
+function cleanUp() {
+	rm -Rf target
+	rm -f $1-$2-install.bin $1-$2-install.sh $1-$2.tar.bz2
+	cd $1
+	make clean
+	cd ..
+}
+
+#arg1 libname
 #arg1 version
 function makeInstaller() {
 	NIXINSTALLER=$1-$2-install.bin

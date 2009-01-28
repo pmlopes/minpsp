@@ -12,13 +12,13 @@ SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
 # gcc deps versions
 ZLIB_VER=1.2.3
-GMP_VER=4.2.3
+GMP_VER=4.2.4
 MPFR_VER=2.3.2
 
 # sdk versions
 BINUTILS_VER=2.16.1
-GCC_VER=4.3.2
-GCC_TC_VERSION=4.3.1
+GCC_VER=4.3.3
+GCC_TC_VER=4.3.2
 NEWLIB_VER=1.16.0
 
 #debugger version
@@ -30,7 +30,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.8.10
+PSPSDK_VERSION=0.8.11
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -105,9 +105,9 @@ function downloadFTP {
 function buildAndInstallDevPak() {
 	cd $1 || exit 1
 	cd $2_$3 || exit 1
-	#./devpak.sh || exit 1
-	#cd $(psp-config --pspdev-path) || exit 1
-	#tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+	./devpak.sh || exit 1
+	cd $(psp-config --pspdev-path) || exit 1
+	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
 	cd $4 || exit 1
 	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
 }
@@ -205,12 +205,19 @@ function buildXGCC {
 	GCC_CORE="gcc-core-"$GCC_VER".tar.bz2"
 	GCC_GPP="gcc-g++-"$GCC_VER".tar.bz2"
 	GCC_OBJC="gcc-objc-"$GCC_VER".tar.bz2"
+	GCC_GCJ="gcc-java-"$GCC_VER".tar.bz2"
 	
 	GCC_SRCDIR="gcc-"$GCC_VER
 	
-	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+	downloadFTP psp $GCC_CORE "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
+	downloadFTP psp $GCC_GPP "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
+	downloadFTP psp $GCC_OBJC "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
+
+#	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+#	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+#	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+##	downloadHTTP psp $GCC_GCJ "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+##	downloadFTP psp ecj-latest.jar "ftp://sourceware.org/pub/java"
 	
 	if [ ! -d psp/$GCC_SRCDIR ]
 	then
@@ -218,13 +225,26 @@ function buildXGCC {
 		tar -xjf $GCC_CORE || die "extracting "$GCC_CORE
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
-		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VERSION-PSP.patch || die "patching gcc"
+#		tar -xjf $GCC_GCJ || die "extracting "$GCC_GCJ
+		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
 		cd ..
 	fi
 
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
 		
+#	../../$GCC_SRCDIR/configure \
+#			--enable-languages="c,c++,objc,obj-c++" \
+#			--disable-win32-registry \
+#			--enable-cxx-flags="-G0" \
+#			--target=psp \
+#			--with-newlib \
+#			--disable-shared \
+#			--enable-objc-gc \
+#			--prefix=$INSTALLDIR \
+#			--with-gmp=/usr/local \
+#			--with-mpfr=/usr/local || die "configuring gcc"
+
 	../../$GCC_SRCDIR/configure \
 			--enable-languages="c,c++,objc,obj-c++" \
 			--disable-win32-registry \
@@ -245,8 +265,8 @@ function bootstrapSDK {
 	if [ ! -d pspsdk ]
 	then
 		svnGetPS2DEV pspsdk
-		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
-		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
+		patch -p1 -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
+		patch -p1 -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
 	else
 		svnGetPS2DEV pspsdk
 	fi
@@ -273,7 +293,6 @@ function buildNewlib {
 	then
 		cd psp
 		tar -xzf $NEWLIB || die "extracting "$NEWLIB
-#		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-PSP.patch || die "Error patching newlib"
 		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-MINPSPW.patch || die "Error patching newlib (MINPSPW)"
 		cd ..
 	fi
@@ -599,25 +618,24 @@ function buildBaseDevpaks {
 #---------------------------------------------------------------------------------
 # main
 #---------------------------------------------------------------------------------
-
 checkTool svn
 checkTool wget
 checkTool make
 checkTool gawk
 checkTool makeinfo
+checkTool python
 
 #---------------------------------------------------------------------------------
 # pre requisites
 #---------------------------------------------------------------------------------
-
 mkdir -p deps
 mkdir -p psp/build
 
-installZlib
-installGMP
-installMPFR
+#installZlib
+#installGMP
+#installMPFR
 
-downloadPatches
+#downloadPatches
 
 #---------------------------------------------------------------------------------
 # Add installed devkit to the path, adjusting path on minsys
@@ -625,10 +643,10 @@ downloadPatches
 TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
 export PATH=$PATH:$TOOLPATH/bin
+
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-
 buildBinutils
 buildXGCC
 bootstrapSDK
@@ -641,7 +659,6 @@ buildGDB
 #---------------------------------------------------------------------------------
 # build tools
 #---------------------------------------------------------------------------------
-
 installExtraBinaries
 installPSPLinkUSB
 installMan
@@ -650,13 +667,11 @@ installInfo
 #---------------------------------------------------------------------------------
 # patch SDK to run without msys
 #---------------------------------------------------------------------------------
-
 patchCMD
 
 #---------------------------------------------------------------------------------
 # prepare distro
 #---------------------------------------------------------------------------------
-
 prepareDistro
 buildBaseDevpaks
 

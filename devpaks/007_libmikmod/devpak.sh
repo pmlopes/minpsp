@@ -6,6 +6,8 @@ VERSION=3.1.11
 
 svnGetPS2DEV $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 make -f Makefile.psp || { echo "Error building $LIBNAME"; exit 1; }
 

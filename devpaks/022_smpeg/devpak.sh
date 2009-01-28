@@ -6,6 +6,8 @@ VERSION=0.4.5
 
 svnGet $LIBNAME http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
 
+cleanUp $LIBNAME $VERSION
+
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
