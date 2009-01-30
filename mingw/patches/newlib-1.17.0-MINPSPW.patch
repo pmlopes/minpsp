@@ -1,7 +1,7 @@
-diff -Naur newlib-1.16.0/config.sub newlib-1.16.0.psp/config.sub
---- newlib-1.16.0/config.sub	Wed Dec  5 04:27:21 2007
-+++ newlib-1.16.0.psp/config.sub	Wed Oct 15 11:58:07 2008
-@@ -267,6 +267,7 @@
+diff -Naur newlib-1.17.0-orig/config.sub newlib-1.17.0/config.sub
+--- newlib-1.17.0-orig/config.sub	Thu Dec 18 04:26:46 2008
++++ newlib-1.17.0/config.sub	Thu Jan 29 12:51:05 2009
+@@ -270,6 +270,7 @@
  	| mipsisa64sb1 | mipsisa64sb1el \
  	| mipsisa64sr71k | mipsisa64sr71kel \
  	| mipstx39 | mipstx39el \
@@ -9,7 +9,7 @@ diff -Naur newlib-1.16.0/config.sub newlib-1.16.0.psp/config.sub
  	| mn10200 | mn10300 \
  	| mt \
  	| msp430 \
-@@ -348,6 +349,7 @@
+@@ -354,6 +355,7 @@
  	| mipsisa64sb1-* | mipsisa64sb1el-* \
  	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
  	| mipstx39-* | mipstx39el-* \
@@ -17,7 +17,7 @@ diff -Naur newlib-1.16.0/config.sub newlib-1.16.0.psp/config.sub
  	| mmix-* \
  	| mt-* \
  	| msp430-* \
-@@ -713,6 +715,10 @@
+@@ -727,6 +729,10 @@
  	*mint | -mint[0-9]* | *MiNT | *MiNT[0-9]*)
  		basic_machine=m68k-atari
  		os=-mint
@@ -28,10 +28,10 @@ diff -Naur newlib-1.16.0/config.sub newlib-1.16.0.psp/config.sub
  		;;
  	mips3*-*)
  		basic_machine=`echo $basic_machine | sed -e 's/mips3/mips64/'`
-diff -Naur newlib-1.16.0/configure newlib-1.16.0.psp/configure
---- newlib-1.16.0/configure	Tue Dec 18 08:37:34 2007
-+++ newlib-1.16.0.psp/configure	Wed Oct 15 11:58:40 2008
-@@ -2530,6 +2530,9 @@
+diff -Naur newlib-1.17.0-orig/configure newlib-1.17.0/configure
+--- newlib-1.17.0-orig/configure	Tue Dec 16 13:31:18 2008
++++ newlib-1.17.0/configure	Thu Jan 29 12:51:05 2009
+@@ -2616,6 +2616,9 @@
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
      ;;
@@ -41,10 +41,10 @@ diff -Naur newlib-1.16.0/configure newlib-1.16.0.psp/configure
    mips*-*-*)
      noconfigdirs="$noconfigdirs gprof ${libgcj}"
      libgloss_dir=mips
-diff -Naur newlib-1.16.0/configure.ac newlib-1.16.0.psp/configure.ac
---- newlib-1.16.0/configure.ac	Tue Dec 18 08:37:34 2007
-+++ newlib-1.16.0.psp/configure.ac	Wed Oct 15 11:59:00 2008
-@@ -807,6 +807,9 @@
+diff -Naur newlib-1.17.0-orig/configure.ac newlib-1.17.0/configure.ac
+--- newlib-1.17.0-orig/configure.ac	Tue Dec 16 13:31:18 2008
++++ newlib-1.17.0/configure.ac	Thu Jan 29 12:51:05 2009
+@@ -852,6 +852,9 @@
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
      ;;
@@ -54,9 +54,9 @@ diff -Naur newlib-1.16.0/configure.ac newlib-1.16.0.psp/configure.ac
    mips*-*-*)
      noconfigdirs="$noconfigdirs gprof ${libgcj}"
      libgloss_dir=mips
-diff -Naur newlib-1.16.0/newlib/Makefile.am newlib-1.16.0.psp/newlib/Makefile.am
---- newlib-1.16.0/newlib/Makefile.am	Thu May 24 19:33:29 2007
-+++ newlib-1.16.0.psp/newlib/Makefile.am	Wed Oct 15 12:10:57 2008
+diff -Naur newlib-1.17.0-orig/newlib/Makefile.am newlib-1.17.0/newlib/Makefile.am
+--- newlib-1.17.0-orig/newlib/Makefile.am	Mon Jan 21 19:29:17 2008
++++ newlib-1.17.0/newlib/Makefile.am	Thu Jan 29 12:51:05 2009
 @@ -267,6 +267,18 @@
  	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
  	    else true; fi ; \
@@ -76,10 +76,10 @@ diff -Naur newlib-1.16.0/newlib/Makefile.am newlib-1.16.0.psp/newlib/Makefile.am
  	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/sys; \
  	  for i in $(srcdir)/libc/include/sys/*.h; do \
  	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
-diff -Naur newlib-1.16.0/newlib/Makefile.in newlib-1.16.0.psp/newlib/Makefile.in
---- newlib-1.16.0/newlib/Makefile.in	Wed Dec 19 23:36:26 2007
-+++ newlib-1.16.0.psp/newlib/Makefile.in	Wed Oct 15 12:12:32 2008
-@@ -928,6 +928,18 @@
+diff -Naur newlib-1.17.0-orig/newlib/Makefile.in newlib-1.17.0/newlib/Makefile.in
+--- newlib-1.17.0-orig/newlib/Makefile.in	Mon Sep 29 17:40:26 2008
++++ newlib-1.17.0/newlib/Makefile.in	Thu Jan 29 12:51:05 2009
+@@ -939,6 +939,18 @@
  	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
  	    else true; fi ; \
  	  done; \
@@ -98,19 +98,10 @@ diff -Naur newlib-1.16.0/newlib/Makefile.in newlib-1.16.0.psp/newlib/Makefile.in
  	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/sys; \
  	  for i in $(srcdir)/libc/include/sys/*.h; do \
  	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
-diff -Naur newlib-1.16.0/newlib/configure.host newlib-1.16.0.psp/newlib/configure.host
---- newlib-1.16.0/newlib/configure.host	Wed Nov  7 22:42:24 2007
-+++ newlib-1.16.0.psp/newlib/configure.host	Wed Oct 15 12:14:07 2008
-@@ -528,7 +528,7 @@
- #  NOTE: When newlib malloc uses a semaphore, RTEMS will switch to that.
-   *-*-rtems*)
- 	default_newlib_io_long_long="yes"
--	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DHAVE_FCNTL"
-+	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DHAVE_FCNTL -DHAVE_RENAME -DHAVE_NANOSLEEP"
- 	;;
- # VxWorks supplies its own version of malloc, and the newlib one
- # doesn't work because VxWorks does not have sbrk.
-@@ -650,7 +650,14 @@
+diff -Naur newlib-1.17.0-orig/newlib/configure.host newlib-1.17.0/newlib/configure.host
+--- newlib-1.17.0-orig/newlib/configure.host	Thu Dec 18 00:09:09 2008
++++ newlib-1.17.0/newlib/configure.host	Thu Jan 29 12:51:05 2009
+@@ -664,7 +664,14 @@
  	;;
    mips*-*-elf*)
  	default_newlib_io_long_long="yes"
@@ -126,9 +117,9 @@ diff -Naur newlib-1.16.0/newlib/configure.host newlib-1.16.0.psp/newlib/configur
  	;;
    mmix-*)
  	syscall_dir=syscalls
-diff -Naur newlib-1.16.0/newlib/libc/include/machine/time.h newlib-1.16.0.psp/newlib/libc/include/machine/time.h
---- newlib-1.16.0/newlib/libc/include/machine/time.h	Mon Dec  4 20:06:37 2000
-+++ newlib-1.16.0.psp/newlib/libc/include/machine/time.h	Wed Oct 15 12:43:59 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/include/machine/time.h newlib-1.17.0/newlib/libc/include/machine/time.h
+--- newlib-1.17.0-orig/newlib/libc/include/machine/time.h	Mon Dec  4 20:06:37 2000
++++ newlib-1.17.0/newlib/libc/include/machine/time.h	Thu Jan 29 12:51:05 2009
 @@ -9,6 +9,10 @@
  #endif
  #endif /* !__rtems__ */
@@ -140,10 +131,10 @@ diff -Naur newlib-1.16.0/newlib/libc/include/machine/time.h newlib-1.16.0.psp/ne
  #endif	/* _MACHTIME_H_ */
  
  
-diff -Naur newlib-1.16.0/newlib/libc/include/stdint.h newlib-1.16.0.psp/newlib/libc/include/stdint.h
---- newlib-1.16.0/newlib/libc/include/stdint.h	Wed Aug 16 23:39:43 2006
-+++ newlib-1.16.0.psp/newlib/libc/include/stdint.h	Wed Oct 15 12:54:47 2008
-@@ -34,11 +34,9 @@
+diff -Naur newlib-1.17.0-orig/newlib/libc/include/stdint.h newlib-1.17.0/newlib/libc/include/stdint.h
+--- newlib-1.17.0-orig/newlib/libc/include/stdint.h	Wed Dec 10 22:27:58 2008
++++ newlib-1.17.0/newlib/libc/include/stdint.h	Thu Jan 29 12:51:05 2009
+@@ -30,11 +30,9 @@
  #define __have_longlong64 1
  #endif
  
@@ -156,9 +147,9 @@ diff -Naur newlib-1.16.0/newlib/libc/include/stdint.h newlib-1.16.0.psp/newlib/l
  #endif
  
  #if __STDINT_EXP(SCHAR_MAX) == 0x7f
-diff -Naur newlib-1.16.0/newlib/libc/include/sys/config.h newlib-1.16.0.psp/newlib/libc/include/sys/config.h
---- newlib-1.16.0/newlib/libc/include/sys/config.h	Thu Mar 15 22:32:12 2007
-+++ newlib-1.16.0.psp/newlib/libc/include/sys/config.h	Wed Oct 15 12:43:18 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/include/sys/config.h newlib-1.17.0/newlib/libc/include/sys/config.h
+--- newlib-1.17.0-orig/newlib/libc/include/sys/config.h	Wed Nov 19 22:05:31 2008
++++ newlib-1.17.0/newlib/libc/include/sys/config.h	Thu Jan 29 12:51:05 2009
 @@ -98,6 +98,12 @@
  #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
  #endif
@@ -172,9 +163,9 @@ diff -Naur newlib-1.16.0/newlib/libc/include/sys/config.h newlib-1.16.0.psp/newl
  #ifdef __xstormy16__
  #define __SMALL_BITFIELDS
  #undef INT_MAX
-diff -Naur newlib-1.16.0/newlib/libc/include/sys/types.h newlib-1.16.0.psp/newlib/libc/include/sys/types.h
---- newlib-1.16.0/newlib/libc/include/sys/types.h	Tue Sep 18 22:05:17 2007
-+++ newlib-1.16.0.psp/newlib/libc/include/sys/types.h	Wed Oct 15 12:43:17 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/include/sys/types.h newlib-1.17.0/newlib/libc/include/sys/types.h
+--- newlib-1.17.0-orig/newlib/libc/include/sys/types.h	Fri Sep 26 18:15:50 2008
++++ newlib-1.17.0/newlib/libc/include/sys/types.h	Thu Jan 29 12:51:05 2009
 @@ -190,6 +190,7 @@
  
  typedef unsigned short nlink_t;
@@ -191,9 +182,9 @@ diff -Naur newlib-1.16.0/newlib/libc/include/sys/types.h newlib-1.16.0.psp/newli
  
  #undef __MS_types__
  #undef _ST_INT32
-diff -Naur newlib-1.16.0/newlib/libc/include/time.h newlib-1.16.0.psp/newlib/libc/include/time.h
---- newlib-1.16.0/newlib/libc/include/time.h	Fri Nov 18 16:57:24 2005
-+++ newlib-1.16.0.psp/newlib/libc/include/time.h	Wed Oct 15 12:45:28 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/include/time.h newlib-1.17.0/newlib/libc/include/time.h
+--- newlib-1.17.0-orig/newlib/libc/include/time.h	Thu Oct 16 23:53:58 2008
++++ newlib-1.17.0/newlib/libc/include/time.h	Thu Jan 29 12:51:05 2009
 @@ -175,6 +175,17 @@
  #endif
  #endif /* _POSIX_TIMERS */
@@ -212,9 +203,9 @@ diff -Naur newlib-1.16.0/newlib/libc/include/time.h newlib-1.16.0.psp/newlib/lib
  #ifdef __cplusplus
  extern "C" {
  #endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/configure newlib-1.16.0.psp/newlib/libc/sys/configure
---- newlib-1.16.0/newlib/libc/sys/configure	Thu May 24 19:33:36 2007
-+++ newlib-1.16.0.psp/newlib/libc/sys/configure	Wed Oct 15 12:22:26 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/configure newlib-1.17.0/newlib/libc/sys/configure
+--- newlib-1.17.0-orig/newlib/libc/sys/configure	Mon Dec 22 20:45:49 2008
++++ newlib-1.17.0/newlib/libc/sys/configure	Thu Jan 29 12:51:05 2009
 @@ -470,6 +470,7 @@
  ac_subdirs_all="$ac_subdirs_all mmixware"
  ac_subdirs_all="$ac_subdirs_all netware"
@@ -223,7 +214,7 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/configure newlib-1.16.0.psp/newlib/libc
  ac_subdirs_all="$ac_subdirs_all rtems"
  ac_subdirs_all="$ac_subdirs_all sh"
  ac_subdirs_all="$ac_subdirs_all sparc64"
-@@ -10716,6 +10717,10 @@
+@@ -11398,6 +11399,10 @@
  	netware)
  
  subdirs="$subdirs netware"
@@ -234,9 +225,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/configure newlib-1.16.0.psp/newlib/libc
   ;;
  	rdos)
  
-diff -Naur newlib-1.16.0/newlib/libc/sys/configure.in newlib-1.16.0.psp/newlib/libc/sys/configure.in
---- newlib-1.16.0/newlib/libc/sys/configure.in	Thu May 24 19:33:37 2007
-+++ newlib-1.16.0.psp/newlib/libc/sys/configure.in	Wed Oct 15 12:22:53 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/configure.in newlib-1.17.0/newlib/libc/sys/configure.in
+--- newlib-1.17.0-orig/newlib/libc/sys/configure.in	Thu May 24 19:33:37 2007
++++ newlib-1.17.0/newlib/libc/sys/configure.in	Thu Jan 29 12:51:05 2009
 @@ -33,6 +33,7 @@
  	mmixware) AC_CONFIG_SUBDIRS(mmixware) ;;
  	netware) AC_CONFIG_SUBDIRS(netware) ;;
@@ -245,9 +236,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/configure.in newlib-1.16.0.psp/newlib/l
  	rtems) AC_CONFIG_SUBDIRS(rtems) ;;
  	sh) AC_CONFIG_SUBDIRS(sh) ;;
  	sparc64) AC_CONFIG_SUBDIRS(sparc64) ;;
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/Makefile.am newlib-1.16.0.psp/newlib/libc/sys/psp/Makefile.am
---- newlib-1.16.0/newlib/libc/sys/psp/Makefile.am	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/Makefile.am	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/Makefile.am newlib-1.17.0/newlib/libc/sys/psp/Makefile.am
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/Makefile.am	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/Makefile.am	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,71 @@
 +## Process this file with automake to generate Makefile.in
 +
@@ -320,9 +311,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/Makefile.am newlib-1.16.0.psp/newli
 +
 +ACLOCAL_AMFLAGS = -I ../../..
 +CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/Makefile.in newlib-1.16.0.psp/newlib/libc/sys/psp/Makefile.in
---- newlib-1.16.0/newlib/libc/sys/psp/Makefile.in	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/Makefile.in	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/Makefile.in newlib-1.17.0/newlib/libc/sys/psp/Makefile.in
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/Makefile.in	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/Makefile.in	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,464 @@
 +# Makefile.in generated by automake 1.9.6 from Makefile.am.
 +# @configure_input@
@@ -788,9 +779,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/Makefile.in newlib-1.16.0.psp/newli
 +# Tell versions [3.59,3.63) of GNU make to not export all variables.
 +# Otherwise a system limit (for SysV at least) may be exceeded.
 +.NOEXPORT:
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/README newlib-1.16.0.psp/newlib/libc/sys/psp/README
---- newlib-1.16.0/newlib/libc/sys/psp/README	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/README	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/README newlib-1.17.0/newlib/libc/sys/psp/README
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/README	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/README	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,16 @@
 +Newlib for PSP
 +--
@@ -808,9 +799,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/README newlib-1.16.0.psp/newlib/lib
 +
 +--
 +Marcus R. Brown <mrbrown@ocgnet.org>
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/aclocal.m4 newlib-1.16.0.psp/newlib/libc/sys/psp/aclocal.m4
---- newlib-1.16.0/newlib/libc/sys/psp/aclocal.m4	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/aclocal.m4	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/aclocal.m4 newlib-1.17.0/newlib/libc/sys/psp/aclocal.m4
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/aclocal.m4	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/aclocal.m4	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,880 @@
 +# generated automatically by aclocal 1.9.6 -*- Autoconf -*-
 +
@@ -1692,9 +1683,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/aclocal.m4 newlib-1.16.0.psp/newlib
 +]) # _AM_PROG_TAR
 +
 +m4_include([../../../acinclude.m4])
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/arpa/inet.h newlib-1.16.0.psp/newlib/libc/sys/psp/arpa/inet.h
---- newlib-1.16.0/newlib/libc/sys/psp/arpa/inet.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/arpa/inet.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/arpa/inet.h newlib-1.17.0/newlib/libc/sys/psp/arpa/inet.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/arpa/inet.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/arpa/inet.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,26 @@
 +/* arpa/inet.h - Functions for converting IP addresses between strings and numbers */
 +
@@ -1722,14 +1713,14 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/arpa/inet.h newlib-1.16.0.psp/newli
 +}
 +#endif
 +#endif /* _ARPA_INET_H_ */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/confdefs.h newlib-1.16.0.psp/newlib/libc/sys/psp/confdefs.h
---- newlib-1.16.0/newlib/libc/sys/psp/confdefs.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/confdefs.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/confdefs.h newlib-1.17.0/newlib/libc/sys/psp/confdefs.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/confdefs.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/confdefs.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1 @@
 +
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/configure newlib-1.16.0.psp/newlib/libc/sys/psp/configure
---- newlib-1.16.0/newlib/libc/sys/psp/configure	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/configure	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/configure newlib-1.17.0/newlib/libc/sys/psp/configure
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/configure	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/configure	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,4085 @@
 +#! /bin/sh
 +# Guess values for system-dependent variables and create Makefiles.
@@ -5816,9 +5807,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/configure newlib-1.16.0.psp/newlib/
 +  $ac_cs_success || { (exit 1); exit 1; }
 +fi
 +
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/configure.in newlib-1.16.0.psp/newlib/libc/sys/psp/configure.in
---- newlib-1.16.0/newlib/libc/sys/psp/configure.in	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/configure.in	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/configure.in newlib-1.17.0/newlib/libc/sys/psp/configure.in
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/configure.in	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/configure.in	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,14 @@
 +dnl This is the newlib/libc/sys/sun4 configure.in file.
 +dnl Process this file with autoconf to produce a configure script.
@@ -5834,16 +5825,16 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/configure.in newlib-1.16.0.psp/newl
 +
 +AC_CONFIG_FILES(Makefile)
 +AC_OUTPUT
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/crt0.c newlib-1.16.0.psp/newlib/libc/sys/psp/crt0.c
---- newlib-1.16.0/newlib/libc/sys/psp/crt0.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/crt0.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/crt0.c newlib-1.17.0/newlib/libc/sys/psp/crt0.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/crt0.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/crt0.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,3 @@
 +/* The real crt0.c lives in PSPSDK. */
 +
 +void _start() { }
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/fdman.c newlib-1.16.0.psp/newlib/libc/sys/psp/fdman.c
---- newlib-1.16.0/newlib/libc/sys/psp/fdman.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/fdman.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/fdman.c newlib-1.17.0/newlib/libc/sys/psp/fdman.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/fdman.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/fdman.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,115 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -5960,9 +5951,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/fdman.c newlib-1.16.0.psp/newlib/li
 +	}
 +	__psp_descriptormap[fd] = NULL;
 +}
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/fdman.h newlib-1.16.0.psp/newlib/libc/sys/psp/fdman.h
---- newlib-1.16.0/newlib/libc/sys/psp/fdman.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/fdman.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/fdman.h newlib-1.17.0/newlib/libc/sys/psp/fdman.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/fdman.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/fdman.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,44 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -6008,9 +5999,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/fdman.h newlib-1.16.0.psp/newlib/li
 +	void __psp_fdman_release_descriptor(int fd);
 +
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/include/netdb.h newlib-1.16.0.psp/newlib/libc/sys/psp/include/netdb.h
---- newlib-1.16.0/newlib/libc/sys/psp/include/netdb.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/include/netdb.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/include/netdb.h newlib-1.17.0/newlib/libc/sys/psp/include/netdb.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/include/netdb.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/include/netdb.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,36 @@
 +/* Simple gethostbyname and gethostbyaddr replacements, note not thread safe */
 +#ifndef __NETDB_H__
@@ -6048,9 +6039,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/include/netdb.h newlib-1.16.0.psp/n
 +#endif
 +
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/interrupt.S newlib-1.16.0.psp/newlib/libc/sys/psp/interrupt.S
---- newlib-1.16.0/newlib/libc/sys/psp/interrupt.S	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/interrupt.S	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/interrupt.S newlib-1.17.0/newlib/libc/sys/psp/interrupt.S
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/interrupt.S	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/interrupt.S	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,66 @@
 +
 +	.set noreorder
@@ -6118,10 +6109,10 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/interrupt.S newlib-1.16.0.psp/newli
 +	nop
 +
 +	.end pspEnableInterrupts
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/libcglue.c newlib-1.16.0.psp/newlib/libc/sys/psp/libcglue.c
---- newlib-1.16.0/newlib/libc/sys/psp/libcglue.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/libcglue.c	Tue Oct 14 09:56:35 2008
-@@ -0,0 +1,962 @@
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/libcglue.c newlib-1.17.0/newlib/libc/sys/psp/libcglue.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/libcglue.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/libcglue.c	Thu Jan 29 12:51:05 2009
+@@ -0,0 +1,972 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
 + * -----------------------------------------------------------------------
@@ -6761,6 +6752,16 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/libcglue.c newlib-1.16.0.psp/newlib
 +		return 0;
 +	}
 +}
++
++int _isatty_r (struct _reent *ptr, int fd)
++{
++  int ret;
++
++  errno = 0;
++  if ((ret = isatty (fd)) == -1 && errno != 0)
++    ptr->_errno = errno;
++  return ret;
++}
 +#endif
 +
 +#ifdef F__stat
@@ -7084,9 +7085,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/libcglue.c newlib-1.16.0.psp/newlib
 +}
 +#endif
 +
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netdb.c newlib-1.16.0.psp/newlib/libc/sys/psp/netdb.c
---- newlib-1.16.0/newlib/libc/sys/psp/netdb.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/netdb.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/netdb.c newlib-1.17.0/newlib/libc/sys/psp/netdb.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/netdb.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/netdb.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,103 @@
 +/* Simple gethostbyname and gethostbyaddr replacements using the resolver lib */
 +#include <stdio.h>
@@ -7191,9 +7192,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netdb.c newlib-1.16.0.psp/newlib/li
 +}
 +
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netinet/in.h newlib-1.16.0.psp/newlib/libc/sys/psp/netinet/in.h
---- newlib-1.16.0/newlib/libc/sys/psp/netinet/in.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/netinet/in.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/netinet/in.h newlib-1.17.0/newlib/libc/sys/psp/netinet/in.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/netinet/in.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/netinet/in.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,271 @@
 +/*	$NetBSD: in.h,v 1.71 2005/08/05 09:21:25 elad Exp $	*/
 +
@@ -7466,9 +7467,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netinet/in.h newlib-1.16.0.psp/newl
 +#endif
 +
 +#endif /* !_NETINET_IN_H_ */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netinet/tcp.h newlib-1.16.0.psp/newlib/libc/sys/psp/netinet/tcp.h
---- newlib-1.16.0/newlib/libc/sys/psp/netinet/tcp.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/netinet/tcp.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/netinet/tcp.h newlib-1.17.0/newlib/libc/sys/psp/netinet/tcp.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/netinet/tcp.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/netinet/tcp.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,12 @@
 +#ifndef __NETINET_TCP_H__
 +#define __NETINET_TCP_H__
@@ -7482,9 +7483,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/netinet/tcp.h newlib-1.16.0.psp/new
 +#define	TCP_MAXSEG	0x02	/* set maximum segment size */
 +
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/pipe.c newlib-1.16.0.psp/newlib/libc/sys/psp/pipe.c
---- newlib-1.16.0/newlib/libc/sys/psp/pipe.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/pipe.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/pipe.c newlib-1.17.0/newlib/libc/sys/psp/pipe.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/pipe.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/pipe.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,305 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -7791,9 +7792,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/pipe.c newlib-1.16.0.psp/newlib/lib
 +		return __psp_set_errno(ret);
 +	}
 +}
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/pspcwd.c newlib-1.16.0.psp/newlib/libc/sys/psp/pspcwd.c
---- newlib-1.16.0/newlib/libc/sys/psp/pspcwd.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/pspcwd.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/pspcwd.c newlib-1.17.0/newlib/libc/sys/psp/pspcwd.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/pspcwd.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/pspcwd.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,166 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -7961,9 +7962,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/pspcwd.c newlib-1.16.0.psp/newlib/l
 +	return __psp_path_normalize(out + dr, len - dr);
 +}
 +
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/select.c newlib-1.16.0.psp/newlib/libc/sys/psp/select.c
---- newlib-1.16.0/newlib/libc/sys/psp/select.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/select.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/select.c newlib-1.17.0/newlib/libc/sys/psp/select.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/select.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/select.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,199 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -8164,9 +8165,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/select.c newlib-1.16.0.psp/newlib/l
 +	return count;
 +}
 +
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/socket.c newlib-1.16.0.psp/newlib/libc/sys/psp/socket.c
---- newlib-1.16.0/newlib/libc/sys/psp/socket.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/socket.c	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/socket.c newlib-1.17.0/newlib/libc/sys/psp/socket.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/socket.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/socket.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,390 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -8558,9 +8559,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/socket.c newlib-1.16.0.psp/newlib/l
 +	return ip_addr;
 +}
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/dirent.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/dirent.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/dirent.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/dirent.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/dirent.h newlib-1.17.0/newlib/libc/sys/psp/sys/dirent.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/dirent.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/dirent.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,39 @@
 +#ifndef _SYS_DIRENT_H
 +#define _SYS_DIRENT_H
@@ -8601,9 +8602,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/dirent.h newlib-1.16.0.psp/newl
 +#endif
 +
 +#endif
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/errno.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/errno.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/errno.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/errno.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/errno.h newlib-1.17.0/newlib/libc/sys/psp/sys/errno.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/errno.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/errno.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,158 @@
 +/* errno.h for PSP, based on newlib/libc/include/sys/errno.h. */
 +
@@ -8763,9 +8764,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/errno.h newlib-1.16.0.psp/newli
 +}
 +#endif
 +#endif /* _SYS_ERRNO_H */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/fd_set.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/fd_set.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/fd_set.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/fd_set.h	Tue Oct 14 09:56:35 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/fd_set.h newlib-1.17.0/newlib/libc/sys/psp/sys/fd_set.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/fd_set.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/fd_set.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,69 @@
 +/*	$NetBSD: fd_set.h,v 1.1 2005/05/22 12:44:24 kleink Exp $	*/
 +
@@ -8836,14 +8837,14 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/fd_set.h newlib-1.16.0.psp/newl
 +#define	FD_ZERO(p)	(void)__builtin_memset((p), 0, sizeof(*(p)))
 +
 +#endif /* _SYS_FD_SET_H_ */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/ioctl.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/ioctl.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/ioctl.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/ioctl.h	Tue Oct 14 09:56:36 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/ioctl.h newlib-1.17.0/newlib/libc/sys/psp/sys/ioctl.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/ioctl.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/ioctl.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1 @@
 +/* Empty file, here for compatibility */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/select.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/select.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/select.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/select.h	Tue Oct 14 09:56:36 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/select.h newlib-1.17.0/newlib/libc/sys/psp/sys/select.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/select.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/select.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,54 @@
 +/*	$NetBSD: select.h,v 1.24 2005/05/22 12:44:24 kleink Exp $	*/
 +
@@ -8899,9 +8900,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/select.h newlib-1.16.0.psp/newl
 +#endif
 +
 +#endif /* !_SYS_SELECT_H_ */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/socket.h newlib-1.16.0.psp/newlib/libc/sys/psp/sys/socket.h
---- newlib-1.16.0/newlib/libc/sys/psp/sys/socket.h	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/sys/socket.h	Tue Oct 14 09:56:36 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/sys/socket.h newlib-1.17.0/newlib/libc/sys/psp/sys/socket.h
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/sys/socket.h	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/sys/socket.h	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,294 @@
 +/*	$NetBSD: socket.h,v 1.77 2005/11/29 03:12:16 christos Exp $	*/
 +
@@ -9197,9 +9198,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/sys/socket.h newlib-1.16.0.psp/newl
 +#endif
 +
 +#endif /* !_SYS_SOCKET_H_ */
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/syscalls.c newlib-1.16.0.psp/newlib/libc/sys/psp/syscalls.c
---- newlib-1.16.0/newlib/libc/sys/psp/syscalls.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/syscalls.c	Tue Oct 14 09:56:36 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/syscalls.c newlib-1.17.0/newlib/libc/sys/psp/syscalls.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/syscalls.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/syscalls.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,19 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org
@@ -9220,9 +9221,9 @@ diff -Naur newlib-1.16.0/newlib/libc/sys/psp/syscalls.c newlib-1.16.0.psp/newlib
 +{
 +       return __psp_set_errno(sceKernelLibcTime(t));
 +} 
-diff -Naur newlib-1.16.0/newlib/libc/sys/psp/xprintf.c newlib-1.16.0.psp/newlib/libc/sys/psp/xprintf.c
---- newlib-1.16.0/newlib/libc/sys/psp/xprintf.c	Thu Jan  1 01:00:00 1970
-+++ newlib-1.16.0.psp/newlib/libc/sys/psp/xprintf.c	Tue Oct 14 09:56:36 2008
+diff -Naur newlib-1.17.0-orig/newlib/libc/sys/psp/xprintf.c newlib-1.17.0/newlib/libc/sys/psp/xprintf.c
+--- newlib-1.17.0-orig/newlib/libc/sys/psp/xprintf.c	Thu Jan  1 01:00:00 1970
++++ newlib-1.17.0/newlib/libc/sys/psp/xprintf.c	Thu Jan 29 12:51:05 2009
 @@ -0,0 +1,984 @@
 +/*
 + * PSP Software Development Kit - http://www.pspdev.org

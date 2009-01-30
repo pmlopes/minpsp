@@ -19,7 +19,7 @@ MPFR_VER=2.3.2
 BINUTILS_VER=2.16.1
 GCC_VER=4.3.3
 GCC_TC_VER=4.3.2
-NEWLIB_VER=1.16.0
+NEWLIB_VER=1.17.0
 
 #debugger version
 GDB_VER=6.8
@@ -30,7 +30,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.8.11
+PSPSDK_VERSION=0.9.0
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -647,13 +647,13 @@ export PATH=$PATH:$TOOLPATH/bin
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-buildBinutils
-buildXGCC
-bootstrapSDK
-buildNewlib
-buildGCC
-buildSDK
-validateSDK
+#buildBinutils
+#buildXGCC
+#bootstrapSDK
+#buildNewlib
+#buildGCC
+#buildSDK
+#validateSDK
 buildGDB
 
 #---------------------------------------------------------------------------------

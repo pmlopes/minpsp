@@ -30,6 +30,17 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.8.12
+* Newlib 1.17.0
+  * new C99 wide-char function additions
+  * movement of regex functions from sys/linux directory into
+    shared libc/posix directory
+  * string function optimizations
+  * redesign of formatted I/O to reduce dependencies when using
+    sprintf/sscanf family of functions
+  * numerous warning cleanups
+  * various bug fixes
+
 0.8.11
 * GMP updated to 4.2.4
 * GCC updated to 4.3.3
