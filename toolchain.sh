@@ -30,7 +30,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.0
+PSPSDK_VERSION=0.9.1
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -193,8 +193,11 @@ function buildBinutils {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
+			--disable-nls \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring binutils"
+
+	make clean
 	make LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
@@ -209,15 +212,11 @@ function buildXGCC {
 	
 	GCC_SRCDIR="gcc-"$GCC_VER
 	
-	downloadFTP psp $GCC_CORE "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
-	downloadFTP psp $GCC_GPP "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
-	downloadFTP psp $GCC_OBJC "ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-"$GCC_VER
-
-#	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-#	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-#	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-##	downloadHTTP psp $GCC_GCJ "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-##	downloadFTP psp ecj-latest.jar "ftp://sourceware.org/pub/java"
+	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+#	downloadHTTP psp $GCC_GCJ "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
+#	downloadFTP psp ecj-latest.jar "ftp://sourceware.org/pub/java"
 	
 	if [ ! -d psp/$GCC_SRCDIR ]
 	then
@@ -225,26 +224,13 @@ function buildXGCC {
 		tar -xjf $GCC_CORE || die "extracting "$GCC_CORE
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
-#		tar -xjf $GCC_GCJ || die "extracting "$GCC_GCJ
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
 		cd ..
 	fi
 
 	mkdir -p psp/build/$GCC_SRCDIR
 	cd psp/build/$GCC_SRCDIR
-		
-#	../../$GCC_SRCDIR/configure \
-#			--enable-languages="c,c++,objc,obj-c++" \
-#			--disable-win32-registry \
-#			--enable-cxx-flags="-G0" \
-#			--target=psp \
-#			--with-newlib \
-#			--disable-shared \
-#			--enable-objc-gc \
-#			--prefix=$INSTALLDIR \
-#			--with-gmp=/usr/local \
-#			--with-mpfr=/usr/local || die "configuring gcc"
-
+	
 	../../$GCC_SRCDIR/configure \
 			--enable-languages="c,c++,objc,obj-c++" \
 			--disable-win32-registry \
@@ -252,9 +238,12 @@ function buildXGCC {
 			--target=psp \
 			--with-newlib \
 			--disable-shared \
+			--disable-nls \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
+	
+	make clean
 	make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
 	make install-gcc || die "installing gcc"
 	cd ../../..
@@ -302,6 +291,7 @@ function buildNewlib {
 
 	../../$NEWLIB_SRCDIR/configure \
 			--target=psp \
+			--disable-nls \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring newlib"
@@ -313,7 +303,7 @@ function buildNewlib {
 function buildGCC {
 	
 	cd psp/build/"gcc-"$GCC_VER
-	make CFLAGS_FOR_TARGET="-G0 -g -O2" LDFLAGS="-s" || die "building final compiler"
+	make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final compiler"
 	make install || die "installing final compiler"
 	cd ../../..
 }
@@ -348,6 +338,7 @@ function buildGDB {
 	
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
+			--disable-nls \
 			--target=psp \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
@@ -403,7 +394,14 @@ function installExtraBinaries {
 
 function installPSPLinkUSB {
 	cd psp
-	svnGetPS2DEV psplinkusb
+	if [ ! -d psplinkusb ]
+	then
+		svnGetPS2DEV psplinkusb
+		patch -p1 -d psplinkusb -i ../patches/psplinkusb-MINPSPW.patch || die "patching psplinkusb"
+	else
+		svnGetPS2DEV psplinkusb
+	fi
+
 	
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
@@ -419,7 +417,7 @@ function installPSPLinkUSB {
 	installFile libusb0.sys ../mingw/bin/usb/driver bin/driver
 	installFile psp.cat ../mingw/bin/usb/driver bin/driver
 	installFile psp.inf ../mingw/bin/usb/driver bin/driver
-	# 64 bits (i've no idea if it works)
+	# 64 bits
 	installFile libusb0.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
 	installFile libusb0.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
 	installFile psp.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
@@ -631,11 +629,11 @@ checkTool python
 mkdir -p deps
 mkdir -p psp/build
 
-#installZlib
-#installGMP
-#installMPFR
+installZlib
+installGMP
+installMPFR
 
-#downloadPatches
+downloadPatches
 
 #---------------------------------------------------------------------------------
 # Add installed devkit to the path, adjusting path on minsys
@@ -647,13 +645,13 @@ export PATH=$PATH:$TOOLPATH/bin
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-#buildBinutils
-#buildXGCC
-#bootstrapSDK
-#buildNewlib
-#buildGCC
-#buildSDK
-#validateSDK
+buildBinutils
+buildXGCC
+bootstrapSDK
+buildNewlib
+buildGCC
+buildSDK
+validateSDK
 buildGDB
 
 #---------------------------------------------------------------------------------

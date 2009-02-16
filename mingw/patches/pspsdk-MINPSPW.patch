@@ -1,28 +1,7 @@
-Index: config.h.in
+Index: pspsdk/src/atrac3/pspatrac3.h
 ===================================================================
---- config.h.in	(revision 2451)
-+++ config.h.in	(working copy)
-@@ -70,9 +70,13 @@
- /* Version number of package */
- #undef VERSION
- 
--/* Define to 1 if your processor stores words with the most significant byte
--   first (like Motorola and SPARC, unlike Intel and VAX). */
--#undef WORDS_BIGENDIAN
-+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
-+   significant byte first (like Motorola and SPARC, unlike Intel and VAX). */
-+#if defined __BIG_ENDIAN__
-+# define WORDS_BIGENDIAN 1
-+#elif ! defined __LITTLE_ENDIAN__
-+# undef WORDS_BIGENDIAN
-+#endif
- 
- /* Define to empty if `const' does not conform to ANSI C. */
- #undef const
-Index: src/atrac3/pspatrac3.h
-===================================================================
---- src/atrac3/pspatrac3.h	(revision 2451)
-+++ src/atrac3/pspatrac3.h	(working copy)
+--- pspsdk/src/atrac3/pspatrac3.h	(revision 2451)
++++ pspsdk/src/atrac3/pspatrac3.h	(working copy)
 @@ -18,6 +18,58 @@
  extern "C" {
  #endif
@@ -112,10 +91,10 @@ Index: src/atrac3/pspatrac3.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/display/pspdisplay.h
+Index: pspsdk/src/display/pspdisplay.h
 ===================================================================
---- src/display/pspdisplay.h	(revision 2451)
-+++ src/display/pspdisplay.h	(working copy)
+--- pspsdk/src/display/pspdisplay.h	(revision 2451)
++++ pspsdk/src/display/pspdisplay.h	(working copy)
 @@ -122,6 +122,13 @@
   */
  int sceDisplayWaitVblankCB(void);
@@ -130,10 +109,10 @@ Index: src/display/pspdisplay.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/display/pspdisplay_kernel.h
+Index: pspsdk/src/display/pspdisplay_kernel.h
 ===================================================================
---- src/display/pspdisplay_kernel.h	(revision 2451)
-+++ src/display/pspdisplay_kernel.h	(working copy)
+--- pspsdk/src/display/pspdisplay_kernel.h	(revision 2451)
++++ pspsdk/src/display/pspdisplay_kernel.h	(working copy)
 @@ -65,6 +65,13 @@
   */
  void sceDisplayGetBrightness(int *level,int *unk1);
@@ -148,10 +127,10 @@ Index: src/display/pspdisplay_kernel.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/ge/pspge.h
+Index: pspsdk/src/ge/pspge.h
 ===================================================================
---- src/ge/pspge.h	(revision 2451)
-+++ src/ge/pspge.h	(working copy)
+--- pspsdk/src/ge/pspge.h	(revision 2451)
++++ pspsdk/src/ge/pspge.h	(working copy)
 @@ -171,6 +171,11 @@
  	PSP_GE_LIST_CANCEL_DONE
  } PspGeSyncType;
@@ -178,10 +157,10 @@ Index: src/ge/pspge.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/kernel/psputilsforkernel.h
+Index: pspsdk/src/kernel/psputilsforkernel.h
 ===================================================================
---- src/kernel/psputilsforkernel.h	(revision 2451)
-+++ src/kernel/psputilsforkernel.h	(working copy)
+--- pspsdk/src/kernel/psputilsforkernel.h	(revision 2451)
++++ pspsdk/src/kernel/psputilsforkernel.h	(working copy)
 @@ -51,7 +51,7 @@
   *
   * @return 0 = not cached, 1 = cache
@@ -205,10 +184,10 @@ Index: src/kernel/psputilsforkernel.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/mpeg/pspmpeg.h
+Index: pspsdk/src/mpeg/pspmpeg.h
 ===================================================================
---- src/mpeg/pspmpeg.h	(revision 2451)
-+++ src/mpeg/pspmpeg.h	(working copy)
+--- pspsdk/src/mpeg/pspmpeg.h	(revision 2451)
++++ pspsdk/src/mpeg/pspmpeg.h	(working copy)
 @@ -92,6 +92,20 @@
  
  } SceMpegAvcMode;
@@ -244,10 +223,10 @@ Index: src/mpeg/pspmpeg.h
  #ifdef __cplusplus
  }
  #endif
-Index: src/net/psphttp.h
+Index: pspsdk/src/net/psphttp.h
 ===================================================================
---- src/net/psphttp.h	(revision 2451)
-+++ src/net/psphttp.h	(working copy)
+--- pspsdk/src/net/psphttp.h	(revision 2451)
++++ pspsdk/src/net/psphttp.h	(working copy)
 @@ -25,6 +25,19 @@
  	
  } PspHttpMethod;
@@ -290,10 +269,10 @@ Index: src/net/psphttp.h
  #if defined(__cplusplus)
  };
  #endif
-Index: src/net/pspnet_adhoc.h
+Index: pspsdk/src/net/pspnet_adhoc.h
 ===================================================================
---- src/net/pspnet_adhoc.h	(revision 2451)
-+++ src/net/pspnet_adhoc.h	(working copy)
+--- pspsdk/src/net/pspnet_adhoc.h	(revision 2451)
++++ pspsdk/src/net/pspnet_adhoc.h	(working copy)
 @@ -33,6 +33,12 @@
   */
  int sceNetAdhocTerm(void);
@@ -307,10 +286,10 @@ Index: src/net/pspnet_adhoc.h
  /**
   * Create a PDP object.
   *
-Index: src/net/pspnet_inet.h
+Index: pspsdk/src/net/pspnet_inet.h
 ===================================================================
---- src/net/pspnet_inet.h	(revision 2451)
-+++ src/net/pspnet_inet.h	(working copy)
+--- pspsdk/src/net/pspnet_inet.h	(revision 2451)
++++ pspsdk/src/net/pspnet_inet.h	(working copy)
 @@ -40,6 +40,17 @@
  int sceNetInetGetErrno(void);
  #endif /* DOXYGEN */

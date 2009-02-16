@@ -1,0 +1,61 @@
+Index: psplinkusb/usbgdb/main.c
+===================================================================
+--- psplinkusb/usbgdb/main.c	(revision 2451)
++++ psplinkusb/usbgdb/main.c	(working copy)
+@@ -11,6 +11,7 @@
+  * $Id$
+  */
+ #include <pspkernel.h>
++#include <pspsysmem_kernel.h>
+ #include <pspdebug.h>
+ #include <pspkdebug.h>
+ #include <pspsdk.h>
+@@ -34,12 +35,15 @@
+ DebugEventHandler g_handler;
+ struct GdbContext g_context;
+ SceUID g_thid = -1;
++unsigned int userbase = 0x08800000;
++unsigned int usertop =  0x0A000000;
+ 
+ int initialise(SceSize args, void *argp)
+ {
+ 	int len;
+ 	int fd;
+ 	Elf32_Ehdr hdr;
++	PspSysmemPartitionInfo info;
+ 
+ 	memset(&g_context, 0, sizeof(g_context));
+ 	if(argp == NULL)
+@@ -58,6 +62,14 @@
+ 	g_context.argp = argp;
+ 	g_context.args = args;
+ 
++	memset(&info, 0, sizeof(info));
++	info.size = sizeof(info);
++	if(sceKernelQueryMemoryPartitionInfo(2, &info) == 0)
++	{
++		userbase = info.startaddr;
++		usertop = info.startaddr + info.memsize;
++	}
++
+ 	fd = sceIoOpen((char*) argp, PSP_O_RDONLY, 0777);
+ 	if(fd < 0)
+ 	{
+@@ -125,7 +137,7 @@
+ 	nibble = addr >> 28;
+ 	addr &= 0x0FFFFFFF;
+ 
+-	if((addr >= 0x08800000) && (addr < 0x0A000000))
++	if((addr >= userbase) && (addr < usertop))
+ 	{
+ 		if((nibble == 0) || (nibble == 4) || (nibble == 8) || (nibble == 10))
+ 		{
+@@ -160,7 +172,7 @@
+ 	nibble = addr >> 28;
+ 	addr &= 0x0FFFFFFF;
+ 
+-	if((addr >= 0x08800000) && (addr < 0x0A000000))
++	if((addr >= userbase) && (addr < usertop))
+ 	{
+ 		if((nibble == 0) || (nibble == 4) || (nibble == 8) || (nibble == 10))
+ 		{
