@@ -13,7 +13,7 @@ SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 # gcc deps versions
 ZLIB_VER=1.2.3
 GMP_VER=4.2.4
-MPFR_VER=2.3.2
+MPFR_VER=2.4.0
 
 # sdk versions
 BINUTILS_VER=2.16.1
@@ -256,9 +256,9 @@ function bootstrapSDK {
 	if [ ! -d pspsdk ]
 	then
 		svnGetPS2DEV pspsdk
-		patch -p1 -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
-		patch -p1 -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
-		patch -p1 -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
+		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
 	else
 		svnGetPS2DEV pspsdk
 	fi
@@ -649,7 +649,7 @@ export PATH=$PATH:$TOOLPATH/bin
 # build sdk
 #---------------------------------------------------------------------------------
 #buildBinutils
-buildXGCC
+#buildXGCC
 bootstrapSDK
 buildNewlib
 buildGCC
