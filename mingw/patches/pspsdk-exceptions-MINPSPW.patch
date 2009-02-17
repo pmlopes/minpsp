@@ -1,0 +1,92 @@
+Index: pspsdk/src/samples/Makefile.am
+===================================================================
+--- pspsdk/src/samples/Makefile.am	(revision 2451)
++++ pspsdk/src/samples/Makefile.am	(working copy)
+@@ -82,7 +82,8 @@
+ 	utility/osk \
+ 	me/basic \
+ 	wlan \
+-	obj-c
++	obj-c \
++	exceptions
+ 
+ all:
+ 
+Index: pspsdk/src/samples/exceptions/main.cpp
+===================================================================
+--- pspsdk/src/samples/exceptions/main.cpp	(revision 0)
++++ pspsdk/src/samples/exceptions/main.cpp	(revision 0)
+@@ -0,0 +1,50 @@
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspctrl.h>
++
++/* Define printf, just to make typing easier */
++#define printf  pspDebugScreenPrintf
++
++/* Define the module info section */
++PSP_MODULE_INFO("cppException", 0, 1, 1);
++
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++
++#include <exception>
++using namespace std;
++
++class myexception: public exception
++{
++	virtual const char* what() const throw()
++	{
++		return "My exception happened";
++	}
++} myex;
++
++int main (void)
++{
++	pspDebugScreenInit();
++	SceCtrlData pad;
++	
++	try
++	{
++		throw myex;
++	}
++	catch (exception& e)
++	{
++		printf("%s\n", e.what());
++	}
++	
++	printf("\nPress X to quit.\n");
++
++	for (;;)
++	{
++		sceCtrlReadBufferPositive(&pad, 1);
++		if (pad.Buttons & PSP_CTRL_CROSS)
++			break;
++	}
++	sceKernelExitGame();
++
++	return 0;
++}
+Index: pspsdk/src/samples/exceptions/Makefile.sample
+===================================================================
+--- pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
++++ pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
+@@ -0,0 +1,18 @@
++TARGET = CppException
++OBJS = main.o
++LIBS = -lstdc++
++
++INCDIR =
++CFLAGS = -G0 -Wall -O2
++CXXFLAGS = $(CFLAGS) -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = C++ Exception Sample
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak
++

@@ -225,6 +225,7 @@ function buildXGCC {
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
+		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VER-exceptions-MINPSPW.patch || die "patching gcc (exceptions)"
 		cd ..
 	fi
 
@@ -239,6 +240,7 @@ function buildXGCC {
 			--with-newlib \
 			--disable-shared \
 			--disable-nls \
+			--enable-threads=psp \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
@@ -255,6 +257,7 @@ function bootstrapSDK {
 	then
 		svnGetPS2DEV pspsdk
 		patch -p1 -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
+		patch -p1 -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
 		patch -p1 -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
 	else
 		svnGetPS2DEV pspsdk
@@ -645,7 +648,7 @@ export PATH=$PATH:$TOOLPATH/bin
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-buildBinutils
+#buildBinutils
 buildXGCC
 bootstrapSDK
 buildNewlib
@@ -674,4 +677,4 @@ prepareDistro
 buildBaseDevpaks
 
 echo
-echo "Run the devpak script to add DEVPAKs to the Full SDK"
+echo "Run the NSIS script to build the Installer"

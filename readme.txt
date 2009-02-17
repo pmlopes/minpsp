@@ -23,14 +23,13 @@ Portable handheld videogame system.
 ===============================================================================
  TODO
 ===============================================================================
-0.9
-* Patched SDK for missing functions (only declared on the ASM side)
+0.10 Still to decide....
 
 
 ===============================================================================
  Changelog
 ===============================================================================
-0.8.12
+0.9.2
 * Newlib 1.17.0
   * new C99 wide-char function additions
   * movement of regex functions from sys/linux directory into
@@ -40,6 +39,11 @@ Portable handheld videogame system.
     sprintf/sscanf family of functions
   * numerous warning cleanups
   * various bug fixes
+* Patched SDK for missing functions (only declared on the ASM side)
+* GDB works with the Slim (wasn't reading the correct memory address if the
+  variables where above 0x0A000000
+* Added threading support to GCC, which will improve Objective-C and enable
+  exception handling on C++
 
 0.8.11
 * GMP updated to 4.2.4

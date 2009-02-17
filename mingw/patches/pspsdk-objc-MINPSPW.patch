@@ -1,6 +1,6 @@
 Index: pspsdk/src/base/build.mak
 ===================================================================
---- pspsdk/src/base/build.mak	(revision 2432)
+--- pspsdk/src/base/build.mak	(revision 2451)
 +++ pspsdk/src/base/build.mak	(working copy)
 @@ -45,6 +45,11 @@
  CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
@@ -14,19 +14,22 @@ Index: pspsdk/src/base/build.mak
  ifeq ($(BUILD_PRX),1)
  LDFLAGS  := $(addprefix -L,$(LIBDIR)) -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx $(LDFLAGS)
  EXTRA_CLEAN += $(TARGET).elf
-@@ -198,6 +203,9 @@
+@@ -198,6 +203,12 @@
  %.c: %.exp
  	psp-build-exports -b $< > $@
  
 +%.o: %.m
 +	$(CC) $(CFLAGS) -c -o $@ $<
 +
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
  clean: 
  	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
  
 Index: pspsdk/src/base/build_prx.mak
 ===================================================================
---- pspsdk/src/base/build_prx.mak	(revision 2432)
+--- pspsdk/src/base/build_prx.mak	(revision 2451)
 +++ pspsdk/src/base/build_prx.mak	(working copy)
 @@ -37,6 +37,11 @@
  
@@ -40,19 +43,22 @@ Index: pspsdk/src/base/build_prx.mak
  # Library selection.  By default we link with Newlib's libc.  Allow the
  # user to link with PSPSDK's libc if USE_PSPSDK_LIBC is set to 1.
  
-@@ -80,6 +85,9 @@
+@@ -80,6 +85,12 @@
  %.c: %.exp
  	psp-build-exports -b $< > $@
  
 +%.o: %.m
 +	$(CC) $(CFLAGS) -c -o $@ $<
 +
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
  clean: $(EXTRA_CLEAN)
  	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
  
 Index: pspsdk/src/samples/Makefile.am
 ===================================================================
---- pspsdk/src/samples/Makefile.am	(revision 2432)
+--- pspsdk/src/samples/Makefile.am	(revision 2451)
 +++ pspsdk/src/samples/Makefile.am	(working copy)
 @@ -81,7 +81,8 @@
  	utility/systemparam \
