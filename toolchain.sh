@@ -13,7 +13,8 @@ SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 # gcc deps versions
 ZLIB_VER=1.2.3
 GMP_VER=4.2.4
-MPFR_VER=2.4.0
+MPFR_VER=2.3.2
+PPL_VER=0.10
 
 # sdk versions
 BINUTILS_VER=2.16.1
@@ -30,7 +31,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.1
+PSPSDK_VERSION=0.9.2
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -51,12 +52,14 @@ function checkTool {
 	fi
 }
 
-# Gets the sources from the PS2DEV SVN reppo, on failure tries to fallback to JimParis mirror
+# Gets the sources from the PS2DEV SVN reppo,
+# if it fails again use a local backup
+# on failure tries to fallback to JimParis mirror,
 #arg1 devpak
 function svnGetPS2DEV() {
 	if [ ! -d $(basename $1) ]
 	then
-		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
+		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../ps2dev/psp/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
 	else
 		svn update $2 $3 $(basename $1)
 	fi
@@ -88,6 +91,9 @@ function downloadHTTP {
 
 }
 
+# arg1 base
+# arg2 file
+# arg3 url
 function downloadFTP {
 	if [ ! -f $1/$2 ]
 	then
@@ -138,7 +144,7 @@ function installGMP {
 		tar -xjf $GMP || die "extracting "$GMP
 
 		cd "gmp-"$GMP_VER
-		./configure --prefix=/usr/local || die "configuring "$GMP
+		./configure --prefix=/usr/local --enable-cxx || die "configuring "$GMP
 		make || die "building "$GMP
 		make check || die "checking "$GMP
 		make install || die "installing "$GMP
@@ -225,7 +231,7 @@ function buildXGCC {
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
-		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VER-exceptions-MINPSPW.patch || die "patching gcc (exceptions)"
+		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VER-exceptions-MINPSPW.patch || die "patching gcc (locks)"
 		cd ..
 	fi
 
@@ -241,6 +247,7 @@ function buildXGCC {
 			--disable-shared \
 			--disable-nls \
 			--enable-threads=psp \
+			--disable-tls \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
@@ -648,8 +655,8 @@ export PATH=$PATH:$TOOLPATH/bin
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-#buildBinutils
-#buildXGCC
+buildBinutils
+buildXGCC
 bootstrapSDK
 buildNewlib
 buildGCC
