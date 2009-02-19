@@ -1,6 +1,6 @@
 Index: pspsdk/src/samples/Makefile.am
 ===================================================================
---- pspsdk/src/samples/Makefile.am	(revision 2451)
+--- pspsdk/src/samples/Makefile.am	(working copy)
 +++ pspsdk/src/samples/Makefile.am	(working copy)
 @@ -82,7 +82,8 @@
  	utility/osk \
@@ -78,7 +78,7 @@ Index: pspsdk/src/samples/exceptions/Makefile.sample
 +
 +INCDIR =
 +CFLAGS = -G0 -Wall -O2
-+CXXFLAGS = $(CFLAGS) -fno-rtti
++CXXFLAGS = $(CFLAGS) -fno-rtti -fexceptions
 +ASFLAGS = $(CFLAGS)
 +
 +LIBDIR =
