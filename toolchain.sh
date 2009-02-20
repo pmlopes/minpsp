@@ -231,7 +231,6 @@ function buildXGCC {
 		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
 		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
 		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
-		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_VER-exceptions-MINPSPW.patch || die "patching gcc (locks)"
 		cd ..
 	fi
 
@@ -246,8 +245,6 @@ function buildXGCC {
 			--with-newlib \
 			--disable-shared \
 			--disable-nls \
-			--enable-threads=psp \
-			--disable-tls \
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
