@@ -34,19 +34,23 @@ Index: libpspirkeybprx/Makefile
  	rm -f $(PSPSDK)/lib/libpspirkeybprx.a
 Index: Makefile
 ===================================================================
---- Makefile	(revision 2366)
+--- Makefile	(revision 2452)
 +++ Makefile	(working copy)
-@@ -30,11 +30,11 @@
+@@ -32,13 +32,13 @@
  
  install: all
  	$(MAKE) -C libpspirkeyb install
 -	mkdir -p $(PSPSDK)/samples/irkeyb
--	cp -r libpspirkeyb/keymap $(PSPSDK)/samples/irkeyb
+-	mkdir -p $(PSPSDK)/samples/irkeyb/keymap
+-	cp libpspirkeyb/keymap/*.ini $(PSPSDK)/samples/irkeyb/keymap
+-	cp libpspirkeyb/keymap/README.txt $(PSPSDK)/samples/irkeyb/keymap
 -	cp libpspirkeyb/config/pspirkeyb.ini $(PSPSDK)/samples/irkeyb
 -	cp asciidemo/main.c $(PSPSDK)/samples/irkeyb
 -	cp asciidemo/Makefile.sdk $(PSPSDK)/samples/irkeyb/Makefile
 +	mkdir -p ../target/psp/sdk/samples/irkeyb
-+	cp -r libpspirkeyb/keymap ../target/psp/sdk/samples/irkeyb
++	mkdir -p ../target/psp/sdk/samples/irkeyb/keymap
++	cp libpspirkeyb/keymap/*.ini ../target/psp/sdk/samples/irkeyb/keymap
++	cp libpspirkeyb/keymap/README.txt ../target/psp/sdk/samples/irkeyb/keymap
 +	cp libpspirkeyb/config/pspirkeyb.ini ../target/psp/sdk/samples/irkeyb
 +	cp asciidemo/main.c ../target/psp/sdk/samples/irkeyb
 +	cp asciidemo/Makefile.sdk ../target/psp/sdk/samples/irkeyb/Makefile
@@ -71,3 +75,53 @@ Index: pspirkeybprx/Makefile
  
  uninstall:
  	rm -f $(PSPSDK)/lib/libpspirkeyb.a
+Index: asciidemo/main.c
+===================================================================
+--- asciidemo/main.c	(revision 2452)
++++ asciidemo/main.c	(working copy)
+@@ -9,7 +9,6 @@
+ #include <pspkernel.h>
+ #include <pspdebug.h>
+ #include <pspctrl.h>
+-#include <kubridge.h>
+ 
+ #include <pspirkeyb.h>
+ #include <pspirkeyb_rawkeys.h>
+Index: asciidemo/Makefile
+===================================================================
+--- asciidemo/Makefile	(revision 2452)
++++ asciidemo/Makefile	(working copy)
+@@ -9,7 +9,7 @@
+ LIBDIR = $(PSPDEV)/SDK/lib ../libpspirkeyb
+ LDFLAGS =
+ 
+-LIBS = -lpspkubridge -lpspirkeyb -lpsppower
++LIBS = -lpspirkeyb -lpsppower
+ 
+ BUILD_PRX = 1
+ PSP_FW_VERSION = 401
+Index: asciidemoprx/main.c
+===================================================================
+--- asciidemoprx/main.c	(revision 2452)
++++ asciidemoprx/main.c	(working copy)
+@@ -13,7 +13,6 @@
+ #include <pspctrl.h>
+ #include <pspdebug.h>
+ #include <psppower.h>
+-#include <kubridge.h>
+ 
+ #include <stdio.h>
+ #include <string.h>
+Index: asciidemoprx/Makefile
+===================================================================
+--- asciidemoprx/Makefile	(revision 2452)
++++ asciidemoprx/Makefile	(working copy)
+@@ -9,7 +9,7 @@
+ LIBDIR = $(PSPDEV)/SDK/lib ../libpspirkeybprx
+ LDFLAGS =
+ 
+-LIBS = -lpspkubridge -lpspirkeybprx -lpsppower
++LIBS = -lpspirkeybprx -lpsppower
+ 
+ BUILD_PRX = 1
+ PSP_FW_VERSION = 401
