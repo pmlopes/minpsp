@@ -124,21 +124,28 @@ Section "Basic Devpaks" SEC0004
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" zziplib 0.13.38
 SectionEnd
 
-Section /o "Visual Studio Support" SEC0005
+Section "Eclipse CDT 5.0+ Support" SEC0005
+    SetOutPath $INSTDIR
+    SetOverwrite on
+    File /r ${SDKDIR}\eclipse\*
+    WriteRegStr HKLM "${REGKEY}\Components" "Eclipse CDT 5.0+ Support" 1
+SectionEnd
+
+Section /o "Visual Studio Support" SEC0006
     SetOutPath $INSTDIR
     SetOverwrite on
     File /r ${SDKDIR}\vstudio\*
     WriteRegStr HKLM "${REGKEY}\Components" "Visual Studio Support" 1
 SectionEnd
 
-Section /o "Man/Info pages" SEC0006
+Section /o "Man/Info pages" SEC0007
     SetOutPath $INSTDIR
     SetOverwrite on
     File /r ${SDKDIR}\documentation\man_info\*
     WriteRegStr HKLM "${REGKEY}\Components" "Man/Info pages" 1
 SectionEnd
 
-Section -post SEC0007
+Section -post SEC0008
     WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
     SetOutPath $INSTDIR
 
@@ -173,12 +180,16 @@ done${UNSECTION_ID}:
 !macroend
 
 # Uninstaller sections
-Section /o "-un.Man/Info pages" UNSEC0006
+Section /o "-un.Man/Info pages" UNSEC0007
     DeleteRegValue HKLM "${REGKEY}\Components" "Man/Info pages"
 SectionEnd
 
-Section /o "-un.Visual Studio Support" UNSEC0005
+Section /o "-un.Visual Studio Support" UNSEC0006
     DeleteRegValue HKLM "${REGKEY}\Components" "Visual Studio Support"
+SectionEnd
+
+Section /o "-un.Visual Studio Support" UNSEC0005
+    DeleteRegValue HKLM "${REGKEY}\Components" "Eclipse CDT 5.0+ Support"
 SectionEnd
 
 Section /o "-un.Basic Devpaks" UNSEC0004
@@ -209,7 +220,7 @@ Section /o "-un.PSP DevKit" UNSEC0000
     DeleteRegValue HKLM "${REGKEY}\Components" "PSP DevKit"
 SectionEnd
 
-Section -un.post UNSEC0007
+Section -un.post UNSEC0008
     DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Readme ${VERSION}.lnk"
 	Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\PSPSDK API.lnk"
@@ -239,8 +250,9 @@ Function un.onInit
     !insertmacro SELECT_UNSECTION "PSP link" ${UNSEC0002}
     !insertmacro SELECT_UNSECTION "HTML Documentation" ${UNSEC0003}
 	!insertmacro SELECT_UNSECTION "Basic Devpaks" ${UNSEC0004}
-	!insertmacro SELECT_UNSECTION "Visual Studio Support" ${UNSEC0005}
-	!insertmacro SELECT_UNSECTION "Man/Info pages" ${UNSEC0006}
+	!insertmacro SELECT_UNSECTION "Eclipse CDT 5.0+ Support" ${UNSEC0005}
+	!insertmacro SELECT_UNSECTION "Visual Studio Support" ${UNSEC0006}
+	!insertmacro SELECT_UNSECTION "Man/Info pages" ${UNSEC0007}
 FunctionEnd
 
 # Section Descriptions
@@ -250,6 +262,7 @@ FunctionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0002} "Utilities for debugging"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0003} "HTML Documentation for the SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "zlib bzip2 freetype jpeg libbulletml libmad libmikmod libogg libpng libpspvram libTremor libvorbis lua pspgl pspirkeyb sqlite SDL SDL_gfx SDL_image SDL_mixer SDL_ttf smpeg-psp zziplib"
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0006} "Only needed if you want the Compiler Man pages, man readed included"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds gcc.exe to the PATH so Eclipse CDT 5.0+ can auto configure itself"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0006} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0007} "Only needed if you want the Compiler Man pages, man readed included"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

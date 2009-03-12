@@ -31,7 +31,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.2
+PSPSDK_VERSION=0.9.3
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
@@ -238,14 +238,14 @@ function buildXGCC {
 	cd psp/build/$GCC_SRCDIR
 	
 	../../$GCC_SRCDIR/configure \
-			--enable-languages="c,c++,objc,obj-c++" \
-			--disable-win32-registry \
-			--enable-cxx-flags="-G0" \
-			--target=psp \
-			--with-newlib \
-			--disable-shared \
-			--disable-nls \
 			--prefix=$INSTALLDIR \
+			--target=psp \
+			--enable-languages="c" \
+			--with-newlib \
+			--without-headers \
+			--disable-libssp \
+			--disable-win32-registry \
+			--disable-nls \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gcc"
 	
@@ -275,6 +275,7 @@ function bootstrapSDK {
 	cd build/pspsdk
 	
 	../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
+	make clean
 	make install-data || die "installing pspsdk headers"
 	cd ../../..
 }
@@ -302,21 +303,37 @@ function buildNewlib {
 			--prefix=$INSTALLDIR \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring newlib"
+	
+	make clean
 	make LDFLAGS="-s" || die "building newlib"
 	make install || die "installing newlib"
 	cd ../../..
 }
 
 function buildGCC {
-	
+
 	cd psp/build/"gcc-"$GCC_VER
-	make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final compiler"
-	make install || die "installing final compiler"
+
+	../../$GCC_SRCDIR/configure \
+			--prefix=$INSTALLDIR \
+			--target=psp \
+			--enable-languages="c,c++,objc,obj-c++" \
+			--enable-cxx-flags="-G0" \
+			--with-newlib \
+			--disable-win32-registry \
+			--disable-nls \
+			--with-gmp=/usr/local \
+			--with-mpfr=/usr/local || die "configuring gcc"
+	
+	make clean
+	make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+	make install || die "installing final gcc collection"
 	cd ../../..
 }
 
 function buildSDK {
 	cd psp/build/pspsdk
+	make clean
 	make LDFLAGS="-s" || die "building pspsdk"
 	make install || die "installing pspsdk"
 	cd ../../..
@@ -345,10 +362,12 @@ function buildGDB {
 	
 	../../$GDB_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
-			--disable-nls \
 			--target=psp \
+			--disable-nls \
 			--with-gmp=/usr/local \
 			--with-mpfr=/usr/local || die "configuring gdb"
+
+	make clean
 	make LDFLAGS="-s" || die "building gdb"
 	make install || die "installing gdb"
 	cd ../../..
@@ -523,6 +542,7 @@ function prepareDistro {
 	[ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
 
 	mkdir -p $INSTALLERDIR/base
+	mkdir -p $INSTALLERDIR/eclipse/bin
 	mkdir -p $INSTALLERDIR/vstudio/bin
 	mkdir -p $INSTALLERDIR/psplink/bin
 	mkdir -p $INSTALLERDIR/documentation/pspdoc
@@ -530,6 +550,9 @@ function prepareDistro {
 	mkdir -p $INSTALLERDIR/samples/psp/sdk
 	# clone the base installation
 	cp -fR $INSTALLDIR/* $INSTALLERDIR/base
+	# copy eclipse tools
+	cp $INSTALLERDIR/base/bin/psp-gcc.exe $INSTALLERDIR/eclipse/bin/gcc.exe
+	cp $INSTALLERDIR/base/bin/psp-g++.exe $INSTALLERDIR/eclipse/bin/g++.exe
 	# copy visual studio tools
 	mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
 	mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
