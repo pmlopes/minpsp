@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
 LIBNAME=SDL_ttf
@@ -10,7 +10,7 @@ cleanUp $LIBNAME $VERSION
 
 cd $LIBNAME
 
-./autogen.sh
+sh autogen.sh
 AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --with-freetype-prefix=$(psp-config --pspdev-path) --without-x || { exit 1; }
 
 make || { echo "Error building $LIBNAME"; exit 1; }

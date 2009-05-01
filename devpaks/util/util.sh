@@ -122,7 +122,7 @@ function makeInstaller {
 
 	if [ ! "$9" == "" ]
 	then
-		addDep $9 $10 $NIXINSTALLER
+		addDep $9 ${10} $NIXINSTALLER
 	fi
 	
 	echo "	cat <<EOF"																			>> $NIXINSTALLER
