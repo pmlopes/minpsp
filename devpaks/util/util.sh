@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PS2DEVSVN_URL="svn://svn.pspdev.org/psp/trunk"
 PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
@@ -9,7 +9,7 @@ PSPWARESVN_MIRROR="http://psp.jim.sh/svn/pspware/trunk"
 #arg1 devpak
 #arg2 svn url
 #arg3 svn module
-function svnGet() {
+function svnGet {
 	if [ ! -d $1 ]
 	then
 		svn checkout $2 $3 || { echo "ERROR GETTING "$1; exit 1; }
@@ -24,10 +24,10 @@ function svnGet() {
 
 # Gets the sources from the PS2DEV SVN reppo, on failure tries to fallback to JimParis mirror
 #arg1 devpak
-function svnGetPS2DEV() {
+function svnGetPS2DEV {
 	if [ ! -d $1 ]
 	then
-		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../../ps2dev/psp/$1 $(basename $1) || svn checkout $2 $3 $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
+		cp -fR ../../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $2 $3 $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
 		if [ -f $1.patch ]
 		then
 			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
@@ -39,7 +39,7 @@ function svnGetPS2DEV() {
 
 # Gets the sources from the PS2DEV pspware SVN reppo, on failure tries to fallback to JimParis mirror
 #arg1 devpak
-function svnGetPSPWARE() {
+function svnGetPSPWARE {
 	if [ ! -d $1 ]
 	then
 		svn checkout $PSPWARESVN_URL/$1 || svn checkout $PSPWARESVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
@@ -64,9 +64,9 @@ function downloadHTTP {
 #arg1 dep
 #arg2 version
 #arg3 file.bin
-function addDep() {
+function addDep {
 	echo "	dep=\$(grep $1-$2 \$SDKPATH/psp/sdk/devpaks)"			>> $3
-	echo "	if [ ! \"\$dep\" == \"\" ]; then"						>> $3
+	echo "	if [ \"\$dep\" == \"\" ]; then"							>> $3
 	echo "		echo \"\""											>> $3
 	echo "		echo \"ERROR: Please install $1 ($2) first.\""		>> $3
 	echo "		exit 1"												>> $3
@@ -75,7 +75,7 @@ function addDep() {
 
 #arg1 libname
 #arg2 version
-function cleanUp() {
+function cleanUp {
 	rm -Rf target
 	rm -f $1-$2-install.bin $1-$2-install.sh $1-$2.tar.bz2
 	cd $1
@@ -85,9 +85,9 @@ function cleanUp() {
 
 #arg1 libname
 #arg1 version
-function makeInstaller() {
+function makeInstaller {
 	NIXINSTALLER=$1-$2-install.bin
-	echo "#!/bin/sh"																			> $NIXINSTALLER
+	echo "#!/bin/bash"																			> $NIXINSTALLER
 	echo "LINES=@@_LINES@@"																		>> $NIXINSTALLER
 	echo "trap 'rm -f /tmp/$1-$2.tar.bz2; exit 1' HUP INT QUIT TERM" 							>> $NIXINSTALLER
 	echo "SDKPATH=\$(psp-config --pspdev-path)"													>> $NIXINSTALLER

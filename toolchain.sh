@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #---------------------------------------------------------------------------------
 # configuration
@@ -36,6 +36,21 @@ PSPSDK_VERSION=0.9.3
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
 
+# ubuntu configs
+DEBIAN_BUILD=1
+INSTALLDIR="/usr/local/pspsdk"
+
+if [ "$DEBIAN_BUILD" == "1" ]; then
+	GMP_LIB=/usr
+	MPFR_LIB=/usr
+else
+	GMP_LIB=/usr/local
+	MPFR_LIB=/usr/local
+fi
+
+# testing
+DISABLE_SVN=1
+
 #---------------------------------------------------------------------------------
 # functions
 #---------------------------------------------------------------------------------
@@ -56,10 +71,14 @@ function checkTool {
 # if it fails again use a local backup
 # on failure tries to fallback to JimParis mirror,
 #arg1 devpak
-function svnGetPS2DEV() {
+function svnGetPS2DEV {
 	if [ ! -d $(basename $1) ]
 	then
-		svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../ps2dev/psp/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
+		if [ "$DISABLE_SVN" == "1" ]; then
+			cp -fR ../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
+		else
+			svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
+		fi
 	else
 		svn update $2 $3 $(basename $1)
 	fi
@@ -108,7 +127,7 @@ function downloadFTP {
 #arg2 devpak folder number
 #arg3 devpak
 #arg4 installer path
-function buildAndInstallDevPak() {
+function buildAndInstallDevPak {
 	cd $1 || exit 1
 	cd $2_$3 || exit 1
 	./devpak.sh || exit 1
@@ -162,7 +181,7 @@ function installMPFR {
 		tar -xjf $MPFR || die "extracting "$MPFR
 
 		cd "mpfr-"$MPFR_VER
-		./configure --prefix=/usr/local --with-gmp=/usr/local || die "configuring "$MPFR
+		./configure --prefix=/usr/local --with-gmp=$GMP_LIB || die "configuring "$MPFR
 		make || die "building "$MPFR
 		make check || die "checking "$MPFR
 		make install || die "installing "$MPFR
@@ -200,11 +219,11 @@ function buildBinutils {
 			--target=psp \
 			--enable-install-libbfd \
 			--disable-nls \
-			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring binutils"
+			--with-gmp=$GMP_LIB \
+			--with-mpfr=$MPFR_LIB || die "configuring binutils"
 
 	make clean
-	make LDFLAGS="-s" || die "Error building binutils"
+	make CFLAGS="-g" LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
 }
@@ -246,11 +265,15 @@ function buildXGCC {
 			--disable-libssp \
 			--disable-win32-registry \
 			--disable-nls \
-			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring gcc"
+			--with-gmp=$GMP_LIB \
+			--with-mpfr=$MPFR_LIB || die "configuring gcc"
 	
 	make clean
-	make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
+	if [ "$DEBIAN_BUILD" == "1" ]; then
+		make LDFLAGS="-s" all-gcc || die "building gcc"
+	else
+		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
+	fi
 	make install-gcc || die "installing gcc"
 	cd ../../..
 }
@@ -259,10 +282,12 @@ function bootstrapSDK {
 	cd psp
 	if [ ! -d pspsdk ]
 	then
-		svnGetPS2DEV pspsdk
-		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
-		patch -p1 -d pspsdk -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
-		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
+#		Disabled for now, for now we'll copy it from the work directory
+#		svnGetPS2DEV pspsdk
+#		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
+#		patch -p1 -d pspsdk -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
+#		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
+		cp -R ../work/pspsdk .
 	else
 		svnGetPS2DEV pspsdk
 	fi
@@ -301,8 +326,8 @@ function buildNewlib {
 			--target=psp \
 			--disable-nls \
 			--prefix=$INSTALLDIR \
-			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring newlib"
+			--with-gmp=$GMP_LIB \
+			--with-mpfr=$MPFR_LIB || die "configuring newlib"
 	
 	make clean
 	make LDFLAGS="-s" || die "building newlib"
@@ -322,11 +347,15 @@ function buildGCC {
 			--with-newlib \
 			--disable-win32-registry \
 			--disable-nls \
-			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring gcc"
+			--with-gmp=$GMP_LIB \
+			--with-mpfr=$MPFR_LIB || die "configuring gcc"
 	
 	make clean
-	make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+	if [ "$DEBIAN_BUILD" == "1" ]; then
+		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+	else
+		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+	fi
 	make install || die "installing final gcc collection"
 	cd ../../..
 }
@@ -364,8 +393,9 @@ function buildGDB {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--disable-nls \
-			--with-gmp=/usr/local \
-			--with-mpfr=/usr/local || die "configuring gdb"
+			--disable-werror \
+			--with-gmp=$GMP_LIB \
+			--with-mpfr=$MPFR_LIB || die "configuring gdb"
 
 	make clean
 	make LDFLAGS="-s" || die "building gdb"
@@ -423,12 +453,12 @@ function installPSPLinkUSB {
 	if [ ! -d psplinkusb ]
 	then
 		svnGetPS2DEV psplinkusb
-		patch -p1 -d psplinkusb -i ../patches/psplinkusb-MINPSPW.patch || die "patching psplinkusb"
 	else
 		svnGetPS2DEV psplinkusb
 	fi
 
 	
+if [ ! "$DEBIAN_BUILD" == "1" ]; then
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
 	installFile usbhostfs_pc.exe ../mingw/bin bin
@@ -451,11 +481,15 @@ function installPSPLinkUSB {
 	installFile libusb0_x64.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
 	installFile libusb0_x64.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
 	installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
+else
+	cd psplinkusb
+	make -f Makefile.clients install
+	cd ..
+fi
 	
 	cd psplinkusb
 	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"
 	make -f Makefile.psp release || die "building PSPLINKUSB (PSP)"
-	
 	cd release
 
 	mkdir -p $INSTALLDIR/psplink/psp
@@ -467,7 +501,6 @@ function installPSPLinkUSB {
 	installFile LICENSE . psplink
 	installFile psplink_manual.pdf . psplink
 	installFile README . psplink
-	touch install-psplinkusb-psp
 	
 	cd ..
 	
@@ -656,12 +689,14 @@ checkTool python
 #---------------------------------------------------------------------------------
 # pre requisites
 #---------------------------------------------------------------------------------
-mkdir -p deps
 mkdir -p psp/build
 
-installZlib
-installGMP
-installMPFR
+if [ ! "$DEBIAN_BUILD" == "1" ]; then
+	mkdir -p deps
+	installZlib
+	installGMP
+	installMPFR
+fi
 
 downloadPatches
 
@@ -687,21 +722,28 @@ buildGDB
 #---------------------------------------------------------------------------------
 # build tools
 #---------------------------------------------------------------------------------
-installExtraBinaries
+if [ ! "$DEBIAN_BUILD" == "1" ]; then
+	installExtraBinaries
+fi
+
 installPSPLinkUSB
-installMan
-installInfo
 
-#---------------------------------------------------------------------------------
-# patch SDK to run without msys
-#---------------------------------------------------------------------------------
-patchCMD
+if [ ! "$DEBIAN_BUILD" == "1" ]; then
+	installMan
+	installInfo
 
-#---------------------------------------------------------------------------------
-# prepare distro
-#---------------------------------------------------------------------------------
-prepareDistro
-buildBaseDevpaks
+	#---------------------------------------------------------------------------------
+	# patch SDK to run without msys
+	#---------------------------------------------------------------------------------
+	patchCMD
+
+	#---------------------------------------------------------------------------------
+	# prepare distro
+	#---------------------------------------------------------------------------------
+	prepareDistro
+fi
+
+#buildBaseDevpaks
 
 echo
 echo "Run the NSIS script to build the Installer"

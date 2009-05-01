@@ -1,4 +1,6 @@
+#ifdef __WIN32
 #include <windows.h>
+#endif
 
 #include <stdio.h>
 #include <getopt.h>
@@ -18,7 +20,11 @@
 #define DIR_SEP_STR "/"
 
 /* The suffix to the path to strip off, if this is not there then we have an error */
+#ifdef __WIN32
 #define PATH_SUFFIX "/bin/sdl-config.exe"
+#else
+#define PATH_SUFFIX "/bin/sdl-config"
+#endif
 /************************/
 
 enum SDLConfigMode
@@ -59,13 +65,17 @@ int process_args(int argc, char **argv)
 	// this will store the fully-qualified path
 	char psp_config_path[MAX_PATH] = "";
 
+#ifdef __WIN32
 	// fetch the path of the executable
 	if(GetModuleFileName(0, psp_config_path, sizeof(psp_config_path) - 1) == 0)
 	{
 		// fall back
 		strcpy(psp_config_path, argv[0]);
 	}
-	
+#else
+	strcpy(psp_config_path, argv[0]);
+#endif
+
 	ch = getopt_long(argc, argv, "pevclL", arg_opts, NULL);
 	while(ch != -1)
 	{

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
 LIBNAME=freetype
@@ -9,7 +9,11 @@ svnGetPS2DEV $LIBNAME
 cleanUp $LIBNAME $VERSION
 
 cd $LIBNAME
-./autogen.sh
+
+cd builds/unix
+automake --add-missing
+cd ../..
+sh autogen.sh
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -22,13 +26,9 @@ cp docs/reference/*.html $(pwd)/../target/doc/$LIBNAME
 cd ..
 
 mkdir -p target/bin
-cp freetype-config target/bin
-POSTINSTALL="chmod a+x \$SDKPATH/bin/freetype-config"
+gcc -s -o target/bin/freetype-config freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
 
 makeInstaller $LIBNAME $VERSION
-rm target/bin/freetype-config
 
-gcc -o target/bin/freetype-config freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\" || exit 1
-strip -s target/bin/freetype-config.exe
 
 echo "Run the NSIS script now!"

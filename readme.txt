@@ -29,6 +29,13 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.9.4
+* Start to port the project also for Ubuntu (vanilla).
+
+0.9.3
+* Patch the GCC for Windows On Eclipse CDT 5.0.2 bug (to be removed in the next
+  major release).
+
 0.9.2
 * Newlib 1.17.0
   * new C99 wide-char function additions
@@ -294,3 +301,23 @@ make install
 To build run the toolchain script:
 
 ./toolchain.sh
+
+===============================================================================
+ How to build it myself (Ubuntu)?
+===============================================================================
+
+## Install the required packages.
+ sudo apt-get install build-essential autoconf automake bison flex \
+  libncurses5-dev libreadline-dev libusb-dev texinfo libgmp3-dev libmpfr-dev \
+  subversion doxygen graphviz libtool
+
+ ## Build and install the toolchain + sdk.
+ sudo ./toolchain.sh
+
+
+===============================================================================
+ Utils commands
+===============================================================================
+
+awk '{ sub("\r$", ""); print }' dosfile.txt > unixfile.txt
+awk 'sub("$", "\r")' unixfile.txt > dosfile.txt

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
 LIBNAME=libmikmod
