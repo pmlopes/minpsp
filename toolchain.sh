@@ -133,8 +133,11 @@ function buildAndInstallDevPak {
 	./devpak.sh || exit 1
 	cd $(psp-config --pspdev-path) || exit 1
 	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
-	cd $4 || exit 1
-	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+	# skip the installer part
+	if [ "$DEBIAN_BUILD" == "1" ]; then
+		cd $4 || exit 1
+		tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+	fi
 }
 
 function installZlib {
@@ -649,7 +652,6 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
-	gcc -s -o $DEVPAK_TARGET/bin/freetype-config $BASE/003_freetype/freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\" || exit 1
 	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
@@ -664,7 +666,6 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
-	gcc -s -o $DEVPAK_TARGET/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"1.2.9\" $BASE/017_SDL/sdl-config.c || exit 1
 	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
@@ -672,8 +673,12 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
 
-	rm $DEVPAK_TARGET/bin/freetype-config
-	rm $DEVPAK_TARGET/bin/sdl-config
+	if [ ! "$DEBIAN_BUILD" == "1" ]; then
+		rm $DEVPAK_TARGET/bin/freetype-config
+		rm $DEVPAK_TARGET/bin/sdl-config
+		i586-mingw32msvc-gcc -s -o $DEVPAK_TARGET/bin/freetype-config.exe $BASE/003_freetype/freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
+		i586-mingw32msvc-gcc -s -o $DEVPAK_TARGET/bin/sdl-config.exe $BASE/017_SDL/sdl-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
+	fi
 }
 
 #---------------------------------------------------------------------------------
@@ -743,7 +748,7 @@ if [ ! "$DEBIAN_BUILD" == "1" ]; then
 	prepareDistro
 fi
 
-#buildBaseDevpaks
+buildBaseDevpaks
 
 echo
 echo "Run the NSIS script to build the Installer"
