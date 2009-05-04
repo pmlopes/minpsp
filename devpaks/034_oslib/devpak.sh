@@ -1,19 +1,24 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
-LIBNAME=OSlib
+LIBNAME=OSLib
 VERSION=2.10
 
 downloadHTTP http://brunni.dev-fr.org/dl/psp OSLib_210_src.rar
 
 if [ ! -d OSLib_210_src ]
 then
-	../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
+	if [ ! $(uname) == Linux ]; then
+		../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
+	else
+		unrar x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
+	fi
+	patch -p0 -d OSLib_210_src -i ../OSLib.patch || { echo "Error patching OSLib"; exit; }
 fi
 
 cp Doxyfile OSLib_210_src/$LIBNAME
 cd OSLib_210_src/$LIBNAME
-make lib
+make lib || { echo "Failed to build"; exit 1; }
 
 mkdir -p ../../target/psp/include/oslib ../../target/psp/lib ../../target/doc/$LIBNAME
 cp libosl.a ../../target/psp/lib

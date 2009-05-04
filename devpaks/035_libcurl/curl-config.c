@@ -1,4 +1,6 @@
+#ifdef __WIN32
 #include <windows.h>
+#endif
 
 #include <stdio.h>
 #include <getopt.h>
@@ -18,7 +20,11 @@
 #define DIR_SEP_STR "/"
 
 /* The suffix to the path to strip off, if this is not there then we have an error */
+#ifdef __WIN32
 #define PATH_SUFFIX "/bin/curl-config.exe"
+#else
+#define PATH_SUFFIX "/bin/curl-config"
+#endif
 /************************/
 
 enum CURLConfigMode
@@ -68,12 +74,16 @@ int process_args(int argc, char **argv)
 	char psp_config_path[MAX_PATH] = "";
 
 	// fetch the path of the executable
+#ifdef __WIN32
 	if(GetModuleFileName(0, psp_config_path, sizeof(psp_config_path) - 1) == 0)
 	{
 		// fall back
 		strcpy(psp_config_path, argv[0]);
 	}
-	
+#else
+	strcpy(psp_config_path, argv[0]);
+#endif
+
 	ch = getopt_long(argc, argv, "cCfFPhlpvV", arg_opts, NULL);
 	while(ch != -1)
 	{

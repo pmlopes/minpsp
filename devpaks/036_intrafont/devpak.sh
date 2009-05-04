@@ -1,21 +1,23 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
 LIBNAME=intraFont
-PKG=$LIBNAME\_0.22
-VERSION=0.22
+PKG=$LIBNAME\_0.31
+VERSION=0.31
 
 downloadHTTP http://www.psp-programming.com/benhur $PKG.zip
 
 if [ ! -d $LIBNAME ]
 then
-	../../mingw/bin/unzip -q $PKG.zip
-fi
-
-if [ ! -f $LIBNAME-patched ]
-then
+	mkdir $LIBNAME
+	cd $LIBNAME
+	if [ ! $(uname) == Linux ]; then
+		../../mingw/bin/unzip -q ../$PKG.zip
+	else
+		unzip -q ../$PKG.zip
+	fi
+	cd ..
 	patch -p1 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
-	touch $LIBNAME-patched
 fi
 
 cd $LIBNAME

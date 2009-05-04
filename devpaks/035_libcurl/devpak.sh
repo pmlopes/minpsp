@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 . ../util/util.sh
 
 LIBNAME=libcurl
@@ -18,8 +18,7 @@ cd ..
 
 mkdir -p target/bin
 rm -fR target/psp/bin
-gcc -o target/bin/curl-config curl-config.c || exit 1
-strip -s target/bin/curl-config.exe
+gcc -s -o target/bin/curl-config curl-config.c || { echo "Error building curl-config"; exit 1; }
 
 makeInstaller $LIBNAME $VERSION
 

@@ -164,4 +164,6 @@ function makeInstaller {
 	tar cjvf ../$1-$2.tar.bz2 *
 	cd ..
 	cat $1-$2.tar.bz2 >> $NIXINSTALLER
+	chmod a+x $NIXINSTALLER
 }
+

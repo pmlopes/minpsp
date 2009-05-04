@@ -3,7 +3,7 @@ diff -BruN intraFont.orig/Makefile intraFont/Makefile
 +++ intraFont/Makefile	Thu May 15 16:03:27 2008
 @@ -0,0 +1,17 @@
 +TARGET_LIB = libintraFont.a
-+OBJS = intraFont.o
++OBJS = intraFont.o libccc.o
 +
 +INCDIR = 
 +CFLAGS = -O2 -G0 -Wall
@@ -25,7 +25,7 @@ diff -BruN intraFont.orig/samples/GU/Makefile intraFont/samples/GU/Makefile
 +++ intraFont/samples/GU/Makefile	Thu May 15 16:02:11 2008
 @@ -1,5 +1,5 @@
  TARGET = intraFontTest
--OBJS = fonttest.o ../../intraFont.o
+-OBJS = fonttest.o ../../intraFont.o ../../libccc.o
 +OBJS = fonttest.o
  
  INCDIR =
@@ -44,7 +44,7 @@ diff -BruN intraFont.orig/samples/graphics/Makefile intraFont/samples/graphics/M
 +++ intraFont/samples/graphics/Makefile	Thu May 15 16:01:55 2008
 @@ -1,5 +1,5 @@
  TARGET = intraFontTest
--OBJS = fonttest.o graphics.o framebuffer.o ../../intraFont.o
+-OBJS = fonttest.o graphics.o framebuffer.o ../../libccc.o ../../intraFont.o
 +OBJS = fonttest.o graphics.o framebuffer.o
  
  INCDIR =

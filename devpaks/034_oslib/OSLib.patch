@@ -1,0 +1,22 @@
+diff -Naur OSLib/Special/oslLoadImageFilePNG.c OSLib.new/Special/oslLoadImageFilePNG.c
+--- OSLib/Special/oslLoadImageFilePNG.c	2007-08-04 14:53:27.000000000 +0200
++++ OSLib.new/Special/oslLoadImageFilePNG.c	2009-05-04 18:03:42.000000000 +0200
+@@ -1,7 +1,6 @@
+ #include "../oslib.h"
+ #include "../png.h"
+ #include "../pngconf.h"
+-#include "../zlibinterface.h"
+ #include "../zlib.h"
+ #include "../zconf.h"
+ 
+diff -Naur OSLib/Special/oslWriteImageFilePNG.c OSLib/Special/oslWriteImageFilePNG.c
+--- OSLib/Special/oslWriteImageFilePNG.c	2007-04-10 22:49:05.000000000 +0200
++++ OSLib.new/Special/oslWriteImageFilePNG.c	2009-05-04 18:03:41.000000000 +0200
+@@ -1,7 +1,6 @@
+ #include "../oslib.h"
+ #include "../png.h"
+ #include "../pngconf.h"
+-#include "../zlibinterface.h"
+ #include "../zlib.h"
+ #include "../zconf.h"
+ 
