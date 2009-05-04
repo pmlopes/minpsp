@@ -167,3 +167,7 @@ function makeInstaller {
 	chmod a+x $NIXINSTALLER
 }
 
+#arg1 libname
+function makeNSISInstaller {
+	makensis $1.nsi
+}

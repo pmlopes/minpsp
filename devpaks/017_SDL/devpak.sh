@@ -28,4 +28,11 @@ gcc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"1.2
 
 makeInstaller $LIBNAME $VERSION  pspgl 2264
 
-echo "Run the NSIS script now!"
+mkdir -p target/bin
+rm target/bin/sdl-config
+i586-mingw32msvc-gcc -s -o target/bin/sdl-config.exe sdl-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
+
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

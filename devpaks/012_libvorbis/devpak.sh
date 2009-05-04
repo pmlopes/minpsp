@@ -46,4 +46,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION libogg 1.1.2
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

@@ -22,4 +22,10 @@ gcc -s -o target/bin/curl-config curl-config.c || { echo "Error building curl-co
 
 makeInstaller $LIBNAME $VERSION
 
-echo "Run the NSIS script now!"
+rm target/bin/curl-config
+i586-mingw32msvc-gcc -s -o target/bin/curl-config.exe || { echo "Error building curl-config"; exit 1; }
+
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

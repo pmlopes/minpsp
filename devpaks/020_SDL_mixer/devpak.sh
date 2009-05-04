@@ -23,4 +23,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION libogg 1.1.2 libvorbis 1.1.2 SDL 1.2.9
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

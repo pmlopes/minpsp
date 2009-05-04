@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME intraFont
-!define VERSION 0.22
+!define VERSION 0.31
 !define COMPANY jetcube
 !define URL http://www.jetcube.eu
 

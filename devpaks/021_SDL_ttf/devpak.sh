@@ -23,4 +23,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION freetype 2.1.10 SDL 1.2.9
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

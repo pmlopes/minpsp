@@ -21,4 +21,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION SDL 1.2.9
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

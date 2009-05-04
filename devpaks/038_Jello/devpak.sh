@@ -18,4 +18,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION pspgl 2264
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

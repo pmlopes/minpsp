@@ -26,4 +26,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

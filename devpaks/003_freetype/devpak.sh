@@ -30,5 +30,11 @@ gcc -s -o target/bin/freetype-config freetype-config.c -DPREFIX=\"\" -DEXEC_PREF
 
 makeInstaller $LIBNAME $VERSION
 
+mkdir -p target/bin
+rm target/bin/freetype-config
+i586-mingw32msvc-gcc -s -o target/bin/freetype-config.exe freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

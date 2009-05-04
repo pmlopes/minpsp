@@ -44,4 +44,7 @@ cd ../..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 libmikmod 3.1.11
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+

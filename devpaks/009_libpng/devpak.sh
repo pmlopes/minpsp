@@ -21,4 +21,7 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2
 
-echo "Run the NSIS script now!"
+makeNSISInstaller $LIBNAME
+
+echo "Done!"
+
