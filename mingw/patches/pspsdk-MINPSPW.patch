@@ -1,310 +1,243 @@
-Index: pspsdk/src/atrac3/pspatrac3.h
+Index: pspsdk/src/samples/exceptions/main.cpp
 ===================================================================
---- pspsdk/src/atrac3/pspatrac3.h	(revision 2451)
-+++ pspsdk/src/atrac3/pspatrac3.h	(working copy)
-@@ -18,6 +18,58 @@
- extern "C" {
- #endif
- 
-+/** Identify the CODEC */
-+typedef enum PspAttracCodecTypes {
-+	PSP_ATRAC_AT3PLUS 	= 0x00001000,
-+	PSP_ATRAC_AT3 		= 0x00001001
-+} PspAttracCodecTypes;
+--- pspsdk/src/samples/exceptions/main.cpp	(revision 0)
++++ pspsdk/src/samples/exceptions/main.cpp	(revision 0)
+@@ -0,0 +1,51 @@
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspctrl.h>
 +
-+/** ATRAC3 Error Codes */
-+enum PspAtract3ErrorCodes {
-+	PSP_ATRAC_SUCCESS						= 0,
-+	PSP_ATRAC_ERROR_PARAM_FAIL				= 0x80630001,
-+	PSP_ATRAC_ERROR_API_FAIL				= 0x80630002,
-+	PSP_ATRAC_ERROR_NO_ATRACID				= 0x80630003,
-+	PSP_ATRAC_ERROR_BAD_CODECTYPE			= 0x80630004,
-+	PSP_ATRAC_ERROR_BAD_ATRACID				= 0x80630005,
-+	PSP_ATRAC_ERROR_UNKNOWN_FORMAT			= 0x80630006,
-+	PSP_ATRAC_ERROR_UNMATCH_FORMAT			= 0x80630007,
-+	PSP_ATRAC_ERROR_BAD_DATA				= 0x80630008,
-+	PSP_ATRAC_ERROR_ALLDATA_IS_ONMEMORY		= 0x80630009,
-+	PSP_ATRAC_ERROR_UNSET_DATA				= 0x80630010,
-+	PSPE_ATRAC_ERROR_READSIZE_IS_TOO_SMALL	= 0x80630011,
-+	PSP_ATRAC_ERROR_NEED_SECOND_BUFFER		= 0x80630012,
-+	PSP_ATRAC_ERROR_READSIZE_OVER_BUFFER	= 0x80630013,
-+	PSP_ATRAC_ERROR_NOT_4BYTE_ALIGNMENT		= 0x80630014,
-+	PSP_ATRAC_ERROR_BAD_SAMPLE				= 0x80630015,
-+	PSP_ATRAC_ERROR_WRITEBYTE_FIRST_BUFFER	= 0x80630016,
-+	PSP_ATRAC_ERROR_WRITEBYTE_SECOND_BUFFER	= 0x80630017,
-+	PSP_ATRAC_ERROR_ADD_DATA_IS_TOO_BIG		= 0x80630018,
-+	PSP_ATRAC_ERROR_UNSET_PARAM				= 0x80630021,
-+	PSP_ATRAC_ERROR_NONEED_SECOND_BUFFER	= 0x80630022,
-+	PSP_ATRAC_ERROR_NODATA_IN_BUFFER		= 0x80630023,
-+	PSP_ATRAC_ERROR_ALLDATA_WAS_DECODED		= 0x80630024
-+};
++/* Define printf, just to make typing easier */
++#define printf  pspDebugScreenPrintf
 +
-+/** Remain Frame typical Status */
-+enum PspAtract3RemainFrameStatus {
-+	PSP_ATRAC_ALLDATA_IS_ON_MEMORY				= -1,
-+	PSP_ATRAC_NONLOOP_STREAM_DATA_IS_ON_MEMORY	= -2,
-+	PSP_ATRAC_LOOP_STREAM_DATA_IS_ON_MEMORY		= -3
-+};
++/* Define the module info section */
++PSP_MODULE_INFO("cppException", 0, 1, 1);
 +
-+typedef struct {
-+	SceUChar8 *pucWritePositionFirstBuf;
-+	SceUInt32 uiWritableByteFirstBuf;
-+	SceUInt32 uiMinWriteByteFirstBuf;
-+	SceUInt32 uiReadPositionFirstBuf;
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
 +
-+	SceUChar8 *pucWritePositionSecondBuf;
-+	SceUInt32 uiWritableByteSecondBuf;
-+	SceUInt32 uiMinWriteByteSecondBuf;
-+	SceUInt32 uiReadPositionSecondBuf;
-+} PspBufferInfo;
++#include <exception>
++using namespace std;
 +
- /**
-  * Creates a new Atrac ID from the specified data
-  *
-@@ -132,6 +184,29 @@
-  */
- int sceAtracGetMaxSample(int atracID, int *outMax); 
- 
-+/**
-+ * Gets the Atrac ID
-+ *
-+ * @param codecType - the CODEC type
-+ * 
-+ * @return < 0 on error, otherwise the ID
-+ *
-+ */
-+int sceAtracGetAtracID(int codecType);
++class myexception: public exception
++{
++	virtual const char* what() const throw()
++	{
++		return "My exception happened";
++	}
++} myex;
 +
-+// missing API
-+int sceAtracSetHalfwayBuffer(int atracID, SceUChar8	*pucBufferAddr, SceUInt32 uiReadByte, SceUInt32 uiBufferByte);
-+int sceAtracSetHalfwayBufferAndGetID(SceUChar8 *pucBufferAddr, SceUInt32 uiReadByte, SceUInt32 uiBufferByte);
-+int sceAtracGetSecondBufferInfo(SceInt32 atracID, SceUInt32 *puiPosition, SceUInt32 *puiDataByte);
-+int sceAtracSetSecondBuffer(SceInt32 atracID, SceUChar8 *pucSecondBufferAddr,SceUInt32 uiSecondBufferByte);
-+int sceAtracGetNextDecodePosition(SceInt32 atracID, SceUInt32 *puiSamplePosition);
-+int sceAtracGetSoundSample(SceInt32 atracID, SceInt32 *piEndSample, SceInt32 *piLoopStartSample, SceInt32 *piLoopEndSample);
-+int sceAtracGetChannel(SceInt32 atracID, SceUInt32 *puiChannel);
-+int sceAtracGetLoopStatus(SceInt32 atracID, SceInt32 *piLoopNum, SceUInt32 *puiLoopStatus);
-+int sceAtracGetBufferInfoForReseting(SceInt32 atracID, SceUInt32 uiSample, PspBufferInfo *pBufferInfo);
-+int sceAtracResetPlayPosition(SceInt32 atracID, SceUInt32 uiSample, SceUInt32 uiWriteByteFirstBuf, SceUInt32 uiWriteByteSecondBuf);
-+int sceAtracGetInternalErrorInfo(SceInt32 atracID, SceInt32 *piResult);
++int main (void)
++{
++	pspDebugScreenInit();
++	SceCtrlData pad;
++	
++	try
++	{
++		throw myex;
++	}
++	catch (exception& e)
++	{
++		printf("%s\n", e.what());
++	}
++	
++	printf("\nPress X to quit.\n");
 +
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/display/pspdisplay.h
++	for (;;)
++	{
++		sceCtrlReadBufferPositive(&pad, 1);
++		if (pad.Buttons & PSP_CTRL_CROSS)
++			break;
++	}
++	sceKernelExitGame();
++
++	return 0;
++}
++
+Index: pspsdk/src/samples/exceptions/Makefile.sample
 ===================================================================
---- pspsdk/src/display/pspdisplay.h	(revision 2451)
-+++ pspsdk/src/display/pspdisplay.h	(working copy)
-@@ -122,6 +122,13 @@
-  */
- int sceDisplayWaitVblankCB(void);
- 
-+// Missing API
-+float sceDisplayGetFramePerSec(void);
-+int sceDisplayIsForeground(void);
-+int sceDisplayIsVblank(void);
-+int sceDisplayGetCurrentHcount(void);
-+int sceDisplayGetAccumulatedHcount(void);
+--- pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
++++ pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
+@@ -0,0 +1,18 @@
++TARGET = CppException
++OBJS = main.o
++LIBS = -lstdc++
 +
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/display/pspdisplay_kernel.h
++INCDIR =
++CFLAGS = -G0 -Wall -O2
++CXXFLAGS = $(CFLAGS) -fno-rtti -fexceptions
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = C++ Exception Sample
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak
++
+Index: pspsdk/src/samples/obj-c/main.m
 ===================================================================
---- pspsdk/src/display/pspdisplay_kernel.h	(revision 2451)
-+++ pspsdk/src/display/pspdisplay_kernel.h	(working copy)
-@@ -65,6 +65,13 @@
-  */
- void sceDisplayGetBrightness(int *level,int *unk1);
- 
-+// Missing API
-+float sceDisplayGetFramePerSec(void);
-+int sceDisplayIsForeground(void);
-+int sceDisplayIsVblank(void);
-+int sceDisplayGetCurrentHcount(void);
-+int sceDisplayGetAccumulatedHcount(void);
+--- pspsdk/src/samples/obj-c/main.m	(revision 0)
++++ pspsdk/src/samples/obj-c/main.m	(revision 0)
+@@ -0,0 +1,62 @@
++#include <objc/Object.h>
 +
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/ge/pspge.h
++@interface Greeter:Object
++{
++ /* This is left empty on purpose:
++  ** Normally instance variables would be declared here,
++  ** but these are not used in our example.
++  */
++}
++
++- (void)greet;
++
++@end
++
++
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspctrl.h>
++
++/* Define printf, just to make typing easier */
++#define printf  pspDebugScreenPrintf
++
++@implementation Greeter
++
++- (void)greet
++{
++	printf("Hello, World from Obj-C!\n");
++}
++
++@end
++
++/* Define the module info section */
++PSP_MODULE_INFO("template", 0, 1, 1);
++
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++
++int main(void)
++{
++	/* Non Objective-C code to allow the app to end */
++	pspDebugScreenInit();
++	SceCtrlData pad;
++	
++	/* Objective-C code */
++	id myGreeter;
++	myGreeter=[Greeter new];
++
++	[myGreeter greet];
++	[myGreeter free];
++
++	printf("\nPress X to quit.\n");
++	for (;;)
++	{
++		sceCtrlReadBufferPositive(&pad, 1);
++		if (pad.Buttons & PSP_CTRL_CROSS)
++			break;
++	}
++	sceKernelExitGame();
++	
++	return 0;
++}
++
+Index: pspsdk/src/samples/obj-c/Makefile.sample
 ===================================================================
---- pspsdk/src/ge/pspge.h	(revision 2451)
-+++ pspsdk/src/ge/pspge.h	(working copy)
-@@ -171,6 +171,11 @@
- 	PSP_GE_LIST_CANCEL_DONE
- } PspGeSyncType;
- 
-+/** Drawing queue interruption parameter */
-+typedef struct PspGeBreakParam {
-+	unsigned int	buf[4];
-+} PspGeBreakParam;
+--- pspsdk/src/samples/obj-c/Makefile.sample	(revision 0)
++++ pspsdk/src/samples/obj-c/Makefile.sample	(revision 0)
+@@ -0,0 +1,19 @@
++TARGET = ObjC
++OBJS = main.o
 +
- /**
-   * Wait for syncronisation of a list.
-   *
-@@ -206,6 +211,13 @@
-   */
- int sceGeUnsetCallback(int cbid);
- 
-+// Missing API
-+int sceGeEdramSetAddrTranslation(int width);
-+/** Interrupt drawing queue */
-+int sceGeBreak(int mode, PspGeBreakParam *pParam);
-+/** Restart drawing queue */
-+int sceGeContinue(void);
++USE_OBJC=1
 +
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/kernel/psputilsforkernel.h
++INCDIR =
++CFLAGS = -G0 -Wall -O2
++CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = ObjC Sample
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak
++
+Index: pspsdk/src/samples/Makefile.am
 ===================================================================
---- pspsdk/src/kernel/psputilsforkernel.h	(revision 2451)
-+++ pspsdk/src/kernel/psputilsforkernel.h	(working copy)
-@@ -51,7 +51,7 @@
-  *
-  * @return 0 = not cached, 1 = cache
-  */
--int  sceKernelDcacheProbe(void *addr);
-+int sceKernelDcacheProbe(void *addr);
+--- pspsdk/src/samples/Makefile.am	(revision 2458)
++++ pspsdk/src/samples/Makefile.am	(working copy)
+@@ -81,7 +81,9 @@
+ 	utility/systemparam \
+ 	utility/osk \
+ 	me/basic \
+-	wlan
++	wlan \
++	obj-c \
++	exceptions
  
- /**
-  * Invalidate the entire instruction cache
-@@ -71,8 +71,12 @@
-  *
-  * @return 0 = not cached, 1 = cache
-  */
--int  sceKernelIcacheProbe(const void *addr);
-+int sceKernelIcacheProbe(const void *addr);
+ all:
  
-+// Missing API
-+unsigned char sceKernelGetGPI(void);
-+void sceKernelSetGPO(unsigned char gpo);
-+
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/mpeg/pspmpeg.h
+Index: pspsdk/src/base/build_prx.mak
 ===================================================================
---- pspsdk/src/mpeg/pspmpeg.h	(revision 2451)
-+++ pspsdk/src/mpeg/pspmpeg.h	(working copy)
-@@ -92,6 +92,20 @@
+--- pspsdk/src/base/build_prx.mak	(revision 2458)
++++ pspsdk/src/base/build_prx.mak	(working copy)
+@@ -37,6 +37,11 @@
  
- } SceMpegAvcMode;
+ CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
  
-+typedef struct {
-+	SceInt32	iDecodeResult;
-+	SceUInt32	uiRecoveryPoint;
++# Objective-C selection. All Objective C code must be linked against libobjc.a
++ifeq ($(USE_OBJC),1)
++LIBS     := $(LIBS) -lobjc
++endif
 +
-+	SceUInt32	uiHorizontalSize;
-+	SceUInt32	uiVerticalSize;
-+	SceUInt32	uiFrameCropLeftOffset;
-+	SceUInt32	uiFrameCropRightOffset;
-+	SceUInt32	uiFrameCropTopOffset;
-+	SceUInt32	uiFrameCropBottomOffset;
-+	SceUInt32	uiDisplayFrameNum;
-+} SceMpegAvcDecodeDetailInfo;
-+
-+
- /**
-  * sceMpegInit
-  *
-@@ -337,6 +351,13 @@
-  */
- SceInt32 sceMpegAtracDecode(SceMpeg* Mpeg, SceMpegAu* pAu, ScePVoid pBuffer, SceInt32 iInit);
+ # Library selection.  By default we link with Newlib's libc.  Allow the
+ # user to link with PSPSDK's libc if USE_PSPSDK_LIBC is set to 1.
  
-+// Missing API
-+SceInt32 sceMpegQueryPcmEsSize(SceMpeg *mp, SceInt32 *iEsSize, SceInt32 *iOutSize);
-+SceInt32 sceMpegChangeGetAuMode(SceMpeg *mp, SceMpegStream *pStream, SceMpegAuMode iAuMode);
-+SceInt32 sceMpegGetPcmAu(SceMpeg *mp, SceMpegStream *pStream, SceMpegAu *pAu, SceInt32 *iAttr);
-+SceInt32 sceMpegFlushStream(SceMpeg *mp, SceMpegStream *pStream);
-+SceInt32 sceMpegAvcDecodeDetail(SceMpeg *mp, SceMpegAvcDecodeDetailInfo *pDetail);
+@@ -80,6 +85,12 @@
+ %.c: %.exp
+ 	psp-build-exports -b $< > $@
+ 
++%.o: %.m
++	$(CC) $(CFLAGS) -c -o $@ $<
 +
- #ifdef __cplusplus
- }
- #endif
-Index: pspsdk/src/net/psphttp.h
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
+ clean: $(EXTRA_CLEAN)
+ 	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
+ 
+Index: pspsdk/src/base/build.mak
 ===================================================================
---- pspsdk/src/net/psphttp.h	(revision 2451)
-+++ pspsdk/src/net/psphttp.h	(working copy)
-@@ -25,6 +25,19 @@
- 	
- } PspHttpMethod;
+--- pspsdk/src/base/build.mak	(revision 2458)
++++ pspsdk/src/base/build.mak	(working copy)
+@@ -45,6 +45,11 @@
+ CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
+ CXXFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
  
-+typedef enum {
-+	SCE_HTTP_AUTH_BASIC,
-+	SCE_HTTP_AUTH_DIGEST
-+} PspHttpAuthType;
++# Objective-C selection. All Objective C code must be linked against libobjc.a
++ifeq ($(USE_OBJC),1)
++LIBS     := $(LIBS) -lobjc
++endif
 +
-+typedef int (*PspHttpPasswordCB)(int request, PspHttpAuthType auth_type, const unsigned char *realm, unsigned char *username, unsigned char *password, SceBool need_entity, unsigned char **entity_body, SceSize *entity_size, SceBool *save);
-+
-+/* Memory function types */
-+typedef void *(*PspHttpMallocFunction)(SceSize size);
-+typedef void *(*PspHttpReallocFunction)(void *p, SceSize size);
-+typedef void (*PspHttpFreeFunction)(void *p);
-+
-+
- /**
-  * Init the http library.
-  *
-@@ -319,6 +332,21 @@
- */
- int sceHttpsLoadDefaultCert(int unknown1, int unknown2);
+ ifeq ($(BUILD_PRX),1)
+ LDFLAGS  := $(addprefix -L,$(LIBDIR)) -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx $(LDFLAGS)
+ EXTRA_CLEAN += $(TARGET).elf
+@@ -198,6 +203,12 @@
+ %.c: %.exp
+ 	psp-build-exports -b $< > $@
  
-+// Missing API
-+int	sceHttpSetAuthInfoCB(int id, PspHttpPasswordCB cbfunc);
-+int sceHttpEnableCache(int id);
-+int sceHttpEndCache(void);
-+int sceHttpEnableAuth(int id);
-+int sceHttpInitCache(SceSize max_size);
-+int sceHttpDisableAuth(int id);
-+int	sceHttpSetResHeaderMaxSize(int id, unsigned int header_size);
-+int sceHttpDisableCache(int id);
-+int sceHttpGetNetworkErrno(int request, int *err_num);
-+int	sceHttpGetProxy(int id, int *activate_flag,int *mode, unsigned char *proxy_host, SceSize len, unsigned short *proxy_port);
-+int	sceHttpGetAllHeader(int request, unsigned char **header, unsigned int *header_size);
-+int	sceHttpSetProxy(int id, int activate_flag, int mode, const unsigned char *new_proxy_host, unsigned short new_proxy_port);
-+int sceHttpSetMallocFunction(PspHttpMallocFunction malloc_func, PspHttpFreeFunction free_func, PspHttpReallocFunction realloc_func);
++%.o: %.m
++	$(CC) $(CFLAGS) -c -o $@ $<
 +
- #if defined(__cplusplus)
- };
- #endif
-Index: pspsdk/src/net/pspnet_adhoc.h
-===================================================================
---- pspsdk/src/net/pspnet_adhoc.h	(revision 2451)
-+++ pspsdk/src/net/pspnet_adhoc.h	(working copy)
-@@ -33,6 +33,12 @@
-  */
- int sceNetAdhocTerm(void);
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
+ clean: 
+ 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
  
-+// Missing API
-+//int sceNetAdhocPollSocket( struct SceNetAdhocPollSd *sds, int nsds, unsigned int timeout, int flag );
-+int sceNetAdhocSetSocketAlert(int id, int flag );
-+int sceNetAdhocGetSocketAlert(int id, int *flag );
-+
-+
- /**
-  * Create a PDP object.
-  *
-Index: pspsdk/src/net/pspnet_inet.h
-===================================================================
---- pspsdk/src/net/pspnet_inet.h	(revision 2451)
-+++ pspsdk/src/net/pspnet_inet.h	(working copy)
-@@ -40,6 +40,17 @@
- int sceNetInetGetErrno(void);
- #endif /* DOXYGEN */
- 
-+// Missing API
-+//int	sceNetInetGetpeername (int, struct SceNetInetSockaddr *, SceNetInetSocklen_t *);
-+//int	sceNetInetGetsockname (int, struct SceNetInetSockaddr *, SceNetInetSocklen_t *);
-+//int	sceNetInetPoll (struct SceNetInetPollfd *, SceNetInetNfds_t, int);
-+//int	sceNetInetRecvmsg (int, struct SceNetInetMsghdr *, int);
-+//int	sceNetInetSelect(int nfds, SceNetInetFdSet *readfds, SceNetInetFdSet *writefds, SceNetInetFdSet *exceptfds, struct SceNetInetTimeval *timeout);
-+//int	sceNetInetSendmsg (int, const struct SceNetInetMsghdr *, int);
-+int sceNetInetSocketAbort(int s);
-+int	sceNetInetGetTcpcbstat(int *, void *);
-+int sceNetInetGetUdpcbstat(int *, void *);
-+
- #ifdef __cplusplus
- }
- #endif

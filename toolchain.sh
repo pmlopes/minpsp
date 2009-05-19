@@ -31,14 +31,14 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.3
+PSPSDK_VERSION=0.9.4
 
 INSTALLDIR="/c/pspsdk"
 INSTALLERDIR="/c/pspsdk-installer"
 
 # ubuntu configs
 DEBIAN_BUILD=1
-INSTALLDIR="/usr/local/pspsdk"
+INSTALLDIR="/opt/pspsdk"
 
 if [ "$DEBIAN_BUILD" == "1" ]; then
 	GMP_LIB=/usr
@@ -285,12 +285,8 @@ function bootstrapSDK {
 	cd psp
 	if [ ! -d pspsdk ]
 	then
-#		Disabled for now, for now we'll copy it from the work directory
-#		svnGetPS2DEV pspsdk
-#		patch -p1 -d pspsdk -i ../patches/pspsdk-objc-MINPSPW.patch || die "patching pspsdk (ObjC Support)"
-#		patch -p1 -d pspsdk -i ../patches/pspsdk-exceptions-MINPSPW.patch || die "patching pspsdk (exceptions Support)"
-#		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk (Missing API)"
-		cp -R ../work/pspsdk .
+		svnGetPS2DEV pspsdk
+		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 	else
 		svnGetPS2DEV pspsdk
 	fi
@@ -643,6 +639,18 @@ function prepareDistro {
 	sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup-nodoc.nsi > $INSTALLERDIR/setup-nodoc.nsi
 }
 
+function prepareDistroNIX {
+	# add release notes
+	cp readme.txt $INSTALLDIR/readme.txt
+	
+	# generate doxygen docs
+	cd psp/build/pspsdk
+	make doxygen-doc
+	mkdir -p $INSTALLDIR/doc
+	cp -fR doc $INSTALLDIR/doc/pspsdk
+	cd ../../..
+}
+
 function buildBaseDevpaks {
 	# create the base set of devpaks
 	mkdir -p $INSTALLERDIR/devpaks
@@ -746,6 +754,11 @@ if [ ! "$DEBIAN_BUILD" == "1" ]; then
 	# prepare distro
 	#---------------------------------------------------------------------------------
 	prepareDistro
+elif
+	#---------------------------------------------------------------------------------
+	# prepare distro for *nix
+	#---------------------------------------------------------------------------------
+	prepareDistroNIX	
 fi
 
 buildBaseDevpaks
