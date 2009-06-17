@@ -749,11 +749,6 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-unset CC
-unset CXX
-unset MAKE
-buildBaseDevpaks
-exit
 
 downloadPatches
 
