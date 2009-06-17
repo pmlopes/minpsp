@@ -29,6 +29,11 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.9.5
+* Start to port the project also for OpenSolaris 2009.06 (vanilla).
+* Added Visual Studio Project Files from Lukas Przytula
+* 38 Devpaks as default instead of the base 20
+
 0.9.4
 * Start to port the project also for Ubuntu (vanilla).
 

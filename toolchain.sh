@@ -489,6 +489,9 @@ function installExtraBinaries {
 	gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
 	# visual studio support
 	installFile vsmake.bat mingw/bin bin
+	cd mingw
+	installDir VC .
+	cd ..
 }
 
 function installPSPLinkUSB {
@@ -632,6 +635,7 @@ function prepareDistro {
 	# copy visual studio tools
 	mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
 	mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
+	mv $INSTALLERDIR/base/VC $INSTALLERDIR/vstudio/VC
 	# move binary psplinkusb
 	mv $INSTALLERDIR/base/bin/driver $INSTALLERDIR/psplink/bin/
 	mv $INSTALLERDIR/base/bin/driver_x64 $INSTALLERDIR/psplink/bin/

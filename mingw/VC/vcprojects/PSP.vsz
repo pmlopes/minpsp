@@ -1,0 +1,6 @@
+VSWIZARD 7.0
+Wizard=VsWizard.VsWizardEngine.9.0
+Param="WIZARD_NAME = PSPProject"
+Param="RELATIVE_PATH = VCWizards\AppWiz\Generic"
+Param="CONSOLE_TYPE_ONLY = true"
+Param="WIZARD_ID = 75"
