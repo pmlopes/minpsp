@@ -98,11 +98,11 @@ function prepare {
 	export PATH=$TOOLPATH/bin:$PATH
 
 	if [ "$OS" == "SunOS" ]; then
-		if [ -z automake ]; then
+		if [ ! -z automake ]; then
 			mkdir -p $TOOLPATH/bin
 			ln -s /usr/bin/automake-1.10 $TOOLPATH/bin/automake
 		fi
-		if [ -z aclocal ]; then
+		if [ ! -z aclocal ]; then
 			mkdir -p $TOOLPATH/bin
 			ln -s /usr/bin/aclocal-1.10 $TOOLPATH/bin/aclocal
 		fi
@@ -728,7 +728,7 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
 #	buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
@@ -749,6 +749,11 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
+unset CC
+unset CXX
+unset MAKE
+buildBaseDevpaks
+exit
 
 downloadPatches
 
