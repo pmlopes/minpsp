@@ -6,7 +6,6 @@ VERSION=2336
 
 svnGetPS2DEV $LIBNAME
 
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -19,8 +18,6 @@ cp README ../target/doc/pthreadlite.txt
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

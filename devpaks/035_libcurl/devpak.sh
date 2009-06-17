@@ -17,15 +17,9 @@ make install || { echo "Error installing $LIBNAME"; exit 1; }
 cd ..
 
 mkdir -p target/bin
-rm -fR target/psp/bin
-gcc -s -o target/bin/curl-config curl-config.c || { echo "Error building curl-config"; exit 1; }
+cc -s -o target/bin/curl-config ../curl-config.c || { echo "Error building curl-config"; exit 1; }
 
 makeInstaller $LIBNAME $VERSION
-
-rm target/bin/curl-config
-i586-mingw32msvc-gcc -s -o target/bin/curl-config.exe || { echo "Error building curl-config"; exit 1; }
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

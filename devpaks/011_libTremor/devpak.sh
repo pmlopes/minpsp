@@ -6,8 +6,6 @@ VERSION=1.0.2
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp
 
@@ -21,8 +19,6 @@ cp doc/*.css $(pwd)/../target/doc/$LIBNAME
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

@@ -6,8 +6,6 @@ VERSION=0.5
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -25,8 +23,6 @@ cp README ../target/doc/$LIBNAME.txt
 cd ..
 
 makeInstaller $LIBNAME $VERSION pspgl 2264
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

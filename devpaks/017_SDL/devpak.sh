@@ -6,8 +6,6 @@ VERSION=1.2.9
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 sh autogen.sh
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
@@ -17,22 +15,15 @@ make || { echo "Error building $LIBNAME"; exit 1; }
 make install || { echo "Error installing $LIBNAME"; exit 1; }
 mkdir -p ../target ../target/doc
 mv ../target/psp/share/man ../target
-rm -fR ../target/psp/bin
 rm -fR ../target/psp/share
 cp README.PSP ../target/doc/$LIBNAME.txt
 
 cd ..
 
 mkdir -p target/bin
-gcc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"1.2.9\" sdl-config.c
+cc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VERSION\" ../sdl-config.c || exit 1
 
 makeInstaller $LIBNAME $VERSION  pspgl 2264
-
-mkdir -p target/bin
-rm target/bin/sdl-config
-i586-mingw32msvc-gcc -s -o target/bin/sdl-config.exe sdl-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

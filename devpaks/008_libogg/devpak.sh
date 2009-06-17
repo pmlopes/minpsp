@@ -6,8 +6,6 @@ VERSION=1.1.2
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp
@@ -18,13 +16,10 @@ make install || { echo "Error installing $LIBNAME"; exit 1; }
 mkdir -p $(pwd)/../target/doc
 mv $(pwd)/../target/psp/share/doc/libogg-1.1.2 $(pwd)/../target/doc
 rm -fR $(pwd)/../target/psp/share
-touch $LIBNAME-devpaktarget
 
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

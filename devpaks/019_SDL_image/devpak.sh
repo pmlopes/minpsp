@@ -6,8 +6,6 @@ VERSION=1.2.4
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 sh autogen.sh
@@ -22,8 +20,6 @@ cp README ../target/doc/SDL_image.txt
 cd ..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 jpeg 6.2 SDL 1.2.9
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

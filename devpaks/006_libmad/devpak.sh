@@ -6,8 +6,6 @@ VERSION=0.15.1
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -18,8 +16,6 @@ cp lib/libmad.a  ../target/psp/lib
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

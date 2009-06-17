@@ -6,8 +6,6 @@ VERSION=1.2.8
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -20,8 +18,6 @@ cp libpng.3 ../target/man/man3
 cd ..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

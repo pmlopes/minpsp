@@ -18,7 +18,5 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION pspgl 2264
 
-makeNSISInstaller $LIBNAME
-
 echo "Done!"
 

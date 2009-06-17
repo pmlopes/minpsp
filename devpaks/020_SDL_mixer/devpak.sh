@@ -6,8 +6,6 @@ VERSION=1.2.6
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 sh autogen.sh
@@ -22,8 +20,6 @@ cp README ../target/doc/SDL_mixer.txt
 cd ..
 
 makeInstaller $LIBNAME $VERSION libogg 1.1.2 libvorbis 1.1.2 SDL 1.2.9
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

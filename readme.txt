@@ -316,6 +316,15 @@ To build run the toolchain script:
 
 
 ===============================================================================
+ How to build it myself (OpenSolaris)?
+===============================================================================
+
+Install required packages:
+pfexec pkg install gcc-dev-4 gcc-432 SUNWbison SUNWaconf SUNWgnu-automake-110 \
+    SUNWlibtool
+You also need unrar from rarlabs for solaris to build OSlib
+
+===============================================================================
  Utils commands
 ===============================================================================
 

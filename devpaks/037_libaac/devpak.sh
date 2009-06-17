@@ -22,7 +22,5 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION
 
-makeNSISInstaller $LIBNAME
-
 echo "Done!"
 

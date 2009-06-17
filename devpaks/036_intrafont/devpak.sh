@@ -11,13 +11,13 @@ if [ ! -d $LIBNAME ]
 then
 	mkdir $LIBNAME
 	cd $LIBNAME
-	if [ ! $(uname) == Linux ]; then
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
 		../../mingw/bin/unzip -q ../$PKG.zip
 	else
 		unzip -q ../$PKG.zip
 	fi
 	cd ..
-	patch -p1 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
+	patch -p1 -d $LIBNAME -i ../../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
 fi
 
 cd $LIBNAME
@@ -29,8 +29,7 @@ make install || { echo "Error building $LIBNAME"; exit 1; }
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
+cp build/intraFont-0.31.tar.bz2 build/intrafont-0.31.tar.bz2
 
 echo "Done!"
 

@@ -6,8 +6,6 @@ VERSION=0.13.38
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
@@ -21,8 +19,6 @@ cp docs/* ../target/doc/$LIBNAME
 cd ..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

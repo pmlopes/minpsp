@@ -33,21 +33,6 @@ MINGW32_LESS_VER=394
 # package version
 PSPSDK_VERSION=0.9.4
 
-INSTALLDIR="/c/pspsdk"
-INSTALLERDIR="/c/pspsdk-installer"
-
-# ubuntu configs
-DEBIAN_BUILD=1
-INSTALLDIR="/opt/pspsdk"
-
-if [ "$DEBIAN_BUILD" == "1" ]; then
-	GMP_LIB=/usr
-	MPFR_LIB=/usr
-else
-	GMP_LIB=/usr/local
-	MPFR_LIB=/usr/local
-fi
-
 # testing
 DISABLE_SVN=1
 
@@ -59,6 +44,69 @@ DISABLE_SVN=1
 function die {
 	echo "Error: "$1
 	exit 1
+}
+
+
+function prepare {
+
+	export OS=$(uname -s)
+
+	if [ "$OS" == "SunOS" ]; then
+		INSTALLDIR="$(pwd)/../pspsdk"
+		GMP_INCLUDE=/usr/include/gmp
+		MPFR_INCLUDE=/usr/include/mpfr
+		GMP_LIB=/usr/lib
+		MPFR_LIB=/usr/lib
+
+		export MAKE=gmake
+		export CC=gcc-4.3.2
+		export CXX=g++-4.3.2
+	fi
+		
+	if [ "$OS" == "Linux" ]; then
+		INSTALLDIR="$(pwd)/../pspsdk"
+		GMP_LIB=/usr
+		MPFR_LIB=/usr
+	fi
+
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+		INSTALLDIR="/c/pspsdk"
+		INSTALLERDIR="/c/pspsdk-installer"
+		GMP_LIB=/usr/local
+		MPFR_LIB=/usr/local
+
+		#-----------------------------------------------------------------------------
+		# pre requisites
+		#-----------------------------------------------------------------------------
+		mkdir -p psp/build
+
+		mkdir -p deps
+		installZlib
+		installGMP
+		installMPFR
+	fi
+	
+	checkTool svn
+	checkTool wget
+	checkTool $MAKE
+	checkTool gawk
+	checkTool makeinfo
+	checkTool python
+	
+	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
+	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
+	export PATH=$TOOLPATH/bin:$PATH
+
+	if [ "$OS" == "SunOS" ]; then
+		if [ -z automake ]; then
+			mkdir -p $TOOLPATH/bin
+			ln -s /usr/bin/automake-1.10 $TOOLPATH/bin/automake
+		fi
+		if [ -z aclocal ]; then
+			mkdir -p $TOOLPATH/bin
+			ln -s /usr/bin/aclocal-1.10 $TOOLPATH/bin/aclocal
+		fi
+	fi
 }
 
 function checkTool {
@@ -130,13 +178,14 @@ function downloadFTP {
 function buildAndInstallDevPak {
 	cd $1 || exit 1
 	cd $2_$3 || exit 1
+	rm -Rf build
 	./devpak.sh || exit 1
 	cd $(psp-config --pspdev-path) || exit 1
-	tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
-	# skip the installer part
-	if [ "$DEBIAN_BUILD" == "1" ]; then
+	tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
+	# only install if we are on windows
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
 		cd $4 || exit 1
-		tar xjfv $1/$2_$3/$3-*.tar.bz2 || exit 1
+		tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
 	fi
 }
 
@@ -221,9 +270,7 @@ function buildBinutils {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
-			--disable-nls \
-			--with-gmp=$GMP_LIB \
-			--with-mpfr=$MPFR_LIB || die "configuring binutils"
+			--disable-nls || die "configuring binutils"
 
 	make clean
 	make CFLAGS="-g" LDFLAGS="-s" || die "Error building binutils"
@@ -236,15 +283,12 @@ function buildXGCC {
 	GCC_CORE="gcc-core-"$GCC_VER".tar.bz2"
 	GCC_GPP="gcc-g++-"$GCC_VER".tar.bz2"
 	GCC_OBJC="gcc-objc-"$GCC_VER".tar.bz2"
-	GCC_GCJ="gcc-java-"$GCC_VER".tar.bz2"
 	
 	GCC_SRCDIR="gcc-"$GCC_VER
 	
 	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
 	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
 	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-#	downloadHTTP psp $GCC_GCJ "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-#	downloadFTP psp ecj-latest.jar "ftp://sourceware.org/pub/java"
 	
 	if [ ! -d psp/$GCC_SRCDIR ]
 	then
@@ -268,15 +312,17 @@ function buildXGCC {
 			--disable-libssp \
 			--disable-win32-registry \
 			--disable-nls \
-			--with-gmp=$GMP_LIB \
-			--with-mpfr=$MPFR_LIB || die "configuring gcc"
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
 	
 	make clean
-	if [ "$DEBIAN_BUILD" == "1" ]; then
-		make LDFLAGS="-s" all-gcc || die "building gcc"
-	else
+
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
+	else
+		make LDFLAGS="-s" all-gcc || die "building gcc"
 	fi
+
 	make install-gcc || die "installing gcc"
 	cd ../../..
 }
@@ -324,9 +370,7 @@ function buildNewlib {
 	../../$NEWLIB_SRCDIR/configure \
 			--target=psp \
 			--disable-nls \
-			--prefix=$INSTALLDIR \
-			--with-gmp=$GMP_LIB \
-			--with-mpfr=$MPFR_LIB || die "configuring newlib"
+			--prefix=$INSTALLDIR || die "configuring newlib"
 	
 	make clean
 	make LDFLAGS="-s" || die "building newlib"
@@ -346,15 +390,17 @@ function buildGCC {
 			--with-newlib \
 			--disable-win32-registry \
 			--disable-nls \
-			--with-gmp=$GMP_LIB \
-			--with-mpfr=$MPFR_LIB || die "configuring gcc"
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
 	
 	make clean
-	if [ "$DEBIAN_BUILD" == "1" ]; then
-		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
-	else
+
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+	else
+		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
 	fi
+
 	make install || die "installing final gcc collection"
 	cd ../../..
 }
@@ -392,9 +438,7 @@ function buildGDB {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--disable-nls \
-			--disable-werror \
-			--with-gmp=$GMP_LIB \
-			--with-mpfr=$MPFR_LIB || die "configuring gdb"
+			--disable-werror || die "configuring gdb"
 
 	make clean
 	make LDFLAGS="-s" || die "building gdb"
@@ -457,7 +501,7 @@ function installPSPLinkUSB {
 	fi
 
 	
-if [ ! "$DEBIAN_BUILD" == "1" ]; then
+if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
 	installFile usbhostfs_pc.exe ../mingw/bin bin
@@ -653,8 +697,10 @@ function prepareDistroNIX {
 
 function buildBaseDevpaks {
 	# create the base set of devpaks
-	mkdir -p $INSTALLERDIR/devpaks
-	DEVPAK_TARGET=$INSTALLERDIR/devpaks
+	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+		mkdir -p $INSTALLERDIR/devpaks
+		DEVPAK_TARGET=$INSTALLERDIR/devpaks
+	fi
 	BASE=$(pwd)/devpaks
 	
 	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
@@ -679,46 +725,32 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
-
-	if [ ! "$DEBIAN_BUILD" == "1" ]; then
-		rm $DEVPAK_TARGET/bin/freetype-config
-		rm $DEVPAK_TARGET/bin/sdl-config
-		i586-mingw32msvc-gcc -s -o $DEVPAK_TARGET/bin/freetype-config.exe $BASE/003_freetype/freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
-		i586-mingw32msvc-gcc -s -o $DEVPAK_TARGET/bin/sdl-config.exe $BASE/017_SDL/sdl-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"2.1.10\"
-	fi
+	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
 }
 
 #---------------------------------------------------------------------------------
 # main
 #---------------------------------------------------------------------------------
-checkTool svn
-checkTool wget
-checkTool make
-checkTool gawk
-checkTool makeinfo
-checkTool python
-
-#---------------------------------------------------------------------------------
-# pre requisites
-#---------------------------------------------------------------------------------
-mkdir -p psp/build
-
-if [ ! "$DEBIAN_BUILD" == "1" ]; then
-	mkdir -p deps
-	installZlib
-	installGMP
-	installMPFR
-fi
+prepare
 
 downloadPatches
-
-#---------------------------------------------------------------------------------
-# Add installed devkit to the path, adjusting path on minsys
-#---------------------------------------------------------------------------------
-TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
-[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
-export PATH=$PATH:$TOOLPATH/bin
 
 #---------------------------------------------------------------------------------
 # build sdk
@@ -732,16 +764,22 @@ buildSDK
 validateSDK
 buildGDB
 
+
+if [ "$OS" == "SunOS" ]; then
+	unset CC
+	unset CXX
+fi
+
 #---------------------------------------------------------------------------------
 # build tools
 #---------------------------------------------------------------------------------
-if [ ! "$DEBIAN_BUILD" == "1" ]; then
+if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installExtraBinaries
 fi
 
 installPSPLinkUSB
 
-if [ ! "$DEBIAN_BUILD" == "1" ]; then
+if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installMan
 	installInfo
 
@@ -754,11 +792,11 @@ if [ ! "$DEBIAN_BUILD" == "1" ]; then
 	# prepare distro
 	#---------------------------------------------------------------------------------
 	prepareDistro
-elif
+else
 	#---------------------------------------------------------------------------------
 	# prepare distro for *nix
 	#---------------------------------------------------------------------------------
-	prepareDistroNIX	
+	prepareDistroNIX
 fi
 
 buildBaseDevpaks

@@ -6,8 +6,6 @@ VERSION=6.2
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -18,8 +16,6 @@ cp libjpeg.doc  ../target/doc
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

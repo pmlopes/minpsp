@@ -6,8 +6,6 @@ VERSION=2.0.13
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 sh autogen.sh
@@ -24,8 +22,6 @@ rm -fR ../target/doc/SDL_gfx/.svn
 cd ..
 
 makeInstaller $LIBNAME $VERSION SDL 1.2.9
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

@@ -6,8 +6,6 @@ VERSION=2.0.7
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 sh autogen.sh
@@ -22,8 +20,6 @@ cp README ../target/doc/SDL_ttf.txt
 cd ..
 
 makeInstaller $LIBNAME $VERSION freetype 2.1.10 SDL 1.2.9
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

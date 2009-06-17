@@ -9,12 +9,7 @@ downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/flac $LIBNAME.tar.gz
 if [ ! -d $LIBNAME ]
 then
 	tar -zxf $LIBNAME.tar.gz || { echo "Failed to download "$1; exit 1; }
-fi
-
-if [ ! -f $LIBNAME-patched ]
-then
-	patch -p0 -d $LIBNAME -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
-	touch $LIBNAME-patched
+	patch -p0 -d $LIBNAME -i ../../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
 fi
 
 cd $LIBNAME
@@ -37,8 +32,6 @@ cp -fR doc/html/* ../target/doc/$LIBNAME
 cd ..
 	
 makeInstaller $LIBNAME $VERSION libogg 1.1.2
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

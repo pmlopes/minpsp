@@ -6,8 +6,6 @@ VERSION=0.0.5
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME/src
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -24,8 +22,6 @@ cp ../README.en ../../target/doc/libbulletml.txt
 cd ../..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

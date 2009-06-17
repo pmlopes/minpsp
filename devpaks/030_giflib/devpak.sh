@@ -9,12 +9,7 @@ downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/giflib $LIBNAME-$VERS
 if [ ! -d $LIBNAME ]
 then
 	tar -jxf $LIBNAME-$VERSION.tar.bz2 || { echo "Failed to download "$1; exit 1; }
-fi
-
-if [ ! -f $LIBNAME-patched ]
-then
-	patch -p0 -d $LIBNAME-$VERSION -i ../$LIBNAME-$VERSION.patch || { echo "Error patching $LIBNAME"; exit; }
-	touch $LIBNAME-patched
+	patch -p0 -d $LIBNAME-$VERSION -i ../../$LIBNAME-$VERSION.patch || { echo "Error patching $LIBNAME"; exit; }
 fi
 
 cd $LIBNAME-$VERSION
@@ -32,8 +27,6 @@ rm ../../target/doc/$LIBNAME/Makefile
 cd ../..	
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

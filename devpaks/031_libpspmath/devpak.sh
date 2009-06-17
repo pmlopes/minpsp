@@ -4,6 +4,9 @@
 LIBNAME=libpspmath
 VERSION=4
 
+cp -R ../libpspmath libpspmath
+cp -R ../sample sample
+
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -16,8 +19,6 @@ cp ../sample/* ../target/psp/sdk/samples/pspmath
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

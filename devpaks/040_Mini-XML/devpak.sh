@@ -1,21 +1,21 @@
 #!/bin/bash
 . ../util/util.sh
 
-LIBNAME=mxml-2.5
+LIBNAME=mxml
 VERSION=2.5
 
-downloadHTTP http://ftp.easysw.com/pub/mxml/2.5 $LIBNAME.tar.gz
+downloadHTTP http://ftp.easysw.com/pub/mxml/2.5 $LIBNAME-$VERSION.tar.gz
 
-if [ ! -d $LIBNAME ]
+if [ ! -d $LIBNAME-$VERSION ]
 then
-	tar -zxf $LIBNAME.tar.gz
+	tar -zxf $LIBNAME-$VERSION.tar.gz
 fi
 
-cd $LIBNAME
+cd $LIBNAME-$VERSION
 
 CFLAGS="-G0" LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --disable-threads --prefix=$(pwd)/../target/psp
 
-patch -p0 -i ../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
+patch -p0 -i ../../$LIBNAME-$VERSION.patch || { echo "Error patching $LIBNAME"; exit; }
 
 echo "There will be an error during the test phase (it is expected)"
 make
@@ -28,8 +28,7 @@ rm -rf ../target/psp/share
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
+cp build/mxml-2.5.tar.bz2 build/Mini-XML-2.5.tar.bz2
 
 echo "Done!"
 

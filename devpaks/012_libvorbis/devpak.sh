@@ -6,7 +6,7 @@ VERSION=1.1.2
 
 svnGetPS2DEV $LIBNAME
 
-if [ ! $(uname) == Linux ]; then
+if [ "$(uname -s)" == "MINGW32_NT-5.1" ]; then
 	# need to remove /msys/local from the path only for the next lib
 	OLDPATH=$PATH
 	PATH=$(echo $PATH | sed 's/\/usr\/local\/bin://g')
@@ -24,15 +24,13 @@ if [ ! $(uname) == Linux ]; then
 	fi
 fi
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp || { echo "Error configuring $LIBNAME"; exit 1; }
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 
-if [ ! $(uname) == Linux ]; then
+if [ "$(uname -s)" == "MINGW32_NT-5.1" ]; then
 	# revert back to the original path
 	PATH=$OLDPATH
 fi
@@ -45,8 +43,6 @@ rm -fR $(pwd)/../target/psp/share
 cd ..
 
 makeInstaller $LIBNAME $VERSION libogg 1.1.2
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

@@ -13,9 +13,9 @@ function svnGet {
 	if [ ! -d $1 ]
 	then
 		svn checkout $2 $3 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f $1.patch ]
+		if [ -f ../$1.patch ]
 		then
-			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
+			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
 		fi
 	else
 		svn update $1
@@ -27,10 +27,10 @@ function svnGet {
 function svnGetPS2DEV {
 	if [ ! -d $1 ]
 	then
-		cp -fR ../../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $2 $3 $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f $1.patch ]
+		cp -fR ../../../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $2 $3 $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
+		if [ -f ../$1.patch ]
 		then
-			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
+			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
 		fi
 	else
 		svn update $2 $3 $1
@@ -42,10 +42,10 @@ function svnGetPS2DEV {
 function svnGetPSPWARE {
 	if [ ! -d $1 ]
 	then
-		cp -fR ../../ps2dev/pspware-svn/$1 $(basename $1) || svn checkout $PSPWARESVN_URL/$1 || svn checkout $PSPWARESVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f $1.patch ]
+		cp -fR ../../../ps2dev/pspware-svn/$1 $(basename $1) || svn checkout $PSPWARESVN_URL/$1 || svn checkout $PSPWARESVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
+		if [ -f ../$1.patch ]
 		then
-			patch -p0 -d $1 -i ../$1.patch || { echo "Error patching "$1; exit; }
+			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
 		fi
 	else
 		svn update $1
@@ -71,16 +71,6 @@ function addDep {
 	echo "		echo \"ERROR: Please install $1 ($2) first.\""		>> $3
 	echo "		exit 1"												>> $3
 	echo "	fi"														>> $3
-}
-
-#arg1 libname
-#arg2 version
-function cleanUp {
-	rm -Rf target
-	rm -f $1-$2-install.bin $1-$2-install.sh $1-$2.tar.bz2
-	cd $1
-	make clean
-	cd ..
 }
 
 #arg1 libname
@@ -126,7 +116,7 @@ function makeInstaller {
 	fi
 	
 	echo "	cat <<EOF"																			>> $NIXINSTALLER
-	cat license.txt																				>> $NIXINSTALLER
+	cat ../license.txt																			>> $NIXINSTALLER
 	echo "EOF"																					>> $NIXINSTALLER
 	echo "	echo \"\""																			>> $NIXINSTALLER
 	echo "	echo -n \"You must agree with the license before installing this DEVPAK [y/N] \""	>> $NIXINSTALLER
@@ -165,9 +155,15 @@ function makeInstaller {
 	cd ..
 	cat $1-$2.tar.bz2 >> $NIXINSTALLER
 	chmod a+x $NIXINSTALLER
+
+	if [ -e makensis ]; then
+		makensis ../$1.nsi
+	fi
+	
+	cd ..
 }
 
-#arg1 libname
-function makeNSISInstaller {
-	makensis $1.nsi
-}
+#build preparation
+mkdir build
+cd build
+

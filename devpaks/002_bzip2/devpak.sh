@@ -6,8 +6,6 @@ VERSION=1.0.4
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 make || { echo "Error building "$LIBNAME; exit 1; }
 
@@ -18,8 +16,6 @@ cp manual.html  $(pwd)/../target/doc/$LIBNAME.html
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

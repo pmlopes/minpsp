@@ -6,8 +6,6 @@ VERSION=2227
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -19,8 +17,6 @@ cp -v *.h ../target/psp/include
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

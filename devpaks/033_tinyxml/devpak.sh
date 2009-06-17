@@ -10,7 +10,7 @@ then
 	tar -zxf ${LIBNAME}_2_5_3.tar.gz
 fi
 
-cp Makefile.PSP $LIBNAME
+cp ../Makefile.PSP $LIBNAME
 
 cd $LIBNAME
 
@@ -21,8 +21,6 @@ make -f Makefile.PSP install || { echo "Error building $LIBNAME"; exit 1; }
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

@@ -6,8 +6,6 @@ VERSION=0.0.4
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 make || { echo "Error building $LIBNAME"; exit 1; }
@@ -18,8 +16,6 @@ rm -fR ../target/psp/sdk/samples/irkeyb/keymap/.svn
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 

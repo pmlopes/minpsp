@@ -19,7 +19,5 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION SDL 1.2.9
 
-makeNSISInstaller $LIBNAME
-
 echo "Done!"
 

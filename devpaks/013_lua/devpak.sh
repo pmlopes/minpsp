@@ -6,8 +6,6 @@ VERSION=5.1
 
 svnGetPS2DEV $LIBNAME
 
-cleanUp $LIBNAME $VERSION
-
 cd $LIBNAME
 
 make -f Makefile.psp || { echo "Error building $LIBNAME"; exit 1; }
@@ -23,8 +21,6 @@ cp doc/lua.css ../target/doc/lua
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-
-makeNSISInstaller $LIBNAME
 
 echo "Done!"
 
