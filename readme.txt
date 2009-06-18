@@ -327,7 +327,8 @@ To build run the toolchain script:
 Install required packages:
 pfexec pkg install gcc-dev-4 gcc-432 SUNWbison SUNWaconf SUNWgnu-automake-110 \
     SUNWlibtool
-You also need unrar from rarlabs for solaris to build OSlib
+You also need unrar from rarlabs for solaris to build OSlib and readline for
+the pspsh, usbhostfs_pc and remotejoy
 
 ===============================================================================
  Utils commands
