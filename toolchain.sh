@@ -538,7 +538,7 @@ else
 	make -f Makefile.clients install
 	cd ..
 fi
-	exit
+
 	cd psplinkusb
 	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"
 	make -f Makefile.psp release || die "building PSPLINKUSB (PSP)"
@@ -760,19 +760,19 @@ function buildBaseDevpaks {
 #---------------------------------------------------------------------------------
 prepare
 
-#downloadPatches
+downloadPatches
 
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-#buildBinutils
-#buildXGCC
-#bootstrapSDK
-#buildNewlib
-#buildGCC
-#buildSDK
-#validateSDK
-#buildGDB
+buildBinutils
+buildXGCC
+bootstrapSDK
+buildNewlib
+buildGCC
+buildSDK
+validateSDK
+buildGDB
 
 if [ "$OS" == "SunOS" ]; then
 	unset CC
@@ -790,7 +790,7 @@ fi
 # PSPLink
 #---------------------------------------------------------------------------------
 installPSPLinkUSB
-exit
+
 if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installMan
 	installInfo
