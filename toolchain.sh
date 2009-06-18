@@ -58,7 +58,6 @@ function prepare {
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
 
-		export MAKE=gmake
 		export CC=gcc-4.3.2
 		export CXX=g++-4.3.2
 	fi
@@ -88,7 +87,7 @@ function prepare {
 	
 	checkTool svn
 	checkTool wget
-	checkTool $MAKE
+	checkTool make
 	checkTool gawk
 	checkTool makeinfo
 	checkTool python
