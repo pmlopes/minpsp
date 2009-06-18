@@ -528,10 +528,17 @@ if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
 else
 	cd psplinkusb
+	
+	if [ "$OS" == "SunOS" ]; then
+		cp -f ../../mingw/solaris/Makefile.pspsh pspsh/Makefile
+		cp -f ../../mingw/solaris/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
+		cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
+	fi
+	
 	make -f Makefile.clients install
 	cd ..
 fi
-	
+	exit
 	cd psplinkusb
 	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"
 	make -f Makefile.psp release || die "building PSPLINKUSB (PSP)"
@@ -753,20 +760,19 @@ function buildBaseDevpaks {
 #---------------------------------------------------------------------------------
 prepare
 
-downloadPatches
+#downloadPatches
 
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-buildBinutils
-buildXGCC
-bootstrapSDK
-buildNewlib
-buildGCC
-buildSDK
-validateSDK
-buildGDB
-
+#buildBinutils
+#buildXGCC
+#bootstrapSDK
+#buildNewlib
+#buildGCC
+#buildSDK
+#validateSDK
+#buildGDB
 
 if [ "$OS" == "SunOS" ]; then
 	unset CC
@@ -780,8 +786,11 @@ if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installExtraBinaries
 fi
 
+#---------------------------------------------------------------------------------
+# PSPLink
+#---------------------------------------------------------------------------------
 installPSPLinkUSB
-
+exit
 if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installMan
 	installInfo
