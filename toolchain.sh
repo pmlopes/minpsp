@@ -64,15 +64,19 @@ function prepare {
 		
 	if [ "$OS" == "Linux" ]; then
 		INSTALLDIR="$(pwd)/../pspsdk"
-		GMP_LIB=/usr
-		MPFR_LIB=/usr
+		GMP_INCLUDE=/usr/include
+		MPFR_INCLUDE=/usr/include
+		GMP_LIB=/usr/lib
+		MPFR_LIB=/usr/lib
 	fi
 
 	if [ "$OS" == "MINGW32_NT-5.1" ]; then
 		INSTALLDIR="/c/pspsdk"
 		INSTALLERDIR="/c/pspsdk-installer"
-		GMP_LIB=/usr/local
-		MPFR_LIB=/usr/local
+		GMP_INCLUDE=/usr/local/include
+		MPFR_INCLUDE=/usr/local/include
+		GMP_LIB=/usr/local/lib
+		MPFR_LIB=/usr/local/lib
 
 		#-----------------------------------------------------------------------------
 		# pre requisites
@@ -94,7 +98,6 @@ function prepare {
 	
 	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
-	export PATH=$TOOLPATH/bin:$PATH
 
 	if [ "$OS" == "SunOS" ]; then
 		if [ ! -z automake ]; then
@@ -105,6 +108,9 @@ function prepare {
 			mkdir -p $TOOLPATH/bin
 			ln -s /usr/bin/aclocal-1.10 $TOOLPATH/bin/aclocal
 		fi
+		export PATH=$TOOLPATH/bin:$PATH
+	else
+		export PATH=$PATH:$TOOLPATH/bin
 	fi
 }
 
@@ -498,6 +504,7 @@ function installPSPLinkUSB {
 	if [ ! -d psplinkusb ]
 	then
 		svnGetPS2DEV psplinkusb
+		patch -p1 -d psplinkusb -i ../patches/psplinkusb-MINPSPW.patch || die "patching psplinkusb"
 	else
 		svnGetPS2DEV psplinkusb
 	fi
@@ -555,7 +562,7 @@ fi
 	installFile README . psplink
 	
 	cd ..
-	
+	patch -p0 < ../../mingw/
 	make -f Makefile.oe clean || die "cleaning PSPLINKUSB (OE)"
 	make -f Makefile.oe release || die "building PSPLINKUSB (OE)"
 	
@@ -791,6 +798,9 @@ fi
 #---------------------------------------------------------------------------------
 installPSPLinkUSB
 
+#---------------------------------------------------------------------------------
+# Distro + Docs
+#---------------------------------------------------------------------------------
 if [ "$OS" == "MINGW32_NT-5.1" ]; then
 	installMan
 	installInfo
