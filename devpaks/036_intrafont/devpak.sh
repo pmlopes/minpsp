@@ -12,7 +12,7 @@ then
 	mkdir $LIBNAME
 	cd $LIBNAME
 	if [ "$OS" == "MINGW32_NT-5.1" ]; then
-		../../mingw/bin/unzip -q ../$PKG.zip
+		../../../../mingw/bin/unzip -q ../$PKG.zip
 	else
 		unzip -q ../$PKG.zip
 	fi
@@ -29,7 +29,7 @@ make install || { echo "Error building $LIBNAME"; exit 1; }
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-cp build/intraFont-0.31.tar.bz2 build/intrafont-0.31.tar.bz2
+mv build/intraFont-0.31.tar.bz2 build/intrafont-0.31.tar.bz2
 
 echo "Done!"
 

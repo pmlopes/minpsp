@@ -303,6 +303,15 @@ make install
      SET PATH=%PATH%;C:\Python25
     In the beginning of the MSYS.BAT file
 
+9th Some dev packs need bison since I've to patch some yy files,
+get them from the mingw msys project:
+  - flex-2.5.33-MSYS-1.0.11-1.tar.bz2
+    * Extract "over" the MSYS installation.
+  - bison-2.3-MSYS-1.0.11-1.tar.bz2
+    * Extract "over" the MSYS installation.
+  - regex-0.12-MSYS-1.0.11-1.tar.bz2
+    * Extract "over" the MSYS installation.
+
 To build run the toolchain script:
 
 ./toolchain.sh
@@ -329,6 +338,9 @@ pfexec pkg install gcc-dev-4 gcc-432 SUNWbison SUNWaconf SUNWgnu-automake-110 \
     SUNWlibtool
 You also need unrar from rarlabs for solaris to build OSlib and readline for
 the pspsh, usbhostfs_pc and remotejoy
+
+I've uploaded a working readline lib to jucr.opensolaris.org so if I get
+enough votes it will become available on the contrib repository.
 
 ===============================================================================
  Utils commands

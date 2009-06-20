@@ -9,7 +9,7 @@ downloadHTTP http://brunni.dev-fr.org/dl/psp OSLib_210_src.rar
 if [ ! -d OSLib_210_src ]
 then
 	if [ "$OS" == "MINGW32_NT-5.1" ]; then
-		../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
+		../../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
 	else
 		unrar x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
 	fi
@@ -43,7 +43,7 @@ rm -fR ../../target/doc/oslib/html
 cd ../..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 libmikmod 3.1.11
-cp build/OSLib-2.10.tar.bz2 build/oslib-2.10.tar.bz2
+mv build/OSLib-2.10.tar.bz2 build/oslib-2.10.tar.bz2
 
 echo "Done!"
 

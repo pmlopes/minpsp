@@ -31,10 +31,10 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.4
+PSPSDK_VERSION=0.9.5
 
 # testing
-DISABLE_SVN=1
+#DISABLE_SVN=1
 
 #---------------------------------------------------------------------------------
 # functions

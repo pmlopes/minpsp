@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION @MINPSPW_VERSION@
+!define VERSION 0.9.4
 !define COMPANY jetcube.eu
 !define URL http://www.jetcube.eu
 !define SDKDIR C:\pspsdk-installer
@@ -121,7 +121,22 @@ Section "Basic Devpaks" SEC0004
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_mixer 1.2.6
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" SDL_ttf 2.0.7
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" smpeg-psp 0.4.5
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" ode 0.5
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libpthreadlite 2336
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" cal3D 0.10.0
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" mikmodlib 3.0
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" cpplibs 1547
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" flac 1.2.1
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" giflib 4.1.6
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libpspmath 4
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" pthreads-emb 1.0
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" tinyxml 2.5.3
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" oslib 2.10
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" libcurl 7.15.1
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" intrafont 0.31
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" Jello 0.0.1
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" zziplib 0.13.38
+	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" Mini-XML 2.5
 SectionEnd
 
 Section "Eclipse CDT 5+ Support" SEC0005
@@ -261,7 +276,7 @@ FunctionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0001} "Bundle of Samples shipped with the current PSP SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0002} "Utilities for debugging"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0003} "HTML Documentation for the SDK"
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "zlib bzip2 freetype jpeg libbulletml libmad libmikmod libogg libpng libpspvram libTremor libvorbis lua pspgl pspirkeyb sqlite SDL SDL_gfx SDL_image SDL_mixer SDL_ttf smpeg-psp zziplib"
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "zlib bzip2 freetype jpeg libbulletml libmad libmikmod libogg libpng libpspvram libTremor libvorbis lua pspgl pspirkeyb sqlite SDL SDL_gfx SDL_image SDL_mixer SDL_ttf smpeg-psp zziplib, etc..."
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds gcc.exe to the PATH so Eclipse CDT 5+ can auto configure itself"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0006} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0007} "Only needed if you want the Compiler Man pages, man readed included"

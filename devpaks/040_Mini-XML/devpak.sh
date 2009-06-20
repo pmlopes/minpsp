@@ -28,7 +28,7 @@ rm -rf ../target/psp/share
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-cp build/mxml-2.5.tar.bz2 build/Mini-XML-2.5.tar.bz2
+mv build/mxml-2.5.tar.bz2 build/Mini-XML-2.5.tar.bz2
 
 echo "Done!"
 
