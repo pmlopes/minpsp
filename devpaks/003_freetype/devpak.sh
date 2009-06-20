@@ -23,7 +23,12 @@ cp docs/reference/*.html $(pwd)/../target/doc/$LIBNAME
 cd ..
 
 mkdir -p target/bin
-cc -s -o target/bin/freetype-config ../freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"$VERSION\" || exit 1
+
+if [ "$OS" == "SunOS" ]; then
+	gcc-4.3.2 -s -o target/bin/freetype-config ../freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"$VERSION\" || exit 1
+else
+	gcc -s -o target/bin/freetype-config ../freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"$VERSION\" || exit 1
+fi
 
 makeInstaller $LIBNAME $VERSION
 

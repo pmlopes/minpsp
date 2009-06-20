@@ -17,7 +17,12 @@ make install || { echo "Error installing $LIBNAME"; exit 1; }
 cd ..
 
 mkdir -p target/bin
-cc -s -o target/bin/curl-config ../curl-config.c || { echo "Error building curl-config"; exit 1; }
+
+if [ "$OS" == "SunOS" ]; then
+	gcc-4.3.2 -s -o target/bin/curl-config ../curl-config.c || { echo "Error building curl-config"; exit 1; }
+else
+	gcc -s -o target/bin/curl-config ../curl-config.c || { echo "Error building curl-config"; exit 1; }
+fi
 
 makeInstaller $LIBNAME $VERSION
 

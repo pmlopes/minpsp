@@ -49,6 +49,9 @@ function die {
 
 function prepare {
 
+	mkdir -p psp/build
+	mkdir -p deps
+	
 	export OS=$(uname -s)
 
 	if [ "$OS" == "SunOS" ]; then
@@ -81,9 +84,6 @@ function prepare {
 		#-----------------------------------------------------------------------------
 		# pre requisites
 		#-----------------------------------------------------------------------------
-		mkdir -p psp/build
-
-		mkdir -p deps
 		installZlib
 		installGMP
 		installMPFR
@@ -385,6 +385,7 @@ function buildNewlib {
 
 function buildGCC {
 
+	GCC_SRCDIR="gcc-"$GCC_VER
 	cd psp/build/"gcc-"$GCC_VER
 
 	../../$GCC_SRCDIR/configure \
@@ -562,7 +563,6 @@ fi
 	installFile README . psplink
 	
 	cd ..
-	patch -p0 < ../../mingw/
 	make -f Makefile.oe clean || die "cleaning PSPLINKUSB (OE)"
 	make -f Makefile.oe release || die "building PSPLINKUSB (OE)"
 	
