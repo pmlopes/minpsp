@@ -34,7 +34,7 @@ MINGW32_LESS_VER=394
 PSPSDK_VERSION=0.9.5
 
 # testing
-#DISABLE_SVN=1
+DISABLE_SVN=1
 
 #---------------------------------------------------------------------------------
 # functions
@@ -60,9 +60,17 @@ function prepare {
 		MPFR_INCLUDE=/usr/include/mpfr
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
-
-		export CC=gcc-4.3.2
-		export CXX=g++-4.3.2
+		
+		if [ ! -e compat ]; then
+			mkdir -p compat
+			ln -s `which gcc-4.3.2` compat/gcc
+			ln -s `which g++-4.3.2` compat/g++
+			ln -s /opt/SunStudioExpress/bin/cc compat/cc
+			ln -s /opt/SunStudioExpress/bin/CC compat/CC
+			ln -s /usr/bin/automake-1.10 compat/automake
+			ln -s /usr/bin/aclocal-1.10 compat/aclocal
+		fi		
+		export PATH=$PATH:`pwd`/compat
 	fi
 		
 	if [ "$OS" == "Linux" ]; then
@@ -98,20 +106,7 @@ function prepare {
 	
 	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
-
-	if [ "$OS" == "SunOS" ]; then
-		if [ ! -z automake ]; then
-			mkdir -p $TOOLPATH/bin
-			ln -s /usr/bin/automake-1.10 $TOOLPATH/bin/automake
-		fi
-		if [ ! -z aclocal ]; then
-			mkdir -p $TOOLPATH/bin
-			ln -s /usr/bin/aclocal-1.10 $TOOLPATH/bin/aclocal
-		fi
-		export PATH=$TOOLPATH/bin:$PATH
-	else
-		export PATH=$PATH:$TOOLPATH/bin
-	fi
+	export PATH=$PATH:$TOOLPATH/bin
 }
 
 function checkTool {
@@ -780,11 +775,6 @@ buildGCC
 buildSDK
 validateSDK
 buildGDB
-
-if [ "$OS" == "SunOS" ]; then
-	unset CC
-	unset CXX
-fi
 
 #---------------------------------------------------------------------------------
 # build tools
