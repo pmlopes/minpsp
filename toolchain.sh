@@ -18,7 +18,7 @@ PPL_VER=0.10
 
 # sdk versions
 BINUTILS_VER=2.16.1
-GCC_VER=4.3.3
+GCC_VER=4.3.4
 GCC_TC_VER=4.3.2
 NEWLIB_VER=1.17.0
 
@@ -69,7 +69,7 @@ function prepare {
 			ln -s /opt/SunStudioExpress/bin/CC compat/CC
 			ln -s /usr/bin/automake-1.10 compat/automake
 			ln -s /usr/bin/aclocal-1.10 compat/aclocal
-		fi		
+		fi
 		export PATH=$PATH:`pwd`/compat
 	fi
 		
@@ -128,7 +128,9 @@ function svnGetPS2DEV {
 			svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
 		fi
 	else
-		svn update $2 $3 $(basename $1)
+		if [ ! "$DISABLE_SVN" == "1" ]; then
+		  svn update $2 $3 $(basename $1)
+		fi
 	fi
 }
 
