@@ -17,7 +17,7 @@ MPFR_VER=2.3.2
 PPL_VER=0.10
 
 # sdk versions
-BINUTILS_VER=2.16.1
+BINUTILS_VER=2.18
 GCC_VER=4.3.4
 GCC_TC_VER=4.3.2
 NEWLIB_VER=1.17.0
@@ -31,7 +31,7 @@ MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
 
 # package version
-PSPSDK_VERSION=0.9.5
+PSPSDK_VERSION=0.9.6
 
 # testing
 DISABLE_SVN=1
@@ -261,7 +261,9 @@ function buildBinutils {
 	then
 		cd psp
 		tar -xjf $BINUTILS || die "extracting "$BINUTILS
-		patch -p1 -d $BINUTILS_SRCDIR -i ../patches/binutils-$BINUTILS_VER-PSP.patch || die "patching binutils"
+		patch -p1 -d $BINUTILS_SRCDIR -i ../patches/binutils-$BINUTILS_VER-MINPSPW.patch || die "patching binutils"
+		# makeinfo is not correctly detected on latest ubuntu this hack fix it
+		touch $BINUTILS_SRCDIR/bfd/doc/*
 		cd ..
 	fi
 	
@@ -272,10 +274,11 @@ function buildBinutils {
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-install-libbfd \
+			--disable-werror \
 			--disable-nls || die "configuring binutils"
 
 	make clean
-	make CFLAGS="-g" LDFLAGS="-s" || die "Error building binutils"
+	make LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
 }
