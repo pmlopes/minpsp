@@ -121,7 +121,7 @@ diff -Naur binutils-2.18/configure binutils-2.18-PSP/configure
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
      ;;
-+  psp*-*-*)
++  mips*-psp-*)
 +    noconfigdirs="$noconfigdirs ${libgcj}"
 +    ;;
    mips*-*-*)
@@ -134,7 +134,7 @@ diff -Naur binutils-2.18/configure.ac binutils-2.18-PSP/configure.ac
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
      ;;
-+  psp*-*-*)
++  mips*-psp-*)
 +    noconfigdirs="$noconfigdirs ${libgcj}"
 +    ;;
    mips*-*-*)
