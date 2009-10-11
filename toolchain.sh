@@ -34,7 +34,7 @@ MINGW32_LESS_VER=394
 PSPSDK_VERSION=0.9.6
 
 # testing
-DISABLE_SVN=1
+#DISABLE_SVN=1
 
 #---------------------------------------------------------------------------------
 # functions
@@ -81,7 +81,16 @@ function prepare {
 		MPFR_LIB=/usr/lib
 	fi
 
+	# --- XP 32 bits
 	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+		OS=MINGW32_NT
+	fi
+	# --- Vista 32 bits
+	if [ "$OS" == "MINGW32_NT-6.0" ]; then
+		OS=MINGW32_NT
+	fi
+	
+	if [ "$OS" == "MINGW32_NT" ]; then
 		INSTALLDIR="/c/pspsdk"
 		INSTALLERDIR="/c/pspsdk-installer"
 		GMP_INCLUDE=/usr/local/include
@@ -185,7 +194,7 @@ function buildAndInstallDevPak {
 	cd $(psp-config --pspdev-path) || exit 1
 	tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
 	# only install if we are on windows
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+	if [ "$OS" == "MINGW32_NT" ]; then
 		cd $4 || exit 1
 		tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
 	fi
@@ -230,12 +239,14 @@ function installMPFR {
 	then
 		MPFR="mpfr-"$MPFR_VER".tar.bz2"
 		
-		downloadHTTP deps $MPFR "http://www.mpfr.org/mpfr-current"
+		downloadHTTP deps $MPFR "http://www.mpfr.org/mpfr-"$MPFR_VER
 		cd deps
 		tar -xjf $MPFR || die "extracting "$MPFR
 
 		cd "mpfr-"$MPFR_VER
-		./configure --prefix=/usr/local --with-gmp=$GMP_LIB || die "configuring "$MPFR
+		./configure \
+			--prefix=/usr/local \
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
 		make || die "building "$MPFR
 		make check || die "checking "$MPFR
 		make install || die "installing "$MPFR
@@ -322,7 +333,7 @@ function buildXGCC {
 	
 	make clean
 
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+	if [ "$OS" == "MINGW32_NT" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
 	else
 		make LDFLAGS="-s" all-gcc || die "building gcc"
@@ -401,7 +412,7 @@ function buildGCC {
 	
 	make clean
 
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+	if [ "$OS" == "MINGW32_NT" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
 	else
 		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
@@ -511,7 +522,7 @@ function installPSPLinkUSB {
 	fi
 
 	
-if [ "$OS" == "MINGW32_NT-5.1" ]; then
+if [ "$OS" == "MINGW32_NT" ]; then
 	# pspsh + usbhostfs_pc
 	installFile pspsh.exe ../mingw/bin bin
 	installFile usbhostfs_pc.exe ../mingw/bin bin
@@ -697,7 +708,6 @@ function prepareDistro {
 	cp installer/AddToPath.nsh $INSTALLERDIR
 	cp installer/licenses.txt $INSTALLERDIR
 	sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup.nsi > $INSTALLERDIR/setup.nsi
-	sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup-nodoc.nsi > $INSTALLERDIR/setup-nodoc.nsi
 }
 
 function prepareDistroNIX {
@@ -714,7 +724,7 @@ function prepareDistroNIX {
 
 function buildBaseDevpaks {
 	# create the base set of devpaks
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
+	if [ "$OS" == "MINGW32_NT" ]; then
 		mkdir -p $INSTALLERDIR/devpaks
 		DEVPAK_TARGET=$INSTALLERDIR/devpaks
 	fi
@@ -784,7 +794,7 @@ buildGDB
 #---------------------------------------------------------------------------------
 # build tools
 #---------------------------------------------------------------------------------
-if [ "$OS" == "MINGW32_NT-5.1" ]; then
+if [ "$OS" == "MINGW32_NT" ]; then
 	installExtraBinaries
 fi
 
@@ -796,7 +806,7 @@ installPSPLinkUSB
 #---------------------------------------------------------------------------------
 # Distro + Docs
 #---------------------------------------------------------------------------------
-if [ "$OS" == "MINGW32_NT-5.1" ]; then
+if [ "$OS" == "MINGW32_NT" ]; then
 	installMan
 	installInfo
 

@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 0.9.4
+!define VERSION @MINPSPW_VERSION@
 !define COMPANY jetcube.eu
 !define URL http://www.jetcube.eu
 !define SDKDIR C:\pspsdk-installer

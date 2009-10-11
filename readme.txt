@@ -229,7 +229,7 @@ Optionally install GDB
 http://downloads.sf.net/mingw/gdb-6.3-2.exe
 
 2nd Download latest MSYS and install it:
-http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11-2004.04.30-1.exe
+http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11.exe
 Chose c:\msys as installation directory. Leave all other options unchanged.
 During the postinstall script, please carefully answer all questions. 
 Important: Do not skip questions with enter.
@@ -243,59 +243,56 @@ http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe
 Install to c:\msys as well.
 
 4th Download wget:
-http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-bin.zip
-http://prdownloads.sourceforge.net/gnuwin32/wget-1.10.1-dep.zip
+http://prdownloads.sourceforge.net/gnuwin32/wget-1.11.4-1-bin.zip
+http://prdownloads.sourceforge.net/gnuwin32/wget-1.11.4-1-dep.zip
 Unzip to C:\msys\local
 
 5th Download the following files to your local home, open the MSys shell and
 execute:
-wget http://downloads.sourceforge.net/mingw/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
-wget http://downloads.sourceforge.net/mingw/m4-1.4.7-MSYS.tar.bz2
-wget ftp://ftp.gnu.org/gnu/libtool/libtool-1.5.24.tar.gz 
-wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.62.tar.bz2
-wget ftp://ftp.gnu.org/gnu/automake/automake-1.10.1.tar.bz2
-wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.11.1.tar.gz
+wget http://downloads.sourceforge.net/mingw/m4-1.4.13-1-msys-1.0.11-bin.tar.lzma
+wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz 
+wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.63.tar.bz2
+wget ftp://ftp.gnu.org/gnu/automake/automake-1.10.2.tar.bz2
+wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.13.1.tar.gz
 
 6th install the download software:
 cd /
-tar -xvjf ~/bash-3.1-MSYS-1.0.11-snapshot.tar.bz2
-tar -xvjf ~/m4-1.4.7-MSYS.tar.bz2
+m4-1.4.13-1-msys-1.0.11-bin.tar.lzma
 
 cd ~
-tar -xvjf autoconf-2.62.tar.bz2
-cd autoconf-2.62
-./configure
+tar -xvjf autoconf-2.63.tar.bz2
+cd autoconf-2.63
+./configure --prefix=/usr
 make
 make install
 
 cd ~
-tar -xvjf automake-1.10.1.tar.bz2
-cd automake-1.10.1
-./configure
+tar -xvjf automake-1.10.2.tar.bz2
+cd automake-1.10.2
+./configure --prefix=/usr
 make
 make install
 
 cd ~
-tar -xvzf libtool-1.5.24.tar.gz
-cd libtool-1.5.24
-./configure
+tar -xvzf libtool-2.2.6a.tar.gz
+cd libtool-2.2.6
+./configure --prefix=/usr
 make
 make install
 
 cd ~
-tar -xvzf libiconv-1.11.1.tar.gz
+tar -xvzf libiconv-1.13.1.tar.gz
 cd libiconv-1.11.1
-./configure --disable-shared --enable-static
+./configure --prefix=/usr --disable-shared --enable-static
 make
 make install
 
 7th Install other packages we need (into C:\msys\local)
   - doxygen 1.5.7.1
-  - pod2man
-  - dot 1.16
-  - texinfo 4.8
-  - svn 1.5.2
-  - flex-2.5.4a-1
+  - The following are in the wports folder
+    * pod2man
+    * dot 1.16
+  - svn 1.6.5
 
 8th Install Python 2.5.4 (later may work but not tested)
   - Python 2.5.4 (Use the windows installer) Then add to the PATH
@@ -305,12 +302,13 @@ make install
 
 9th Some dev packs need bison since I've to patch some yy files,
 get them from the mingw msys project:
-  - flex-2.5.33-MSYS-1.0.11-1.tar.bz2
+  -flex-2.5.35-1-msys-1.0.11-bin.tar.lzma
     * Extract "over" the MSYS installation.
-  - bison-2.3-MSYS-1.0.11-1.tar.bz2
+  - bison-2.4.1-1-msys-1.0.11-bin.tar.lzma
     * Extract "over" the MSYS installation.
-  - regex-0.12-MSYS-1.0.11-1.tar.bz2
+  - libregex-0.12-1-msys-1.0.11-dll-0.tar.lzma
     * Extract "over" the MSYS installation.
+  - texinfo-4.13a-1-msys-1.0.11-bin.tar
 
 To build run the toolchain script:
 
