@@ -1,6 +1,6 @@
-diff -Naur binutils-2.18/bfd/archures.c binutils-2.18-PSP/bfd/archures.c
---- binutils-2.18/bfd/archures.c	2007-08-06 21:59:14.000000000 +0200
-+++ binutils-2.18-PSP/bfd/archures.c	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/bfd/archures.c binutils-2.18/bfd/archures.c
+--- binutils-2.18.orig/bfd/archures.c	2007-08-06 21:59:14.000000000 +0200
++++ binutils-2.18/bfd/archures.c	2009-10-12 11:31:57.000000000 +0200
 @@ -167,6 +167,7 @@
  .#define bfd_mach_mips16		16
  .#define bfd_mach_mips5                 5
@@ -9,9 +9,9 @@ diff -Naur binutils-2.18/bfd/archures.c binutils-2.18-PSP/bfd/archures.c
  .#define bfd_mach_mipsisa32             32
  .#define bfd_mach_mipsisa32r2           33
  .#define bfd_mach_mipsisa64             64
-diff -Naur binutils-2.18/bfd/bfd-in2.h binutils-2.18-PSP/bfd/bfd-in2.h
---- binutils-2.18/bfd/bfd-in2.h	2007-08-06 21:59:15.000000000 +0200
-+++ binutils-2.18-PSP/bfd/bfd-in2.h	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/bfd/bfd-in2.h binutils-2.18/bfd/bfd-in2.h
+--- binutils-2.18.orig/bfd/bfd-in2.h	2007-08-06 21:59:15.000000000 +0200
++++ binutils-2.18/bfd/bfd-in2.h	2009-10-12 11:31:57.000000000 +0200
 @@ -1838,6 +1838,7 @@
  #define bfd_mach_mips16                16
  #define bfd_mach_mips5                 5
@@ -20,9 +20,9 @@ diff -Naur binutils-2.18/bfd/bfd-in2.h binutils-2.18-PSP/bfd/bfd-in2.h
  #define bfd_mach_mipsisa32             32
  #define bfd_mach_mipsisa32r2           33
  #define bfd_mach_mipsisa64             64
-diff -Naur binutils-2.18/bfd/cpu-mips.c binutils-2.18-PSP/bfd/cpu-mips.c
---- binutils-2.18/bfd/cpu-mips.c	2007-08-06 21:59:20.000000000 +0200
-+++ binutils-2.18-PSP/bfd/cpu-mips.c	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/bfd/cpu-mips.c binutils-2.18/bfd/cpu-mips.c
+--- binutils-2.18.orig/bfd/cpu-mips.c	2007-08-06 21:59:20.000000000 +0200
++++ binutils-2.18/bfd/cpu-mips.c	2009-10-12 11:31:57.000000000 +0200
 @@ -87,6 +87,7 @@
    I_mipsisa64,
    I_mipsisa64r2,
@@ -41,9 +41,9 @@ diff -Naur binutils-2.18/bfd/cpu-mips.c binutils-2.18-PSP/bfd/cpu-mips.c
  };
  
  /* The default architecture is mips:3000, but with a machine number of
-diff -Naur binutils-2.18/bfd/elfxx-mips.c binutils-2.18-PSP/bfd/elfxx-mips.c
---- binutils-2.18/bfd/elfxx-mips.c	2007-08-24 16:01:08.000000000 +0200
-+++ binutils-2.18-PSP/bfd/elfxx-mips.c	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/bfd/elfxx-mips.c binutils-2.18/bfd/elfxx-mips.c
+--- binutils-2.18.orig/bfd/elfxx-mips.c	2007-08-24 16:01:08.000000000 +0200
++++ binutils-2.18/bfd/elfxx-mips.c	2009-10-12 11:31:57.000000000 +0200
 @@ -5013,6 +5013,9 @@
      case E_MIPS_MACH_SB1:
        return bfd_mach_mips_sb1;
@@ -73,9 +73,9 @@ diff -Naur binutils-2.18/bfd/elfxx-mips.c binutils-2.18-PSP/bfd/elfxx-mips.c
  
    /* MIPS I extensions.  */
    { bfd_mach_mips6000, bfd_mach_mips3000 },
-diff -Naur binutils-2.18/binutils/readelf.c binutils-2.18-PSP/binutils/readelf.c
---- binutils-2.18/binutils/readelf.c	2007-08-28 19:19:34.000000000 +0200
-+++ binutils-2.18-PSP/binutils/readelf.c	2009-10-02 16:06:45.000000000 +0200
+diff -Naur binutils-2.18.orig/binutils/readelf.c binutils-2.18/binutils/readelf.c
+--- binutils-2.18.orig/binutils/readelf.c	2007-08-28 19:19:34.000000000 +0200
++++ binutils-2.18/binutils/readelf.c	2009-10-12 11:31:57.000000000 +0200
 @@ -2171,6 +2171,7 @@
  	    case E_MIPS_MACH_5500: strcat (buf, ", 5500"); break;
  	    case E_MIPS_MACH_SB1:  strcat (buf, ", sb1");  break;
@@ -84,9 +84,9 @@ diff -Naur binutils-2.18/binutils/readelf.c binutils-2.18-PSP/binutils/readelf.c
  	    case 0:
  	    /* We simply ignore the field in this case to avoid confusion:
  	       MIPS ELF does not specify EF_MIPS_MACH, it is a GNU
-diff -Naur binutils-2.18/config.sub binutils-2.18-PSP/config.sub
---- binutils-2.18/config.sub	2007-08-06 22:00:30.000000000 +0200
-+++ binutils-2.18-PSP/config.sub	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/config.sub binutils-2.18/config.sub
+--- binutils-2.18.orig/config.sub	2007-08-06 22:00:30.000000000 +0200
++++ binutils-2.18/config.sub	2009-10-12 11:31:57.000000000 +0200
 @@ -267,6 +267,7 @@
  	| mipsisa64sb1 | mipsisa64sb1el \
  	| mipsisa64sr71k | mipsisa64sr71kel \
@@ -114,9 +114,9 @@ diff -Naur binutils-2.18/config.sub binutils-2.18-PSP/config.sub
  	mips3*-*)
  		basic_machine=`echo $basic_machine | sed -e 's/mips3/mips64/'`
  		;;
-diff -Naur binutils-2.18/configure binutils-2.18-PSP/configure
---- binutils-2.18/configure	2007-08-06 22:29:40.000000000 +0200
-+++ binutils-2.18-PSP/configure	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/configure binutils-2.18/configure
+--- binutils-2.18.orig/configure	2007-08-06 22:29:40.000000000 +0200
++++ binutils-2.18/configure	2009-10-12 11:33:52.000000000 +0200
 @@ -2498,6 +2498,9 @@
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
@@ -127,9 +127,18 @@ diff -Naur binutils-2.18/configure binutils-2.18-PSP/configure
    mips*-*-*)
      noconfigdirs="$noconfigdirs gprof ${libgcj}"
      ;;
-diff -Naur binutils-2.18/configure.ac binutils-2.18-PSP/configure.ac
---- binutils-2.18/configure.ac	2007-08-28 22:24:26.000000000 +0200
-+++ binutils-2.18-PSP/configure.ac	2009-10-02 14:49:52.000000000 +0200
+@@ -6128,7 +6131,7 @@
+     # For an installed makeinfo, we require it to be from texinfo 4.4 or
+     # higher, else we use the "missing" dummy.
+     if ${MAKEINFO} --version \
+-       | egrep 'texinfo[^0-9]*([1-3][0-9]|4\.[4-9]|[5-9])' >/dev/null 2>&1; then
++       | egrep 'texinfo[^0-9]*(4\.([6-9]|[1-9][0-9])|[5-9]|[1-9][0-9])' >/dev/null 2>&1; then
+       :
+     else
+       MAKEINFO="$MISSING makeinfo"
+diff -Naur binutils-2.18.orig/configure.ac binutils-2.18/configure.ac
+--- binutils-2.18.orig/configure.ac	2007-08-28 22:24:26.000000000 +0200
++++ binutils-2.18/configure.ac	2009-10-12 11:33:51.000000000 +0200
 @@ -776,6 +776,9 @@
    mips*-*-linux*)
      noconfigdirs="$noconfigdirs target-newlib target-libgloss"
@@ -140,9 +149,18 @@ diff -Naur binutils-2.18/configure.ac binutils-2.18-PSP/configure.ac
    mips*-*-*)
      noconfigdirs="$noconfigdirs gprof ${libgcj}"
      ;;
-diff -Naur binutils-2.18/gas/config/tc-mips.c binutils-2.18-PSP/gas/config/tc-mips.c
---- binutils-2.18/gas/config/tc-mips.c	2007-08-06 22:00:02.000000000 +0200
-+++ binutils-2.18-PSP/gas/config/tc-mips.c	2009-10-05 11:01:23.000000000 +0200
+@@ -2403,7 +2406,7 @@
+     # For an installed makeinfo, we require it to be from texinfo 4.4 or
+     # higher, else we use the "missing" dummy.
+     if ${MAKEINFO} --version \
+-       | egrep 'texinfo[^0-9]*([1-3][0-9]|4\.[4-9]|[5-9])' >/dev/null 2>&1; then
++       | egrep 'texinfo[^0-9]*(4\.([6-9]|[1-9][0-9])|[5-9]|[1-9][0-9])' >/dev/null 2>&1; then
+       :
+     else
+       MAKEINFO="$MISSING makeinfo"
+diff -Naur binutils-2.18.orig/gas/config/tc-mips.c binutils-2.18/gas/config/tc-mips.c
+--- binutils-2.18.orig/gas/config/tc-mips.c	2007-08-06 22:00:02.000000000 +0200
++++ binutils-2.18/gas/config/tc-mips.c	2009-10-12 11:31:57.000000000 +0200
 @@ -414,11 +414,14 @@
     (strncmp (TARGET_CPU, "mips16", sizeof ("mips16") - 1) == 0		\
      || strncmp (TARGET_CANONICAL, "mips-lsi-elf", sizeof ("mips-lsi-elf") - 1) == 0)
@@ -1960,9 +1978,9 @@ diff -Naur binutils-2.18/gas/config/tc-mips.c binutils-2.18-PSP/gas/config/tc-mi
    /* MIPS III */
    { "r4000",          0,			ISA_MIPS3,      CPU_R4000 },
    { "r4010",          0,			ISA_MIPS2,      CPU_R4010 },
-diff -Naur binutils-2.18/gas/configure binutils-2.18-PSP/gas/configure
---- binutils-2.18/gas/configure	2007-08-06 22:29:43.000000000 +0200
-+++ binutils-2.18-PSP/gas/configure	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/gas/configure binutils-2.18/gas/configure
+--- binutils-2.18.orig/gas/configure	2007-08-06 22:29:43.000000000 +0200
++++ binutils-2.18/gas/configure	2009-10-12 11:31:57.000000000 +0200
 @@ -10056,6 +10056,9 @@
  	  mips64vr | mips64vrel)
  	    mips_cpu=vr4100
@@ -1973,9 +1991,9 @@ diff -Naur binutils-2.18/gas/configure binutils-2.18-PSP/gas/configure
  	  mipsisa32r2* | mipsisa64r2*)
  	    mips_cpu=`echo $target_cpu | sed -e 's/[a-z]*..r2//' -e 's/el$//'`
  	    ;;
-diff -Naur binutils-2.18/gas/configure.in binutils-2.18-PSP/gas/configure.in
---- binutils-2.18/gas/configure.in	2007-08-06 21:59:50.000000000 +0200
-+++ binutils-2.18-PSP/gas/configure.in	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/gas/configure.in binutils-2.18/gas/configure.in
+--- binutils-2.18.orig/gas/configure.in	2007-08-06 21:59:50.000000000 +0200
++++ binutils-2.18/gas/configure.in	2009-10-12 11:31:57.000000000 +0200
 @@ -210,6 +210,9 @@
  	  mips64vr | mips64vrel)
  	    mips_cpu=vr4100
@@ -1986,9 +2004,9 @@ diff -Naur binutils-2.18/gas/configure.in binutils-2.18-PSP/gas/configure.in
  	  mipsisa32r2* | mipsisa64r2*)
  changequote(,)dnl
  	    mips_cpu=`echo $target_cpu | sed -e 's/[a-z]*..r2//' -e 's/el$//'`
-diff -Naur binutils-2.18/gas/testsuite/gas/mips/mips.exp binutils-2.18-PSP/gas/testsuite/gas/mips/mips.exp
---- binutils-2.18/gas/testsuite/gas/mips/mips.exp	2007-08-06 22:00:14.000000000 +0200
-+++ binutils-2.18-PSP/gas/testsuite/gas/mips/mips.exp	2009-10-05 11:29:48.000000000 +0200
+diff -Naur binutils-2.18.orig/gas/testsuite/gas/mips/mips.exp binutils-2.18/gas/testsuite/gas/mips/mips.exp
+--- binutils-2.18.orig/gas/testsuite/gas/mips/mips.exp	2007-08-06 22:00:14.000000000 +0200
++++ binutils-2.18/gas/testsuite/gas/mips/mips.exp	2009-10-12 11:31:57.000000000 +0200
 @@ -361,6 +361,9 @@
  mips_arch_create sb1 	64	mips64	{ mips3d } \
  			{ -march=sb1 -mtune=sb1 } { -mmips:sb1 } \
@@ -1999,9 +2017,9 @@ diff -Naur binutils-2.18/gas/testsuite/gas/mips/mips.exp binutils-2.18-PSP/gas/t
  
  #
  # And now begin the actual tests!  VxWorks uses RELA rather than REL
-diff -Naur binutils-2.18/include/elf/mips.h binutils-2.18-PSP/include/elf/mips.h
---- binutils-2.18/include/elf/mips.h	2007-08-06 21:59:47.000000000 +0200
-+++ binutils-2.18-PSP/include/elf/mips.h	2009-10-02 14:49:52.000000000 +0200
+diff -Naur binutils-2.18.orig/include/elf/mips.h binutils-2.18/include/elf/mips.h
+--- binutils-2.18.orig/include/elf/mips.h	2007-08-06 21:59:47.000000000 +0200
++++ binutils-2.18/include/elf/mips.h	2009-10-12 11:31:57.000000000 +0200
 @@ -216,6 +216,7 @@
  #define E_MIPS_MACH_5400	0x00910000
  #define E_MIPS_MACH_5500	0x00980000
@@ -2010,9 +2028,9 @@ diff -Naur binutils-2.18/include/elf/mips.h binutils-2.18-PSP/include/elf/mips.h
  
  /* Processor specific section indices.  These sections do not actually
     exist.  Symbols with a st_shndx field corresponding to one of these
-diff -Naur binutils-2.18/include/opcode/mips.h binutils-2.18-PSP/include/opcode/mips.h
---- binutils-2.18/include/opcode/mips.h	2007-02-20 14:28:54.000000000 +0100
-+++ binutils-2.18-PSP/include/opcode/mips.h	2009-10-05 11:22:46.000000000 +0200
+diff -Naur binutils-2.18.orig/include/opcode/mips.h binutils-2.18/include/opcode/mips.h
+--- binutils-2.18.orig/include/opcode/mips.h	2007-02-20 14:28:54.000000000 +0100
++++ binutils-2.18/include/opcode/mips.h	2009-10-12 11:31:57.000000000 +0200
 @@ -215,6 +215,228 @@
  #define OP_SH_UDI4		6
  #define OP_MASK_UDI4		0xfffff
@@ -2368,9 +2386,9 @@ diff -Naur binutils-2.18/include/opcode/mips.h binutils-2.18-PSP/include/opcode/
    M_XOR_I,
    M_COP0,
    M_COP1,
-diff -Naur binutils-2.18/include/opcode/vfpu.h binutils-2.18-PSP/include/opcode/vfpu.h
---- binutils-2.18/include/opcode/vfpu.h	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.18-PSP/include/opcode/vfpu.h	2009-10-02 17:12:13.000000000 +0200
+diff -Naur binutils-2.18.orig/include/opcode/vfpu.h binutils-2.18/include/opcode/vfpu.h
+--- binutils-2.18.orig/include/opcode/vfpu.h	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.18/include/opcode/vfpu.h	2009-10-12 11:31:57.000000000 +0200
 @@ -0,0 +1,261 @@
 +#ifndef _VFPU_H_
 +#define _VFPU_H_
@@ -2633,9 +2651,9 @@ diff -Naur binutils-2.18/include/opcode/vfpu.h binutils-2.18-PSP/include/opcode/
 +#define VFPU_MASK_SYNC		0xffff0000
 +
 +#endif /* _VFPU_H_ */
-diff -Naur binutils-2.18/ld/configure.tgt binutils-2.18-PSP/ld/configure.tgt
---- binutils-2.18/ld/configure.tgt	2007-08-28 19:19:42.000000000 +0200
-+++ binutils-2.18-PSP/ld/configure.tgt	2009-10-02 16:21:29.000000000 +0200
+diff -Naur binutils-2.18.orig/ld/configure.tgt binutils-2.18/ld/configure.tgt
+--- binutils-2.18.orig/ld/configure.tgt	2007-08-28 19:19:42.000000000 +0200
++++ binutils-2.18/ld/configure.tgt	2009-10-12 11:31:57.000000000 +0200
 @@ -370,6 +370,8 @@
  mips*vr4100-*-elf*)	targ_emul=elf32b4300 ;;
  mips*vr5000el-*-elf*)	targ_emul=elf32l4300 ;;
@@ -2645,9 +2663,9 @@ diff -Naur binutils-2.18/ld/configure.tgt binutils-2.18-PSP/ld/configure.tgt
  mips*el-sde-elf*)	targ_emul=elf32ltsmip
  			targ_extra_emuls="elf32btsmip elf32ltsmipn32 elf64ltsmip elf32btsmipn32 elf64btsmip" ;;
  mips*-sde-elf*)		targ_emul=elf32btsmip
-diff -Naur binutils-2.18/ld/emulparams/elf_mipsallegrexel_psp.sh binutils-2.18-PSP/ld/emulparams/elf_mipsallegrexel_psp.sh
---- binutils-2.18/ld/emulparams/elf_mipsallegrexel_psp.sh	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.18-PSP/ld/emulparams/elf_mipsallegrexel_psp.sh	2009-10-02 16:18:44.000000000 +0200
+diff -Naur binutils-2.18.orig/ld/emulparams/elf_mipsallegrexel_psp.sh binutils-2.18/ld/emulparams/elf_mipsallegrexel_psp.sh
+--- binutils-2.18.orig/ld/emulparams/elf_mipsallegrexel_psp.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.18/ld/emulparams/elf_mipsallegrexel_psp.sh	2009-10-12 11:31:57.000000000 +0200
 @@ -0,0 +1,22 @@
 +# Based off of the default elf32 MIPS target.  However, we use a seperate
 +# script template because the PSP architecture defines sections that normally
@@ -2671,9 +2689,9 @@ diff -Naur binutils-2.18/ld/emulparams/elf_mipsallegrexel_psp.sh binutils-2.18-P
 +
 +# Discard the .comment and .pdr sections.
 +OTHER_SECTIONS="/DISCARD/ : { *(.comment) *(.pdr) }"
-diff -Naur binutils-2.18/ld/Makefile.am binutils-2.18-PSP/ld/Makefile.am
---- binutils-2.18/ld/Makefile.am	2007-08-06 22:00:17.000000000 +0200
-+++ binutils-2.18-PSP/ld/Makefile.am	2009-10-02 16:21:29.000000000 +0200
+diff -Naur binutils-2.18.orig/ld/Makefile.am binutils-2.18/ld/Makefile.am
+--- binutils-2.18.orig/ld/Makefile.am	2007-08-06 22:00:17.000000000 +0200
++++ binutils-2.18/ld/Makefile.am	2009-10-12 11:31:57.000000000 +0200
 @@ -205,6 +205,7 @@
  	eelf_i386_chaos.o \
  	eelf_i386_fbsd.o \
@@ -2692,9 +2710,9 @@ diff -Naur binutils-2.18/ld/Makefile.am binutils-2.18-PSP/ld/Makefile.am
  eelf_i386_vxworks.c: $(srcdir)/emulparams/elf_i386_vxworks.sh \
    $(srcdir)/emulparams/vxworks.sh $(srcdir)/emultempl/vxworks.em \
    $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
-diff -Naur binutils-2.18/ld/Makefile.in binutils-2.18-PSP/ld/Makefile.in
---- binutils-2.18/ld/Makefile.in	2007-08-06 22:29:54.000000000 +0200
-+++ binutils-2.18-PSP/ld/Makefile.in	2009-10-02 16:21:29.000000000 +0200
+diff -Naur binutils-2.18.orig/ld/Makefile.in binutils-2.18/ld/Makefile.in
+--- binutils-2.18.orig/ld/Makefile.in	2007-08-06 22:29:54.000000000 +0200
++++ binutils-2.18/ld/Makefile.in	2009-10-12 11:31:57.000000000 +0200
 @@ -452,6 +452,7 @@
  	eelf_i386_chaos.o \
  	eelf_i386_fbsd.o \
@@ -2713,9 +2731,9 @@ diff -Naur binutils-2.18/ld/Makefile.in binutils-2.18-PSP/ld/Makefile.in
  eelf_i386_vxworks.c: $(srcdir)/emulparams/elf_i386_vxworks.sh \
    $(srcdir)/emulparams/vxworks.sh $(srcdir)/emultempl/vxworks.em \
    $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
-diff -Naur binutils-2.18/ld/scripttempl/elf_psp.sc binutils-2.18-PSP/ld/scripttempl/elf_psp.sc
---- binutils-2.18/ld/scripttempl/elf_psp.sc	1970-01-01 01:00:00.000000000 +0100
-+++ binutils-2.18-PSP/ld/scripttempl/elf_psp.sc	2009-10-02 16:21:14.000000000 +0200
+diff -Naur binutils-2.18.orig/ld/scripttempl/elf_psp.sc binutils-2.18/ld/scripttempl/elf_psp.sc
+--- binutils-2.18.orig/ld/scripttempl/elf_psp.sc	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.18/ld/scripttempl/elf_psp.sc	2009-10-12 11:31:57.000000000 +0200
 @@ -0,0 +1,496 @@
 +#
 +# Unusual variables checked by this code:
@@ -3213,9 +3231,9 @@ diff -Naur binutils-2.18/ld/scripttempl/elf_psp.sc binutils-2.18-PSP/ld/scriptte
 +  ${RELOCATING+${STACKNOTE}}
 +}
 +EOF
-diff -Naur binutils-2.18/opcodes/mips-dis.c binutils-2.18-PSP/opcodes/mips-dis.c
---- binutils-2.18/opcodes/mips-dis.c	2007-08-06 21:59:07.000000000 +0200
-+++ binutils-2.18-PSP/opcodes/mips-dis.c	2009-10-05 11:28:00.000000000 +0200
+diff -Naur binutils-2.18.orig/opcodes/mips-dis.c binutils-2.18/opcodes/mips-dis.c
+--- binutils-2.18.orig/opcodes/mips-dis.c	2007-08-06 21:59:07.000000000 +0200
++++ binutils-2.18/opcodes/mips-dis.c	2009-10-12 11:31:57.000000000 +0200
 @@ -136,6 +136,139 @@
    "c0_taglo",     "c0_taghi",     "c0_errorepc",  "c0_desave",
  };
@@ -3770,9 +3788,9 @@ diff -Naur binutils-2.18/opcodes/mips-dis.c binutils-2.18-PSP/opcodes/mips-dis.c
  	default:
  	  /* xgettext:c-format */
  	  (*info->fprintf_func) (info->stream,
-diff -Naur binutils-2.18/opcodes/mips-opc.c binutils-2.18-PSP/opcodes/mips-opc.c
---- binutils-2.18/opcodes/mips-opc.c	2007-08-06 21:59:07.000000000 +0200
-+++ binutils-2.18-PSP/opcodes/mips-opc.c	2009-10-05 11:34:57.000000000 +0200
+diff -Naur binutils-2.18.orig/opcodes/mips-opc.c binutils-2.18/opcodes/mips-opc.c
+--- binutils-2.18.orig/opcodes/mips-opc.c	2007-08-06 21:59:07.000000000 +0200
++++ binutils-2.18/opcodes/mips-opc.c	2009-10-12 11:31:57.000000000 +0200
 @@ -113,6 +113,7 @@
  #define N5	(INSN_5400 | INSN_5500)
  #define N54	INSN_5400
