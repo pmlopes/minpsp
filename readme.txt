@@ -29,6 +29,10 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.9.6
+* Updated the dev environment to build under Windows Vista
+* Updated binutils to 2.18 (for better integration with gcc 4.3.x)
+
 0.9.5
 * Start to port the project also for OpenSolaris 2009.06 (vanilla).
 * Added Visual Studio Project Files from Lukas Przytula
@@ -221,14 +225,19 @@ up to date was a terrible task since there were conflicts constantly between
 updated dlls and tools.
 
 1st Download latest MinGW version and install it:
-http://downloads.sf.net/mingw/MinGW-5.1.4.exe Choose c:\msys\mingw as 
-installation directory. Select "candidate" package version and check the g++
+http://downloads.sf.net/mingw/MinGW-5.1.6.exe Choose c:\msys\mingw as 
+installation directory. Select "current" package version and check the g++
 option on the packages list.
 
 Optionally install GDB
-http://downloads.sf.net/mingw/gdb-6.3-2.exe
+http://downloads.sf.net/mingw/gdb-7.0-mingw32-bin.tar.gz decompress over
+c:\msys\mingw
 
-2nd Download latest MSYS and install it:
+2nd Download and install MSYS Developer Toolkit executable:
+http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe
+Install to c:\msys.
+
+3rd Download latest MSYS and install it:
 http://prdownloads.sourceforge.net/mingw/MSYS-1.0.11.exe
 Chose c:\msys as installation directory. Leave all other options unchanged.
 During the postinstall script, please carefully answer all questions. 
@@ -238,9 +247,8 @@ Note: Users of 64-bit Windows variants have to change the startmenu shortcut.
 Change it to c:\WINDOWS\SysWOW64\cmd.exe /C c:\dev\msys\msys.bat (adjust path
 to Windows directory as needed)
 
-3rd Download and install MSYS Developer Toolkit executable:
-http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe
-Install to c:\msys as well.
+At this moment you have a working bash shell with the basic tools, however
+to make it more convenient we need some extra libs and tools.
 
 4th Download wget:
 http://prdownloads.sourceforge.net/gnuwin32/wget-1.11.4-1-bin.zip
@@ -282,19 +290,22 @@ make install
 
 cd ~
 tar -xvzf libiconv-1.13.1.tar.gz
-cd libiconv-1.11.1
+cd libiconv-1.13.1
 ./configure --prefix=/usr --disable-shared --enable-static
 make
 make install
 
 7th Install other packages we need (into C:\msys\local)
   - doxygen 1.5.7.1
+    http://ftp.stack.nl/pub/users/dimitri/doxygen-1.5.7.1.windows.bin.zip
   - The following are in the wports folder
     * pod2man
     * dot 1.16
   - svn 1.6.5
+    http://subversion.tigris.org
 
 8th Install Python 2.5.4 (later may work but not tested)
+  http://python.org/ftp/python/2.5.4/python-2.5.4.msi
   - Python 2.5.4 (Use the windows installer) Then add to the PATH
   - Add it to the MSys PATH by adding the line:
      SET PATH=%PATH%;C:\Python25
@@ -308,7 +319,7 @@ get them from the mingw msys project:
     * Extract "over" the MSYS installation.
   - libregex-0.12-1-msys-1.0.11-dll-0.tar.lzma
     * Extract "over" the MSYS installation.
-  - texinfo-4.13a-1-msys-1.0.11-bin.tar
+	* Then rename to msys-regex-1.dll
 
 To build run the toolchain script:
 

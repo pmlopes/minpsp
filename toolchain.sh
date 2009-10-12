@@ -10,20 +10,27 @@ PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 #SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
 SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
-# gcc deps versions
-ZLIB_VER=1.2.3
-GMP_VER=4.2.4
-MPFR_VER=2.3.2
-PPL_VER=0.10
+# testing
+#DISABLE_SVN=1
 
 # sdk versions
 BINUTILS_VER=2.18
 GCC_VER=4.3.4
 GCC_TC_VER=4.3.2
 NEWLIB_VER=1.17.0
-
 #debugger version
 GDB_VER=6.8
+
+# gcc >= 4.x deps versions
+ZLIB_VER=1.2.3
+GMP_VER=4.2.4
+MPFR_VER=2.4.1
+# for gcc >= 4.4 (graphite)
+PPL_VER=0.10.2
+CLOOGG_PPL_VER=0.15
+MPC_VER=0.7.0
+# for gcc >= 4.5 (lto)
+LIBELF_VER=0.8.12
 
 #extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
@@ -32,9 +39,6 @@ MINGW32_LESS_VER=394
 
 # package version
 PSPSDK_VERSION=0.9.6
-
-# testing
-#DISABLE_SVN=1
 
 #---------------------------------------------------------------------------------
 # functions
@@ -104,6 +108,8 @@ function prepare {
 		installZlib
 		installGMP
 		installMPFR
+		# graphite
+		installPPL
 	fi
 	
 	checkTool svn
@@ -112,6 +118,8 @@ function prepare {
 	checkTool gawk
 	checkTool makeinfo
 	checkTool python
+	checkTool flex
+	checkTool bison
 	
 	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
@@ -226,10 +234,10 @@ function installGMP {
 		tar -xjf $GMP || die "extracting "$GMP
 
 		cd "gmp-"$GMP_VER
-		./configure --prefix=/usr/local --enable-cxx || die "configuring "$GMP
-		make || die "building "$GMP
-		make check || die "checking "$GMP
-		make install || die "installing "$GMP
+		./configure --prefix=/usr/local --enable-cxx || die "configuring gmp"
+		make || die "building gmp"
+		make check || die "checking gmp"
+		make install || die "installing gmp"
 		cd ../..
 	fi
 }
@@ -247,9 +255,27 @@ function installMPFR {
 		./configure \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
-		make || die "building "$MPFR
-		make check || die "checking "$MPFR
-		make install || die "installing "$MPFR
+		make || die "building mpfr"
+		make check || die "checking mpfr"
+		make install || die "installing mpfr"
+		cd ../..
+	fi
+}
+
+function installPPL {
+	if [ ! -f /usr/local/include/ppl.h ]
+	then
+		PPL="ppl-"$PPL_VER".tar.bz2"
+		
+		downloadHTTP deps $PPL "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER
+		cd deps
+		tar -xjf $PPL || die "extracting "$PPL
+
+		cd "ppl-"$PPL_VER
+		./configure || die "configuring ppl"
+		make || die "building ppl"
+		make check || die "checking ppl"
+		make install || die "installing ppl"
 		cd ../..
 	fi
 }
@@ -273,8 +299,6 @@ function buildBinutils {
 		cd psp
 		tar -xjf $BINUTILS || die "extracting "$BINUTILS
 		patch -p1 -d $BINUTILS_SRCDIR -i ../patches/binutils-$BINUTILS_VER-MINPSPW.patch || die "patching binutils"
-		# makeinfo is not correctly detected on latest ubuntu this hack fix it
-		touch $BINUTILS_SRCDIR/bfd/doc/*
 		cd ..
 	fi
 	
@@ -776,7 +800,7 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-
+exit
 downloadPatches
 
 #---------------------------------------------------------------------------------
