@@ -225,13 +225,23 @@ up to date was a terrible task since there were conflicts constantly between
 updated dlls and tools.
 
 1st Download latest MinGW version and install it:
-http://downloads.sf.net/mingw/MinGW-5.1.6.exe Choose c:\msys\mingw as 
-installation directory. Select "current" package version and check the g++
-option on the packages list.
+http://downloads.sourceforge.net/mingw/binutils-2.19.1-mingw32-bin.tar.gz
+http://downloads.sourceforge.net/mingw/gcc-c++-4.4.0-mingw32-bin.tar.gz
+http://downloads.sourceforge.net/mingw/gcc-c++-4.4.0-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/gcc-core-4.4.0-mingw32-bin.tar.gz
+http://downloads.sourceforge.net/mingw/gcc-core-4.4.0-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/gmp-4.2.4-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/libiconv-1.13.1-1-mingw32-dll-2.tar.tar
+http://downloads.sourceforge.net/mingw/mingwrt-3.16-mingw32-dev.tar.gz
+http://downloads.sourceforge.net/mingw/mingwrt-3.16-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/mpfr-2.4.1-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/pthreads-w32-2.8.0-mingw32-dll.tar.gz
+http://downloads.sourceforge.net/mingw/w32api-3.13-mingw32-dev.tar.gz
+
+Download and unzip over c:\msys\mingw.
 
 Optionally install GDB
-http://downloads.sf.net/mingw/gdb-7.0-mingw32-bin.tar.gz decompress over
-c:\msys\mingw
+http://downloads.sourceforge.net/mingw/gdb-7.0-2-mingw32-bin.tar.gz
 
 2nd Download and install MSYS Developer Toolkit executable:
 http://downloads.sourceforge.net/mingw/msysDTK-1.0.1.exe

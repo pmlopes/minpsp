@@ -24,11 +24,12 @@ GDB_VER=6.8
 # gcc >= 4.x deps versions
 ZLIB_VER=1.2.3
 GMP_VER=4.2.4
+# minimal is 2.3.2
 MPFR_VER=2.4.1
 # for gcc >= 4.4 (graphite)
 PPL_VER=0.10.2
-CLOOGG_PPL_VER=0.15
-MPC_VER=0.7.0
+CLOOGG_PPL_VER=0.15.7
+MPC_VER=0.7
 # for gcc >= 4.5 (lto)
 LIBELF_VER=0.8.12
 
@@ -64,6 +65,8 @@ function prepare {
 		MPFR_INCLUDE=/usr/include/mpfr
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
+		GMP_PREFIX=/usr
+		PPL_PREFIX=/usr
 		
 		if [ ! -e compat ]; then
 			mkdir -p compat
@@ -83,6 +86,8 @@ function prepare {
 		MPFR_INCLUDE=/usr/include
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
+		GMP_PREFIX=/usr
+		PPL_PREFIX=/usr
 	fi
 
 	# --- XP 32 bits
@@ -101,6 +106,8 @@ function prepare {
 		MPFR_INCLUDE=/usr/local/include
 		GMP_LIB=/usr/local/lib
 		MPFR_LIB=/usr/local/lib
+		GMP_PREFIX=/usr/local
+		PPL_PREFIX=/usr/local
 
 		#-----------------------------------------------------------------------------
 		# pre requisites
@@ -110,6 +117,9 @@ function prepare {
 		installMPFR
 		# graphite
 		installPPL
+		installCLOOG_PPL
+		installMPC
+		installLIBELF
 	fi
 	
 	checkTool svn
@@ -263,7 +273,7 @@ function installMPFR {
 }
 
 function installPPL {
-	if [ ! -f /usr/local/include/ppl.h ]
+	if [ ! -f /usr/local/include/ppl_c.h ]
 	then
 		PPL="ppl-"$PPL_VER".tar.bz2"
 		
@@ -272,10 +282,75 @@ function installPPL {
 		tar -xjf $PPL || die "extracting "$PPL
 
 		cd "ppl-"$PPL_VER
-		./configure || die "configuring ppl"
+		./configure \
+			--prefix=/usr/local \
+			--with-libgmp-prefix=$GMP_PREFIX \
+			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
 		make || die "building ppl"
 		make check || die "checking ppl"
 		make install || die "installing ppl"
+		cd ../..
+	fi
+}
+
+function installCLOOGPPL {
+	if [ ! -f /usr/local/include/cloog/cloog.h ]
+	then
+		CLOOG_PPL="cloog-ppl-"$CLOOG_PPL_VER".tar.gz"
+		
+		downloadFTP deps $CLOOG_PPL "ftp://gcc.gnu.org/pub/gcc/infrastructure"
+		cd deps
+		tar -xjf $CLOOG_PPL || die "extracting "$CLOOG_PPL
+
+		cd "cloog-ppl-"$CLOOG_PPL_VER
+		./configure \
+			--prefix=/usr/local \
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
+			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
+		make || die "building cloog-ppl"
+		make check || die "checking cloog-ppl"
+		make install || die "installing cloog-ppl"
+		cd ../..
+	fi
+}
+
+function installMPC {
+	if [ ! -f /usr/local/include/mpc.h ]
+	then
+		MPC="mpc-"$MPC_VER".tar.gz"
+		
+		downloadHTTP deps $MPC "http://www.multiprecision.org/mpc/download"
+		cd deps
+		tar -xjf $MPC || die "extracting "$MPC
+
+		cd "mpc-"$MPC_VER
+		./configure \
+			--prefix=/usr/local \
+			--enable-static --disable-shared \
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring mpc"
+		make || die "building mpc"
+		make check || die "checking mpc"
+		make install || die "installing mpc"
+		cd ../..
+	fi
+}
+
+function installLIBELF {
+	if [ ! -f /usr/local/include/elf.h ]
+	then
+		LIBELF="libelf-"$LIBELF_VER".tar.gz"
+		
+		downloadHTTP deps $LIBELF "http://www.mr511.de/software"
+		cd deps
+		tar -xjf $LIBELF || die "extracting "$LIBELF
+
+		cd "libelf-"$LIBELF_VER
+		./configure \
+			--prefix=/usr/local \
+			--disable-shared || die "configuring libelf"
+		make || die "building libelf"
+		make install || die "installing libelf"
 		cd ../..
 	fi
 }
