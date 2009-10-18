@@ -8,11 +8,7 @@ downloadHTTP http://brunni.dev-fr.org/dl/psp OSLib_210_src.rar
 
 if [ ! -d OSLib_210_src ]
 then
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
-		../../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
-	else
-		unrar x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
-	fi
+	unrar x OSLib_210_src.rar || ../../../mingw/bin/UnRAR x OSLib_210_src.rar || { echo "Failed to download"; exit 1; }
 	patch -p0 -d OSLib_210_src -i ../../OSLib.patch || { echo "Error patching OSLib"; exit; }
 fi
 

@@ -11,11 +11,7 @@ if [ ! -d $LIBNAME ]
 then
 	mkdir $LIBNAME
 	cd $LIBNAME
-	if [ "$OS" == "MINGW32_NT-5.1" ]; then
-		../../../../mingw/bin/unzip -q ../$PKG.zip
-	else
-		unzip -q ../$PKG.zip
-	fi
+	unzip -q ../$PKG.zip || ../../../../mingw/bin/unzip -q ../$PKG.zip
 	cd ..
 	patch -p1 -d $LIBNAME -i ../../$LIBNAME.patch || { echo "Error patching $LIBNAME"; exit; }
 fi
