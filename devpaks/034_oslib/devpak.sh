@@ -39,7 +39,9 @@ rm -fR ../../target/doc/oslib/html
 cd ../..
 
 makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 libmikmod 3.1.11
-mv build/OSLib-2.10.tar.bz2 build/oslib-2.10.tar.bz2
+# broke into 2 commands to make msys happy
+mv build/OSLib-2.10.tar.bz2 build/tmp
+mv build/tmp build/oslib-2.10.tar.bz2
 
 echo "Done!"
 

@@ -139,12 +139,12 @@ Section "Basic Devpaks" SEC0004
 	WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" Mini-XML 2.5
 SectionEnd
 
-Section "Eclipse CDT 5+ Support" SEC0005
-    SetOutPath $INSTDIR
-    SetOverwrite on
-    File /r ${SDKDIR}\eclipse\*
-    WriteRegStr HKLM "${REGKEY}\Components" "Eclipse CDT 5+ Support" 1
-SectionEnd
+#Section "Eclipse CDT 5+ Support" SEC0005
+#    SetOutPath $INSTDIR
+#    SetOverwrite on
+#    File /r ${SDKDIR}\eclipse\*
+#    WriteRegStr HKLM "${REGKEY}\Components" "Eclipse CDT 5+ Support" 1
+#SectionEnd
 
 Section /o "Visual Studio Support" SEC0006
     SetOutPath $INSTDIR
@@ -203,9 +203,9 @@ Section /o "-un.Visual Studio Support" UNSEC0006
     DeleteRegValue HKLM "${REGKEY}\Components" "Visual Studio Support"
 SectionEnd
 
-Section /o "-un.Visual Studio Support" UNSEC0005
-    DeleteRegValue HKLM "${REGKEY}\Components" "Eclipse CDT 5+ Support"
-SectionEnd
+#Section /o "-un.Visual Studio Support" UNSEC0005
+#    DeleteRegValue HKLM "${REGKEY}\Components" "Eclipse CDT 5+ Support"
+#SectionEnd
 
 Section /o "-un.Basic Devpaks" UNSEC0004
 	# delete all devpaks since all files will be deleted after all
@@ -265,7 +265,7 @@ Function un.onInit
     !insertmacro SELECT_UNSECTION "PSP link" ${UNSEC0002}
     !insertmacro SELECT_UNSECTION "HTML Documentation" ${UNSEC0003}
 	!insertmacro SELECT_UNSECTION "Basic Devpaks" ${UNSEC0004}
-	!insertmacro SELECT_UNSECTION "Eclipse CDT 5+ Support" ${UNSEC0005}
+#	!insertmacro SELECT_UNSECTION "Eclipse CDT 5+ Support" ${UNSEC0005}
 	!insertmacro SELECT_UNSECTION "Visual Studio Support" ${UNSEC0006}
 	!insertmacro SELECT_UNSECTION "Man/Info pages" ${UNSEC0007}
 FunctionEnd
@@ -277,7 +277,7 @@ FunctionEnd
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0002} "Utilities for debugging"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0003} "HTML Documentation for the SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0004} "zlib bzip2 freetype jpeg libbulletml libmad libmikmod libogg libpng libpspvram libTremor libvorbis lua pspgl pspirkeyb sqlite SDL SDL_gfx SDL_image SDL_mixer SDL_ttf smpeg-psp zziplib, etc..."
-!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds gcc.exe to the PATH so Eclipse CDT 5+ can auto configure itself"
+#!insertmacro MUI_DESCRIPTION_TEXT ${SEC0005} "Adds gcc.exe to the PATH so Eclipse CDT 5+ can auto configure itself"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0006} "Adds a script called 'vsmake' that can be used inside Visual Studio with the SDK"
 !insertmacro MUI_DESCRIPTION_TEXT ${SEC0007} "Only needed if you want the Compiler Man pages, man readed included"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END

@@ -87,22 +87,6 @@ diff -Naur newlib-1.17.0/newlib/libc/include/machine/time.h newlib-1.17.0.new/ne
  #endif	/* _MACHTIME_H_ */
  
  
-diff -Naur newlib-1.17.0/newlib/libc/include/stdint.h newlib-1.17.0.new/newlib/libc/include/stdint.h
---- newlib-1.17.0/newlib/libc/include/stdint.h	2008-12-10 22:27:58.000000000 +0100
-+++ newlib-1.17.0.new/newlib/libc/include/stdint.h	2009-09-25 14:37:31.000000000 +0200
-@@ -30,11 +30,9 @@
- #define __have_longlong64 1
- #endif
- 
--/* Check if "long" is 64bit or 32bit wide */
-+/* Check if "long" is 64bit */
- #if __STDINT_EXP(LONG_MAX) > 0x7fffffff
- #define __have_long64 1
--#elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
--#define __have_long32 1
- #endif
- 
- #if __STDINT_EXP(SCHAR_MAX) == 0x7f
 diff -Naur newlib-1.17.0/newlib/libc/include/sys/config.h newlib-1.17.0.new/newlib/libc/include/sys/config.h
 --- newlib-1.17.0/newlib/libc/include/sys/config.h	2008-11-19 22:05:31.000000000 +0100
 +++ newlib-1.17.0.new/newlib/libc/include/sys/config.h	2009-09-25 14:37:31.000000000 +0200

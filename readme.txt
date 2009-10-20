@@ -32,6 +32,9 @@ Portable handheld videogame system.
 0.9.6
 * Updated the dev environment to build under Windows Vista
 * Updated binutils to 2.18 (for better integration with gcc 4.3.x)
+* removed the patch that defines long as 64bit back to 32bit. This can
+  lead to faster code but breaks old compiled libraries
+* Disabled CDT-5.0.x bug fix.
 
 0.9.5
 * Start to port the project also for OpenSolaris 2009.06 (vanilla).

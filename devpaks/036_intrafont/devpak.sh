@@ -25,7 +25,9 @@ make install || { echo "Error building $LIBNAME"; exit 1; }
 cd ..
 
 makeInstaller $LIBNAME $VERSION
-mv build/intraFont-0.31.tar.bz2 build/intrafont-0.31.tar.bz2
+# 2 mv for msys
+mv build/intraFont-0.31.tar.bz2 build/tmp
+mv build/tmp build/intrafont-0.31.tar.bz2
 
 echo "Done!"
 

@@ -11,7 +11,7 @@ PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
 # testing
-#DISABLE_SVN=1
+DISABLE_SVN=1
 
 # sdk versions
 BINUTILS_VER=2.18
@@ -733,6 +733,13 @@ function installInfo {
 }
 
 function patchCMD {
+	# make sure the line endings are correct (DOS style)
+	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build.mak > $INSTALLDIR/psp/sdk/lib/build.mak.unix
+	mv -f $INSTALLDIR/psp/sdk/lib/build.mak.unix $INSTALLDIR/psp/sdk/lib/build.mak
+	
+	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build_prx.mak > $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix
+	mv -f $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix $INSTALLDIR/psp/sdk/lib/build_prx.mak
+
 	patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/psp/patches/pspsdk-CMD.patch || die "patching makefiles for Win CMD shell"
 }
 
@@ -751,9 +758,10 @@ function prepareDistro {
 	mkdir -p $INSTALLERDIR/samples/psp/sdk
 	# clone the base installation
 	cp -fR $INSTALLDIR/* $INSTALLERDIR/base
-	# copy eclipse tools
-	cp $INSTALLERDIR/base/bin/psp-gcc.exe $INSTALLERDIR/eclipse/bin/gcc.exe
-	cp $INSTALLERDIR/base/bin/psp-g++.exe $INSTALLERDIR/eclipse/bin/g++.exe
+#	Eclipse Works great again so disable this since it causes problems with local GCCs
+#	# copy eclipse tools
+#	cp $INSTALLERDIR/base/bin/psp-gcc.exe $INSTALLERDIR/eclipse/bin/gcc.exe
+#	cp $INSTALLERDIR/base/bin/psp-g++.exe $INSTALLERDIR/eclipse/bin/g++.exe
 	# copy visual studio tools
 	mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
 	mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
@@ -874,7 +882,7 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-exit
+
 downloadPatches
 
 #---------------------------------------------------------------------------------
