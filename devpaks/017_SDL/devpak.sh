@@ -8,7 +8,7 @@ svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 sh autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp --enable-pspirkeyb
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 
@@ -28,7 +28,7 @@ else
 	gcc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VERSION\" ../sdl-config.c || exit 1
 fi
 
-makeInstaller $LIBNAME $VERSION  pspgl 2264
+makeInstaller $LIBNAME $VERSION pspgl 2264 pspirkeyb 0.0.4
 
 echo "Done!"
 

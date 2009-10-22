@@ -9,7 +9,7 @@ svnGetPS2DEV $LIBNAME
 cd $LIBNAME
 
 sh autogen.sh
-AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --disable-mmx --disable-shared || { exit 1; }
+AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --disable-mmx --disable-shared || { exit 1; }
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 

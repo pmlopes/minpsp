@@ -8,7 +8,7 @@ svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 

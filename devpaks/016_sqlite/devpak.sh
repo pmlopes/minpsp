@@ -8,7 +8,7 @@ svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 export PSPDEV=$(psp-config --pspdev-path)
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp
 
 make || { echo "Error building $LIBNAME"; exit 1; }
 

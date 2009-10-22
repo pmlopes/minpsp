@@ -446,6 +446,9 @@ function bootstrapSDK {
 	if [ ! -d pspsdk ]
 	then
 		svnGetPS2DEV pspsdk
+		# some SDK files are in DOS format, fix back to UNIX
+		awk '{ sub("\r$", ""); print }' pspsdk/src/samples/Makefile.am > tmp
+		mv -f tmp pspsdk/src/samples/Makefile.am
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 	else
 		svnGetPS2DEV pspsdk
@@ -733,7 +736,7 @@ function installInfo {
 }
 
 function patchCMD {
-	# make sure the line endings are correct (DOS style)
+	# make sure the line endings are correct (UNIX style)
 	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build.mak > $INSTALLDIR/psp/sdk/lib/build.mak.unix
 	mv -f $INSTALLDIR/psp/sdk/lib/build.mak.unix $INSTALLDIR/psp/sdk/lib/build.mak
 	

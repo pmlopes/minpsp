@@ -12,7 +12,7 @@ cd builds/unix
 automake --add-missing
 cd ../..
 sh autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
 make || { echo "Error building $LIBNAME"; exit 1; }
 
 make install || { echo "Error installing $LIBNAME"; exit 1; }
