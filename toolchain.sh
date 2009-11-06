@@ -22,16 +22,17 @@ NEWLIB_VER=1.17.0
 GDB_VER=6.8
 
 # gcc >= 4.x deps versions
-ZLIB_VER=1.2.3
 GMP_VER=4.2.4
 # minimal is 2.3.2
 MPFR_VER=2.4.1
 ## for gcc >= 4.4 (graphite)
 #PPL_VER=0.10.2
-#CLOOGG_PPL_VER=0.15.7
+#CLOOG_PPL_VER=0.15.7
 #MPC_VER=0.7
 ## for gcc >= 4.5 (lto)
 #LIBELF_VER=0.8.12
+
+ZLIB_VER=1.2.3
 
 #extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
@@ -271,88 +272,88 @@ function installMPFR {
 	fi
 }
 
-#function installPPL {
-#	if [ ! -f /usr/local/include/ppl_c.h ]
-#	then
-#		PPL="ppl-"$PPL_VER".tar.bz2"
-#		
-#		downloadHTTP deps $PPL "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER
-#		cd deps
-#		tar -xjf $PPL || die "extracting "$PPL
-#
-#		cd "ppl-"$PPL_VER
-#		./configure \
-#			--prefix=/usr/local \
-#			--with-libgmp-prefix=$GMP_PREFIX \
-#			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
-#		make || die "building ppl"
-#		make check || die "checking ppl"
-#		make install || die "installing ppl"
-#		cd ../..
-#	fi
-#}
+function installPPL {
+	if [ ! -f /usr/local/include/ppl_c.h ]
+	then
+		PPL="ppl-"$PPL_VER".tar.bz2"
+		
+		downloadHTTP deps $PPL "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER
+		cd deps
+		tar -xjf $PPL || die "extracting "$PPL
 
-#function installCLOOGPPL {
-#	if [ ! -f /usr/local/include/cloog/cloog.h ]
-#	then
-#		CLOOG_PPL="cloog-ppl-"$CLOOG_PPL_VER".tar.gz"
-#		
-#		downloadFTP deps $CLOOG_PPL "ftp://gcc.gnu.org/pub/gcc/infrastructure"
-#		cd deps
-#		tar -xjf $CLOOG_PPL || die "extracting "$CLOOG_PPL
-#
-#		cd "cloog-ppl-"$CLOOG_PPL_VER
-#		./configure \
-#			--prefix=/usr/local \
-#			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
-#			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
-#		make || die "building cloog-ppl"
-#		make check || die "checking cloog-ppl"
-#		make install || die "installing cloog-ppl"
-#		cd ../..
-#	fi
-#}
+		cd "ppl-"$PPL_VER
+		./configure \
+			--prefix=/usr/local \
+			--with-libgmp-prefix=$GMP_PREFIX \
+			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
+		make || die "building ppl"
+		make check || die "checking ppl"
+		make install || die "installing ppl"
+		cd ../..
+	fi
+}
 
-#function installMPC {
-#	if [ ! -f /usr/local/include/mpc.h ]
-#	then
-#		MPC="mpc-"$MPC_VER".tar.gz"
-#		
-#		downloadHTTP deps $MPC "http://www.multiprecision.org/mpc/download"
-#		cd deps
-#		tar -xjf $MPC || die "extracting "$MPC
-#
-#		cd "mpc-"$MPC_VER
-#		./configure \
-#			--prefix=/usr/local \
-#			--enable-static --disable-shared \
-#			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-#			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring mpc"
-#		make || die "building mpc"
-#		make check || die "checking mpc"
-#		make install || die "installing mpc"
-#		cd ../..
-#	fi
-#}
+function installCLOOGPPL {
+	if [ ! -f /usr/local/include/cloog/cloog.h ]
+	then
+		CLOOG_PPL="cloog-ppl-"$CLOOG_PPL_VER".tar.gz"
+		
+		downloadFTP deps $CLOOG_PPL "ftp://gcc.gnu.org/pub/gcc/infrastructure"
+		cd deps
+		tar -xjf $CLOOG_PPL || die "extracting "$CLOOG_PPL
 
-#function installLIBELF {
-#	if [ ! -f /usr/local/include/elf.h ]
-#	then
-#		LIBELF="libelf-"$LIBELF_VER".tar.gz"
-#		
-#		downloadHTTP deps $LIBELF "http://www.mr511.de/software"
-#		cd deps
-#		tar -xjf $LIBELF || die "extracting "$LIBELF
-#
-#		cd "libelf-"$LIBELF_VER
-#		./configure \
-#			--prefix=/usr/local \
-#			--disable-shared || die "configuring libelf"
-#		make || die "building libelf"
-#		make install || die "installing libelf"
-#		cd ../..
-#	fi
-#}
+		cd "cloog-ppl-"$CLOOG_PPL_VER
+		./configure \
+			--prefix=/usr/local \
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
+			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
+		make || die "building cloog-ppl"
+		make check || die "checking cloog-ppl"
+		make install || die "installing cloog-ppl"
+		cd ../..
+	fi
+}
+
+function installMPC {
+	if [ ! -f /usr/local/include/mpc.h ]
+	then
+		MPC="mpc-"$MPC_VER".tar.gz"
+		
+		downloadHTTP deps $MPC "http://www.multiprecision.org/mpc/download"
+		cd deps
+		tar -xjf $MPC || die "extracting "$MPC
+
+		cd "mpc-"$MPC_VER
+		./configure \
+			--prefix=/usr/local \
+			--enable-static --disable-shared \
+			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring mpc"
+		make || die "building mpc"
+		make check || die "checking mpc"
+		make install || die "installing mpc"
+		cd ../..
+	fi
+}
+
+function installLIBELF {
+	if [ ! -f /usr/local/include/elf.h ]
+	then
+		LIBELF="libelf-"$LIBELF_VER".tar.gz"
+		
+		downloadHTTP deps $LIBELF "http://www.mr511.de/software"
+		cd deps
+		tar -xjf $LIBELF || die "extracting "$LIBELF
+
+		cd "libelf-"$LIBELF_VER
+		./configure \
+			--prefix=/usr/local \
+			--disable-shared || die "configuring libelf"
+		make || die "building libelf"
+		make install || die "installing libelf"
+		cd ../..
+	fi
+}
 
 function downloadPatches {
 	cd psp
@@ -376,17 +377,22 @@ function buildBinutils {
 		cd ..
 	fi
 	
-	mkdir -p psp/build/$BINUTILS_SRCDIR
-	cd psp/build/$BINUTILS_SRCDIR
+	if [ ! -d psp/build/$BINUTILS_SRCDIR ]
+	then
+		mkdir -p psp/build/$BINUTILS_SRCDIR
+		cd psp/build/$BINUTILS_SRCDIR
 	
-	../../$BINUTILS_SRCDIR/configure \
-			--prefix=$INSTALLDIR \
-			--target=psp \
-			--enable-install-libbfd \
-			--disable-werror \
-			--disable-nls || die "configuring binutils"
+		../../$BINUTILS_SRCDIR/configure \
+				--prefix=$INSTALLDIR \
+				--target=psp \
+				--enable-install-libbfd \
+				--disable-werror \
+				--disable-nls || die "configuring binutils"
+	else
+		cd psp/build/$BINUTILS_SRCDIR
+		make clean
+	fi
 
-	make clean
 	make LDFLAGS="-s" || die "Error building binutils"
 	make install || die "Error installing binutils"
 	cd ../../..
@@ -414,22 +420,26 @@ function buildXGCC {
 		cd ..
 	fi
 
-	mkdir -p psp/build/$GCC_SRCDIR
-	cd psp/build/$GCC_SRCDIR
+	if [ ! -d psp/build/$GCC_SRCDIR ]
+	then
+		mkdir -p psp/build/$GCC_SRCDIR
+		cd psp/build/$GCC_SRCDIR
 	
-	../../$GCC_SRCDIR/configure \
-			--prefix=$INSTALLDIR \
-			--target=psp \
-			--enable-languages="c" \
-			--with-newlib \
-			--without-headers \
-			--disable-libssp \
-			--disable-win32-registry \
-			--disable-nls \
-			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
-	
-	make clean
+		../../$GCC_SRCDIR/configure \
+				--prefix=$INSTALLDIR \
+				--target=psp \
+				--enable-languages="c" \
+				--with-newlib \
+				--without-headers \
+				--disable-libssp \
+				--disable-win32-registry \
+				--disable-nls \
+				--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+				--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
+	else
+		cd psp/build/$GCC_SRCDIR
+		make clean
+	fi
 
 	if [ "$OS" == "MINGW32_NT" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
@@ -454,15 +464,23 @@ function bootstrapSDK {
 		svnGetPS2DEV pspsdk
 	fi
 	
-	cd pspsdk
-	./bootstrap || die "running pspsdk bootstrap"
-	cd ..
+	if [ ! -f pspsdk/configure ]
+	then
+		cd pspsdk
+		./bootstrap || die "running pspsdk bootstrap"
+		cd ..
+	fi
 	
-	mkdir -p build/pspsdk
-	cd build/pspsdk
-	
-	../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
-	make clean
+	if [ ! -d build/pspsdk ]
+	then
+		mkdir -p build/pspsdk
+		cd build/pspsdk
+		../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
+	else
+		cd build/pspsdk
+		make clean
+	fi
+
 	make install-data || die "installing pspsdk headers"
 	cd ../../..
 }
@@ -481,15 +499,20 @@ function buildNewlib {
 		cd ..
 	fi
 	
-	mkdir -p psp/build/$NEWLIB_SRCDIR
-	cd psp/build/$NEWLIB_SRCDIR
+	if [ ! -d psp/build/$NEWLIB_SRCDIR ]
+	then
+		mkdir -p psp/build/$NEWLIB_SRCDIR
+		cd psp/build/$NEWLIB_SRCDIR
 
-	../../$NEWLIB_SRCDIR/configure \
-			--target=psp \
-			--disable-nls \
-			--prefix=$INSTALLDIR || die "configuring newlib"
-	
-	make clean
+		../../$NEWLIB_SRCDIR/configure \
+				--target=psp \
+				--disable-nls \
+				--prefix=$INSTALLDIR || die "configuring newlib"
+	else
+		cd psp/build/$NEWLIB_SRCDIR
+		make clean
+	fi
+
 	make LDFLAGS="-s" || die "building newlib"
 	make install || die "installing newlib"
 	cd ../../..
@@ -500,18 +523,22 @@ function buildGCC {
 	GCC_SRCDIR="gcc-"$GCC_VER
 	cd psp/build/"gcc-"$GCC_VER
 
+	# directory is dirty with bootstrap compiler, should clean just in case
+	make clean
+
+	# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
 	../../$GCC_SRCDIR/configure \
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-languages="c,c++,objc,obj-c++" \
 			--enable-cxx-flags="-G0" \
 			--with-newlib \
+			--with-headers \
 			--disable-win32-registry \
 			--disable-nls \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
 			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
 	
-	make clean
 
 	if [ "$OS" == "MINGW32_NT" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
@@ -549,16 +576,21 @@ function buildGDB {
 		cd ..
 	fi
 	
-	mkdir -p psp/build/$GDB_SRCDIR
-	cd psp/build/$GDB_SRCDIR
+	if [ ! -d psp/build/$GDB_SRCDIR ]
+	then
+		mkdir -p psp/build/$GDB_SRCDIR
+		cd psp/build/$GDB_SRCDIR
 	
-	../../$GDB_SRCDIR/configure \
-			--prefix=$INSTALLDIR \
-			--target=psp \
-			--disable-nls \
-			--disable-werror || die "configuring gdb"
+		../../$GDB_SRCDIR/configure \
+				--prefix=$INSTALLDIR \
+				--target=psp \
+				--disable-nls \
+				--disable-werror || die "configuring gdb"
+	else
+		cd psp/build/$GDB_SRCDIR
+		make clean
+	fi
 
-	make clean
 	make LDFLAGS="-s" || die "building gdb"
 	make install || die "installing gdb"
 	cd ../../..

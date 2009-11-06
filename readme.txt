@@ -35,6 +35,7 @@ Portable handheld videogame system.
 * removed the patch that defines long as 64bit back to 32bit. This can
   lead to faster code but breaks old compiled libraries
 * Disabled CDT-5.0.x bug fix.
+* gcov builds property not fully tested if works as expected
 
 0.9.5
 * Start to port the project also for OpenSolaris 2009.06 (vanilla).
