@@ -26,13 +26,16 @@ GMP_VER=4.2.4
 # minimal is 2.3.2
 MPFR_VER=2.4.1
 ## for gcc >= 4.4 (graphite)
-#PPL_VER=0.10.2
-#CLOOG_PPL_VER=0.15.7
-#MPC_VER=0.7
-## for gcc >= 4.5 (lto)
-#LIBELF_VER=0.8.12
+PPL_VER=0.10.2
+CLOOG_PPL_VER=0.15.7
+MPC_VER=0.7
+# for gcc >= 4.5 (lto)
+LIBELF_VER=0.8.12
 
 ZLIB_VER=1.2.3
+
+LIBPDCURSES_VER=3.4
+LIBREADLINE_VER=5.2
 
 #extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
@@ -67,7 +70,7 @@ function prepare {
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
 		GMP_PREFIX=/usr
-#		PPL_PREFIX=/usr
+		PPL_PREFIX=/usr
 		
 		if [ ! -e compat ]; then
 			mkdir -p compat
@@ -88,7 +91,7 @@ function prepare {
 		GMP_LIB=/usr/lib
 		MPFR_LIB=/usr/lib
 		GMP_PREFIX=/usr
-#		PPL_PREFIX=/usr
+		PPL_PREFIX=/usr
 	fi
 
 	# --- XP 32 bits
@@ -108,18 +111,22 @@ function prepare {
 		GMP_LIB=/usr/local/lib
 		MPFR_LIB=/usr/local/lib
 		GMP_PREFIX=/usr/local
-#		PPL_PREFIX=/usr/local
+		PPL_PREFIX=/usr/local
 
 		#-----------------------------------------------------------------------------
 		# pre requisites
 		#-----------------------------------------------------------------------------
+		# GCC
 		installZlib
 		installGMP
 		installMPFR
-#		installPPL
-#		installCLOOGPPL
-#		installMPC
-#		installLIBELF
+		installPPL
+		installCLOOGPPL
+		installMPC
+		installLIBELF
+		# GDB
+		installPDCURSES
+		installREADLINE
 	fi
 	
 	checkTool svn
@@ -244,7 +251,9 @@ function installGMP {
 		tar -xjf $GMP || die "extracting "$GMP
 
 		cd "gmp-"$GMP_VER
-		./configure --prefix=/usr/local --enable-cxx || die "configuring gmp"
+		./configure \
+			--build=pentium3-pc-mingw32 \
+			--prefix=/usr/local --enable-cxx || die "configuring gmp"
 		make || die "building gmp"
 		make check || die "checking gmp"
 		make install || die "installing gmp"
@@ -263,6 +272,7 @@ function installMPFR {
 
 		cd "mpfr-"$MPFR_VER
 		./configure \
+			 --build=pentium3-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
 		make || die "building mpfr"
@@ -283,6 +293,7 @@ function installPPL {
 
 		cd "ppl-"$PPL_VER
 		./configure \
+			 --build=pentium3-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-libgmp-prefix=$GMP_PREFIX \
 			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
@@ -300,10 +311,11 @@ function installCLOOGPPL {
 		
 		downloadFTP deps $CLOOG_PPL "ftp://gcc.gnu.org/pub/gcc/infrastructure"
 		cd deps
-		tar -xjf $CLOOG_PPL || die "extracting "$CLOOG_PPL
+		tar -xzf $CLOOG_PPL || die "extracting "$CLOOG_PPL
 
 		cd "cloog-ppl-"$CLOOG_PPL_VER
 		./configure \
+			 --build=pentium3-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
 			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
@@ -321,10 +333,11 @@ function installMPC {
 		
 		downloadHTTP deps $MPC "http://www.multiprecision.org/mpc/download"
 		cd deps
-		tar -xjf $MPC || die "extracting "$MPC
+		tar -xzf $MPC || die "extracting "$MPC
 
 		cd "mpc-"$MPC_VER
 		./configure \
+			 --build=pentium3-pc-mingw32 \
 			--prefix=/usr/local \
 			--enable-static --disable-shared \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
@@ -337,13 +350,13 @@ function installMPC {
 }
 
 function installLIBELF {
-	if [ ! -f /usr/local/include/elf.h ]
+	if [ ! -f /usr/local/include/libelf.h ]
 	then
 		LIBELF="libelf-"$LIBELF_VER".tar.gz"
 		
 		downloadHTTP deps $LIBELF "http://www.mr511.de/software"
 		cd deps
-		tar -xjf $LIBELF || die "extracting "$LIBELF
+		tar -xzf $LIBELF || die "extracting "$LIBELF
 
 		cd "libelf-"$LIBELF_VER
 		./configure \
@@ -351,6 +364,45 @@ function installLIBELF {
 			--disable-shared || die "configuring libelf"
 		make || die "building libelf"
 		make install || die "installing libelf"
+		cd ../..
+	fi
+}
+
+function installPDCURSES {
+	if [ ! -f /mingw/include/curses.h ]
+	then
+		LIBPDCURSES="PDCurses-"$LIBPDCURSES_VER".tar.gz"
+		
+		downloadHTTP deps $LIBPDCURSES $SF_MIRROR"/pdcurses"
+		cd deps
+		tar -xzf $LIBPDCURSES || die "extracting "$LIBPDCURSES
+
+		cd "PDCurses-"$LIBPDCURSES_VER/win32
+		make -f mingwin32.mak DLL=n
+		cp pdcurses.a /mingw/lib/libcurses.a
+		cp pdcurses.a /mingw/lib/libpanel.a
+		cp ../curses.h /mingw/include
+		cp ../panel.h /mingw/include
+		cd ../../..
+	fi
+}
+
+function installREADLINE {
+	if [ ! -f /mingw/include/readline/readline.h ]
+	then
+		LIBREADLINE="readline-"$LIBREADLINE_VER".tar.gz"
+		
+		downloadFTP deps $LIBREADLINE "ftp://ftp.gnu.org/gnu/readline"
+		cd deps
+		tar -xzf $LIBREADLINE || die "extracting "$LIBREADLINE
+
+		cd "readline-"$LIBREADLINE_VER
+		./configure \
+			--prefix=/mingw \
+			--with-curses \
+			--disable-shared || die "configuring readline"
+		make || die "building readline"
+		make install || die "installing readline"
 		cd ../..
 	fi
 }
@@ -459,6 +511,8 @@ function bootstrapSDK {
 		# some SDK files are in DOS format, fix back to UNIX
 		awk '{ sub("\r$", ""); print }' pspsdk/src/samples/Makefile.am > tmp
 		mv -f tmp pspsdk/src/samples/Makefile.am
+		awk '{ sub("\r$", ""); print }' pspsdk/src/base/build.mak > tmp
+		mv -f tmp pspsdk/src/base/build.mak
 		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
 	else
 		svnGetPS2DEV pspsdk
@@ -573,6 +627,7 @@ function buildGDB {
 		cd psp
 		tar -xjf $GDB || die "extracting "$GDB
 		patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-PSP.patch || die "patching gdb"
+		patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-MINPSPW.patch || die "patching gdb MINPSPW"
 		cd ..
 	fi
 	
@@ -580,7 +635,7 @@ function buildGDB {
 	then
 		mkdir -p psp/build/$GDB_SRCDIR
 		cd psp/build/$GDB_SRCDIR
-	
+
 		../../$GDB_SRCDIR/configure \
 				--prefix=$INSTALLDIR \
 				--target=psp \
@@ -890,9 +945,11 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+	# according to Luqman Aden smpeg must be build before SDL_mixer
+	# otherwise there is no MP3 support on SDL mixer
+	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
 #	buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET

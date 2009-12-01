@@ -36,6 +36,7 @@ Portable handheld videogame system.
   lead to faster code but breaks old compiled libraries
 * Disabled CDT-5.0.x bug fix.
 * gcov builds property not fully tested if works as expected
+* added fixes from Luqman Aden in TinyXML
 
 0.9.5
 * Start to port the project also for OpenSolaris 2009.06 (vanilla).
@@ -305,7 +306,7 @@ make install
 cd ~
 tar -xvzf libiconv-1.13.1.tar.gz
 cd libiconv-1.13.1
-./configure --prefix=/usr --disable-shared --enable-static
+./configure --prefix=/mingw --disable-shared --enable-static
 make
 make install
 
@@ -334,6 +335,24 @@ get them from the mingw msys project:
   - libregex-0.12-1-msys-1.0.11-dll-0.tar.lzma
     * Extract "over" the MSYS installation.
 	* Then rename to msys-regex-1.dll
+
+10th Extras for remotejoy
+Download PDCurses 3.4
+
+tar -zxvf PDCurses-3.4.tar.gz
+cd PDCurses-3.4/win32
+make -f mingw32.mak
+
+cp pdcurses.a /mingw/lib/libcurses.a
+cd ..
+cp *.h /mingw/include
+
+Download readline 5.2
+tar -zxvf readline-5.2.tar.gz
+cd readline-5.2
+./configure --prefix=/mingw --with-curses --enable-static --disable-shared
+make
+make install
 
 To build run the toolchain script:
 

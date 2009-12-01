@@ -103,6 +103,7 @@ install:
 	cp -fR readme.txt  $(PREFIX)/doc/TinyXml
 	cp libtinyxml.a $(PREFIX)/psp/lib
 	cp tinyxml.h $(PREFIX)/psp/include
+	cp tinystr.h $(PREFIX)/psp/include
 	cp xmltest.cpp $(PREFIX)/psp/sdk/samples/TinyXml
 	cp *.xml $(PREFIX)/psp/sdk/samples/TinyXml
 	cp *.gif $(PREFIX)/psp/sdk/samples/TinyXml
