@@ -1,0 +1,20 @@
+diff -ur pthreads-w32-2-8-0-release.orig/sched.h pthreads-w32-2-8-0-release/sched.h
+--- pthreads-w32-2-8-0-release.orig/sched.h	Thu Mar 31 21:55:21 2005
++++ pthreads-w32-2-8-0-release/sched.h	Mon Dec  1 00:58:36 2008
+@@ -113,16 +113,7 @@
+ #endif
+ #endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+ 
+-#if defined(__MINGW32__) || defined(_UWIN)
+-#if PTW32_LEVEL >= PTW32_LEVEL_MAX
+-/* For pid_t */
+-#  include <sys/types.h>
+-/* Required by Unix 98 */
+-#  include <time.h>
+-#endif /* PTW32_LEVEL >= PTW32_LEVEL_MAX */
+-#else
+ typedef int pid_t;
+-#endif
+ 
+ /* Thread scheduling policies */
+ 

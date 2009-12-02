@@ -276,7 +276,6 @@ wget http://downloads.sourceforge.net/mingw/m4-1.4.13-1-msys-1.0.11-bin.tar.lzma
 wget ftp://ftp.gnu.org/gnu/libtool/libtool-2.2.6a.tar.gz 
 wget ftp://ftp.gnu.org/gnu/autoconf/autoconf-2.63.tar.bz2
 wget ftp://ftp.gnu.org/gnu/automake/automake-1.10.2.tar.bz2
-wget ftp://ftp.gnu.org/gnu/libiconv/libiconv-1.13.1.tar.gz
 
 6th install the download software:
 cd /
@@ -300,13 +299,6 @@ cd ~
 tar -xvzf libtool-2.2.6a.tar.gz
 cd libtool-2.2.6
 ./configure --prefix=/usr
-make
-make install
-
-cd ~
-tar -xvzf libiconv-1.13.1.tar.gz
-cd libiconv-1.13.1
-./configure --prefix=/mingw --disable-shared --enable-static
 make
 make install
 
@@ -335,24 +327,6 @@ get them from the mingw msys project:
   - libregex-0.12-1-msys-1.0.11-dll-0.tar.lzma
     * Extract "over" the MSYS installation.
 	* Then rename to msys-regex-1.dll
-
-10th Extras for remotejoy
-Download PDCurses 3.4
-
-tar -zxvf PDCurses-3.4.tar.gz
-cd PDCurses-3.4/win32
-make -f mingw32.mak
-
-cp pdcurses.a /mingw/lib/libcurses.a
-cd ..
-cp *.h /mingw/include
-
-Download readline 5.2
-tar -zxvf readline-5.2.tar.gz
-cd readline-5.2
-./configure --prefix=/mingw --with-curses --enable-static --disable-shared
-make
-make install
 
 To build run the toolchain script:
 

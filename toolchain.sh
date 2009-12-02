@@ -13,6 +13,9 @@ SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 # testing
 DISABLE_SVN=1
 
+# package version
+PSPSDK_VERSION=0.9.6
+
 # sdk versions
 BINUTILS_VER=2.18
 GCC_VER=4.3.4
@@ -32,18 +35,17 @@ MPC_VER=0.7
 # for gcc >= 4.5 (lto)
 LIBELF_VER=0.8.12
 
+# gdb + pspusbsh + etc...
 ZLIB_VER=1.2.3
-
 LIBPDCURSES_VER=3.4
 LIBREADLINE_VER=5.2
+LIBICONV_VER=1.13.1
+PTHREADS_VER=2-8-0
 
 #extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
 MINGW32_GROFF_VER=1.19.2
 MINGW32_LESS_VER=394
-
-# package version
-PSPSDK_VERSION=0.9.6
 
 #---------------------------------------------------------------------------------
 # functions
@@ -116,7 +118,12 @@ function prepare {
 		#-----------------------------------------------------------------------------
 		# pre requisites
 		#-----------------------------------------------------------------------------
-		# GCC
+		# generic
+		installPTHREADS
+		installPDCURSES
+		installREADLINE
+		installICONV
+		# GCC specific
 		installZlib
 		installGMP
 		installMPFR
@@ -124,9 +131,6 @@ function prepare {
 		installCLOOGPPL
 		installMPC
 		installLIBELF
-		# GDB
-		installPDCURSES
-		installREADLINE
 	fi
 	
 	checkTool svn
@@ -407,6 +411,44 @@ function installREADLINE {
 	fi
 }
 
+function installICONV {
+	if [ ! -f /mingw/include/iconv.h ]
+	then
+		LIBICONV="libiconv-"$LIBICONV_VER".tar.gz"
+		
+		downloadFTP deps $LIBICONV "ftp://ftp.gnu.org/gnu/libiconv"
+		cd deps
+		tar -xzf $LIBICONV || die "extracting "$LIBICONV
+
+		cd "libiconv-"$LIBICONV_VER
+		./configure \
+			--prefix=/mingw \
+			--disable-shared \
+			--enable-static || die "configuring libiconv"
+		make || die "building libiconv"
+		make install || die "installing libiconv"
+		cd ../..
+	fi
+}
+
+function installPTHREADS {
+	if [ ! -f /mingw/include/pthread.h ]
+	then
+		PTHREADS="pthreads-w32-"$PTHREADS_VER"-release.tar.gz"
+		
+		downloadFTP deps $PTHREADS "ftp://sourceware.org/pub/pthreads-win32"
+		cd deps
+		tar -xzf $PTHREADS || die "extracting "$PTHREADS
+
+		patch -p0 < ../mingw/patches/pthreads-w32-2-8-0-MINPSPW.diff
+		cd "pthreads-w32-"$PTHREADS_VER"-release"
+		make clean GC-static
+		cp libpthreadGC2.a /mingw/lib/libpthread.a
+		cp pthread.h sched.h /mingw/include
+		cd ../..
+	fi
+}
+
 function downloadPatches {
 	cd psp
 	svnGetPS2DEV psptoolchain/patches
@@ -627,7 +669,9 @@ function buildGDB {
 		cd psp
 		tar -xjf $GDB || die "extracting "$GDB
 		patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-PSP.patch || die "patching gdb"
-		patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-MINPSPW.patch || die "patching gdb MINPSPW"
+		if [ "$OS" == "MINGW32_NT" ]; then
+			patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-MINPSPW.patch || die "patching gdb MINPSPW"
+		fi
 		cd ..
 	fi
 	
@@ -710,41 +754,41 @@ function installPSPLinkUSB {
 	fi
 
 	
-if [ "$OS" == "MINGW32_NT" ]; then
-	# pspsh + usbhostfs_pc
-	installFile pspsh.exe ../mingw/bin bin
-	installFile usbhostfs_pc.exe ../mingw/bin bin
-	installFile cygncurses-8.dll ../mingw/bin bin
-	installFile cygreadline6.dll ../mingw/bin bin
-	installFile cygwin1.dll ../mingw/bin bin
-	
-	# copy the drivers for windows
-	mkdir -p $INSTALLDIR/bin/driver
-	mkdir -p $INSTALLDIR/bin/driver_x64
-	installFile libusb0.dll ../mingw/bin/usb/driver bin/driver
-	installFile libusb0.sys ../mingw/bin/usb/driver bin/driver
-	installFile psp.cat ../mingw/bin/usb/driver bin/driver
-	installFile psp.inf ../mingw/bin/usb/driver bin/driver
-	# 64 bits
-	installFile libusb0.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile libusb0.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile psp.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile psp.inf ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile libusb0_x64.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile libusb0_x64.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
-	installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
-else
-	cd psplinkusb
-	
-	if [ "$OS" == "SunOS" ]; then
-		cp -f ../../mingw/solaris/Makefile.pspsh pspsh/Makefile
-		cp -f ../../mingw/solaris/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
-		cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
+	if [ "$OS" == "MINGW32_NT" ]; then
+		# pspsh + usbhostfs_pc
+		installFile pspsh.exe ../mingw/bin bin
+		installFile usbhostfs_pc.exe ../mingw/bin bin
+		installFile cygncurses-8.dll ../mingw/bin bin
+		installFile cygreadline6.dll ../mingw/bin bin
+		installFile cygwin1.dll ../mingw/bin bin
+		
+		# copy the drivers for windows
+		mkdir -p $INSTALLDIR/bin/driver
+		mkdir -p $INSTALLDIR/bin/driver_x64
+		installFile libusb0.dll ../mingw/bin/usb/driver bin/driver
+		installFile libusb0.sys ../mingw/bin/usb/driver bin/driver
+		installFile psp.cat ../mingw/bin/usb/driver bin/driver
+		installFile psp.inf ../mingw/bin/usb/driver bin/driver
+		# 64 bits
+		installFile libusb0.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile libusb0.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile psp.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile psp.inf ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile libusb0_x64.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile libusb0_x64.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
+		installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
+	else
+		cd psplinkusb
+		
+		if [ "$OS" == "SunOS" ]; then
+			cp -f ../../mingw/solaris/Makefile.pspsh pspsh/Makefile
+			cp -f ../../mingw/solaris/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
+			cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
+		fi
+		
+		make -f Makefile.clients install
+		cd ..
 	fi
-	
-	make -f Makefile.clients install
-	cd ..
-fi
 
 	cd psplinkusb
 	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"

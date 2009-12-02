@@ -12,15 +12,3 @@ diff -Naur gdb-6.8.orig/gdb/tui/tui-io.c gdb-6.8/gdb/tui/tui-io.c
  
  /* TUI output files.  */
  static struct ui_file *tui_stdout;
-diff -Naur gdb-6.8.orig/sim/common/sim-signal.c gdb-6.8/sim/common/sim-signal.c
---- gdb-6.8.orig/sim/common/sim-signal.c	2008-01-01 14:53:23 -0800
-+++ gdb-6.8/sim/common/sim-signal.c	2009-12-01 07:26:38 -0800
-@@ -26,7 +26,7 @@
-    to not think the process has died (so it can be debugged at the point of
-    failure).  */
- 
--#ifdef _MSC_VER
-+#ifdef _WIN32
- #ifndef SIGTRAP
- #define SIGTRAP 5
- #endif
