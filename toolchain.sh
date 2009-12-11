@@ -119,18 +119,19 @@ function prepare {
 		# pre requisites
 		#-----------------------------------------------------------------------------
 		# generic
+		installZlib
+		installICONV
 		installPTHREADS
 		installPDCURSES
 		installREADLINE
-		installICONV
 		# GCC specific
-		installZlib
 		installGMP
 		installMPFR
-		installPPL
-		installCLOOGPPL
-		installMPC
-		installLIBELF
+		# not needed right now
+		# installPPL
+		# installCLOOGPPL
+		# installMPC
+		# installLIBELF
 	fi
 	
 	checkTool svn
@@ -256,7 +257,7 @@ function installGMP {
 
 		cd "gmp-"$GMP_VER
 		./configure \
-			--build=pentium3-pc-mingw32 \
+			--build=i686-pc-mingw32 \
 			--prefix=/usr/local --enable-cxx || die "configuring gmp"
 		make || die "building gmp"
 		make check || die "checking gmp"
@@ -276,7 +277,7 @@ function installMPFR {
 
 		cd "mpfr-"$MPFR_VER
 		./configure \
-			 --build=pentium3-pc-mingw32 \
+			 --build=i686-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
 		make || die "building mpfr"
@@ -297,7 +298,7 @@ function installPPL {
 
 		cd "ppl-"$PPL_VER
 		./configure \
-			 --build=pentium3-pc-mingw32 \
+			 --build=i686-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-libgmp-prefix=$GMP_PREFIX \
 			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
@@ -319,7 +320,7 @@ function installCLOOGPPL {
 
 		cd "cloog-ppl-"$CLOOG_PPL_VER
 		./configure \
-			 --build=pentium3-pc-mingw32 \
+			 --build=i686-pc-mingw32 \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
 			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
@@ -341,7 +342,7 @@ function installMPC {
 
 		cd "mpc-"$MPC_VER
 		./configure \
-			 --build=pentium3-pc-mingw32 \
+			 --build=i686-pc-mingw32 \
 			--prefix=/usr/local \
 			--enable-static --disable-shared \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
@@ -477,6 +478,7 @@ function buildBinutils {
 		cd psp/build/$BINUTILS_SRCDIR
 	
 		../../$BINUTILS_SRCDIR/configure \
+				--build=i686-pc-mingw32 \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--enable-install-libbfd \
@@ -520,6 +522,7 @@ function buildXGCC {
 		cd psp/build/$GCC_SRCDIR
 	
 		../../$GCC_SRCDIR/configure \
+				--build=i686-pc-mingw32 \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--enable-languages="c" \
@@ -601,6 +604,7 @@ function buildNewlib {
 		cd psp/build/$NEWLIB_SRCDIR
 
 		../../$NEWLIB_SRCDIR/configure \
+				--build=i686-pc-mingw32 \
 				--target=psp \
 				--disable-nls \
 				--prefix=$INSTALLDIR || die "configuring newlib"
@@ -624,6 +628,7 @@ function buildGCC {
 
 	# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
 	../../$GCC_SRCDIR/configure \
+			--build=i686-pc-mingw32 \
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-languages="c,c++,objc,obj-c++" \
@@ -681,6 +686,7 @@ function buildGDB {
 		cd psp/build/$GDB_SRCDIR
 
 		../../$GDB_SRCDIR/configure \
+				--build=i686-pc-mingw32 \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--disable-nls \
