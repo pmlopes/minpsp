@@ -30,12 +30,20 @@ Portable handheld videogame system.
  Changelog
 ===============================================================================
 0.9.6
+* Updated newlib to 1.18
+ - wide-char enhancements
+ - long double math routines added for platforms where LDBL == DBL
+ - long long math routines added
+ - math cleanup
+ - major locale charset overhaul including added charsets
+ - various cleanups
+ - various bug fixes
 * Updated the dev environment to build under Windows Vista
 * Updated binutils to 2.18 (for better integration with gcc 4.3.x)
 * removed the patch that defines long as 64bit back to 32bit. This can
   lead to faster code but breaks old compiled libraries
-* Disabled CDT-5.0.x bug fix.
-* gcov builds property not fully tested if works as expected
+* Disabled CDT-5.0.x bug fix
+* gcov builds properly but not fully tested if works as expected
 * added fixes from Luqman Aden in TinyXML
 
 0.9.5

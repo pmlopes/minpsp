@@ -20,7 +20,7 @@ PSPSDK_VERSION=0.9.6
 BINUTILS_VER=2.18
 GCC_VER=4.3.4
 GCC_TC_VER=4.3.2
-NEWLIB_VER=1.17.0
+NEWLIB_VER=1.18.0
 #debugger version
 GDB_VER=6.8
 
@@ -66,6 +66,7 @@ function prepare {
 	export OS=$(uname -s)
 
 	if [ "$OS" == "SunOS" ]; then
+		EXTRA_BUILD_CFG=""
 		INSTALLDIR="$(pwd)/../pspsdk"
 		GMP_INCLUDE=/usr/include/gmp
 		MPFR_INCLUDE=/usr/include/mpfr
@@ -87,6 +88,7 @@ function prepare {
 	fi
 		
 	if [ "$OS" == "Linux" ]; then
+		EXTRA_BUILD_CFG=""
 		INSTALLDIR="$(pwd)/../pspsdk"
 		GMP_INCLUDE=/usr/include
 		MPFR_INCLUDE=/usr/include
@@ -106,6 +108,9 @@ function prepare {
 	fi
 	
 	if [ "$OS" == "MINGW32_NT" ]; then
+		# since I'm running this under a Xeon processor, I don't want it to be
+		# build that cpu, so I must instruct mingw to target a i686
+		EXTRA_BUILD_CFG="--build=i686-pc-mingw32"
 		INSTALLDIR="/c/pspsdk"
 		INSTALLERDIR="/c/pspsdk-installer"
 		GMP_INCLUDE=/usr/local/include
@@ -477,8 +482,7 @@ function buildBinutils {
 		mkdir -p psp/build/$BINUTILS_SRCDIR
 		cd psp/build/$BINUTILS_SRCDIR
 	
-		../../$BINUTILS_SRCDIR/configure \
-				--build=i686-pc-mingw32 \
+		../../$BINUTILS_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--enable-install-libbfd \
@@ -521,8 +525,7 @@ function buildXGCC {
 		mkdir -p psp/build/$GCC_SRCDIR
 		cd psp/build/$GCC_SRCDIR
 	
-		../../$GCC_SRCDIR/configure \
-				--build=i686-pc-mingw32 \
+		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--enable-languages="c" \
@@ -603,8 +606,7 @@ function buildNewlib {
 		mkdir -p psp/build/$NEWLIB_SRCDIR
 		cd psp/build/$NEWLIB_SRCDIR
 
-		../../$NEWLIB_SRCDIR/configure \
-				--build=i686-pc-mingw32 \
+		../../$NEWLIB_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--target=psp \
 				--disable-nls \
 				--prefix=$INSTALLDIR || die "configuring newlib"
@@ -627,8 +629,7 @@ function buildGCC {
 	make clean
 
 	# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
-	../../$GCC_SRCDIR/configure \
-			--build=i686-pc-mingw32 \
+	../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 			--prefix=$INSTALLDIR \
 			--target=psp \
 			--enable-languages="c,c++,objc,obj-c++" \
@@ -685,8 +686,7 @@ function buildGDB {
 		mkdir -p psp/build/$GDB_SRCDIR
 		cd psp/build/$GDB_SRCDIR
 
-		../../$GDB_SRCDIR/configure \
-				--build=i686-pc-mingw32 \
+		../../$GDB_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--disable-nls \
