@@ -30,6 +30,9 @@ Portable handheld videogame system.
  Changelog
 ===============================================================================
 0.9.6
+* updated the fpulib trig functions can use the FPU processor but
+  we either use vfpu or software impl using libm. This can help to
+  make a bit faster code if we do not need vectors.
 * Updated newlib to 1.18
  - wide-char enhancements
  - long double math routines added for platforms where LDBL == DBL

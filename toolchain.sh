@@ -11,7 +11,7 @@ PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
 
 # testing
-DISABLE_SVN=1
+DISABLE_SVN=0
 
 # package version
 PSPSDK_VERSION=0.9.6
@@ -36,7 +36,7 @@ MPC_VER=0.7
 LIBELF_VER=0.8.12
 
 # gdb + pspusbsh + etc...
-ZLIB_VER=1.2.3
+ZLIB_VER=1.2.4
 LIBPDCURSES_VER=3.4
 LIBREADLINE_VER=5.2
 LIBICONV_VER=1.13.1
@@ -245,8 +245,9 @@ function installZlib {
 		tar -xzf $ZLIB || die "extracting "$ZLIB
 
 		cd "zlib-"$ZLIB_VER
-		make CC=gcc || die "building "$ZLIB
-		make install prefix=/mingw || die "installing "$ZLIB
+		./configure --prefix=/mingw --static
+		make || die "building "$ZLIB
+		make install || die "installing "$ZLIB
 		cd ../..
 	fi
 }
