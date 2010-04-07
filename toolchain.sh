@@ -106,6 +106,10 @@ function prepare {
 	if [ "$OS" == "MINGW32_NT-6.0" ]; then
 		OS=MINGW32_NT
 	fi
+	# --- Windows 7 32 bits
+	if [ "$OS" == "MINGW32_NT-6.1" ]; then
+		OS=MINGW32_NT
+	fi
 	
 	if [ "$OS" == "MINGW32_NT" ]; then
 		# since I'm running this under a Xeon processor, I don't want it to be
@@ -138,7 +142,7 @@ function prepare {
 		# installMPC
 		# installLIBELF
 	fi
-	
+
 	checkTool svn
 	checkTool wget
 	checkTool make
@@ -262,8 +266,7 @@ function installGMP {
 		tar -xjf $GMP || die "extracting "$GMP
 
 		cd "gmp-"$GMP_VER
-		./configure \
-			--build=i686-pc-mingw32 \
+		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local --enable-cxx || die "configuring gmp"
 		make || die "building gmp"
 		make check || die "checking gmp"
@@ -282,8 +285,7 @@ function installMPFR {
 		tar -xjf $MPFR || die "extracting "$MPFR
 
 		cd "mpfr-"$MPFR_VER
-		./configure \
-			 --build=i686-pc-mingw32 \
+		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
 		make || die "building mpfr"
@@ -303,8 +305,7 @@ function installPPL {
 		tar -xjf $PPL || die "extracting "$PPL
 
 		cd "ppl-"$PPL_VER
-		./configure \
-			 --build=i686-pc-mingw32 \
+		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
 			--with-libgmp-prefix=$GMP_PREFIX \
 			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
@@ -325,8 +326,7 @@ function installCLOOGPPL {
 		tar -xzf $CLOOG_PPL || die "extracting "$CLOOG_PPL
 
 		cd "cloog-ppl-"$CLOOG_PPL_VER
-		./configure \
-			 --build=i686-pc-mingw32 \
+		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
 			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
@@ -347,8 +347,7 @@ function installMPC {
 		tar -xzf $MPC || die "extracting "$MPC
 
 		cd "mpc-"$MPC_VER
-		./configure \
-			 --build=i686-pc-mingw32 \
+		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
 			--enable-static --disable-shared \
 			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
@@ -521,10 +520,10 @@ function buildXGCC {
 		cd ..
 	fi
 
-	if [ ! -d psp/build/$GCC_SRCDIR ]
+	if [ ! -d psp/build/x$GCC_SRCDIR ]
 	then
-		mkdir -p psp/build/$GCC_SRCDIR
-		cd psp/build/$GCC_SRCDIR
+		mkdir -p psp/build/x$GCC_SRCDIR
+		cd psp/build/x$GCC_SRCDIR
 	
 		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
@@ -538,7 +537,7 @@ function buildXGCC {
 				--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
 				--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
 	else
-		cd psp/build/$GCC_SRCDIR
+		cd psp/build/x$GCC_SRCDIR
 		make clean
 	fi
 
@@ -624,24 +623,30 @@ function buildNewlib {
 function buildGCC {
 
 	GCC_SRCDIR="gcc-"$GCC_VER
-	cd psp/build/"gcc-"$GCC_VER
 
-	# directory is dirty with bootstrap compiler, should clean just in case
-	make clean
-
-	# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
-	../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
-			--prefix=$INSTALLDIR \
-			--target=psp \
-			--enable-languages="c,c++,objc,obj-c++" \
-			--enable-cxx-flags="-G0" \
-			--with-newlib \
-			--with-headers \
-			--disable-win32-registry \
-			--disable-nls \
-			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
+	if [ ! -d psp/build/$GCC_SRCDIR ]
+	then
+		mkdir -p psp/build/$GCC_SRCDIR
+		cd psp/build/$GCC_SRCDIR
 	
+		# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
+		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
+				--prefix=$INSTALLDIR \
+				--target=psp \
+				--enable-languages="c,c++,objc,obj-c++" \
+				--enable-cxx-flags="-G0" \
+				--with-newlib \
+				--with-headers \
+				--disable-win32-registry \
+				--disable-nls \
+				--enable-c99 \
+				--enable-long-long \
+				--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
+				--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
+	else
+		cd psp/build/$GCC_SRCDIR
+		make clean
+	fi
 
 	if [ "$OS" == "MINGW32_NT" ]; then
 		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
@@ -1019,6 +1024,7 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 }
 
 #---------------------------------------------------------------------------------
