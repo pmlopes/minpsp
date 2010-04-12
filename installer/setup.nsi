@@ -5,8 +5,8 @@ SetCompressor /SOLID lzma
 # Defines
 !define REGKEY "SOFTWARE\$(^Name)"
 !define VERSION @MINPSPW_VERSION@
-!define COMPANY jetcube.eu
-!define URL http://www.jetcube.eu
+!define COMPANY jetdrone.com
+!define URL http://www.jetdrone.com
 !define SDKDIR C:\pspsdk-installer
 
 # MUI defines

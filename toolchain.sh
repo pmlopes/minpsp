@@ -448,8 +448,10 @@ function installPTHREADS {
 
 		patch -p0 < ../mingw/patches/pthreads-w32-2-8-0-MINPSPW.diff
 		cd "pthreads-w32-"$PTHREADS_VER"-release"
-		make clean GC-static
-		cp libpthreadGC2.a /mingw/lib/libpthread.a
+		make clean GC
+		cp pthreadGC2.dll /mingw/lib/pthreadGC2.dll
+		cp pthreadGC2.dll /mingw/bin/pthreadGC2.dll
+		cp pthreadGC2.dll /mingw/lib/pthread.dll
 		cp pthread.h sched.h /mingw/include
 		cd ../..
 	fi
@@ -753,6 +755,10 @@ function installExtraBinaries {
 	cd mingw
 	installDir VC .
 	cd ..
+
+	# in case any win32 native bin was linked with threads we
+	# add the dll to the output install dir too
+	installFile pthreadGC2.dll /mingw/bin bin
 }
 
 function installPSPLinkUSB {
@@ -1024,7 +1030,9 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+	# still waiting for 4.4 fix from diedel
+#	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 }
 
 #---------------------------------------------------------------------------------
@@ -1032,6 +1040,9 @@ function buildBaseDevpaks {
 #---------------------------------------------------------------------------------
 prepare
 
+#---------------------------------------------------------------------------------
+# gather patches in a single place
+#---------------------------------------------------------------------------------
 downloadPatches
 
 #---------------------------------------------------------------------------------

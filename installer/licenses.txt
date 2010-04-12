@@ -1,4 +1,4 @@
-Copyright (c) 2008, jetcube.eu
+Copyright (c) 2008-2010, jetdrone.com
 
 All rights reserved.
 

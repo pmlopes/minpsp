@@ -5,8 +5,8 @@ SetCompressor /SOLID lzma
 # Defines
 !define UNIX_NAME mikmodlib
 !define VERSION 3.0
-!define COMPANY jetcube
-!define URL http://www.jetcube.eu
+!define COMPANY jetdrone
+!define URL http://www.jetdrone.com
 
 # MUI defines
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\pixel-install.ico"

@@ -48,6 +48,9 @@ Portable handheld videogame system.
 * Disabled CDT-5.0.x bug fix
 * gcov builds properly but not fully tested if works as expected
 * added fixes from Luqman Aden in TinyXML
+* added libmpeg2 devpak
+* windows tools are linked against pthreads, if thereads are used it can
+  improved performance on the development side.
 
 0.9.5
 * Start to port the project also for OpenSolaris 2009.06 (vanilla).
@@ -229,7 +232,7 @@ http://www.ps2dev.org
 http://forums.ps2dev.org
 
 My MINGW specific stuff:
-http://www.jetcube.eu
+http://www.jetdrone.com
 
 
 ===============================================================================
