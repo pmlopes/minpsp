@@ -1,10 +1,10 @@
-Name "Mini-XML DevPak"
+Name "libmpeg2 DevPak"
 
 SetCompressor /SOLID lzma
 
 # Defines
-!define UNIX_NAME Mini-XML
-!define VERSION 2.5
+!define UNIX_NAME libmpeg2
+!define VERSION 0.5.1
 !define COMPANY jetcube
 !define URL http://www.jetcube.eu
 
