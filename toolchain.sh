@@ -38,7 +38,7 @@ LIBELF_VER=0.8.12
 # gdb + pspusbsh + etc...
 ZLIB_VER=1.2.4
 LIBPDCURSES_VER=3.4
-LIBREADLINE_VER=5.2
+LIBREADLINE_VER=5.1
 LIBICONV_VER=1.13.1
 PTHREADS_VER=2-8-0
 
@@ -131,7 +131,8 @@ function prepare {
 		installZlib
 		installICONV
 		installPTHREADS
-		installPDCURSES
+		# disbled since the patch for readline fixes the termcap missing features
+		# installPDCURSES
 		installREADLINE
 		# GCC specific
 		installGMP
@@ -405,11 +406,12 @@ function installREADLINE {
 		downloadFTP deps $LIBREADLINE "ftp://ftp.gnu.org/gnu/readline"
 		cd deps
 		tar -xzf $LIBREADLINE || die "extracting "$LIBREADLINE
+		patch -p0 < ../mingw/patches/readline-$LIBREADLINE_VER-MINPSPW.patch
 
 		cd "readline-"$LIBREADLINE_VER
 		./configure \
 			--prefix=/mingw \
-			--with-curses \
+			--without-curses \
 			--disable-shared || die "configuring readline"
 		make || die "building readline"
 		make install || die "installing readline"
@@ -446,7 +448,8 @@ function installPTHREADS {
 		cd deps
 		tar -xzf $PTHREADS || die "extracting "$PTHREADS
 
-		patch -p0 < ../mingw/patches/pthreads-w32-2-8-0-MINPSPW.diff
+		# although it is needed for ffmpeg it seems useless for everything else
+		#patch -p0 < ../mingw/patches/pthreads-w32-2-8-0-MINPSPW.patch
 		cd "pthreads-w32-"$PTHREADS_VER"-release"
 		make clean GC
 		cp pthreadGC2.dll /mingw/lib/pthreadGC2.dll

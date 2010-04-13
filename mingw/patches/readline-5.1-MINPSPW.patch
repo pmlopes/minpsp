@@ -1,0 +1,495 @@
+diff -Naur readline-5.1.orig/Makefile.in readline-5.1/Makefile.in
+--- readline-5.1.orig/Makefile.in	2005-05-07 18:11:23 -0700
++++ readline-5.1/Makefile.in	2010-04-13 02:46:23 -0700
+@@ -430,6 +430,7 @@
+ vi_mode.o: rlprivate.h
+ 
+ bind.o: xmalloc.h
++callback.o: xmalloc.h
+ complete.o: xmalloc.h
+ display.o: xmalloc.h
+ funmap.o: xmalloc.h
+diff -Naur readline-5.1.orig/callback.c readline-5.1/callback.c
+--- readline-5.1.orig/callback.c	2005-05-24 11:19:04 -0700
++++ readline-5.1/callback.c	2010-04-13 01:29:01 -0700
+@@ -43,6 +43,7 @@
+ #include "rldefs.h"
+ #include "readline.h"
+ #include "rlprivate.h"
++#include "xmalloc.h"
+ 
+ /* Private data for callback registration functions.  See comments in
+    rl_callback_read_char for more details. */
+diff -Naur readline-5.1.orig/display.c readline-5.1/display.c
+--- readline-5.1.orig/display.c	2005-11-30 11:05:02 -0800
++++ readline-5.1/display.c	2010-04-13 01:34:13 -0700
+@@ -41,6 +41,10 @@
+ 
+ #include <stdio.h>
+ 
++#ifdef __MSDOS__
++# include <pc.h>
++#endif
++
+ /* System-specific feature definitions and include files. */
+ #include "rldefs.h"
+ #include "rlmbutil.h"
+@@ -1782,9 +1786,18 @@
+     }
+   else
+     {			/* delta < 0 */
++#ifdef __MSDOS__
++      int row, col;
++
++      fflush (rl_outstream); /* make sure the cursor pos is current! */
++      ScreenGetCursor (&row, &col);
++      ScreenSetCursor (row + delta, col);
++      i = -delta;    /* in case someone wants to use it after the loop */
++#else /* !__MSDOS__ */
+       if (_rl_term_up && *_rl_term_up)
+ 	for (i = 0; i < -delta; i++)
+ 	  tputs (_rl_term_up, 1, _rl_output_character_function);
++#endif /* !__MSDOS__ */
+     }
+ 
+   _rl_last_v_pos = to;		/* Now TO is here */
+@@ -1983,11 +1996,15 @@
+      int pchar;
+ {
+   int len;
+-  char *pmt;
++  char *pmt, *p;
+ 
+   rl_save_prompt ();
+ 
+-  if (saved_local_prompt == 0)
++  /* We've saved the prompt, and can do anything with the various prompt
++     strings we need before they're restored.  We want the unexpanded
++     portion of the prompt string after any final newline. */
++  p = rl_prompt ? strrchr (rl_prompt, '\n') : 0;
++  if (p == 0)
+     {
+       len = (rl_prompt && *rl_prompt) ? strlen (rl_prompt) : 0;
+       pmt = (char *)xmalloc (len + 2);
+@@ -1998,17 +2015,16 @@
+     }
+   else
+     {
+-      len = *saved_local_prompt ? strlen (saved_local_prompt) : 0;
++      p++;
++      len = strlen (p);
+       pmt = (char *)xmalloc (len + 2);
+       if (len)
+-	strcpy (pmt, saved_local_prompt);
++	strcpy (pmt, p);
+       pmt[len] = pchar;
+       pmt[len+1] = '\0';
+-      local_prompt = savestring (pmt);
+-      prompt_last_invisible = saved_last_invisible;
+-      prompt_visible_length = saved_visible_length + 1;
+     }
+ 
++  /* will be overwritten by expand_prompt, called from rl_message */
+   prompt_physical_chars = saved_physical_chars + 1;
+ 
+   return pmt;
+@@ -2036,9 +2052,12 @@
+ _rl_clear_to_eol (count)
+      int count;
+ {
++#ifndef __MSDOS__
+   if (_rl_term_clreol)
+     tputs (_rl_term_clreol, 1, _rl_output_character_function);
+-  else if (count)
++  else
++#endif
++  if (count)
+     space_to_eol (count);
+ }
+ 
+@@ -2059,10 +2078,15 @@
+ void
+ _rl_clear_screen ()
+ {
++#if defined (__GO32__)
++  ScreenClear ();	/* FIXME: only works in text modes */
++  ScreenSetCursor (0, 0);  /* term_clrpag is "cl" which homes the cursor */
++#else
+   if (_rl_term_clrpag)
+     tputs (_rl_term_clrpag, 1, _rl_output_character_function);
+   else
+     rl_crlf ();
++#endif
+ }
+ 
+ /* Insert COUNT characters from STRING to the output stream at column COL. */
+diff -Naur readline-5.1.orig/emacs_keymap.c readline-5.1/emacs_keymap.c
+--- readline-5.1.orig/emacs_keymap.c	2001-11-29 09:04:56 -0800
++++ readline-5.1/emacs_keymap.c	2010-04-13 01:35:16 -0700
+@@ -278,7 +278,13 @@
+   { ISFUNC, rl_insert },	/* Latin capital letter Y with acute */
+   { ISFUNC, rl_insert },	/* Latin capital letter thorn (Icelandic) */
+   { ISFUNC, rl_insert },	/* Latin small letter sharp s (German) */
++#ifndef __MINGW32__  
+   { ISFUNC, rl_insert },	/* Latin small letter a with grave */
++#else
++  /* Temporary - this is a bug in readline 5.1 that should be fixed in
++     readline 5.2.  */
++  { ISFUNC, 0 },		/* Must leave this unbound for the arrow keys to work.  */
++#endif
+   { ISFUNC, rl_insert },	/* Latin small letter a with acute */
+   { ISFUNC, rl_insert },	/* Latin small letter a with circumflex */
+   { ISFUNC, rl_insert },	/* Latin small letter a with tilde */
+diff -Naur readline-5.1.orig/examples/Makefile.in readline-5.1/examples/Makefile.in
+--- readline-5.1.orig/examples/Makefile.in	2005-08-02 13:12:43 -0700
++++ readline-5.1/examples/Makefile.in	2010-04-13 02:15:16 -0700
+@@ -45,7 +45,7 @@
+ READLINE_LIB = ../libreadline.a
+ HISTORY_LIB = ../libhistory.a
+ 
+-TERMCAP_LIB = @TERMCAP_LIB@
++TERMCAP_LIB =
+ 
+ .c.o:
+ 	${RM} $@
+diff -Naur readline-5.1.orig/histfile.c readline-5.1/histfile.c
+--- readline-5.1.orig/histfile.c	2004-03-03 19:39:33 -0800
++++ readline-5.1/histfile.c	2010-04-13 01:50:56 -0700
+@@ -256,7 +256,10 @@
+   for (line_end = line_start; line_end < bufend; line_end++)
+     if (*line_end == '\n')
+       {
+-	*line_end = '\0';
++	if (line_end - 1 >= line_start && *(line_end - 1) == '\r')
++	  *(line_end - 1) = '\0';
++	else
++	  *line_end = '\0';
+ 
+ 	if (*line_start)
+ 	  {
+diff -Naur readline-5.1.orig/input.c readline-5.1/input.c
+--- readline-5.1.orig/input.c	2005-07-04 19:30:24 -0700
++++ readline-5.1/input.c	2010-04-13 01:51:59 -0700
+@@ -220,6 +220,16 @@
+     }
+ #endif /* O_NDELAY */
+ 
++#if defined (__MINGW32__)
++  /* We use getch to read console input, so use the same
++     mechanism to check for more.  Otherwise, we don't know.  */
++  if (isatty (fileno (rl_instream)))
++    chars_avail = _kbhit ();
++  else
++    chars_avail = 0;
++  result = 0;
++#endif
++
+   /* If there's nothing available, don't waste time trying to read
+      something. */
+   if (chars_avail <= 0)
+@@ -305,6 +315,13 @@
+ 
+ #endif
+ 
++#if defined (__MINGW32__)
++  /* We use getch to read console input, so use the same
++     mechanism to check for more.  Otherwise, we don't know.  */
++  if (isatty (fileno (rl_instream)))
++    return _kbhit ();
++#endif
++
+   return 0;
+ }
+ 
+diff -Naur readline-5.1.orig/readline.c readline-5.1/readline.c
+--- readline-5.1.orig/readline.c	2005-07-04 19:29:35 -0700
++++ readline-5.1/readline.c	2010-04-13 01:54:04 -0700
+@@ -282,6 +282,7 @@
+ {
+   FREE (rl_prompt);
+   rl_prompt = prompt ? savestring (prompt) : (char *)NULL;
++  rl_display_prompt = rl_prompt ? rl_prompt : "";
+ 
+   rl_visible_prompt_length = rl_expand_prompt (rl_prompt);
+   return 0;
+@@ -714,7 +715,7 @@
+ 
+ 	  rl_dispatching = 1;
+ 	  RL_SETSTATE(RL_STATE_DISPATCHING);
+-	  r = (*map[key].function)(rl_numeric_arg * rl_arg_sign, key);
++	  (*map[key].function)(rl_numeric_arg * rl_arg_sign, key);
+ 	  RL_UNSETSTATE(RL_STATE_DISPATCHING);
+ 	  rl_dispatching = 0;
+ 
+diff -Naur readline-5.1.orig/terminal.c readline-5.1/terminal.c
+--- readline-5.1.orig/terminal.c	2005-11-12 17:46:54 -0800
++++ readline-5.1/terminal.c	2010-04-13 02:21:14 -0700
+@@ -55,6 +55,10 @@
+ #  include <sys/ioctl.h>
+ #endif /* GWINSZ_IN_SYS_IOCTL && !TIOCGWINSZ */
+ 
++#ifdef __MSDOS__
++# include <pc.h>
++#endif
++
+ #include "rltty.h"
+ #include "tcap.h"
+ 
+@@ -66,6 +70,54 @@
+ #include "rlshell.h"
+ #include "xmalloc.h"
+ 
++#if defined (__MINGW32__)
++# include <windows.h>
++# include <wincon.h>
++
++/* Each of the files below is a minimal implementation of the standard
++   termcap function with the same name, suitable for use in a Windows
++   console window.  */
++
++int
++tgetent (char *buffer, char *termtype)
++{
++  return -1;
++}
++
++int
++tgetnum (char *name)
++{
++  return -1;
++}
++
++int
++tgetflag (char *name)
++{
++  return -1;
++}
++
++char *
++tgetstr (char *name, char **area)
++{
++  return NULL;
++}
++
++int
++tputs (char *string, int nlines, int (*outfun) ())
++{
++  while (*string)
++    outfun (*string++);
++
++  return 0;
++}
++
++char *
++tgoto (const char *cap, int col, int row)
++{
++  return NULL;
++}
++#endif
++
+ #define CUSTOM_REDISPLAY_FUNC() (rl_redisplay_function != rl_redisplay)
+ #define CUSTOM_INPUT_FUNC() (rl_getc_function != rl_getc)
+ 
+@@ -77,8 +129,10 @@
+ /*								    */
+ /* **************************************************************** */
+ 
++#ifndef __MSDOS__
+ static char *term_buffer = (char *)NULL;
+ static char *term_string_buffer = (char *)NULL;
++#endif /* !__MSDOS__ */
+ 
+ static int tcap_initialized;
+ 
+@@ -122,7 +176,7 @@
+ static char *_rl_visible_bell;
+ 
+ /* Non-zero means the terminal can auto-wrap lines. */
+-int _rl_term_autowrap;
++int _rl_term_autowrap = -1;
+ 
+ /* Non-zero means that this terminal has a meta key. */
+ static int term_has_meta;
+@@ -207,6 +261,20 @@
+     }
+ #endif /* TIOCGWINSZ */
+ 
++  /* For MinGW, we get the console size from the Windows API.  */
++#if defined (__MINGW32__)
++  HANDLE hConOut = GetStdHandle (STD_OUTPUT_HANDLE);
++  if (hConOut != INVALID_HANDLE_VALUE)
++    {
++      CONSOLE_SCREEN_BUFFER_INFO scr;
++      if (GetConsoleScreenBufferInfo (hConOut, &scr))
++	{
++	  wc = scr.dwSize.X;
++	  wr = scr.srWindow.Bottom - scr.srWindow.Top + 1;
++	}
++    }
++#endif
++
+ #if defined (__EMX__)
+   _emx_get_screensize (&_rl_screenwidth, &_rl_screenheight);
+ #endif
+@@ -230,7 +298,10 @@
+       if (_rl_screenwidth <= 0)
+         _rl_screenwidth = wc;
+ 
+-#if !defined (__DJGPP__)
++#if defined (__DJGPP__)
++      if (_rl_screenwidth <= 0)
++	_rl_screenwidth = ScreenCols ();
++#else
+       if (_rl_screenwidth <= 0 && term_string_buffer)
+ 	_rl_screenwidth = tgetnum ("co");
+ #endif
+@@ -246,7 +317,10 @@
+       if (_rl_screenheight <= 0)
+         _rl_screenheight = wr;
+ 
+-#if !defined (__DJGPP__)
++#if defined (__DJGPP__)
++      if (_rl_screenheight <= 0)
++	_rl_screenheight = ScreenRows ();
++#else
+       if (_rl_screenheight <= 0 && term_string_buffer)
+ 	_rl_screenheight = tgetnum ("li");
+ #endif
+@@ -274,6 +348,9 @@
+ _rl_set_screen_size (rows, cols)
+      int rows, cols;
+ {
++  if (_rl_term_autowrap == -1)
++    _rl_init_terminal_io (rl_terminal_name);
++
+   if (rows > 0)
+     _rl_screenheight = rows;
+   if (cols > 0)
+@@ -397,6 +474,23 @@
+   if (term == 0)
+     term = "dumb";
+ 
++#ifdef __MSDOS__
++  _rl_term_im = _rl_term_ei = _rl_term_ic = _rl_term_IC = (char *)NULL;
++  _rl_term_up = _rl_term_dc = _rl_term_DC = _rl_visible_bell = (char *)NULL;
++  _rl_term_ku = _rl_term_kd = _rl_term_kl = _rl_term_kr = (char *)NULL;
++  _rl_term_mm = _rl_term_mo = (char *)NULL;
++  _rl_terminal_can_insert = term_has_meta = _rl_term_autowrap = 0;
++  _rl_term_cr = "\r";
++  _rl_term_clreol = _rl_term_clrpag = _rl_term_backspace = (char *)NULL;
++  _rl_term_goto = _rl_term_pc = _rl_term_ip = (char *)NULL;
++  _rl_term_ks = _rl_term_ke =_rl_term_vs = _rl_term_ve = (char *)NULL;
++  _rl_term_kh = _rl_term_kH = _rl_term_at7 = _rl_term_kI = (char *)NULL;
++#if defined(HACK_TERMCAP_MOTION)
++  _rl_term_forward_char = (char *)NULL;
++#endif
++
++  _rl_get_screen_size (tty, 0);
++#else  /* !__MSDOS__ */
+   /* I've separated this out for later work on not calling tgetent at all
+      if the calling application has supplied a custom redisplay function,
+      (and possibly if the application has supplied a custom input function). */
+@@ -499,6 +593,8 @@
+   if (!term_has_meta)
+     _rl_term_mm = _rl_term_mo = (char *)NULL;
+ 
++#endif /* !__MSDOS__ */
++
+   /* Attempt to find and bind the arrow keys.  Do not override already
+      bound keys in an overzealous attempt, however. */
+ 
+@@ -595,10 +691,12 @@
+ {
+   register int i;
+ 
++#ifndef __MSDOS__
+   if (_rl_term_backspace)
+     for (i = 0; i < count; i++)
+       tputs (_rl_term_backspace, 1, _rl_output_character_function);
+   else
++#endif
+     for (i = 0; i < count; i++)
+       putc ('\b', _rl_out_stream);
+   return 0;
+@@ -628,12 +726,17 @@
+ 	default:
+ 	  break;
+ 	case VISIBLE_BELL:
++#ifdef __MSDOS__
++	  ScreenVisualBell ();
++	  break;
++#else
+ 	  if (_rl_visible_bell)
+ 	    {
+ 	      tputs (_rl_visible_bell, 1, _rl_output_character_function);
+ 	      break;
+ 	    }
+ 	  /* FALLTHROUGH */
++#endif
+ 	case AUDIBLE_BELL:
+ 	  fprintf (stderr, "\007");
+ 	  fflush (stderr);
+@@ -685,6 +788,7 @@
+ _rl_set_cursor (im, force)
+      int im, force;
+ {
++#ifndef __MSDOS__
+   if (_rl_term_ve && _rl_term_vs)
+     {
+       if (force || im != rl_insert_mode)
+@@ -695,4 +799,5 @@
+ 	    tputs (_rl_term_ve, 1, _rl_output_character_function);
+ 	}
+     }
++#endif
+ }
+diff -Naur readline-5.1.orig/text.c readline-5.1/text.c
+--- readline-5.1.orig/text.c	2005-09-24 16:06:07 -0700
++++ readline-5.1/text.c	2010-04-13 02:02:20 -0700
+@@ -1071,8 +1071,6 @@
+ rl_delete (count, key)
+      int count, key;
+ {
+-  int r;
+-
+   if (count < 0)
+     return (_rl_rubout_char (-count, key));
+ 
+@@ -1090,17 +1088,17 @@
+       else
+ 	rl_forward_byte (count, key);
+ 
+-      r = rl_kill_text (orig_point, rl_point);
++      rl_kill_text (orig_point, rl_point);
+       rl_point = orig_point;
+-      return r;
+     }
+   else
+     {
+       int new_point;
+ 
+       new_point = MB_NEXTCHAR (rl_line_buffer, rl_point, 1, MB_FIND_NONZERO);
+-      return (rl_delete_text (rl_point, new_point));
++      rl_delete_text (rl_point, new_point);
+     }
++  return 0;
+ }
+ 
+ /* Delete the character under the cursor, unless the insertion
+diff -Naur readline-5.1.orig/tilde.c readline-5.1/tilde.c
+--- readline-5.1.orig/tilde.c	2005-05-07 11:49:51 -0700
++++ readline-5.1/tilde.c	2010-04-13 02:02:54 -0700
+@@ -410,12 +410,12 @@
+       if (dirname == 0)
+ 	dirname = savestring (filename);
+     }
++#if defined (HAVE_GETPWENT)
+   else
+     {
+       free (username);
+       dirname = glue_prefix_and_suffix (user_entry->pw_dir, filename, user_len);
+     }
+-#if defined (HAVE_GETPWENT)
+   endpwent ();
+ #endif
+   return (dirname);
