@@ -8,7 +8,7 @@ svnGetPS2DEV $LIBNAME
 
 cd $LIBNAME
 rm -Rf `find . -name ".svn"`
-LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp || { echo "Error building $LIBNAME"; exit 1; }
+LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lstdc++ -lpsplibc -lpspuser" ./configure --host psp --disable-shared --prefix=$(pwd)/../target/psp || { echo "Error building $LIBNAME"; exit 1; }
 
 LIBS="-lpsplibc -lpspuser" make || { echo "Error building $LIBNAME"; exit 1; }
 
