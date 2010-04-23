@@ -36,11 +36,12 @@ MPC_VER=0.7
 LIBELF_VER=0.8.12
 
 # gdb + pspusbsh + etc...
-ZLIB_VER=1.2.4
+ZLIB_VER=1.2.5
 LIBPDCURSES_VER=3.4
 LIBREADLINE_VER=5.1
 LIBICONV_VER=1.13.1
 PTHREADS_VER=2-8-0
+SDL_VER=1.2.14
 
 #extra deps version
 MINGW32_MAKE_VER=3.79.1-20010722
@@ -142,6 +143,8 @@ function prepare {
 		# installCLOOGPPL
 		# installMPC
 		# installLIBELF
+		# nice to have
+		installSDL
 	fi
 
 	checkTool svn
@@ -250,9 +253,14 @@ function installZlib {
 		tar -xzf $ZLIB || die "extracting "$ZLIB
 
 		cd "zlib-"$ZLIB_VER
-		./configure --prefix=/mingw --static
-		make || die "building "$ZLIB
-		make install || die "installing "$ZLIB
+#		./configure --prefix=/mingw --static
+#		make || die "building zlib"
+#		make install || die "installing zlib"
+		# version 1.2.5 seems another hack
+		make -f win32/Makefile.gcc
+		install zlib.h /mingw/include
+		install zconf.h /mingw/include
+		install libz.a /mingw/lib
 		cd ../..
 	fi
 }
@@ -456,6 +464,26 @@ function installPTHREADS {
 		cp pthreadGC2.dll /mingw/bin/pthreadGC2.dll
 		cp pthreadGC2.dll /mingw/lib/pthread.dll
 		cp pthread.h sched.h /mingw/include
+		cd ../..
+	fi
+}
+
+function installSDL {
+	if [ ! -f /usr/local/include/SDL.h ]
+	then
+		SDL="SDL-"$SDL_VER".tar.gz"
+
+		downloadHTTP deps $SDL "http://www.libsdl.org/release"
+		cd deps
+		tar -xzf $SDL || die "extracting "$SDL
+
+		cd "SDL-"$SDL_VER
+		./configure \
+			--prefix=/usr/local \
+			--disable-shared \
+			--enable-static || die "configuring SDL"
+		make || die "building SDL"
+		make install || die "installing SDL"
 		cd ../..
 	fi
 }

@@ -30,6 +30,13 @@ Portable handheld videogame system.
  Changelog
 ===============================================================================
 0.9.6
+* pspsh builds as a native app on win32 too (no need for cygwin) WIP
+* win32 dependencies updated
+ - zlib 1.2.5
+ - SDL 1.2.14
+ - readline 5.1 (same as gdb)
+ - libiconv 1.13.1
+ - pthreads 2.8.0
 * updated the fpulib trig functions can use the FPU processor but
   we either use vfpu or software impl using libm. This can help to
   make a bit faster code if we do not need vectors.
