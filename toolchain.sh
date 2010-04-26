@@ -1064,6 +1064,7 @@ function buildBaseDevpaks {
 	# still waiting for 4.4 fix from diedel
 #	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
 }
 
 #---------------------------------------------------------------------------------
