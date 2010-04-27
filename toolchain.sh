@@ -4,7 +4,7 @@
 # configuration
 #---------------------------------------------------------------------------------
 
-PS2DEVSVN_URL="svn://svn.pspdev.org/psp/trunk"
+PS2DEVSVN_URL="svn://svn.ps2dev.org/psp/trunk"
 PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 
 #SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
@@ -469,7 +469,7 @@ function installPTHREADS {
 }
 
 function installSDL {
-	if [ ! -f /usr/local/include/SDL.h ]
+	if [ ! -f /usr/local/include/SDL/SDL.h ]
 	then
 		SDL="SDL-"$SDL_VER".tar.gz"
 
@@ -1044,7 +1044,7 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
+	#buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET

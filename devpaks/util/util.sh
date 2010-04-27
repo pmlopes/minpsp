@@ -1,10 +1,19 @@
 #!/bin/bash
 
-PS2DEVSVN_URL="svn://svn.pspdev.org/psp/trunk"
+PS2DEVSVN_URL="svn://svn.ps2dev.org/psp/trunk"
 PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
 
-PSPWARESVN_URL="svn://svn.pspdev.org/pspware/trunk"
+PSPWARESVN_URL="svn://svn.ps2dev.org/pspware/trunk"
 PSPWARESVN_MIRROR="http://psp.jim.sh/svn/pspware/trunk"
+
+unset CC
+unset CXX
+unset LD
+unset AR
+unset LIBS
+unset CFLAGS
+unset CXXFLAGS
+unset LDFLAGS
 
 #arg1 devpak
 #arg2 svn url
