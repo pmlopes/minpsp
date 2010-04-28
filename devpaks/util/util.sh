@@ -14,6 +14,7 @@ unset LIBS
 unset CFLAGS
 unset CXXFLAGS
 unset LDFLAGS
+unset PSPDEV
 
 #arg1 devpak
 #arg2 svn url
@@ -88,7 +89,7 @@ function makeInstaller {
 	NIXINSTALLER=$1-$2-install.bin
 	echo "#!/bin/bash"																			> $NIXINSTALLER
 	echo "LINES=@@_LINES@@"																		>> $NIXINSTALLER
-	echo "trap 'rm -f /tmp/$1-$2.tar.bz2; exit 1' HUP INT QUIT TERM" 							>> $NIXINSTALLER
+	echo "trap 'rm -f /tmp/$1-$2-psp.tar.bz2; exit 1' HUP INT QUIT TERM" 						>> $NIXINSTALLER
 	echo "SDKPATH=\$(psp-config --pspdev-path)"													>> $NIXINSTALLER
 	echo "touch \$SDKPATH/psp/sdk/devpaks"														>> $NIXINSTALLER
 	echo "if [ \"\$SDKPATH\" == \"\" ]; then"													>> $NIXINSTALLER
@@ -132,11 +133,11 @@ function makeInstaller {
 	echo "	read agree in"																		>> $NIXINSTALLER
 	echo "	if [ \"\$agree\" == \"y\" ]; then"													>> $NIXINSTALLER
 	# prepare installation
-	echo "		tail -n +\$LINES \"\$0\" > /tmp/$1-$2.tar.bz2"									>> $NIXINSTALLER
+	echo "		tail -n +\$LINES \"\$0\" > /tmp/$1-$2-psp.tar.bz2"								>> $NIXINSTALLER
 	# install
 	echo "		cd \$SDKPATH"																	>> $NIXINSTALLER
-	echo "		tar xjfv /tmp/$1-$2.tar.bz2"													>> $NIXINSTALLER
-	echo "		rm /tmp/$1-$2.tar.bz2"															>> $NIXINSTALLER
+	echo "		tar xjfv /tmp/$1-$2-psp.tar.bz2"												>> $NIXINSTALLER
+	echo "		rm /tmp/$1-$2-psp.tar.bz2"														>> $NIXINSTALLER
 	# post installl
 	if [ ! "$POSTINSTALL" == "" ]
 	then
@@ -160,9 +161,9 @@ function makeInstaller {
 	cat $NIXINSTALLER.sh | sed s/@@_LINES@@/$LINES/ > $NIXINSTALLER
 	# rm $NIXINSTALLER.sh
 	cd target
-	tar cjvf ../$1-$2.tar.bz2 *
+	tar cjvf ../$1-$2-psp.tar.bz2 *
 	cd ..
-	cat $1-$2.tar.bz2 >> $NIXINSTALLER
+	cat $1-$2-psp.tar.bz2 >> $NIXINSTALLER
 	chmod a+x $NIXINSTALLER
 
 	if [ -e makensis ]; then
@@ -173,6 +174,5 @@ function makeInstaller {
 }
 
 #build preparation
-mkdir build
+mkdir -p build
 cd build
-

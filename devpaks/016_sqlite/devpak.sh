@@ -19,5 +19,6 @@ cd ..
 
 makeInstaller $LIBNAME $VERSION
 
+unset PSPDEV
 echo "Done!"
 
