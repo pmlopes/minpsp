@@ -1,25 +1,17 @@
 #!/bin/bash
+set -e
 
 #---------------------------------------------------------------------------------
 # configuration
 #---------------------------------------------------------------------------------
-
-PS2DEVSVN_URL="svn://svn.ps2dev.org/psp/trunk"
-PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
-
-#SF_MIRROR="http://surfnet.dl.sourceforge.net/sourceforge"
-SF_MIRROR="http://voxel.dl.sourceforge.net/sourceforge"
-
-# testing
-DISABLE_SVN=0
 
 # package version
 PSPSDK_VERSION=0.9.6
 
 # sdk versions
 BINUTILS_VER=2.18
-GCC_VER=4.3.4
 GCC_TC_VER=4.3.2
+GCC_VER=4.3.5
 NEWLIB_VER=1.18.0
 #debugger version
 GDB_VER=6.8
@@ -51,13 +43,6 @@ MINGW32_LESS_VER=394
 #---------------------------------------------------------------------------------
 # functions
 #---------------------------------------------------------------------------------
-
-#arg1 func
-function die {
-	echo "Error: "$1
-	exit 1
-}
-
 
 function prepare {
 
@@ -139,10 +124,10 @@ function prepare {
 		installGMP
 		installMPFR
 		# not needed right now
-		# installPPL
-		# installCLOOGPPL
-		# installMPC
-		# installLIBELF
+#		installPPL
+#		installCLOOGPPL
+#		installMPC
+#		installLIBELF
 		# nice to have
 		installSDL
 	fi
@@ -162,67 +147,123 @@ function prepare {
 }
 
 function checkTool {
-	if [ -z $1 ]; then
-		die "Please make sure you have '"$1"' installed."
+	if [ ! -f `which $1` ]; then
+		echo "Please make sure you have '"$1"' installed."
+		exit 1
 	fi
 }
 
-# Gets the sources from the PS2DEV SVN reppo,
-# if it fails again use a local backup
-# on failure tries to fallback to JimParis mirror,
-#arg1 devpak
-function svnGetPS2DEV {
-	if [ ! -d $(basename $1) ]
-	then
-		if [ "$DISABLE_SVN" == "1" ]; then
-			cp -fR ../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
-		else
-			svn checkout $2 $3 $PS2DEVSVN_URL/$1 || cp -fR ../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $PS2DEVSVN_MIRROR/$1 || die "ERROR GETTING "$1
-		fi
+# arg1 target-build
+# arg2 url
+# arg3 base
+# arg4 compression
+# arg5 [target-dir]
+# psp http://server file tar.gz [dir]
+function download {
+	DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
+	cd $1
+	if [ ! -f ../offline/$DOWNLOAD_DIR/$3.$4 ]; then
+		mkdir -p ../offline/$DOWNLOAD_DIR
+		wget -c -O ../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4
+	fi
+	if [ "$5" == "" ]; then
+		TARGET_DIR=$3
+		CREATE_TARGET=0
+		DOWNLOAD_PREFIX=../offline/$DOWNLOAD_DIR
 	else
-		if [ ! "$DISABLE_SVN" == "1" ]; then
-		  svn update $2 $3 $(basename $1)
+		TARGET_DIR=$5
+		CREATE_TARGET=1
+		DOWNLOAD_PREFIX=../../offline/$DOWNLOAD_DIR
+	fi
+	if [ ! -d $TARGET_DIR ]; then
+		if [ $CREATE_TARGET == 1 ]; then
+			mkdir $TARGET_DIR
+			cd $TARGET_DIR
 		fi
-	fi
-}
-
-#arg1 file
-#arg2 from
-#arg3 to
-function installFile {
-	cp $2/$1 $INSTALLDIR/$3/$1 || die "Failed to install file "$1
-}
-
-#arg1 from
-#arg2 to
-function installDir {
-	cp -fR $1 $INSTALLDIR/$2 || die "Failed to install dir "$1
-}
-
-# arg1 base
-# arg2 file
-# arg3 url
-function downloadHTTP {
-	if [ ! -f $1/$2 ]
-	then
-		cd $1
-		wget -c $3/$2 || die "Failed to download "$2
+		if [ $4 == tar.gz ]; then
+			tar -zxf $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $4 == tar.bz2 ]; then
+			tar -jxf $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $4 == zip ]; then
+			if [ "$OS" == "MINGW32_NT" ]; then
+				$DOWNLOAD_PREFIX../mingw/bin/unzip -q $DOWNLOAD_PREFIX/$3.$4
+			else
+				unzip -q $DOWNLOAD_PREFIX/$3.$4
+			fi
+		fi
+		if [ $4 == rar ]; then
+			if [ "$OS" == "MINGW32_NT" ]; then
+				../mingw/bin/UnRAR x $DOWNLOAD_PREFIX/$3.$4
+			else
+				unrar x $DOWNLOAD_PREFIX/$3.$4
+			fi
+		fi
+		if [ $CREATE_TARGET == 1 ]; then
+			cd ..
+		fi
+		cd $TARGET_DIR
+		if [ -f ../patches/$3-PSP.patch ]; then
+			patch -p1 < ../patches/$3-PSP.patch
+		fi
+		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+		fi
+		if [ -f $3.patch ]; then
+			patch -p1 < $3.patch
+		fi
 		cd ..
 	fi
-
+	cd ..
 }
 
-# arg1 base
-# arg2 file
-# arg3 url
-function downloadFTP {
-	if [ ! -f $1/$2 ]
+# arg1 target
+# arg2 svn reppo
+# arg3 module
+function svnGet {
+	DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
+	cd $1
+	if [ ! -d $3 ]
 	then
-		cd $1
-		wget --passive-ftp -c $3/$2 || die "Failed to download "$2
+		if [ ! -d ../offline/$DOWNLOAD_DIR/$3 ]; then
+			mkdir -p ../offline/$DOWNLOAD_DIR
+			cd ../offline/$DOWNLOAD_DIR
+			svn co $2/$3 $3
+			cd -
+		else
+			cd ../offline/$DOWNLOAD_DIR/$3
+			svn up
+			cd -
+		fi
+		cp -Rf ../offline/$DOWNLOAD_DIR/$3 .
+		cd $3
+		# some SDK files are in DOS format, fix back to UNIX
+		if [ -f src/samples/Makefile.am ]; then
+			awk '{ sub("\r$", ""); print }' src/samples/Makefile.am > tmp
+			mv -f tmp src/samples/Makefile.am
+		fi
+		if [ -f src/base/build.mak ]; then
+			awk '{ sub("\r$", ""); print }' src/base/build.mak > tmp
+			mv -f tmp src/base/build.mak
+		fi
+		# normal patching
+		if [ -f ../patches/$3-PSP.patch ]; then
+			patch -p1 < ../patches/$3-PSP.patch
+		fi
+		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+		fi
+		if [ -f $3.patch ]; then
+			patch -p1 < $3.patch
+		fi
+		cd ..
+	else
+		cd $3
+		svn up
 		cd ..
 	fi
-
+	cd ..
 }
 
 #arg1 base path
@@ -230,32 +271,25 @@ function downloadFTP {
 #arg3 devpak
 #arg4 installer path
 function buildAndInstallDevPak {
-	cd $1 || exit 1
-	cd $2_$3 || exit 1
+	cd $1/$2_$3
 	rm -Rf build
-	./devpak.sh || exit 1
-	cd $(psp-config --pspdev-path) || exit 1
-	tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
+	./devpak.sh
+	tar -C $(psp-config --pspdev-path) -xjf $1/$2_$3/build/$3-*.tar.bz2
 	# only install if we are on windows
 	if [ "$OS" == "MINGW32_NT" ]; then
-		cd $4 || exit 1
-		tar xjfv $1/$2_$3/build/$3-*.tar.bz2 || exit 1
+		tar -C $4 -xjf $1/$2_$3/build/$3-*.tar.bz2
 	fi
 }
 
 function installZlib {
 	if [ ! -f /mingw/include/zlib.h ]
 	then
-		ZLIB="zlib-"$ZLIB_VER".tar.gz"
-
-		downloadHTTP deps $ZLIB "http://www.zlib.net"
-		cd deps
-		tar -xzf $ZLIB || die "extracting "$ZLIB
-
-		cd "zlib-"$ZLIB_VER
+		download deps "http://www.zlib.net" "zlib-"$ZLIB_VER "tar.gz"
+		pwd
+		cd deps/"zlib-"$ZLIB_VER
 #		./configure --prefix=/mingw --static
-#		make || die "building zlib"
-#		make install || die "installing zlib"
+#		make
+#		make install
 		# version 1.2.5 seems another hack
 		make -f win32/Makefile.gcc
 		install zlib.h /mingw/include
@@ -268,18 +302,13 @@ function installZlib {
 function installGMP {
 	if [ ! -f /usr/local/include/gmp.h ]
 	then
-		GMP="gmp-"$GMP_VER".tar.bz2"
-		
-		downloadHTTP deps $GMP "http://ftp.gnu.org/gnu/gmp"
-		cd deps
-		tar -xjf $GMP || die "extracting "$GMP
-
-		cd "gmp-"$GMP_VER
+		download deps "http://ftp.gnu.org/gnu/gmp" "gmp-"$GMP_VER "tar.bz2"
+		cd deps/"gmp-"$GMP_VER
 		./configure $EXTRA_BUILD_CFG \
-			--prefix=/usr/local --enable-cxx || die "configuring gmp"
-		make || die "building gmp"
-		make check || die "checking gmp"
-		make install || die "installing gmp"
+			--prefix=/usr/local --enable-cxx
+		make
+		make check
+		make install
 		cd ../..
 	fi
 }
@@ -287,19 +316,15 @@ function installGMP {
 function installMPFR {
 	if [ ! -f /usr/local/include/mpfr.h ]
 	then
-		MPFR="mpfr-"$MPFR_VER".tar.bz2"
-		
-		downloadHTTP deps $MPFR "http://www.mpfr.org/mpfr-"$MPFR_VER
-		cd deps
-		tar -xjf $MPFR || die "extracting "$MPFR
-
-		cd "mpfr-"$MPFR_VER
+		download deps "http://www.mpfr.org/mpfr-"$MPFR_VER "mpfr-"$MPFR_VER "tar.bz2"
+		cd deps/"mpfr-"$MPFR_VER
 		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
-			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB || die "configuring mpfr"
-		make || die "building mpfr"
-		make check || die "checking mpfr"
-		make install || die "installing mpfr"
+			--with-gmp-include=$GMP_INCLUDE \
+			--with-gmp-lib=$GMP_LIB
+		make
+		make check
+		make install
 		cd ../..
 	fi
 }
@@ -307,20 +332,15 @@ function installMPFR {
 function installPPL {
 	if [ ! -f /usr/local/include/ppl_c.h ]
 	then
-		PPL="ppl-"$PPL_VER".tar.bz2"
-		
-		downloadHTTP deps $PPL "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER
-		cd deps
-		tar -xjf $PPL || die "extracting "$PPL
-
-		cd "ppl-"$PPL_VER
+		download deps "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER "ppl-"$PPL_VER "tar.bz2"
+		cd deps/"ppl-"$PPL_VER
 		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
 			--with-libgmp-prefix=$GMP_PREFIX \
-			--with-libgmpxx-prefix=$GMP_PREFIX || die "configuring ppl"
-		make || die "building ppl"
-		make check || die "checking ppl"
-		make install || die "installing ppl"
+			--with-libgmpxx-prefix=$GMP_PREFIX
+		make
+		make check
+		make install
 		cd ../..
 	fi
 }
@@ -328,20 +348,16 @@ function installPPL {
 function installCLOOGPPL {
 	if [ ! -f /usr/local/include/cloog/cloog.h ]
 	then
-		CLOOG_PPL="cloog-ppl-"$CLOOG_PPL_VER".tar.gz"
-		
-		downloadFTP deps $CLOOG_PPL "ftp://gcc.gnu.org/pub/gcc/infrastructure"
-		cd deps
-		tar -xzf $CLOOG_PPL || die "extracting "$CLOOG_PPL
-
-		cd "cloog-ppl-"$CLOOG_PPL_VER
+		download deps "ftp://gcc.gnu.org/pub/gcc/infrastructure" "cloog-ppl-"$CLOOG_PPL_VER "tar.gz"
+		cd deps/"cloog-ppl-"$CLOOG_PPL_VER
 		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
-			--with-gmp-include=$GMP_INCLUDE --with-gmp-library=$GMP_LIB \
-			--with-ppl=$PPL_PREFIX || die "configuring cloog-ppl"
-		make || die "building cloog-ppl"
-		make check || die "checking cloog-ppl"
-		make install || die "installing cloog-ppl"
+			--with-gmp-include=$GMP_INCLUDE \
+			--with-gmp-library=$GMP_LIB \
+			--with-ppl=$PPL_PREFIX
+		make
+		make check
+		make install
 		cd ../..
 	fi
 }
@@ -349,21 +365,19 @@ function installCLOOGPPL {
 function installMPC {
 	if [ ! -f /usr/local/include/mpc.h ]
 	then
-		MPC="mpc-"$MPC_VER".tar.gz"
-		
-		downloadHTTP deps $MPC "http://www.multiprecision.org/mpc/download"
-		cd deps
-		tar -xzf $MPC || die "extracting "$MPC
-
-		cd "mpc-"$MPC_VER
+		download deps "http://www.multiprecision.org/mpc/download" "mpc-"$MPC_VER "tar.gz"
+		cd deps/"mpc-"$MPC_VER
 		./configure $EXTRA_BUILD_CFG \
 			--prefix=/usr/local \
-			--enable-static --disable-shared \
-			--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-			--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring mpc"
-		make || die "building mpc"
-		make check || die "checking mpc"
-		make install || die "installing mpc"
+			--enable-static \
+			--disable-shared \
+			--with-gmp-include=$GMP_INCLUDE \
+			--with-gmp-lib=$GMP_LIB \
+			--with-mpfr-include=$MPFR_INCLUDE \
+			--with-mpfr-lib=$MPFR_LIB
+		make
+		make check
+		make install
 		cd ../..
 	fi
 }
@@ -371,18 +385,13 @@ function installMPC {
 function installLIBELF {
 	if [ ! -f /usr/local/include/libelf.h ]
 	then
-		LIBELF="libelf-"$LIBELF_VER".tar.gz"
-		
-		downloadHTTP deps $LIBELF "http://www.mr511.de/software"
-		cd deps
-		tar -xzf $LIBELF || die "extracting "$LIBELF
-
-		cd "libelf-"$LIBELF_VER
+		download deps "http://www.mr511.de/software" "libelf-"$LIBELF_VER "tar.gz"
+		cd deps/"libelf-"$LIBELF_VER
 		./configure \
 			--prefix=/usr/local \
-			--disable-shared || die "configuring libelf"
-		make || die "building libelf"
-		make install || die "installing libelf"
+			--disable-shared
+		make
+		make install
 		cd ../..
 	fi
 }
@@ -390,13 +399,8 @@ function installLIBELF {
 function installPDCURSES {
 	if [ ! -f /mingw/include/curses.h ]
 	then
-		LIBPDCURSES="PDCurses-"$LIBPDCURSES_VER".tar.gz"
-		
-		downloadHTTP deps $LIBPDCURSES $SF_MIRROR"/pdcurses"
-		cd deps
-		tar -xzf $LIBPDCURSES || die "extracting "$LIBPDCURSES
-
-		cd "PDCurses-"$LIBPDCURSES_VER/win32
+		download deps "http://downloads.sourceforge.net/pdcurses" "PDCurses-"$LIBPDCURSES_VER "tar.gz"
+		cd deps/"PDCurses-"$LIBPDCURSES_VER/win32
 		make -f mingwin32.mak DLL=n
 		cp pdcurses.a /mingw/lib/libcurses.a
 		cp pdcurses.a /mingw/lib/libpanel.a
@@ -409,20 +413,14 @@ function installPDCURSES {
 function installREADLINE {
 	if [ ! -f /mingw/include/readline/readline.h ]
 	then
-		LIBREADLINE="readline-"$LIBREADLINE_VER".tar.gz"
-		
-		downloadFTP deps $LIBREADLINE "ftp://ftp.gnu.org/gnu/readline"
-		cd deps
-		tar -xzf $LIBREADLINE || die "extracting "$LIBREADLINE
-		patch -p0 < ../mingw/patches/readline-$LIBREADLINE_VER-MINPSPW.patch
-
-		cd "readline-"$LIBREADLINE_VER
+		download deps "ftp://ftp.gnu.org/gnu/readline" "readline-"$LIBREADLINE_VER "tar.gz"
+		cd deps/"readline-"$LIBREADLINE_VER
 		./configure \
 			--prefix=/mingw \
 			--without-curses \
-			--disable-shared || die "configuring readline"
-		make || die "building readline"
-		make install || die "installing readline"
+			--disable-shared
+		make
+		make install
 		cd ../..
 	fi
 }
@@ -430,19 +428,14 @@ function installREADLINE {
 function installICONV {
 	if [ ! -f /mingw/include/iconv.h ]
 	then
-		LIBICONV="libiconv-"$LIBICONV_VER".tar.gz"
-		
-		downloadFTP deps $LIBICONV "ftp://ftp.gnu.org/gnu/libiconv"
-		cd deps
-		tar -xzf $LIBICONV || die "extracting "$LIBICONV
-
-		cd "libiconv-"$LIBICONV_VER
+		download deps "ftp://ftp.gnu.org/gnu/libiconv" "libiconv-"$LIBICONV_VER "tar.gz"
+		cd deps/"libiconv-"$LIBICONV_VER
 		./configure \
 			--prefix=/mingw \
 			--disable-shared \
-			--enable-static || die "configuring libiconv"
-		make || die "building libiconv"
-		make install || die "installing libiconv"
+			--enable-static
+		make
+		make install
 		cd ../..
 	fi
 }
@@ -450,15 +443,8 @@ function installICONV {
 function installPTHREADS {
 	if [ ! -f /mingw/include/pthread.h ]
 	then
-		PTHREADS="pthreads-w32-"$PTHREADS_VER"-release.tar.gz"
-		
-		downloadFTP deps $PTHREADS "ftp://sourceware.org/pub/pthreads-win32"
-		cd deps
-		tar -xzf $PTHREADS || die "extracting "$PTHREADS
-
-		# although it is needed for ffmpeg it seems useless for everything else
-		#patch -p0 < ../mingw/patches/pthreads-w32-2-8-0-MINPSPW.patch
-		cd "pthreads-w32-"$PTHREADS_VER"-release"
+		download deps "ftp://sourceware.org/pub/pthreads-win32" "pthreads-w32-"$PTHREADS_VER"-release" "tar.gz"
+		cd deps/"pthreads-w32-"$PTHREADS_VER"-release"
 		make clean GC
 		cp pthreadGC2.dll /mingw/lib/pthreadGC2.dll
 		cp pthreadGC2.dll /mingw/bin/pthreadGC2.dll
@@ -471,44 +457,27 @@ function installPTHREADS {
 function installSDL {
 	if [ ! -f /usr/local/include/SDL/SDL.h ]
 	then
-		SDL="SDL-"$SDL_VER".tar.gz"
-
-		downloadHTTP deps $SDL "http://www.libsdl.org/release"
-		cd deps
-		tar -xzf $SDL || die "extracting "$SDL
-
-		cd "SDL-"$SDL_VER
+		download deps "http://www.libsdl.org/release" "SDL-"$SDL_VER "tar.gz"
+		cd deps/"SDL-"$SDL_VER
 		./configure \
 			--prefix=/usr/local \
 			--disable-shared \
-			--enable-static || die "configuring SDL"
-		make || die "building SDL"
-		make install || die "installing SDL"
+			--enable-static
+		make
+		make install
 		cd ../..
 	fi
 }
 
 function downloadPatches {
-	cd psp
-	svnGetPS2DEV psptoolchain/patches
-
-	cp ../mingw/patches/* patches || die "adding MinPSPW patches"
-	cd ..
+	svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
+	cp psp/patches/gcc-$GCC_TC_VER-PSP.patch psp/patches/gcc-$GCC_VER-PSP.patch 
 }
 
 function buildBinutils {
-	BINUTILS="binutils-"$BINUTILS_VER".tar.bz2"
 	BINUTILS_SRCDIR="binutils-"$BINUTILS_VER
 	
-	downloadFTP psp $BINUTILS "http://ftp.gnu.org/gnu/binutils"
-	
-	if [ ! -d psp/$BINUTILS_SRCDIR ]
-	then
-		cd psp
-		tar -xjf $BINUTILS || die "extracting "$BINUTILS
-		patch -p1 -d $BINUTILS_SRCDIR -i ../patches/binutils-$BINUTILS_VER-MINPSPW.patch || die "patching binutils"
-		cd ..
-	fi
+	download psp "http://ftp.gnu.org/gnu/binutils" "binutils-"$BINUTILS_VER "tar.bz2"
 	
 	if [ ! -d psp/build/$BINUTILS_SRCDIR ]
 	then
@@ -520,38 +489,22 @@ function buildBinutils {
 				--target=psp \
 				--enable-install-libbfd \
 				--disable-werror \
-				--disable-nls || die "configuring binutils"
+				--disable-nls
 	else
 		cd psp/build/$BINUTILS_SRCDIR
 		make clean
 	fi
 
-	make LDFLAGS="-s" || die "Error building binutils"
-	make install || die "Error installing binutils"
+	make LDFLAGS="-s"
+	make install
 	cd ../../..
 }
 
 # build a compiler so we can bootstrap the SDK and the newlib
 function buildXGCC {
-	GCC_CORE="gcc-core-"$GCC_VER".tar.bz2"
-	GCC_GPP="gcc-g++-"$GCC_VER".tar.bz2"
-	GCC_OBJC="gcc-objc-"$GCC_VER".tar.bz2"
-	
 	GCC_SRCDIR="gcc-"$GCC_VER
 	
-	downloadHTTP psp $GCC_CORE "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-	downloadHTTP psp $GCC_GPP "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-	downloadHTTP psp $GCC_OBJC "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER
-	
-	if [ ! -d psp/$GCC_SRCDIR ]
-	then
-		cd psp
-		tar -xjf $GCC_CORE || die "extracting "$GCC_CORE
-		tar -xjf $GCC_GPP || die "extracting "$GCC_GPP
-		tar -xjf $GCC_OBJC || die "extracting "$GCC_OBJC
-		patch -p1 -d $GCC_SRCDIR -i ../patches/gcc-$GCC_TC_VER-PSP.patch || die "patching gcc"
-		cd ..
-	fi
+	download psp "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER "gcc-"$GCC_VER "tar.bz2"
 
 	if [ ! -d psp/build/x$GCC_SRCDIR ]
 	then
@@ -567,42 +520,32 @@ function buildXGCC {
 				--disable-libssp \
 				--disable-win32-registry \
 				--disable-nls \
-				--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-				--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
+				--with-gmp-include=$GMP_INCLUDE \
+				--with-gmp-lib=$GMP_LIB \
+				--with-mpfr-include=$MPFR_INCLUDE \
+				--with-mpfr-lib=$MPFR_LIB
 	else
 		cd psp/build/x$GCC_SRCDIR
 		make clean
 	fi
 
 	if [ "$OS" == "MINGW32_NT" ]; then
-		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc || die "building gcc"
+		make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc
 	else
-		make LDFLAGS="-s" all-gcc || die "building gcc"
+		make LDFLAGS="-s" all-gcc
 	fi
 
-	make install-gcc || die "installing gcc"
+	make install-gcc
 	cd ../../..
 }
 
 function bootstrapSDK {
+	svnGet psp "svn://svn.ps2dev.org/psp/trunk" "pspsdk"
 	cd psp
-	if [ ! -d pspsdk ]
-	then
-		svnGetPS2DEV pspsdk
-		# some SDK files are in DOS format, fix back to UNIX
-		awk '{ sub("\r$", ""); print }' pspsdk/src/samples/Makefile.am > tmp
-		mv -f tmp pspsdk/src/samples/Makefile.am
-		awk '{ sub("\r$", ""); print }' pspsdk/src/base/build.mak > tmp
-		mv -f tmp pspsdk/src/base/build.mak
-		patch -p1 -d pspsdk -i ../patches/pspsdk-MINPSPW.patch || die "patching pspsdk"
-	else
-		svnGetPS2DEV pspsdk
-	fi
-	
 	if [ ! -f pspsdk/configure ]
 	then
 		cd pspsdk
-		./bootstrap || die "running pspsdk bootstrap"
+		./bootstrap
 		cd ..
 	fi
 	
@@ -610,46 +553,36 @@ function bootstrapSDK {
 	then
 		mkdir -p build/pspsdk
 		cd build/pspsdk
-		../../pspsdk/configure --with-pspdev="$INSTALLDIR" || die "running pspsdk configure"
+		../../pspsdk/configure --with-pspdev="$INSTALLDIR"
 	else
 		cd build/pspsdk
 		make clean
 	fi
 
-	make install-data || die "installing pspsdk headers"
+	make install-data
 	cd ../../..
 }
 
 function buildNewlib {
-	NEWLIB="newlib-$NEWLIB_VER.tar.gz"
 	NEWLIB_SRCDIR="newlib-"$NEWLIB_VER
-	
-	downloadFTP psp $NEWLIB "ftp://sources.redhat.com/pub/newlib"
-	
-	if [ ! -d psp/$NEWLIB_SRCDIR ]
-	then
-		cd psp
-		tar -xzf $NEWLIB || die "extracting "$NEWLIB
-		patch -p1 -d $NEWLIB_SRCDIR -i ../patches/newlib-$NEWLIB_VER-MINPSPW.patch || die "Error patching newlib (MINPSPW)"
-		cd ..
-	fi
-	
+	download psp "ftp://sources.redhat.com/pub/newlib" "newlib-"$NEWLIB_VER "tar.gz"
+
 	if [ ! -d psp/build/$NEWLIB_SRCDIR ]
 	then
 		mkdir -p psp/build/$NEWLIB_SRCDIR
 		cd psp/build/$NEWLIB_SRCDIR
 
-		../../$NEWLIB_SRCDIR/configure $EXTRA_BUILD_CFG \
+		../../$NEWLIB_SRCDIR/configure \
 				--target=psp \
 				--disable-nls \
-				--prefix=$INSTALLDIR || die "configuring newlib"
+				--prefix=$INSTALLDIR
 	else
 		cd psp/build/$NEWLIB_SRCDIR
 		make clean
 	fi
 
-	make LDFLAGS="-s" || die "building newlib"
-	make install || die "installing newlib"
+	make LDFLAGS="-s"
+	make install
 	cd ../../..
 }
 
@@ -661,7 +594,7 @@ function buildGCC {
 	then
 		mkdir -p psp/build/$GCC_SRCDIR
 		cd psp/build/$GCC_SRCDIR
-	
+
 		# in order to get gcov to build libgcov we need to specify with-headers in conjuction with newlib
 		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
@@ -674,51 +607,41 @@ function buildGCC {
 				--disable-nls \
 				--enable-c99 \
 				--enable-long-long \
-				--with-gmp-include=$GMP_INCLUDE --with-gmp-lib=$GMP_LIB \
-				--with-mpfr-include=$MPFR_INCLUDE --with-mpfr-lib=$MPFR_LIB || die "configuring gcc"
+				--with-gmp-include=$GMP_INCLUDE \
+				--with-gmp-lib=$GMP_LIB \
+				--with-mpfr-include=$MPFR_INCLUDE \
+				--with-mpfr-lib=$MPFR_LIB
 	else
 		cd psp/build/$GCC_SRCDIR
 		make clean
 	fi
 
 	if [ "$OS" == "MINGW32_NT" ]; then
-		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+		make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s"
 	else
-		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s" || die "building final gcc collection"
+		make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s"
 	fi
 
-	make install || die "installing final gcc collection"
+	make install
 	cd ../../..
 }
 
 function buildSDK {
 	cd psp/build/pspsdk
 	make clean
-	make LDFLAGS="-s" || die "building pspsdk"
-	make install || die "installing pspsdk"
+	make LDFLAGS="-s"
+	make install
 	cd ../../..
 }
 
 function validateSDK {
-	find $INSTALLDIR/psp/sdk/samples -type f -name "Makefile" | xargs $(pwd)/mingw/build-sample.sh $1 || exit 1;
+	find $INSTALLDIR/psp/sdk/samples -type f -name "Makefile" | xargs $(pwd)/mingw/build-sample.sh $1
 }
 
 function buildGDB {
-	GDB="gdb-"$GDB_VER".tar.bz2"
 	GDB_SRCDIR="gdb-"$GDB_VER
 
-	downloadHTTP psp $GDB "http://ftp.gnu.org/gnu/gdb"
-	
-	if [ ! -d psp/$GDB_SRCDIR ]
-	then
-		cd psp
-		tar -xjf $GDB || die "extracting "$GDB
-		patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-PSP.patch || die "patching gdb"
-		if [ "$OS" == "MINGW32_NT" ]; then
-			patch -p1 -d $GDB_SRCDIR -i ../patches/gdb-$GDB_VER-MINPSPW.patch || die "patching gdb MINPSPW"
-		fi
-		cd ..
-	fi
+	download psp "http://ftp.gnu.org/gnu/gdb" "gdb-"$GDB_VER "tar.bz2"
 	
 	if [ ! -d psp/build/$GDB_SRCDIR ]
 	then
@@ -729,103 +652,73 @@ function buildGDB {
 				--prefix=$INSTALLDIR \
 				--target=psp \
 				--disable-nls \
-				--disable-werror || die "configuring gdb"
+				--disable-werror
 	else
 		cd psp/build/$GDB_SRCDIR
 		make clean
 	fi
 
-	make LDFLAGS="-s" || die "building gdb"
-	make install || die "installing gdb"
+	make LDFLAGS="-s"
+	make install
 	cd ../../..
 }
 
 function installExtraBinaries {
-	UNXUTILS="UnxUtils.zip"
 	UNXUTILS_DIR="UnxUtils"
-	
-	downloadHTTP deps $UNXUTILS $SF_MIRROR"/unxutils"
-	
-	if [ ! -d deps/$UNXUTILS_DIR ]
-	then
-		cd deps
-		../mingw/bin/unzip -q $UNXUTILS -d $UNXUTILS_DIR
-		cd ..
-	fi
-	
-	cd deps
-	installFile cp.exe $UNXUTILS_DIR/usr/local/wbin bin
-	installFile rm.exe $UNXUTILS_DIR/usr/local/wbin bin
-	installFile mkdir.exe $UNXUTILS_DIR/usr/local/wbin bin
-	installFile sed.exe $UNXUTILS_DIR/usr/local/wbin bin
-	cd ..
-	
-	MINGW32_MAKE="make-"$MINGW32_MAKE_VER".tar.gz"
-	MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
+	download deps "http://downloads.sourceforge.net/unxutils" "UnxUtils" "zip" $UNXUTILS_DIR
 
-	downloadHTTP deps $MINGW32_MAKE $SF_MIRROR"/mingw"
+	cd deps/$UNXUTILS_DIR
+	cp usr/local/wbin/cp.exe $INSTALLDIR/bin
+	cp usr/local/wbin/rm.exe $INSTALLDIR/bin
+	cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
+	cp usr/local/wbin/sed.exe $INSTALLDIR/bin
+	cd ../..
 	
-	if [ ! -d deps/$MINGW32_MAKE_DIR ]
-	then
-		cd deps
-		mkdir $MINGW32_MAKE_DIR
-		cd $MINGW32_MAKE_DIR
-		tar -xzf ../$MINGW32_MAKE || die "extracting "$MINGW32_MAKE
-		cd ../..
-	fi
+	MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
+	download deps "http://downloads.sourceforge.net/mingw" "make-"$MINGW32_MAKE_VER "tar.gz" $MINGW32_MAKE_DIR
 	
 	cd deps/$MINGW32_MAKE_DIR
-	installFile make.exe . bin
-	installDir info .
+	cp make.exe $INSTALLDIR/bin
+	cp -Rf info $INSTALLDIR/info
 	cd ../..
 	
 	# true for some samples (namely minifire asm demo)
 	gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
 	# visual studio support
-	installFile vsmake.bat mingw/bin bin
-	cd mingw
-	installDir VC .
-	cd ..
+	cp mingw/bin/vsmake.bat $INSTALLDIR/bin
 
 	# in case any win32 native bin was linked with threads we
 	# add the dll to the output install dir too
-	installFile pthreadGC2.dll /mingw/bin bin
+	cp /mingw/bin/pthreadGC2.dll $INSTALLDIR/bin
 }
 
 function installPSPLinkUSB {
-	cd psp
-	if [ ! -d psplinkusb ]
-	then
-		svnGetPS2DEV psplinkusb
-		patch -p1 -d psplinkusb -i ../patches/psplinkusb-MINPSPW.patch || die "patching psplinkusb"
-	else
-		svnGetPS2DEV psplinkusb
-	fi
-
+	svnGet psp "svn://svn.ps2dev.org/psp/trunk" "psplinkusb"
 	
+	cd psp
 	if [ "$OS" == "MINGW32_NT" ]; then
 		# pspsh + usbhostfs_pc
-		installFile pspsh.exe ../mingw/bin bin
-		installFile usbhostfs_pc.exe ../mingw/bin bin
-		installFile cygncurses-8.dll ../mingw/bin bin
-		installFile cygreadline6.dll ../mingw/bin bin
-		installFile cygwin1.dll ../mingw/bin bin
+		cp ../mingw/bin/pspsh.exe $INSTALLDIR/bin
+		cp ../mingw/bin/usbhostfs_pc.exe $INSTALLDIR/bin
+		cp ../mingw/bin/cygncurses-8.dll $INSTALLDIR/bin
+		cp ../mingw/bin/cygreadline6.dll $INSTALLDIR/bin
+		cp ../mingw/bin/cygwin1.dll $INSTALLDIR/bin
 		
 		# copy the drivers for windows
 		mkdir -p $INSTALLDIR/bin/driver
-		mkdir -p $INSTALLDIR/bin/driver_x64
-		installFile libusb0.dll ../mingw/bin/usb/driver bin/driver
-		installFile libusb0.sys ../mingw/bin/usb/driver bin/driver
-		installFile psp.cat ../mingw/bin/usb/driver bin/driver
-		installFile psp.inf ../mingw/bin/usb/driver bin/driver
+		cp ../mingw/bin/usb/driver/libusb0.dll $INSTALLDIR/bin/driver
+		cp ../mingw/bin/usb/driver/libusb0.sys $INSTALLDIR/bin/driver
+		cp ../mingw/bin/usb/driver/psp.cat $INSTALLDIR/bin/driver
+		cp ../mingw/bin/usb/driver/psp.inf $INSTALLDIR/bin/driver
 		# 64 bits
-		installFile libusb0.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile libusb0.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile psp.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile psp.inf ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile libusb0_x64.dll ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile libusb0_x64.sys ../mingw/bin/usb/driver_x64 bin/driver_x64
-		installFile psp_x64.cat ../mingw/bin/usb/driver_x64 bin/driver_x64
+		mkdir -p $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/libusb0.dll $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/libusb0.sys $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/psp.cat $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/psp.inf $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/libusb0_x64.dll $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/libusb0_x64.sys $INSTALLDIR/bin/driver_x64
+		cp ../mingw/bin/usb/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64
 	else
 		cd psplinkusb
 		
@@ -840,79 +733,91 @@ function installPSPLinkUSB {
 	fi
 
 	cd psplinkusb
-	make -f Makefile.psp clean || die "cleaning PSPLINKUSB (PSP)"
-	make -f Makefile.psp release || die "building PSPLINKUSB (PSP)"
+	make -f Makefile.psp clean
+	make -f Makefile.psp release
 	cd release
 
 	mkdir -p $INSTALLDIR/psplink/psp
-	installDir scripts psplink/psp
-	rm -fR $INSTALLDIR/psplink/psp/scripts/.svn
-	installDir v1.0 psplink/psp
-	installDir v1.5 psplink/psp
-	installDir v1.5_nocorrupt psplink/psp
-	installFile LICENSE . psplink
-	installFile psplink_manual.pdf . psplink
-	installFile README . psplink
+	install -d $INSTALLDIR/psplink/psp/scripts
+	install -m 644 scripts/loadvsh.sh $INSTALLDIR/psplink/psp/scripts
+	install -m 644 scripts/README $INSTALLDIR/psplink/psp/scripts
+	install -d $INSTALLDIR/psplink/psp/v1.0
+	install -d $INSTALLDIR/psplink/psp/v1.0/psplink
+	install -m 644 v1.0/psplink/EBOOT.PBP $INSTALLDIR/psplink/psp/v1.0/psplink/EBOOT.PBP
+	install -m 644 v1.0/psplink/psplink.ini $INSTALLDIR/psplink/psp/v1.0/psplink/psplink.ini
+	install -m 644 v1.0/psplink/psplink.prx $INSTALLDIR/psplink/psp/v1.0/psplink/psplink.prx
+	install -m 644 v1.0/psplink/psplink_user.prx $INSTALLDIR/psplink/psp/v1.0/psplink/psplink_user.prx
+	install -m 644 v1.0/psplink/usbgdb.prx $INSTALLDIR/psplink/psp/v1.0/psplink/usbgdb.prx
+	install -m 644 v1.0/psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/v1.0/psplink/usbhostfs.prx
+	install -d $INSTALLDIR/psplink/psp/v1.5
+	install -d $INSTALLDIR/psplink/psp/v1.5/psplink
+	install -m 644 v1.5/psplink/EBOOT.PBP $INSTALLDIR/psplink/psp/v1.5/psplink/EBOOT.PBP
+	install -m 644 v1.5/psplink/psplink.ini $INSTALLDIR/psplink/psp/v1.5/psplink/psplink.ini
+	install -m 644 v1.5/psplink/psplink.prx $INSTALLDIR/psplink/psp/v1.5/psplink/psplink.prx
+	install -m 644 v1.5/psplink/psplink_user.prx $INSTALLDIR/psplink/psp/v1.5/psplink/psplink_user.prx
+	install -m 644 v1.5/psplink/usbgdb.prx $INSTALLDIR/psplink/psp/v1.5/psplink/usbgdb.prx
+	install -m 644 v1.5/psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/v1.5/psplink/usbhostfs.prx
+	install -d $INSTALLDIR/psplink/psp/v1.5/psplink\%
+	install -m 644 v1.5/psplink\%/EBOOT.PBP $INSTALLDIR/psplink/psp/v1.5/psplink\%/EBOOT.PBP
+	install -d $INSTALLDIR/psplink/psp/v1.5_nocorrupt
+	install -d $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/EBOOT.PBP $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/EBOOT.PBP
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/psplink.ini $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/psplink.ini
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/psplink.prx $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/psplink.prx
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/psplink_user.prx $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/psplink_user.prx
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/usbgdb.prx $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/usbgdb.prx
+	install -m 644 v1.5_nocorrupt/__SCE__psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/v1.5_nocorrupt/__SCE__psplink/usbhostfs.prx
+	install -d $INSTALLDIR/psplink/psp/v1.5_nocorrupt/\%__SCE__psplink
+	install -m 644 v1.5_nocorrupt/\%__SCE__psplink/EBOOT.PBP $INSTALLDIR/psplink/psp/v1.5_nocorrupt/\%__SCE__psplink/EBOOT.PBP
+	install -m 644 LICENSE $INSTALLDIR/psplink
+	install -m 644 psplink_manual.pdf $INSTALLDIR/psplink
+	install -m 644 README $INSTALLDIR/psplink
 	
 	cd ..
-	make -f Makefile.oe clean || die "cleaning PSPLINKUSB (OE)"
-	make -f Makefile.oe release || die "building PSPLINKUSB (OE)"
+	make -f Makefile.oe clean
+	make -f Makefile.oe release
 	
 	cd release_oe
-
-	installDir psplink psplink/psp/oe
+	install -d $INSTALLDIR/psplink/psp/oe
+	install -d $INSTALLDIR/psplink/psp/oe/psplink
+	install -m 644 psplink/EBOOT.PBP $INSTALLDIR/psplink/psp/oe/psplink/EBOOT.PBP
+	install -m 644 psplink/psplink.ini $INSTALLDIR/psplink/psp/oe/psplink/psplink.ini
+	install -m 644 psplink/psplink.prx $INSTALLDIR/psplink/psp/oe/psplink/psplink.prx
+	install -m 644 psplink/psplink_user.prx $INSTALLDIR/psplink/psp/oe/psplink/psplink_user.prx
+	install -m 644 psplink/usbgdb.prx $INSTALLDIR/psplink/psp/oe/psplink/usbgdb.prx
+	install -m 644 psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/oe/psplink/usbhostfs.prx
 	
 	cd ../../..
 }
 
 function installMan {
 
-	MINGW32_GROFF="groff-"$MINGW32_GROFF_VER"-bin.zip"
 	MINGW32_GROFF_DIR="groff-"$MINGW32_GROFF_VER
-
-	MINGW32_LESS="less-"$MINGW32_LESS_VER"-bin.zip"
-	MINGW32_LESS_DEP="less-"$MINGW32_LESS_VER"-dep.zip"
-	MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
-
-	downloadHTTP deps $MINGW32_GROFF $SF_MIRROR"/gnuwin32"
-	downloadHTTP deps $MINGW32_LESS $SF_MIRROR"/gnuwin32"
-	downloadHTTP deps $MINGW32_LESS_DEP $SF_MIRROR"/gnuwin32"
-	
-	if [ ! -d deps/$MINGW32_GROFF_DIR ]
-	then
-		cd deps
-		../mingw/bin/unzip -q $MINGW32_GROFF -d $MINGW32_GROFF_DIR
-		cd ..
-	fi
+	download deps "http://downloads.sourceforge.net/gnuwin32" "groff-"$MINGW32_GROFF_VER"-bin" "zip" "groff-"$MINGW32_GROFF_VER
 
 	cd deps
-	installFile groff.exe $MINGW32_GROFF_DIR/bin bin
-	installFile grotty.exe $MINGW32_GROFF_DIR/bin bin
-	installFile troff.exe $MINGW32_GROFF_DIR/bin bin
+	cp $MINGW32_GROFF_DIR/bin/groff.exe $INSTALLDIR/bin
+	cp $MINGW32_GROFF_DIR/bin/grotty.exe $INSTALLDIR/bin
+	cp $MINGW32_GROFF_DIR/bin/troff.exe $INSTALLDIR/bin
 	mkdir -p $INSTALLDIR/share
-	
-	installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font share
-	installDir $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac share
+	cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font $INSTALLDIR/share
+	cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac $INSTALLDIR/share
 	cd ..
-	
-	if [ ! -d deps/$MINGW32_LESS_DIR ]
-	then
-		cd deps
-		../mingw/bin/unzip -q $MINGW32_LESS -d $MINGW32_LESS_DIR
-		../mingw/bin/unzip -q $MINGW32_LESS_DEP -d $MINGW32_LESS_DIR
-		cd ..
-	fi
+
+	MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
+	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER
+	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER
 	
 	cd deps
-	installFile less.exe $MINGW32_LESS_DIR/bin bin
-	installFile pcre3.dll $MINGW32_LESS_DIR/bin bin
-	installFile man.bat ../mingw/bin bin
+	cp $MINGW32_LESS_DIR/bin/less.exe $INSTALLDIR/bin
+	cp $MINGW32_LESS_DIR/bin/pcre3.dll $INSTALLDIR/bin
+	cp ../mingw/bin/man.bat $INSTALLDIR/bin
 	cd ..
 }
 
 function installInfo {
-	installFile info.bat mingw/bin bin
-	installFile ginfo.exe mingw/bin bin
+	cp mingw/bin/info.bat $INSTALLDIR/bin
+	cp mingw/bin/ginfo.exe $INSTALLDIR/bin
 }
 
 function patchCMD {
@@ -923,7 +828,7 @@ function patchCMD {
 	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build_prx.mak > $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix
 	mv -f $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix $INSTALLDIR/psp/sdk/lib/build_prx.mak
 
-	patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/psp/patches/pspsdk-CMD.patch || die "patching makefiles for Win CMD shell"
+	patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/mingw/patches/pspsdk-CMD.patch
 }
 
 function prepareDistro {
@@ -1071,7 +976,6 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
