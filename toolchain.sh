@@ -48,7 +48,7 @@ function prepare {
 
 	mkdir -p psp/build
 	mkdir -p deps
-	
+
 	export OS=$(uname -s)
 
 	if [ "$OS" == "SunOS" ]; then
@@ -60,7 +60,7 @@ function prepare {
 		MPFR_LIB=/usr/lib
 		GMP_PREFIX=/usr
 		PPL_PREFIX=/usr
-		
+
 		if [ ! -e compat ]; then
 			mkdir -p compat
 			ln -s `which gcc-4.3.2` compat/gcc
@@ -72,7 +72,7 @@ function prepare {
 		fi
 		export PATH=$PATH:`pwd`/compat
 	fi
-		
+
 	if [ "$OS" == "Linux" ]; then
 		EXTRA_BUILD_CFG=""
 		INSTALLDIR="$(pwd)/../pspsdk"
@@ -96,7 +96,7 @@ function prepare {
 	if [ "$OS" == "MINGW32_NT-6.1" ]; then
 		OS=MINGW32_NT
 	fi
-	
+
 	if [ "$OS" == "MINGW32_NT" ]; then
 		# since I'm running this under a Xeon processor, I don't want it to be
 		# build that cpu, so I must instruct mingw to target a i686
@@ -140,7 +140,7 @@ function prepare {
 	checkTool python
 	checkTool flex
 	checkTool bison
-	
+
 	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
 	export PATH=$PATH:$TOOLPATH/bin
@@ -187,18 +187,10 @@ function download {
 			tar -jxf $DOWNLOAD_PREFIX/$3.$4
 		fi
 		if [ $4 == zip ]; then
-			if [ "$OS" == "MINGW32_NT" ]; then
-				$DOWNLOAD_PREFIX../mingw/bin/unzip -q $DOWNLOAD_PREFIX/$3.$4
-			else
-				unzip -q $DOWNLOAD_PREFIX/$3.$4
-			fi
+			unzip -q $DOWNLOAD_PREFIX/$3.$4
 		fi
 		if [ $4 == rar ]; then
-			if [ "$OS" == "MINGW32_NT" ]; then
-				../mingw/bin/UnRAR x $DOWNLOAD_PREFIX/$3.$4
-			else
-				unrar x $DOWNLOAD_PREFIX/$3.$4
-			fi
+			unrar x $DOWNLOAD_PREFIX/$3.$4
 		fi
 		if [ $CREATE_TARGET == 1 ]; then
 			cd ..
@@ -233,7 +225,7 @@ function svnGet {
 			cd -
 		else
 			cd ../offline/$DOWNLOAD_DIR/$3
-			svn up
+			svn up || echo "*** SVN not updated!!! ***"
 			cd -
 		fi
 		cp -Rf ../offline/$DOWNLOAD_DIR/$3 .
@@ -260,7 +252,7 @@ function svnGet {
 		cd ..
 	else
 		cd $3
-		svn up
+		svn up || echo "*** SVN not updated!!! ***"
 		cd ..
 	fi
 	cd ..
@@ -476,14 +468,14 @@ function downloadPatches {
 
 function buildBinutils {
 	BINUTILS_SRCDIR="binutils-"$BINUTILS_VER
-	
+
 	download psp "http://ftp.gnu.org/gnu/binutils" "binutils-"$BINUTILS_VER "tar.bz2"
-	
+
 	if [ ! -d psp/build/$BINUTILS_SRCDIR ]
 	then
 		mkdir -p psp/build/$BINUTILS_SRCDIR
 		cd psp/build/$BINUTILS_SRCDIR
-	
+
 		../../$BINUTILS_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
@@ -503,14 +495,14 @@ function buildBinutils {
 # build a compiler so we can bootstrap the SDK and the newlib
 function buildXGCC {
 	GCC_SRCDIR="gcc-"$GCC_VER
-	
+
 	download psp "http://ftp.gnu.org/gnu/gcc/gcc-"$GCC_VER "gcc-"$GCC_VER "tar.bz2"
 
 	if [ ! -d psp/build/x$GCC_SRCDIR ]
 	then
 		mkdir -p psp/build/x$GCC_SRCDIR
 		cd psp/build/x$GCC_SRCDIR
-	
+
 		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
@@ -548,7 +540,7 @@ function bootstrapSDK {
 		./bootstrap
 		cd ..
 	fi
-	
+
 	if [ ! -d build/pspsdk ]
 	then
 		mkdir -p build/pspsdk
@@ -642,7 +634,7 @@ function buildGDB {
 	GDB_SRCDIR="gdb-"$GDB_VER
 
 	download psp "http://ftp.gnu.org/gnu/gdb" "gdb-"$GDB_VER "tar.bz2"
-	
+
 	if [ ! -d psp/build/$GDB_SRCDIR ]
 	then
 		mkdir -p psp/build/$GDB_SRCDIR
@@ -673,15 +665,15 @@ function installExtraBinaries {
 	cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
 	cp usr/local/wbin/sed.exe $INSTALLDIR/bin
 	cd ../..
-	
+
 	MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
 	download deps "http://downloads.sourceforge.net/mingw" "make-"$MINGW32_MAKE_VER "tar.gz" $MINGW32_MAKE_DIR
-	
+
 	cd deps/$MINGW32_MAKE_DIR
 	cp make.exe $INSTALLDIR/bin
 	cp -Rf info $INSTALLDIR/info
 	cd ../..
-	
+
 	# true for some samples (namely minifire asm demo)
 	gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
 	# visual studio support
@@ -694,7 +686,7 @@ function installExtraBinaries {
 
 function installPSPLinkUSB {
 	svnGet psp "svn://svn.ps2dev.org/psp/trunk" "psplinkusb"
-	
+
 	cd psp
 	if [ "$OS" == "MINGW32_NT" ]; then
 		# pspsh + usbhostfs_pc
@@ -703,7 +695,7 @@ function installPSPLinkUSB {
 		cp ../mingw/bin/cygncurses-8.dll $INSTALLDIR/bin
 		cp ../mingw/bin/cygreadline6.dll $INSTALLDIR/bin
 		cp ../mingw/bin/cygwin1.dll $INSTALLDIR/bin
-		
+
 		# copy the drivers for windows
 		mkdir -p $INSTALLDIR/bin/driver
 		cp ../mingw/bin/usb/driver/libusb0.dll $INSTALLDIR/bin/driver
@@ -721,13 +713,13 @@ function installPSPLinkUSB {
 		cp ../mingw/bin/usb/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64
 	else
 		cd psplinkusb
-		
+
 		if [ "$OS" == "SunOS" ]; then
 			cp -f ../../mingw/solaris/Makefile.pspsh pspsh/Makefile
 			cp -f ../../mingw/solaris/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
 			cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
 		fi
-		
+
 		make -f Makefile.clients install
 		cd ..
 	fi
@@ -772,11 +764,11 @@ function installPSPLinkUSB {
 	install -m 644 LICENSE $INSTALLDIR/psplink
 	install -m 644 psplink_manual.pdf $INSTALLDIR/psplink
 	install -m 644 README $INSTALLDIR/psplink
-	
+
 	cd ..
 	make -f Makefile.oe clean
 	make -f Makefile.oe release
-	
+
 	cd release_oe
 	install -d $INSTALLDIR/psplink/psp/oe
 	install -d $INSTALLDIR/psplink/psp/oe/psplink
@@ -786,7 +778,7 @@ function installPSPLinkUSB {
 	install -m 644 psplink/psplink_user.prx $INSTALLDIR/psplink/psp/oe/psplink/psplink_user.prx
 	install -m 644 psplink/usbgdb.prx $INSTALLDIR/psplink/psp/oe/psplink/usbgdb.prx
 	install -m 644 psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/oe/psplink/usbhostfs.prx
-	
+
 	cd ../../..
 }
 
@@ -807,7 +799,7 @@ function installMan {
 	MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
 	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER
 	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER
-	
+
 	cd deps
 	cp $MINGW32_LESS_DIR/bin/less.exe $INSTALLDIR/bin
 	cp $MINGW32_LESS_DIR/bin/pcre3.dll $INSTALLDIR/bin
@@ -824,7 +816,7 @@ function patchCMD {
 	# make sure the line endings are correct (UNIX style)
 	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build.mak > $INSTALLDIR/psp/sdk/lib/build.mak.unix
 	mv -f $INSTALLDIR/psp/sdk/lib/build.mak.unix $INSTALLDIR/psp/sdk/lib/build.mak
-	
+
 	awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build_prx.mak > $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix
 	mv -f $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix $INSTALLDIR/psp/sdk/lib/build_prx.mak
 
@@ -834,7 +826,7 @@ function patchCMD {
 function prepareDistro {
 	# add release notes
 	cp readme.txt $INSTALLDIR/readme.txt
-	
+
 	[ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
 
 	mkdir -p $INSTALLERDIR/base
@@ -907,7 +899,7 @@ function prepareDistro {
 function prepareDistroNIX {
 	# add release notes
 	cp readme.txt $INSTALLDIR/readme.txt
-	
+
 	# generate doxygen docs
 	cd psp/build/pspsdk
 	make doxygen-doc
@@ -923,7 +915,7 @@ function buildBaseDevpaks {
 		DEVPAK_TARGET=$INSTALLERDIR/devpaks
 	fi
 	BASE=$(pwd)/devpaks
-	
+
 	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
@@ -979,13 +971,13 @@ prepare
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
-downloadPatches
+#downloadPatches
 
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-buildBinutils
-buildXGCC
+#buildBinutils
+#buildXGCC
 bootstrapSDK
 buildNewlib
 buildGCC
