@@ -4,9 +4,9 @@
 LIBNAME=freetype
 VERSION=2.1.10
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
 cd builds/unix
 automake --add-missing
@@ -30,6 +30,7 @@ else
 	gcc -s -o target/bin/freetype-config ../freetype-config.c -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DFTVERSION=\"$VERSION\" || exit 1
 fi
 
+cd ..
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 PS2DEVSVN_URL="svn://svn.ps2dev.org/psp/trunk"
 PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
@@ -16,59 +17,109 @@ unset CXXFLAGS
 unset LDFLAGS
 unset PSPDEV
 
-#arg1 devpak
-#arg2 svn url
-#arg3 svn module
+# arg1 target-build
+# arg2 url
+# arg3 base
+# arg4 compression
+# arg5 [target-dir]
+# psp http://server file tar.gz [dir]
+function download {
+	DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
+	cd $1
+	if [ ! -f ../offline/$DOWNLOAD_DIR/$3.$4 ]; then
+		mkdir -p ../offline/$DOWNLOAD_DIR
+		wget -c -O ../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4
+	fi
+	if [ "$5" == "" ]; then
+		TARGET_DIR=$3
+		CREATE_TARGET=0
+		DOWNLOAD_PREFIX=../offline/$DOWNLOAD_DIR
+	else
+		TARGET_DIR=$5
+		CREATE_TARGET=1
+		DOWNLOAD_PREFIX=../../offline/$DOWNLOAD_DIR
+	fi
+	if [ ! -d $TARGET_DIR ]; then
+		if [ $CREATE_TARGET == 1 ]; then
+			mkdir $TARGET_DIR
+			cd $TARGET_DIR
+		fi
+		if [ $4 == tar.gz ]; then
+			tar -zxf $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $4 == tar.bz2 ]; then
+			tar -jxf $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $4 == zip ]; then
+			unzip -q $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $4 == rar ]; then
+			unrar x $DOWNLOAD_PREFIX/$3.$4
+		fi
+		if [ $CREATE_TARGET == 1 ]; then
+			cd ..
+		fi
+		cd $TARGET_DIR
+		if [ -f ../patches/$3-PSP.patch ]; then
+			patch -p1 < ../patches/$3-PSP.patch
+		fi
+		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+		fi
+		if [ -f $3.patch ]; then
+			patch -p1 < $3.patch
+		fi
+		cd ..
+	fi
+	cd ..
+}
+
+# arg1 target
+# arg2 svn reppo
+# arg3 module
 function svnGet {
-	if [ ! -d $1 ]
+	DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
+	cd $1
+	if [ ! -d $3 ]
 	then
-		svn checkout $2 $3 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f ../$1.patch ]
-		then
-			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
+		if [ ! -d ../../../offline/$DOWNLOAD_DIR/$3 ]; then
+			mkdir -p ../../../offline/$DOWNLOAD_DIR
+			cd ../../../offline/$DOWNLOAD_DIR
+			svn co $2/$3 $3
+			cd -
+		else
+			cd ../../../offline/$DOWNLOAD_DIR/$3
+			svn up || echo "*** SVN not updated!!! ***"
+			cd -
 		fi
-	else
-		svn update $1
-	fi
-}
-
-# Gets the sources from the PS2DEV SVN reppo, on failure tries to fallback to JimParis mirror
-#arg1 devpak
-function svnGetPS2DEV {
-	if [ ! -d $1 ]
-	then
-		cp -fR ../../../ps2dev/psp-svn/$1 $(basename $1) || svn checkout $2 $3 $PS2DEVSVN_URL/$1 || svn checkout $2 $3 $PS2DEVSVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f ../$1.patch ]
-		then
-			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
+		cp -Rf ../../../offline/$DOWNLOAD_DIR/$3 .
+		cd $3
+		# some SDK files are in DOS format, fix back to UNIX
+		if [ -f src/samples/Makefile.am ]; then
+			awk '{ sub("\r$", ""); print }' src/samples/Makefile.am > tmp
+			mv -f tmp src/samples/Makefile.am
 		fi
-	else
-		svn update $2 $3 $1
-	fi
-}
-
-# Gets the sources from the PS2DEV pspware SVN reppo, on failure tries to fallback to JimParis mirror
-#arg1 devpak
-function svnGetPSPWARE {
-	if [ ! -d $1 ]
-	then
-		cp -fR ../../../ps2dev/pspware-svn/$1 $(basename $1) || svn checkout $PSPWARESVN_URL/$1 || svn checkout $PSPWARESVN_MIRROR/$1 || { echo "ERROR GETTING "$1; exit 1; }
-		if [ -f ../$1.patch ]
-		then
-			patch -p0 -d $1 -i ../../$1.patch || { echo "Error patching "$1; exit; }
+		if [ -f src/base/build.mak ]; then
+			awk '{ sub("\r$", ""); print }' src/base/build.mak > tmp
+			mv -f tmp src/base/build.mak
 		fi
+		# normal patching
+		if [ -f ../patches/$3-PSP.patch ]; then
+			patch -p1 < ../patches/$3-PSP.patch
+		fi
+		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+		fi
+		if [ -f ../$3.patch ]; then
+			patch -p1 < ../$3.patch
+		fi
+		cd ..
 	else
-		svn update $1
+		cd $3
+		svn up || echo "*** SVN not updated!!! ***"
+		cd ..
 	fi
-}
-
-# arg1 url
-# arg2 file
-function downloadHTTP {
-	if [ ! -f $2 ]
-	then
-		wget -c $1/$2 || { echo "Failed to download "$2; exit 1; }
-	fi
+	cd ..
 }
 
 #arg1 dep
@@ -86,7 +137,7 @@ function addDep {
 #arg1 libname
 #arg1 version
 function makeInstaller {
-	NIXINSTALLER=$1-$2-install.bin
+	NIXINSTALLER=build/$1-$2-install.bin
 	echo "#!/bin/bash"																			> $NIXINSTALLER
 	echo "LINES=@@_LINES@@"																		>> $NIXINSTALLER
 	echo "trap 'rm -f /tmp/$1-$2-psp.tar.bz2; exit 1' HUP INT QUIT TERM" 						>> $NIXINSTALLER
@@ -125,54 +176,51 @@ function makeInstaller {
 		addDep $9 ${10} $NIXINSTALLER
 	fi
 	
-	echo "	cat <<EOF"																			>> $NIXINSTALLER
-	cat ../license.txt																			>> $NIXINSTALLER
-	echo "EOF"																					>> $NIXINSTALLER
-	echo "	echo \"\""																			>> $NIXINSTALLER
-	echo "	echo -n \"You must agree with the license before installing this DEVPAK [y/N] \""	>> $NIXINSTALLER
-	echo "	read agree in"																		>> $NIXINSTALLER
-	echo "	if [ \"\$agree\" == \"y\" ]; then"													>> $NIXINSTALLER
+	echo "	cat <<EOF" >> $NIXINSTALLER
+	cat license.txt >> $NIXINSTALLER
+	echo "EOF" >> $NIXINSTALLER
+	echo "	echo \"\"" >> $NIXINSTALLER
+	echo "	echo -n \"You must agree with the license before installing this DEVPAK [y/N] \"" >> $NIXINSTALLER
+	echo "	read agree in" >> $NIXINSTALLER
+	echo "	if [ \"\$agree\" == \"y\" ]; then" >> $NIXINSTALLER
 	# prepare installation
-	echo "		tail -n +\$LINES \"\$0\" > /tmp/$1-$2-psp.tar.bz2"								>> $NIXINSTALLER
+	echo "		tail -n +\$LINES \"\$0\" > /tmp/$1-$2-psp.tar.bz2" >> $NIXINSTALLER
 	# install
-	echo "		cd \$SDKPATH"																	>> $NIXINSTALLER
-	echo "		tar xjfv /tmp/$1-$2-psp.tar.bz2"												>> $NIXINSTALLER
-	echo "		rm /tmp/$1-$2-psp.tar.bz2"														>> $NIXINSTALLER
+	echo "		cd \$SDKPATH" >> $NIXINSTALLER
+	echo "		tar xjfv /tmp/$1-$2-psp.tar.bz2" >> $NIXINSTALLER
+	echo "		rm /tmp/$1-$2-psp.tar.bz2" >> $NIXINSTALLER
 	# post installl
 	if [ ! "$POSTINSTALL" == "" ]
 	then
-		echo "		"$POSTINSTALL 																>> $NIXINSTALLER
+		echo "		"$POSTINSTALL >> $NIXINSTALLER
 	fi
 	# register devpak
-	echo "		echo $1-$2 >> \$SDKPATH/psp/sdk/devpaks"										>> $NIXINSTALLER
+	echo "		echo $1-$2 >> \$SDKPATH/psp/sdk/devpaks" >> $NIXINSTALLER
 	# done
-	echo "		echo \"\""																		>> $NIXINSTALLER
+	echo "		echo \"\"" >> $NIXINSTALLER
 	echo "		echo \"$1-$2 has been installed on your SDK.\""									>> $NIXINSTALLER
-	echo "	else"																				>> $NIXINSTALLER
-	echo "		echo \"ERROR: You opt not to install this DEVPAK.\""							>> $NIXINSTALLER
-	echo "	fi"																					>> $NIXINSTALLER
-	echo "fi"																					>> $NIXINSTALLER
-	echo "echo \"Please visit minpspw.sourceforge.net for other DEVPAKs.\""						>> $NIXINSTALLER
-	echo "exit 0"																				>> $NIXINSTALLER
-	echo ""																						>> $NIXINSTALLER
+	echo "	else" >> $NIXINSTALLER
+	echo "		echo \"ERROR: You opt not to install this DEVPAK.\"" >> $NIXINSTALLER
+	echo "	fi" >> $NIXINSTALLER
+	echo "fi" >> $NIXINSTALLER
+	echo "echo \"Please visit minpspw.sourceforge.net for other DEVPAKs.\"" >> $NIXINSTALLER
+	echo "exit 0" >> $NIXINSTALLER
+	echo ""	>> $NIXINSTALLER
 	LINES=`cat $NIXINSTALLER| wc -l`
 	LINES=$((LINES+1))
 	mv $NIXINSTALLER $NIXINSTALLER.sh
 	cat $NIXINSTALLER.sh | sed s/@@_LINES@@/$LINES/ > $NIXINSTALLER
 	# rm $NIXINSTALLER.sh
-	cd target
+	cd build/target
 	tar cjvf ../$1-$2-psp.tar.bz2 *
-	cd ..
-	cat $1-$2-psp.tar.bz2 >> $NIXINSTALLER
+	cd ../..
+	cat build/$1-$2-psp.tar.bz2 >> $NIXINSTALLER
 	chmod a+x $NIXINSTALLER
 
 	if [ -e makensis ]; then
 		makensis ../$1.nsi
 	fi
-	
-	cd ..
 }
 
 #build preparation
 mkdir -p build
-cd build
