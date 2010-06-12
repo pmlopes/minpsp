@@ -356,7 +356,7 @@ To build run the toolchain script:
 ## Install the required packages.
  sudo apt-get install build-essential autoconf automake bison flex \
   libncurses5-dev libreadline-dev libusb-dev texinfo libgmp3-dev libmpfr-dev \
-  subversion doxygen graphviz libtool unrar nsis mingw32 unzip
+  subversion doxygen graphviz libtool unrar nsis mingw32 unzip cmake
 
  ## Build and install the toolchain + sdk.
  sudo ./toolchain.sh
