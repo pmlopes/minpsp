@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=libpspmath
@@ -9,7 +10,7 @@ cp -R ../sample sample
 
 cd $LIBNAME
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
 mkdir -p ../target/psp/sdk/lib ../target/psp/sdk/include ../target/psp/sdk/samples/pspmath
 cp libpspmath.a ../target/psp/sdk/lib

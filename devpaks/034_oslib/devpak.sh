@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=OSLib
@@ -44,4 +45,3 @@ mv build/OSLib-2.10.tar.bz2 build/tmp
 mv build/tmp build/oslib-2.10.tar.bz2
 
 echo "Done!"
-

@@ -7,7 +7,7 @@ VERSION=1547
 
 svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
 make
 

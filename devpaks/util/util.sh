@@ -57,8 +57,8 @@ function download {
 		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
 			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
 		fi
-		if [ -f $3.patch ]; then
-			patch -p1 < $3.patch
+		if [ -f ../../$3.patch ]; then
+			patch -p0 < ../../$3.patch
 		fi
 		cd ..
 	fi
@@ -101,7 +101,6 @@ function svnGet {
 		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
 			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
 		fi
-		pwd
 		if [ -f ../../$3.patch ]; then
 			patch -p0 < ../../$3.patch
 		fi

@@ -5,9 +5,9 @@ set -e
 LIBNAME=smpeg-psp
 VERSION=0.4.5
 
-svnGet build http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
+svnGet build http://smpeg-psp.googlecode.com/svn trunk
 
-cd build/$LIBNAME
+cd build/trunk
 
 make
 

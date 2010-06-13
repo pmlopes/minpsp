@@ -1,20 +1,16 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
-LIBNAME=pthreads-emb-1.0
+LIBNAME=pthreads-emb
 VERSION=1.0
 
-downloadHTTP http://surfnet.dl.sourceforge.net/sourceforge/pthreads-emb $LIBNAME.tar.gz
+download build "http://downloads.sourceforge.net/pthreads-emb" $LIBNAME-$VERSION "tar.gz"
 
-if [ ! -d $LIBNAME ]
-then
-	tar -zxf $LIBNAME.tar.gz || { echo "Failed to unpack "$1; exit 1; }
-fi
-
-cd $LIBNAME
+cd build/$LIBNAME-$VERSION
 
 cd platform/psp
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 cd ../..
 
 mkdir -p ../target/psp/lib ../target/psp/include ../target/doc/$LIBNAME
@@ -22,9 +18,8 @@ cp platform/psp/libpthread-psp.a ../target/psp/lib
 cp *.h ../target/psp/include
 cp doc/* ../target/doc/$LIBNAME
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-
