@@ -1,20 +1,21 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=libpspvram
 VERSION=2227
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
 mkdir -p ../target/psp/lib ../target/psp/include
 cp -v libpspvram.a libpspvalloc.a ../target/psp/lib
 cp -v *.h ../target/psp/include
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 

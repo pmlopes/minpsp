@@ -1,12 +1,3 @@
-#!/bin/bash
-set -e
-
-PS2DEVSVN_URL="svn://svn.ps2dev.org/psp/trunk"
-PS2DEVSVN_MIRROR="http://psp.jim.sh/svn/psp/trunk"
-
-PSPWARESVN_URL="svn://svn.ps2dev.org/pspware/trunk"
-PSPWARESVN_MIRROR="http://psp.jim.sh/svn/pspware/trunk"
-
 unset CC
 unset CXX
 unset LD
@@ -110,8 +101,9 @@ function svnGet {
 		if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
 			patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
 		fi
-		if [ -f ../$3.patch ]; then
-			patch -p1 < ../$3.patch
+		pwd
+		if [ -f ../../$3.patch ]; then
+			patch -p0 < ../../$3.patch
 		fi
 		cd ..
 	else
@@ -218,7 +210,9 @@ function makeInstaller {
 	chmod a+x $NIXINSTALLER
 
 	if [ -e makensis ]; then
+		cd build
 		makensis ../$1.nsi
+		cd ..
 	fi
 }
 

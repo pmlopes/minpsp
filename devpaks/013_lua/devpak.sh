@@ -1,14 +1,15 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=lua
 VERSION=5.1
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-make -f Makefile.psp || { echo "Error building $LIBNAME"; exit 1; }
+make -f Makefile.psp
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc/lua
 cp src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h etc/lua.hpp ../target/psp/include
@@ -18,7 +19,7 @@ cp doc/contents.html ../target/doc/lua
 cp doc/logo.gif ../target/doc/lua
 cp doc/lua.css ../target/doc/lua
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 

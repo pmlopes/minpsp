@@ -1,21 +1,22 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=smpeg-psp
 VERSION=0.4.5
 
-svnGet $LIBNAME http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
+svnGet build http://smpeg-psp.googlecode.com/svn/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 cp -v libsmpeg.a ../target/psp/lib
 cp -v *.h ../target/psp/include
 cp README ../target/doc/$LIBNAME.txt
 	
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION SDL 1.2.9
 

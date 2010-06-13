@@ -1,21 +1,22 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=libpthreadlite
 VERSION=2336
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 cp pthreadlite.h ../target/psp/include
 cp libpthreadlite.a ../target/psp/lib
 cp README ../target/doc/pthreadlite.txt
 	
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 

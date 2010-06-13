@@ -1,23 +1,27 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=libvorbis
 VERSION=1.1.2
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host=psp --prefix=$(pwd)/../target/psp || { echo "Error configuring $LIBNAME"; exit 1; }
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host=psp --prefix=$(pwd)/../target/psp
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
-make install || { echo "Error installing $LIBNAME"; exit 1; }
-mkdir -p $(pwd)/../target/doc
-mv $(pwd)/../target/psp/share/doc/libvorbis-1.1.2 $(pwd)/../target/doc
-rm -fR $(pwd)/../target/psp/share
-
+make install
+cd doc
+make install
 cd ..
+mkdir -p ../target/doc
+mv ../target/psp/share/doc/libvorbis-1.1.1 ../target/doc/libvorbis-1.1.2
+rm -fR ../target/psp/share
+
+cd ../..
 
 makeInstaller $LIBNAME $VERSION libogg 1.1.2
 

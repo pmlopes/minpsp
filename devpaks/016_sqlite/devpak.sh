@@ -1,21 +1,22 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=sqlite
 VERSION=3.3.17
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 export PSPDEV=$(psp-config --pspdev-path)
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
-make install || { echo "Error installing $LIBNAME"; exit 1; }
+make install
 rm -fR ../target/psp/lib/pkgconfig
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 

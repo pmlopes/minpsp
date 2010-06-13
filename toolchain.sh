@@ -277,7 +277,6 @@ function installZlib {
 	if [ ! -f /mingw/include/zlib.h ]
 	then
 		download deps "http://www.zlib.net" "zlib-"$ZLIB_VER "tar.gz"
-		pwd
 		cd deps/"zlib-"$ZLIB_VER
 #		./configure --prefix=/mingw --static
 #		make
@@ -916,17 +915,17 @@ function buildBaseDevpaks {
 	fi
 	BASE=$(pwd)/devpaks
 
-	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
@@ -968,16 +967,18 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
+buildBaseDevpaks
+exit
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
-#downloadPatches
+downloadPatches
 
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-#buildBinutils
-#buildXGCC
+buildBinutils
+buildXGCC
 bootstrapSDK
 buildNewlib
 buildGCC

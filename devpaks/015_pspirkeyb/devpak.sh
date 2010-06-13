@@ -1,19 +1,20 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=pspirkeyb
 VERSION=0.0.4
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 
-make || { echo "Error building $LIBNAME"; exit 1; }
+make
 
-make install || { echo "Error installing $LIBNAME"; exit 1; }
+make install
 rm -fR ../target/psp/sdk/samples/irkeyb/keymap/.svn
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 

@@ -1,13 +1,14 @@
 #!/bin/bash
+set -e
 . ../util/util.sh
 
 LIBNAME=libbulletml
 VERSION=0.0.5
 
-svnGetPS2DEV $LIBNAME
+svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME/src
-make || { echo "Error building $LIBNAME"; exit 1; }
+cd build/$LIBNAME/src
+make
 
 mkdir -p ../../target/psp/include/bulletml ../../target/psp/lib ../../target/doc
 mkdir -p ../../target/psp/include/boost/config
@@ -19,7 +20,7 @@ cp bulletml*.h formula.h tree.h tinyxml/tinyxml.h ../../target/psp/include/bulle
 find boost -name *.hpp -exec cp -R {} ../../target/psp/include/{} \;
 cp libbulletml.a ../../target/psp/lib
 cp ../README.en ../../target/doc/libbulletml.txt
-cd ../..
+cd ../../..
 
 makeInstaller $LIBNAME $VERSION
 
