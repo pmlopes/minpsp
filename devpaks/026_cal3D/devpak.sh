@@ -7,7 +7,7 @@ VERSION=0.10.0
 
 svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd buil/$LIBNAME
+cd build/$LIBNAME
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
 
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" make

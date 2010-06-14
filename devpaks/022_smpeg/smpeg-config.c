@@ -264,7 +264,7 @@ void print_path(char *name)
 				printf("%s\n", VERSION);
 				exit(0);
 			case CONFIG_CFLAGS :
-				printf("-I%s%cpsp%cinclude%csmpeg -I%s%cpsp%cinclude%cSDL -Dmain=SDL_main ", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SET);
+				printf("-I%s%cpsp%cinclude%csmpeg -I%s%cpsp%cinclude%cSDL -Dmain=SDL_main ", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
 				break;
 			case CONFIG_LIB:
 				printf("-L%s%cpsp%clib -lsmpeg -L%s%cpsp%clib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s%cpsp%csdk%clib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);

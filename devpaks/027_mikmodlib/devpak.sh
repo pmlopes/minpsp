@@ -7,7 +7,7 @@ VERSION=3.0
 
 svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd $LIBNAME
+cd build/$LIBNAME
 make libs
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc/$LIBNAME
