@@ -5,6 +5,8 @@ set -e
 LIBNAME=libpspmath
 VERSION=4
 
+cd build
+
 cp -R ../libpspmath libpspmath
 cp -R ../sample sample
 
@@ -17,7 +19,7 @@ cp libpspmath.a ../target/psp/sdk/lib
 cp pspmath.h ../target/psp/sdk/include
 cp ../sample/* ../target/psp/sdk/samples/pspmath
 
-cd ..
+cd ../..
 
 makeInstaller $LIBNAME $VERSION
 
