@@ -17,18 +17,18 @@ unset PSPDEV
 function download {
 	DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
 	cd $1
-	if [ ! -f ../offline/$DOWNLOAD_DIR/$3.$4 ]; then
-		mkdir -p ../offline/$DOWNLOAD_DIR
-		wget -c -O ../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4
+	if [ ! -f ../../../offline/$DOWNLOAD_DIR/$3.$4 ]; then
+		mkdir -p ../../../offline/$DOWNLOAD_DIR
+		wget -c -O ../../../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4
 	fi
 	if [ "$5" == "" ]; then
 		TARGET_DIR=$3
 		CREATE_TARGET=0
-		DOWNLOAD_PREFIX=../offline/$DOWNLOAD_DIR
+		DOWNLOAD_PREFIX=../../../offline/$DOWNLOAD_DIR
 	else
 		TARGET_DIR=$5
 		CREATE_TARGET=1
-		DOWNLOAD_PREFIX=../../offline/$DOWNLOAD_DIR
+		DOWNLOAD_PREFIX=../../../../offline/$DOWNLOAD_DIR
 	fi
 	if [ ! -d $TARGET_DIR ]; then
 		if [ $CREATE_TARGET == 1 ]; then
@@ -50,7 +50,7 @@ function download {
 		if [ $CREATE_TARGET == 1 ]; then
 			cd ..
 		fi
-		cd $TARGET_DIR
+		cd $TARGET_DIR || cd `echo "$TARGET_DIR"|cut -d_ -f1` || cd `echo "$TARGET_DIR"|cut -d- -f1`
 		if [ -f ../patches/$3-PSP.patch ]; then
 			patch -p1 < ../patches/$3-PSP.patch
 		fi
