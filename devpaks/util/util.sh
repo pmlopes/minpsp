@@ -38,6 +38,9 @@ function download {
 		if [ $4 == tar.gz ]; then
 			tar -zxf $DOWNLOAD_PREFIX/$3.$4
 		fi
+		if [ $4 == tgz ]; then
+			tar -zxf $DOWNLOAD_PREFIX/$3.$4
+		fi
 		if [ $4 == tar.bz2 ]; then
 			tar -jxf $DOWNLOAD_PREFIX/$3.$4
 		fi
