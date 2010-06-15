@@ -70,7 +70,7 @@ function prepare {
 			ln -s /usr/bin/automake-1.10 compat/automake
 			ln -s /usr/bin/aclocal-1.10 compat/aclocal
 		fi
-		export PATH=$PATH:`pwd`/compat
+		export PATH=`pwd`/compat:$PATH
 	fi
 
 	if [ "$OS" == "Linux" ]; then
@@ -143,7 +143,7 @@ function prepare {
 
 	TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
 	[ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
-	export PATH=$PATH:$TOOLPATH/bin
+	export PATH=$TOOLPATH/bin:$PATH
 }
 
 function checkTool {
@@ -926,39 +926,39 @@ function buildBaseDevpaks {
 #	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
 #	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
 #	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
 	# according to Luqman Aden smpeg must be build before SDL_mixer
 	# otherwise there is no MP3 support on SDL mixer
-	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
 	#buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
+	#buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
+#	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
 	# still waiting for 4.4 fix from diedel
-#	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+	#buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
 }

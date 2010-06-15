@@ -14,7 +14,6 @@ CFLAGS="-G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configu
 make
 
 make install
-mv ../target/psp/share/doc ../target
 mv ../target/psp/share/man ../target
 rm -rf ../target/psp/share
 mkdir -p ../target/doc/$LIBNAME
