@@ -796,12 +796,12 @@ function installMan {
 	cd ..
 
 	MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
-	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER
-	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER
+	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER"-bin"
+	download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER"-dep"
 
 	cd deps
-	cp $MINGW32_LESS_DIR/bin/less.exe $INSTALLDIR/bin
-	cp $MINGW32_LESS_DIR/bin/pcre3.dll $INSTALLDIR/bin
+	cp $MINGW32_LESS_DIR"-bin"/bin/less.exe $INSTALLDIR/bin
+	cp $MINGW32_LESS_DIR"-dep"/bin/pcre3.dll $INSTALLDIR/bin
 	cp ../mingw/bin/man.bat $INSTALLDIR/bin
 	cd ..
 }
@@ -837,14 +837,9 @@ function prepareDistro {
 	mkdir -p $INSTALLERDIR/samples/psp/sdk
 	# clone the base installation
 	cp -fR $INSTALLDIR/* $INSTALLERDIR/base
-#	Eclipse Works great again so disable this since it causes problems with local GCCs
-#	# copy eclipse tools
-#	cp $INSTALLERDIR/base/bin/psp-gcc.exe $INSTALLERDIR/eclipse/bin/gcc.exe
-#	cp $INSTALLERDIR/base/bin/psp-g++.exe $INSTALLERDIR/eclipse/bin/g++.exe
 	# copy visual studio tools
 	mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
 	mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
-	mv $INSTALLERDIR/base/VC $INSTALLERDIR/vstudio/VC
 	# move binary psplinkusb
 	mv $INSTALLERDIR/base/bin/driver $INSTALLERDIR/psplink/bin/
 	mv $INSTALLERDIR/base/bin/driver_x64 $INSTALLERDIR/psplink/bin/
@@ -912,55 +907,78 @@ function buildBaseDevpaks {
 	if [ "$OS" == "MINGW32_NT" ]; then
 		mkdir -p $INSTALLERDIR/devpaks
 		DEVPAK_TARGET=$INSTALLERDIR/devpaks
+		# need to disable all commands that interfere with msys
+		mv $INSTALLDIR/bin/cp.exe $INSTALLDIR/bin/cp-minpspw.exe || true
+		mv $INSTALLDIR/bin/rm.exe $INSTALLDIR/bin/rm-minpspw.exe || true
+		mv $INSTALLDIR/bin/mkdir.exe $INSTALLDIR/bin/mkdir-minpspw.exe || true
+		mv $INSTALLDIR/bin/sed.exe $INSTALLDIR/bin/sed-minpspw.exe || true
+		mv $INSTALLDIR/bin/make.exe $INSTALLDIR/bin/make-minpspw.exe || true
+		mv $INSTALLDIR/bin/groff.exe $INSTALLDIR/bin/groff-minpspw.exe || true
+		mv $INSTALLDIR/bin/grotty.exe $INSTALLDIR/bin/grotty-minpspw.exe || true
+		mv $INSTALLDIR/bin/troff.exe $INSTALLDIR/bin/troff-minpspw.exe || true
+		mv $INSTALLDIR/bin/less.exe $INSTALLDIR/bin/less-minpspw.exe || true
 	fi
 	BASE=$(pwd)/devpaks
 
-#	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
 	# according to Luqman Aden smpeg must be build before SDL_mixer
 	# otherwise there is no MP3 support on SDL mixer
-#	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
 	#buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
 	#buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
-#	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
 	# still waiting for 4.4 fix from diedel
 	#buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
+
+	# restore
+	if [ "$OS" == "MINGW32_NT" ]; then
+		mv $INSTALLDIR/bin/cp-minpspw.exe $INSTALLDIR/bin/cp.exe || true
+		mv $INSTALLDIR/bin/rm-minpspw.exe $INSTALLDIR/bin/rm.exe || true
+		mv $INSTALLDIR/bin/mkdir-minpspw.exe $INSTALLDIR/bin/mkdir.exe || true
+		mv $INSTALLDIR/bin/sed-minpspw.exe $INSTALLDIR/bin/sed.exe || true
+		mv $INSTALLDIR/bin/make-minpspw.exe $INSTALLDIR/bin/make.exe || true
+		mv $INSTALLDIR/bin/groff-minpspw.exe $INSTALLDIR/bin/groff.exe || true
+		mv $INSTALLDIR/bin/grotty-minpspw.exe $INSTALLDIR/bin/grotty.exe || true
+		mv $INSTALLDIR/bin/troff-minpspw.exe $INSTALLDIR/bin/troff.exe || true
+		mv $INSTALLDIR/bin/less-minpspw.exe $INSTALLDIR/bin/less.exe || true
+	fi
 }
 
 #---------------------------------------------------------------------------------
@@ -973,7 +991,6 @@ exit
 # gather patches in a single place
 #---------------------------------------------------------------------------------
 downloadPatches
-
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
@@ -985,31 +1002,21 @@ buildGCC
 buildSDK
 validateSDK
 buildGDB
-
-#---------------------------------------------------------------------------------
-# build tools
-#---------------------------------------------------------------------------------
-if [ "$OS" == "MINGW32_NT" ]; then
-	installExtraBinaries
-fi
-
 #---------------------------------------------------------------------------------
 # PSPLink
 #---------------------------------------------------------------------------------
 installPSPLinkUSB
-
 #---------------------------------------------------------------------------------
 # Distro + Docs
 #---------------------------------------------------------------------------------
 if [ "$OS" == "MINGW32_NT" ]; then
+	installExtraBinaries
 	installMan
 	installInfo
-
 	#---------------------------------------------------------------------------------
 	# patch SDK to run without msys
 	#---------------------------------------------------------------------------------
 	patchCMD
-
 	#---------------------------------------------------------------------------------
 	# prepare distro
 	#---------------------------------------------------------------------------------
@@ -1020,7 +1027,9 @@ else
 	#---------------------------------------------------------------------------------
 	prepareDistroNIX
 fi
-
+#---------------------------------------------------------------------------------
+# Build base devpaks
+#---------------------------------------------------------------------------------
 buildBaseDevpaks
 
 echo

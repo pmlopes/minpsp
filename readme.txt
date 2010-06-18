@@ -325,12 +325,14 @@ make install
   - The following are in the wports folder
     * pod2man
     * dot 1.16
+	* unrar
+	* unzip
   - svn 1.6.5
     http://subversion.tigris.org
 
 8th Install Python 2.5.4 (later may work but not tested)
-  http://python.org/ftp/python/2.5.4/python-2.5.4.msi
-  - Python 2.5.4 (Use the windows installer) Then add to the PATH
+  http://python.org/ftp/python/2.6.5/python-2.6.5.msi
+  - Python 2.6.5 (Use the windows installer) Then add to the PATH
   - Add it to the MSys PATH by adding the line:
      SET PATH=%PATH%;C:\Python25
     In the beginning of the MSYS.BAT file
@@ -344,6 +346,10 @@ get them from the mingw msys project:
   - libregex-0.12-1-msys-1.0.11-dll-0.tar.lzma
     * Extract "over" the MSYS installation.
 	* Then rename to msys-regex-1.dll
+
+10th CMake get it from:
+ http://www.cmake.org/files/v2.8/cmake-2.8.1-win32-x86.zip
+  install to /local
 
 To build run the toolchain script:
 
