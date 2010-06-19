@@ -7,14 +7,16 @@ VERSION=0.10.0
 
 svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd build/$LIBNAME
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
+cd build
+mkdir build
+cd build
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" ../$LIBNAME/configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
 
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" make
+make
+make install 
 
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" make install 
 mkdir -p ../target/doc
-cp README ../target/doc/$LIBNAME.txt
+cp ../$LIBNAME/README ../target/doc/$LIBNAME.txt
 
 cd ../..
 
