@@ -968,6 +968,7 @@ function buildBaseDevpaks {
 	#buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
+	#buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
 
 	# restore
 	if [ "$OS" == "MINGW32_NT" ]; then
@@ -987,6 +988,8 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
+buildBaseDevpaks
+exit
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------

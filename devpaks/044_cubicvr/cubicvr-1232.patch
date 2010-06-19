@@ -1,0 +1,409 @@
+Index: psp/Makefile
+===================================================================
+--- psp/Makefile	(revision 1232)
++++ psp/Makefile	(working copy)
+@@ -1,265 +1,80 @@
+-INCDIR = ../cubicvr/include/ ../dependencies/product/include/bullet/ ./ $(PSPSDK)/psp/include
+-OFLAGS = -funroll-loops -fauto-inc-dec -fcprop-registers -fdce -fdefer-pop -fdelayed-branch \
+--fdse -fguess-branch-probability -fif-conversion2 -fif-conversion -fipa-pure-const \
+--fipa-reference -fmerge-constants -fsplit-wide-types -ftree-ccp -ftree-ch \
+--ftree-copyrename -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-fre \
+--ftree-sra -ftree-ter -funit-at-a-time \
+--fthread-jumps -falign-functions -falign-jumps -falign-loops  -falign-labels -fcaller-saves -fcrossjumping -fcse-follow-jumps  -fcse-skip-blocks \
+--fdelete-null-pointer-checks -fexpensive-optimizations -fgcse -fgcse-lm  -finline-small-functions -foptimize-sibling-calls \
+--fpeephole2 -fregmove -freorder-blocks -freorder-functions -frerun-cse-after-loop -fsched-interblock -fsched-spec -fschedule-insns  -fschedule-insns2 \
++TARGET_LIB = libcubicvr.a
++CUBICVR_OBJS = ../cubicvr/src/Gamepad.o			\
++		../cubicvr/src/Envelope.o		\
++		../cubicvr/src/Face.o			\
++		../cubicvr/src/IFFReader.o		\
++		../cubicvr/src/lodepng.o		\
++		../cubicvr/src/Matrix.o			\
++		../cubicvr/src/Motion.o			\
++		../cubicvr/src/RGB.o			\
++		../cubicvr/src/RGBA.o 			\
++		../cubicvr/src/Timer.o			\
++		../cubicvr/src/Transform.o		\
++		../cubicvr/src/psp/TGALoader.o		\
++		../cubicvr/src/Vector.o			\
++		../cubicvr/src/XYZ.o			\
++		../cubicvr/src/XYZRGB.o			\
++		../cubicvr/src/SectorMap.o		\
++		../cubicvr/src/BITSET.o			\
++		../cubicvr/src/math/MATRIX4X4.o		\
++		../cubicvr/src/math/PLANE.o		\
++		../cubicvr/src/math/VECTOR3D.o		\
++		../cubicvr/src/Resource.o		\
++		../cubicvr/src/ResourcePool.o		\
++		../cubicvr/src/ResourceManager.o	\
++		../cubicvr/src/Logger.o			\
++		../cubicvr/src/StringUtil.o		\
++		../cubicvr/src/tinyxml/tinystr.o	\
++		../cubicvr/src/tinyxml/tinyxml.o	\
++		../cubicvr/src/tinyxml/tinyxmlparser.o	\
++		../cubicvr/src/tinyxml/tinyxmlerror.o
+ 
++CUBICVR_GL_OBJS = ../cubicvr/src/Camera.o		\
++		../cubicvr/src/GLExt.o			\
++		../cubicvr/src/Texture.o		\
++		../cubicvr/src/Light.o			\
++		../cubicvr/src/Material.o		\
++		../cubicvr/src/Object.o			\
++		../cubicvr/src/objectLWO.o		\
++		../cubicvr/src/UV.o			\
++		../cubicvr/src/UVMapper.o		\
++		../cubicvr/src/SceneObject.o		\
++		../cubicvr/src/ObjectController.o	\
++		../cubicvr/src/Scene.o			\
++		../cubicvr/src/sceneLWS.o		\
++		../cubicvr/src/Shader.o			\
++		../cubicvr/src/CollisionMap.o		\
++		../cubicvr/src/datatree/DataTree.o	\
++		../cubicvr/src/FRUSTUM.o
+ 
+-#CFLAGS = $(OFLAGS)
+-#CFLAGS = -O2
+-#CFLAGS = -g -Wall
+-CXXFLAGS = -fexceptions -DARCH_PSP  -pipe -Wno-unknown-pragmas -fomit-frame-pointer -ffast-math
+-ASFLAGS = $(CFLAGS)
++CUBICVR_DYNAMICS_OBJS = ../cubicvr/src/RigidScene.o		\
++		../cubicvr/src/SceneObjects/RigidSceneObject.o	\
++		../cubicvr/src/SceneObjects/Landscape.o		\
++		../cubicvr/src/SceneObjects/Vehicle.o		\
++		../cubicvr/src/SceneObjects//RigidBox.o		\
++		../cubicvr/src/SceneObjects/RigidSphere.o	\
++		../cubicvr/src/SoftScene.o			\
++		../cubicvr/src/SceneObjects/SoftSceneObject.o
+ 
+-LIBDIR = ../dependencies/product/lib/bullet/psp/
+-LDFLAGS =
+-//BULLET_LIBS = libpspbulletdynamics.a ../dependencies/pspbullet/libpspbulletcollision.a ../dependencies/pspbullet/libpspbulletmath.a
+-//BULLET_LIBS = pspbullet/*.o
+-
+-PSPSDK=$(shell psp-config --pspsdk-path)
+-
+-ifeq ($(PSPSDK),)
+-$(error $$(PSPSDK) is undefined.  Use "PSPSDK := $$(shell psp-config --pspsdk-path)" in your Makefile)
+-endif
+-
+-CC       = psp-gcc
+-CXX      = psp-g++
+-AS       = psp-gcc
+-LD       = psp-gcc
+-AR       = psp-ar
+-RANLIB   = psp-ranlib
+-STRIP    = psp-strip
+-MKSFO    = mksfo
+-PACK_PBP = pack-pbp
+-FIXUP    = psp-fixup-imports
+-
+-# Add in PSPSDK includes and libraries.
+-INCDIR   := $(INCDIR) . $(PSPSDK)/include
+-LIBDIR   := $(LIBDIR) . $(PSPSDK)/lib
+-
+-
+-
+-CFLAGS   := $(addprefix -I,$(INCDIR)) $(CFLAGS)
+-CXXFLAGS := $(CFLAGS) $(CXXFLAGS)
+-ASFLAGS  := $(CFLAGS) $(ASFLAGS)
+-
+-
+-#CVRBUILD=@echo Compiling $^ && $(CC) $(CFLAGS) $(CXXFLAGS) -c -o 1>/dev/null 2>cubicvr_compiler.err
+-CVRBUILD=$(CC) $(OFLAGS) $(CFLAGS) $(CXXFLAGS) -c -o 
+-#CVRBUILD_ALT=$(CC) -O2 $(CXXFLAGS) -c -o
+-CvRBUILD_ALT=$(CC) $(OFLAGS) $(CFLAGS) $(CXXFLAGS) -c -o 
+-
+-CUBICVR_OBJS = Gamepad.o Envelope.o Face.o IFFReader.o lodepng.o Matrix.o Motion.o RGB.o RGBA.o Timer.o Transform.o TGALoader.o Vector.o XYZ.o XYZRGB.o SectorMap.o BITSET.o MATRIX4X4.o PLANE.o VECTOR3D.o Resource.o ResourcePool.o ResourceManager.o Logger.o StringUtil.o tinystr.o tinyxml.o tinyxmlparser.o tinyxmlerror.o
+-CUBICVR_GL_OBJS = Camera.o  GLExt.o Texture.o Light.o Material.o Object.o objectLWO.o UV.o UVMapper.o SceneObject.o ObjectController.o Scene.o sceneLWS.o Shader.o CollisionMap.o DataTree.o FRUSTUM.o 
+-CUBICVR_DYNAMICS_OBJS = RigidScene.o RigidScene.o RigidSceneObject.o Landscape.o Vehicle.o RigidBox.o RigidSphere.o SoftScene.o SoftSceneObject.o
+-#   Particle.o ParticleEmitter.o ParticleSystem.o systemfont.o   CollisionMap.o Bone.o 
+-
++# Particle.o ParticleEmitter.o ParticleSystem.o systemfont.o   CollisionMap.o Bone.o 
+ # not used: Bitmap.o Font.o
+ 
+-all: bullet cubicvr
++OBJS = $(CUBICVR_OBJS) $(CUBICVR_GL_OBJS) $(CUBICVR_DYNAMICS_OBJS)
+ 
+-bullet:
+-	cd pspbullet && make
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet ../cubicvr/include .
++CFLAGS = -O2 -G0 -Wall
++CXXFLAGS = $(CFLAGS) -fexceptions -DARCH_PSP -pipe -Wno-unknown-pragmas -fomit-frame-pointer -ffast-math
++ASFLAGS = $(CFLAGS)
+ 
+-Bitmap.o: ../cubicvr/src/Bitmap.cpp
+-	$(CVRBUILD) Bitmap.o $^
+-Camera.o: ../cubicvr/src/Camera.cpp
+-	$(CVRBUILD) Camera.o $^ 
+-CollisionMap.o: ../cubicvr/src/CollisionMap.cpp
+-	$(CVRBUILD) CollisionMap.o $^
+-Envelope.o: ../cubicvr/src/Envelope.cpp					
+-	$(CVRBUILD) Envelope.o $^
+-Face.o: ../cubicvr/src/Face.cpp
+-	$(CVRBUILD) Face.o $^
+-Font.o: ../cubicvr/src/Font.cpp
+-	$(CVRBUILD) Font.o $^
+-Gamepad.o: ../cubicvr/src/Gamepad.cpp
+-	$(CVRBUILD) Gamepad.o $^
+-GLExt.o: ../cubicvr/src/GLExt.cpp
+-	$(CVRBUILD) GLExt.o $^
+-IFFReader.o: ../cubicvr/src/IFFReader.cpp
+-	$(CVRBUILD) IFFReader.o $^
+-Light.o: ../cubicvr/src/Light.cpp
+-	$(CVRBUILD) Light.o $^
+-lodepng.o: ../cubicvr/src/lodepng.cpp
+-	$(CVRBUILD) lodepng.o $^
+-Material.o: ../cubicvr/src/Material.cpp
+-	$(CVRBUILD) Material.o $^
+-Matrix.o: ../cubicvr/src/Matrix.cpp
+-	$(CVRBUILD) Matrix.o $^
+-Motion.o: ../cubicvr/src/Motion.cpp
+-	$(CVRBUILD) Motion.o $^
+-Object.o: ../cubicvr/src/Object.cpp
+-	$(CVRBUILD) Object.o $^
+-ObjectController.o: ../cubicvr/src/ObjectController.cpp
+-	$(CVRBUILD) ObjectController.o $^
+-objectLWO.o: ../cubicvr/src/objectLWO.cpp
+-	$(CVRBUILD) objectLWO.o $^
+-Particle.o: ../cubicvr/src/Particle.cpp
+-	$(CVRBUILD) Particle.o $^
+-ParticleEmitter.o: ../cubicvr/src/ParticleEmitter.cpp
+-	$(CVRBUILD) ParticleEmitter.o $^
+-ParticleSystem.o: ../cubicvr/src/ParticleSystem.cpp
+-	$(CVRBUILD) ParticleSystem.o $^
+-RGB.o: ../cubicvr/src/RGB.cpp
+-	$(CVRBUILD) RGB.o $^
+-RGBA.o: ../cubicvr/src/RGBA.cpp
+-	$(CVRBUILD) RGBA.o $^
+-Scene.o: ../cubicvr/src/Scene.cpp
+-	$(CVRBUILD) Scene.o $^
+-sceneLWS.o: ../cubicvr/src/sceneLWS.cpp
+-	$(CVRBUILD) sceneLWS.o $^
+-SceneObject.o: ../cubicvr/src/SceneObject.cpp
+-	$(CVRBUILD) SceneObject.o $^
+-Shader.o: ../cubicvr/src/Shader.cpp
+-	$(CVRBUILD) Shader.o $^
+-systemfont.o: ../cubicvr/src/systemfont.cpp
+-	$(CVRBUILD) systemfont.o $^
+-Texture.o: ../cubicvr/src/Texture.cpp
+-	$(CVRBUILD) Texture.o $^
+-Timer.o: ../cubicvr/src/Timer.cpp
+-	$(CVRBUILD) Timer.o $^
+-Transform.o: ../cubicvr/src/Transform.cpp
+-	$(CVRBUILD) Transform.o $^
+-UV.o: ../cubicvr/src/UV.cpp
+-	$(CVRBUILD) UV.o $^
+-UVMapper.o: ../cubicvr/src/UVMapper.cpp
+-	$(CVRBUILD) UVMapper.o $^
+-Vector.o: ../cubicvr/src/Vector.cpp
+-	$(CVRBUILD) Vector.o $^
+-XYZ.o: ../cubicvr/src/XYZ.cpp
+-	$(CVRBUILD) XYZ.o $^
+-XYZRGB.o: ../cubicvr/src/XYZRGB.cpp
+-	$(CVRBUILD) XYZRGB.o $^
+-TGALoader.o: ../cubicvr/src/psp/TGALoader.cpp
+-	$(CVRBUILD) TGALoader.o $^
+-SectorMap.o: ../cubicvr/src/SectorMap.cpp
+-	$(CVRBUILD) SectorMap.o $^
++LIBDIR =
++LDFLAGS =
+ 
++include $(PSPSDK)/lib/build.mak
+ 
+-# dynamics
+-RigidScene.o: ../cubicvr/src/RigidScene.cpp
+-	$(CVRBUILD) RigidScene.o $^
+-RigidSceneObject.o: ../cubicvr/src/SceneObjects/RigidSceneObject.cpp
+-	$(CVRBUILD) RigidSceneObject.o $^
+-Landscape.o: ../cubicvr/src/SceneObjects/Landscape.cpp
+-	$(CVRBUILD) Landscape.o $^
+-Vehicle.o: ../cubicvr/src/SceneObjects/Vehicle.cpp
+-	$(CVRBUILD) Vehicle.o $^
+-RigidBox.o: ../cubicvr/src/SceneObjects/RigidBox.cpp
+-	$(CVRBUILD) RigidBox.o $^
+-RigidSphere.o: ../cubicvr/src/SceneObjects/RigidSphere.cpp
+-	$(CVRBUILD) RigidSphere.o $^
+-SoftSceneObject.o: ../cubicvr/src/SceneObjects/SoftSceneObject.cpp
+-	$(CVRBUILD) SoftSceneObject.o $^
+-SoftScene.o: ../cubicvr/src/SoftScene.cpp
+-	$(CVRBUILD) SoftScene.o $^
+-
+-
+-#new
+-
+-BITSET.o: ../cubicvr/src/BITSET.cpp
+-	$(CVRBUILD) BITSET.o $^
+-
+-
+-Bone.o: ../cubicvr/src/Bone.cpp
+-	$(CVRBUILD) Bone.o $^
+-
+-
+-BSP.o: ../cubicvr/src/BSP.cpp
+-	$(CVRBUILD) BSP.o $^
+-
+-
+-DataTree.o: ../cubicvr/src/datatree/DataTree.cpp
+-	$(CVRBUILD) DataTree.o $^
+-
+-
+-FRUSTUM.o: ../cubicvr/src/FRUSTUM.cpp
+-	$(CVRBUILD) FRUSTUM.o $^
+-
+-IMAGE.o: ../cubicvr/src/IMAGE.cpp
+-	$(CVRBUILD) IMAGE.o $^
+-
+-
+-MATRIX4X4.o: ../cubicvr/src/math/MATRIX4X4.cpp
+-	$(CVRBUILD) MATRIX4X4.o $^
+-
+-PLANE.o: ../cubicvr/src/math/PLANE.cpp
+-	$(CVRBUILD) PLANE.o $^
+-
+-#VECTOR2D.o: ../cubicvr/src/math/VECTOR2D.cpp
+-#	$(CVRBUILD) VECTOR2D.o $^
+-
+-VECTOR3D.o: ../cubicvr/src/math/VECTOR3D.cpp
+-	$(CVRBUILD) VECTOR3D.o $^
+-
+-#VECTOR4D.o: ../cubicvr/src/math/VECTOR4D.cpp
+-#	$(CVRBUILD) VECTOR4D.o $^
+-
+-#RigidSceneDebug.o: ../cubicvr/src/RigidSceneDebug.cpp
+-#	$(CVRBUILD) RigidSceneDebug.o $^
+-
+-textureTGA.o: ../cubicvr/src/textureTGA.cpp
+-	$(CVRBUILD) textureTGA.o $^
+-
+-Resource.o: ../cubicvr/src/Resource.cpp
+-	$(CVRBUILD) Resource.o $^
+-
+-ResourceManager.o: ../cubicvr/src/ResourceManager.cpp
+-	$(CVRBUILD) ResourceManager.o $^
+-
+-
+-ResourcePool.o: ../cubicvr/src/ResourcePool.cpp
+-	$(CVRBUILD) ResourcePool.o $^
+-
+-
+-Logger.o: ../cubicvr/src/Logger.cpp
+-	$(CVRBUILD) Logger.o $^
+-
+-
+-StringUtil.o: ../cubicvr/src/StringUtil.cpp
+-	$(CVRBUILD) StringUtil.o $^
+-
+-
+-tinyxml.o: ../cubicvr/src/tinyxml/tinyxml.cpp
+-	$(CVRBUILD) tinyxml.o $^
+-
+-
+-tinyxmlerror.o: ../cubicvr/src/tinyxml/tinyxmlerror.cpp
+-	$(CVRBUILD) tinyxmlerror.o $^
+-
+-
+-tinyxmlparser.o: ../cubicvr/src/tinyxml/tinyxmlparser.cpp
+-	$(CVRBUILD) tinyxmlparser.o $^
+-
+-
+-tinystr.o: ../cubicvr/src/tinyxml/tinystr.cpp
+-	$(CVRBUILD) tinystr.o $^
+-
+-
+-
+-
+-	
+-cubicvr: libcubicvr.a
+-
+-libcubicvr.a: $(CUBICVR_OBJS) $(CUBICVR_GL_OBJS) $(CUBICVR_DYNAMICS_OBJS)
+-	$(AR) cru $@ $^ 
+-	$(RANLIB) $@
+-
+-install: libcubicvr.a
+-	cp libcubicvr.a $(PSPDEV)/psp/lib/
+-	test -d $(PSPDEV)/psp/include/CubicVR || mkdir $(PSPDEV)/psp/include/CubicVR/
+-	cp -R ../cubicvr/include/CubicVR/* $(PSPDEV)/psp/include/CubicVR/ || true
+-	cd pspbullet && make install
+-	cp lua/include/* $(PSPDEV)/psp/include/
+-	cp lua/lib/* $(PSPDEV)/psp/lib/
+-
+-clean: 
+-	rm *.o || true
+-	rm libcubicvr.a || true
+-
+-rebuild: clean all
++install: $(TARGET_LIB)
++	mkdir -p ../../target/psp/lib
++	mkdir -p ../../target/psp/include
++	cp $(TARGET_LIB) ../../target/psp/lib
++	cp -R ../cubicvr/include/CubicVR  ../../target/psp/include
++	rm -Rf `find ../../target/psp/include | grep .svn`
+Index: cubicvr/include/CubicVR/SoftScene.h
+===================================================================
+--- cubicvr/include/CubicVR/SoftScene.h	(revision 1232)
++++ cubicvr/include/CubicVR/SoftScene.h	(working copy)
+@@ -26,6 +26,7 @@
+ 
+ #include <CubicVR/RigidScene.h>
+ #include <CubicVR/SceneObjects/SoftSceneObject.h>
++#include <BulletSoftBody/btSoftBody.h>
+ #include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+ 
+ #ifndef ARCH_PSP
+@@ -39,7 +40,7 @@
+ 	
+ 	std::map<std::string, SoftSceneObject *, string_less> soft_sceneobjs_bound_ref;
+ 
+-	btSoftBodyWorldInfo	softBodyWorldInfo;
++	btSoftBody::btSoftBodyWorldInfo	softBodyWorldInfo;
+ 	btSoftRigidDynamicsWorld *softDynamicsWorld;
+ public:
+ 
+Index: cubicvr/include/CubicVR/SceneObjects/SoftSceneObject.h
+===================================================================
+--- cubicvr/include/CubicVR/SceneObjects/SoftSceneObject.h	(revision 1232)
++++ cubicvr/include/CubicVR/SceneObjects/SoftSceneObject.h	(working copy)
+@@ -39,7 +39,7 @@
+ {
+ protected:
+ 	btSoftBody *mSoftBody;
+-	btSoftBodyWorldInfo	*softBodyWorldInfo;
++	btSoftBody::btSoftBodyWorldInfo	*softBodyWorldInfo;
+ 	int *indicies;
+ 	btScalar *verticies;
+ 	Object soft_obj;
+@@ -51,7 +51,7 @@
+ 
+ 	virtual void bind(Object &obj_in);
+ 	
+-	void initialize(btSoftRigidDynamicsWorld &dynamicsWorld_in, btSoftBodyWorldInfo &softBodyWorldInfo_in);
++	void initialize(btSoftRigidDynamicsWorld &dynamicsWorld_in, btSoftBody::btSoftBodyWorldInfo &softBodyWorldInfo_in);
+ 	virtual void evaluate();
+ 	
+ 	virtual void render(Shader &renderer, int stage, bool initShadowMatrix = false, bool no_pivot = false, bool no_scale = false);
+Index: cubicvr/include/CubicVR/IFFReader.h
+===================================================================
+--- cubicvr/include/CubicVR/IFFReader.h	(revision 1232)
++++ cubicvr/include/CubicVR/IFFReader.h	(working copy)
+@@ -29,6 +29,7 @@
+ #include "CubicVR/XYZ.h"
+ #include "CubicVR/Vector.h"
+ 
++#include <cstring>
+ #include <vector>
+ #include <iostream>
+ #include <fstream>
+Index: cubicvr/src/SceneObjects/SoftSceneObject.cpp
+===================================================================
+--- cubicvr/src/SceneObjects/SoftSceneObject.cpp	(revision 1232)
++++ cubicvr/src/SceneObjects/SoftSceneObject.cpp	(working copy)
+@@ -45,7 +45,7 @@
+ };
+ 
+ 
+-void SoftSceneObject::initialize(btSoftRigidDynamicsWorld &dynamicsWorld_in, btSoftBodyWorldInfo &softBodyWorldInfo_in)
++void SoftSceneObject::initialize(btSoftRigidDynamicsWorld &dynamicsWorld_in, btSoftBody::btSoftBodyWorldInfo &softBodyWorldInfo_in)
+ {
+ 	softBodyWorldInfo = &softBodyWorldInfo_in;	
+ 	

@@ -57,6 +57,7 @@ Portable handheld videogame system.
 * gcov builds properly but not fully tested if works as expected
 * added fixes from Luqman Aden in TinyXML
 * added libmpeg2 devpak
+* added bullet physics devpak
 * windows tools are linked against pthreads, if thereads are used it can
   improved performance on the development side.
 
