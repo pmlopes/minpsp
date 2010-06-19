@@ -1,6 +1,7 @@
+Index: psplinkusb/Makefile.oe
 ===================================================================
---- psplinkusb/Makefile.oe.orig	2009-06-19 09:06:44.654743748 +0200
-+++ psplinkusb/Makefile.oe	2009-06-19 00:30:56.000000000 +0200
+--- psplinkusb/Makefile.oe	(revision 2494)
++++ psplinkusb/Makefile.oe	(working copy)
 @@ -10,7 +10,7 @@
  	$(MAKE) -C boot271   release PSP_FW_VERSION=271
  
@@ -9,5 +10,1025 @@
 +	mkdir -p release_oe
  	mkdir -p release_oe/pc
  	mkdir -p release_oe/psplink
- 	cp -Rf scripts release_oe/scriptsIndex: psplinkusb/usbgdb/main.c
-
+ 	cp -Rf scripts release_oe/scripts
+Index: psplinkusb/pspsh/jetcompat.C
+===================================================================
+--- psplinkusb/pspsh/jetcompat.C	(revision 0)
++++ psplinkusb/pspsh/jetcompat.C	(revision 0)
+@@ -0,0 +1,63 @@
++#include <stdio.h>
++#include "jetcompat.h"
++
++void jc_perror(const char *s)
++{
++	unsigned int winerr;
++
++	winerr = WSAGetLastError();
++	
++	switch(winerr)
++	{
++    case WSAEINTR: printf("%s: Interrupted system call\n", s); return;
++    case WSAEBADF: printf("%s: Bad file number\n", s); return;
++    case WSAEACCES: printf("%s: Permission denied\n", s); return;
++    case WSAEFAULT: printf("%s: Bad address\n", s); return;
++    case WSAEINVAL: printf("%s: Invalid argument\n", s); return;
++    case WSAEMFILE: printf("%s: Too many open sockets\n", s); return;
++    case WSAEWOULDBLOCK: printf("%s: Operation would block\n", s); return;
++    case WSAEINPROGRESS: printf("%s: Operation now in progress\n", s); return;
++    case WSAEALREADY: printf("%s: Operation already in progress\n", s); return;
++    case WSAENOTSOCK: printf("%s: Socket operation on non-socket\n", s); return;
++    case WSAEDESTADDRREQ: printf("%s: Destination address required\n", s); return;
++    case WSAEMSGSIZE: printf("%s: Message too long\n", s); return;
++    case WSAEPROTOTYPE: printf("%s: Protocol wrong type for socket\n", s); return;
++    case WSAENOPROTOOPT: printf("%s: Bad protocol option\n", s); return;
++    case WSAEPROTONOSUPPORT: printf("%s: Protocol not supported\n", s); return;
++    case WSAESOCKTNOSUPPORT: printf("%s: Socket type not supported\n", s); return;
++    case WSAEOPNOTSUPP: printf("%s: Operation not supported on socket\n", s); return;
++    case WSAEPFNOSUPPORT: printf("%s: Protocol family not supported\n", s); return;
++    case WSAEAFNOSUPPORT: printf("%s: Address family not supported\n", s); return;
++    case WSAEADDRINUSE: printf("%s: Address already in use\n", s); return;
++    case WSAEADDRNOTAVAIL: printf("%s: Can't assign requested address\n", s); return;
++    case WSAENETDOWN: printf("%s: Network is down\n", s); return;
++    case WSAENETUNREACH: printf("%s: Network is unreachable\n", s); return;
++    case WSAENETRESET: printf("%s: Net connection reset\n", s); return;
++    case WSAECONNABORTED: printf("%s: Software caused connection abort\n", s); return;
++    case WSAECONNRESET: printf("%s: Connection reset by peer\n", s); return;
++    case WSAENOBUFS: printf("%s: No buffer space available\n", s); return;
++    case WSAEISCONN: printf("%s: Socket is already connected\n", s); return;
++    case WSAENOTCONN: printf("%s: Socket is not connected\n", s); return;
++    case WSAESHUTDOWN: printf("%s: Can't send after socket shutdown\n", s); return;
++    case WSAETOOMANYREFS: printf("%s: Too many references, can't splice\n", s); return;
++    case WSAETIMEDOUT: printf("%s: Connection timed out\n", s); return;
++    case WSAECONNREFUSED: printf("%s: Connection refused\n", s); return;
++    case WSAELOOP: printf("%s: Too many levels of symbolic links\n", s); return;
++    case WSAENAMETOOLONG: printf("%s: File name too long\n", s); return;
++    case WSAEHOSTDOWN: printf("%s: Host is down\n", s); return;
++    case WSAEHOSTUNREACH: printf("%s: No route to host\n", s); return;
++    case WSAENOTEMPTY: printf("%s: Directory not empty\n", s); return;
++    case WSAEPROCLIM: printf("%s: Too many processes\n", s); return;
++    case WSAEUSERS: printf("%s: Too many users\n", s); return;
++    case WSAEDQUOT: printf("%s: Disc quota exceeded\n", s); return;
++    case WSAESTALE: printf("%s: Stale NFS file handle\n", s); return;
++    case WSAEREMOTE: printf("%s: Too many levels of remote in path\n", s); return;
++    case WSASYSNOTREADY: printf("%s: Network system is unavailable\n", s); return;
++    case WSAVERNOTSUPPORTED: printf("%s: Winsock version out of range\n", s); return;
++    case WSANOTINITIALISED: printf("%s: WSAStartup not yet called\n", s); return;
++    case WSAEDISCON: printf("%s: Graceful shutdown in progress\n", s); return;
++    case WSAHOST_NOT_FOUND: printf("%s: Host not found\n", s); return;
++    case WSANO_DATA: printf("%s: No host data of that type was found\n", s); return;
++	}
++	perror(s);
++}
+Index: psplinkusb/pspsh/jetcompat.h
+===================================================================
+--- psplinkusb/pspsh/jetcompat.h	(revision 0)
++++ psplinkusb/pspsh/jetcompat.h	(revision 0)
+@@ -0,0 +1,44 @@
++#ifndef __JETDRONE_WIN32_COMPAT
++#define __JETDRONE_WIN32_COMPAT
++#include <errno.h>
++
++#if defined(__MINGW32__) && !defined(__CYGWIN__)
++#include <conio.h>
++#include <stdio.h>
++
++#include <winsock2.h>
++
++/* This is a broken replacement since I am ignoring the 3rd argument */
++#define setenv(a,b,c) SetEnvironmentVariable(a,b)
++#define unsetenv(a) SetEnvironmentVariable(a,NULL)
++
++void jc_perror(const char *s);
++
++#define jc_socket_startup WSADATA wsaData; (void) WSAStartup(MAKEWORD(2,2), &wsaData)
++
++#define jc_socket_write(a,b,c) send(a,b,c,0)
++#define jc_socket_read(a,b,c) recv(a,(char*)b,c,0)
++#define jc_socket_close(a) closesocket(a)
++
++#else
++#include <sys/select.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++#include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <netdb.h>
++#include <limits.h>
++
++#define jc_socket_startup
++
++#define jc_perror(a) perror(a)
++#define jc_socket_write(a,b,c) write(a,b,c)
++#define jc_socket_read(a,b,c) read(a,b,c)
++#define jc_socket_close(a) close(a)
++
++#define INVALID_SOCKET -1
++#define SOCKET int
++
++#endif
++
++#endif
+Index: psplinkusb/pspsh/Makefile
+===================================================================
+--- psplinkusb/pspsh/Makefile	(revision 2494)
++++ psplinkusb/pspsh/Makefile	(working copy)
+@@ -1,15 +1,21 @@
+-OUTPUT=pspsh
+-OBJS=pspsh.o parse_args.o pspkerror.o asm.o disasm.o
++OBJS=pspsh.o parse_args.o pspkerror.o asm.o disasm.o jetcompat.o
+ 
+ CXXFLAGS=-Wall -g -D_PCTERM -I../psplink
++
++ifdef BUILD_WIN32
++OUTPUT=pspsh.exe
++LIBS=-lws2_32 -lreadline
++else
++OUTPUT=pspsh
+ LIBS=-lreadline -lcurses
++endif
+ 
+ PREFIX=$(shell psp-config --pspdev-path 2> /dev/null)
+ 
+ all: $(OUTPUT)
+ 
+ $(OUTPUT): $(OBJS)
+-	$(CXX) -o $@ $^ $(LIBS)
++	$(CXX) -s -o $@ $^ $(LIBS)
+ 
+ install: $(OUTPUT)
+ 	@echo "Installing $(OUTPUT)..."
+Index: psplinkusb/pspsh/pspsh.C
+===================================================================
+--- psplinkusb/pspsh/pspsh.C	(revision 2494)
++++ psplinkusb/pspsh/pspsh.C	(working copy)
+@@ -13,18 +13,12 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+-#include <sys/select.h>
+-#include <sys/socket.h>
+-#include <fcntl.h>
+-#include <netinet/in.h>
+-#include <netinet/tcp.h>
+-#include <netdb.h>
+-#include <limits.h>
+ #include <readline/readline.h>
+ #include <readline/history.h>
+ #include <errno.h>
+ #include <signal.h>
+ #include <shellcmd.h>
++#include "jetcompat.h"
+ #include "parse_args.h"
+ #include "pspkerror.h"
+ #include "disasm.h"
+@@ -59,10 +53,10 @@
+ 	int exit;
+ 	int conn_sanity;
+ 	fd_set readsave;
+-	int sock;
+-	int outsock;
+-	int errsock;
+-	int fssock;
++	SOCKET sock;
++	SOCKET outsock;
++	SOCKET errsock;
++	SOCKET fssock;
+ 	char history_file[PATH_MAX];
+ 	char currpath[PATH_MAX];
+ 	char currcmd[PATH_MAX];
+@@ -152,7 +146,7 @@
+ }
+ 
+ 
+-int fixed_write(int s, const void *buf, int len)
++int fixed_write(SOCKET s, const void *buf, int len)
+ {
+ 	int written = 0;
+ 
+@@ -160,12 +154,12 @@
+ 	{
+ 		int ret;
+ 
+-		ret = write(s, (const char*) buf+written, len-written);
++		ret = jc_socket_write(s, (const char*) buf+written, len-written);
+ 		if(ret < 0)
+ 		{
+ 			if(errno != EINTR)
+ 			{
+-				perror("write");
++				jc_perror("write");
+ 				written = -1;
+ 				break;
+ 			}
+@@ -252,8 +246,8 @@
+ 			len = fixed_write(g_context.sock, args, binlen);
+ 			if(len < 0)
+ 			{
+-				close(g_context.sock);
+-				g_context.sock = -1;
++				jc_socket_close(g_context.sock);
++				g_context.sock = INVALID_SOCKET;
+ 				return -1;
+ 			}
+ 			strcpy(g_context.currcmd, args);
+@@ -573,12 +567,12 @@
+ 				snprintf(prompt, PATH_MAX, "%s> ", g_context.currpath);
+ 				rl_callback_handler_install(prompt, cli_handler);
+ 			}
+-			else if(g_context.outsock >= 0)
++			else if(g_context.outsock != INVALID_SOCKET)
+ 			{
+ 				char b[1024];
+ 
+ 				snprintf(b, sizeof(b), "%s\n", buf);
+-				write(g_context.outsock, b, strlen(b));
++				jc_socket_write(g_context.outsock, b, strlen(b));
+ 			}
+ 
+ 			return;
+@@ -643,9 +637,9 @@
+ 		}
+ 		else if(buf[0] == '@')
+ 		{
+-			if(g_context.fssock >= 0)
++			if(g_context.fssock != INVALID_SOCKET)
+ 			{
+-				(void) write(g_context.fssock, &buf[1], strlen(&buf[1]));
++				(void) jc_socket_write(g_context.fssock, &buf[1], strlen(&buf[1]));
+ 			}
+ 			return;
+ 		}
+@@ -816,7 +810,7 @@
+ 			curr += strlen(curr)+1;
+ 		}
+ 		*curr++ = 1;
+-		write(g_context.sock, cmd, curr-cmd);
++		jc_socket_write(g_context.sock, cmd, curr-cmd);
+ 		pEntry = read_tab_completion();
+ 		if(pEntry == NULL)
+ 		{
+@@ -880,7 +874,7 @@
+ 		strcpy(curr, text);
+ 		curr += strlen(curr)+1;
+ 		*curr++ = 1;
+-		write(g_context.sock, cmd, curr-cmd);
++		jc_socket_write(g_context.sock, cmd, curr-cmd);
+ 		pEntry = read_tab_completion();
+ 	}
+ 
+@@ -1138,7 +1132,7 @@
+ 
+ void print_help(void)
+ {
+-	fprintf(stderr, "PSPSH Help (c) TyRaNiD\n");
++	fprintf(stderr, "PSPSH Help (c) TyRaNiD, Heimdall\n");
+ 	fprintf(stderr, "Built %s %s - $Revision: 2200 $\n", __DATE__, __TIME__);
+ 	fprintf(stderr, "Usage: pspsh [options] [script args...]\n");
+ 	fprintf(stderr, "Options:\n");
+@@ -1284,7 +1278,7 @@
+ 
+ 		if(setenv(name, value, 1) < 0)
+ 		{
+-			perror("setenv");
++			jc_perror("setenv");
+ 			break;
+ 		}
+ 	}
+@@ -1494,7 +1488,7 @@
+ 	return 1;
+ }
+ 
+-int read_socket(int sock)
++int read_socket(SOCKET sock)
+ {
+ 	static unsigned char linebuf[16*1024];
+ 	static int pos = 0;
+@@ -1502,10 +1496,10 @@
+ 	unsigned char *curr;
+ 	int len;
+ 
+-	len = read(sock, buf, sizeof(buf)-1);
++	len = jc_socket_read(sock, buf, sizeof(buf)-1);
+ 	if(len < 0)
+ 	{
+-		perror("read");
++		jc_perror("read");
+ 		return -1;
+ 	}
+ 
+@@ -1550,15 +1544,15 @@
+ 	return len;
+ }
+ 
+-int read_outsocket(int sock)
++int read_outsocket(SOCKET sock)
+ {
+ 	char buf[1024];
+ 	int len;
+ 
+-	len = read(sock, buf, sizeof(buf)-1);
++	len = jc_socket_read(sock, buf, sizeof(buf)-1);
+ 	if(len < 0)
+ 	{
+-		perror("read");
++		jc_perror("read");
+ 		return -1;
+ 	}
+ 
+@@ -1576,15 +1570,15 @@
+ 	return len;
+ }
+ 
+-int read_errsocket(int sock)
++int read_errsocket(SOCKET sock)
+ {
+ 	char buf[1024];
+ 	int len;
+ 
+-	len = read(sock, buf, sizeof(buf)-1);
++	len = jc_socket_read(sock, buf, sizeof(buf)-1);
+ 	if(len < 0)
+ 	{
+-		perror("read");
++		jc_perror("read");
+ 		return -1;
+ 	}
+ 
+@@ -1602,15 +1596,15 @@
+ 	return len;
+ }
+ 
+-int read_fssocket(int sock)
++int read_fssocket(SOCKET sock)
+ {
+ 	char buf[1024];
+ 	int len;
+ 
+-	len = read(sock, buf, sizeof(buf)-1);
++	len = jc_socket_read(sock, buf, sizeof(buf)-1);
+ 	if(len < 0)
+ 	{
+-		perror("read");
++		jc_perror("read");
+ 		return -1;
+ 	}
+ 
+@@ -1627,9 +1621,9 @@
+ 	return len;
+ }
+ 
+-int connect_to(const char *ipaddr, unsigned short port)
++SOCKET connect_to(const char *ipaddr, unsigned short port)
+ {
+-	int sock = -1;
++	SOCKET sock = INVALID_SOCKET;
+ 	int success = 0;
+ 	struct sockaddr_in name;
+ 
+@@ -1640,15 +1634,15 @@
+ 			break;
+ 		}
+ 		sock = socket(PF_INET, SOCK_STREAM, 0);
+-		if(sock < 0)
++		if(sock == INVALID_SOCKET)
+ 		{
+-			perror("socket");
++			jc_perror("socket");
+ 			break;
+ 		}
+ 
+ 		if(connect(sock, (struct sockaddr *) &name, sizeof(name)) < 0)
+ 		{
+-			perror("connect");
++			jc_perror("connect");
+ 			break;
+ 		}
+ 		else
+@@ -1662,17 +1656,17 @@
+ 
+ 	if(!success)
+ 	{
+-		if(sock >= 0)
++		if(sock != INVALID_SOCKET)
+ 		{
+-			close(sock);
+-			sock = -1;
++			jc_socket_close(sock);
++			sock = INVALID_SOCKET;
+ 		}
+ 	}
+ 
+ 	return sock;
+ }
+ 
+-int read_tab(int sock, struct TabEntry *head)
++int read_tab(SOCKET sock, struct TabEntry *head)
+ {
+ 	static unsigned char linebuf[16*1024];
+ 	static int pos = 0;
+@@ -1694,10 +1688,10 @@
+ 		tabcurr = tabcurr->pNext;
+ 	}
+ 
+-	len = read(sock, buf, sizeof(buf)-1);
++	len = jc_socket_read(sock, buf, sizeof(buf)-1);
+ 	if(len < 0)
+ 	{
+-		perror("read");
++		jc_perror("read");
+ 		return -1;
+ 	}
+ 
+@@ -1776,7 +1770,7 @@
+ 	struct timeval tv;
+ 	struct TabEntry head;
+ 
+-	if(g_context.sock < 0)
++	if(g_context.sock == INVALID_SOCKET)
+ 	{
+ 		return NULL;
+ 	}
+@@ -1800,7 +1794,7 @@
+ 				continue;
+ 			}
+ 
+-			perror("select");
++			jc_perror("select");
+ 			break;
+ 		}
+ 		else if(ret == 0)
+@@ -1826,6 +1820,13 @@
+ 
+ int shell(void)
+ {
++#if defined(__MINGW32__)
++	/* MINGW (windows) select does not support any fd, only sockets, so this need a workaround */
++	/* I know it sucks...  pooling... */
++	struct timeval timev;
++	timev.tv_sec=0;
++	timev.tv_usec=500;
++#endif
+ 	fd_set readset;
+ 	FD_ZERO(&g_context.readsave);
+ 
+@@ -1834,25 +1835,25 @@
+ 		fprintf(stderr, "Opening connection to %s port %d\n", g_context.args.ip, g_context.args.port);
+ 	}
+ 
+-	if((g_context.sock = connect_to(g_context.args.ip, g_context.args.port)) < 0)
++	if((g_context.sock = connect_to(g_context.args.ip, g_context.args.port)) == INVALID_SOCKET)
+ 	{
+ 		return 1;
+ 	}
+ 
+ 	if(g_context.args.notty == 0)
+ 	{
+-		if((g_context.outsock = connect_to(g_context.args.ip, g_context.args.port+2)) < 0)
++		if((g_context.outsock = connect_to(g_context.args.ip, g_context.args.port+2)) == INVALID_SOCKET)
+ 		{
+ 			fprintf(stderr, "Could not connect to stdout channel\n");
+ 		}
+-		if((g_context.errsock = connect_to(g_context.args.ip, g_context.args.port+3)) < 0)
++		if((g_context.errsock = connect_to(g_context.args.ip, g_context.args.port+3)) == INVALID_SOCKET)
+ 		{
+ 			fprintf(stderr, "Could not connect to stderr channel\n");
+ 		}
+ 	}
+ 
+ 	/*
+-	if((g_context.fssock == connect_to(g_context.args.ip, g_context.args.port+8)) < 0)
++	if((g_context.fssock == connect_to(g_context.args.ip, g_context.args.port+8)) == INVALID_SOCKET)
+ 	{
+ 		fprintf(stderr, "Could not connect to fs admin channel\n");
+ 	}
+@@ -1863,8 +1864,9 @@
+ 		init_readline();
+ 		read_history(g_context.history_file);
+ 		history_set_pos(history_length);
+-
++#if !defined(__MINGW32__)
+ 		FD_SET(STDIN_FILENO, &g_context.readsave);
++#endif
+ 	}
+ 
+ 	/* Change to the current directory, should return our path */
+@@ -1875,6 +1877,13 @@
+ 		int ret;
+ 
+ 		readset = g_context.readsave;
++#if defined(__MINGW32__)
++		if(!g_context.args.script)
++		{
++			ret = select(FD_SETSIZE, &readset, NULL, NULL, &timev);
++		}
++		else
++#endif
+ 		ret = select(FD_SETSIZE, &readset, NULL, NULL, NULL);
+ 		if(ret < 0)
+ 		{
+@@ -1883,15 +1892,26 @@
+ 				continue;
+ 			}
+ 
+-			perror("select");
++			jc_perror("select");
+ 			break;
+ 		}
+ 		else if(ret == 0)
+ 		{
++#if defined(__MINGW32__)
++			if(!g_context.args.script)
++			{
++				if (_kbhit() != 0)
++				{
++					rl_callback_read_char();
++				}
++			}
++#else
+ 			continue;
++#endif
+ 		}
+ 		else
+ 		{
++#if defined(__MINGW32__)
+ 			if(!g_context.args.script)
+ 			{
+ 				if(FD_ISSET(STDIN_FILENO, &readset))
+@@ -1899,44 +1919,44 @@
+ 					rl_callback_read_char();
+ 				}
+ 			}
+-
++#endif
+ 			if(FD_ISSET(g_context.sock, &readset))
+ 			{
+ 				/* Do read */
+ 				if(read_socket(g_context.sock) < 0)
+ 				{
+-					close(g_context.sock);
+-					g_context.sock = -1;
++					jc_socket_close(g_context.sock);
++					g_context.sock = INVALID_SOCKET;
+ 					break;
+ 				}
+ 			}
+ 
+-			if((g_context.outsock >= 0) && FD_ISSET(g_context.outsock, &readset))
++			if((g_context.outsock != INVALID_SOCKET) && FD_ISSET(g_context.outsock, &readset))
+ 			{
+ 				if(read_outsocket(g_context.outsock) < 0)
+ 				{
+ 					FD_CLR(g_context.outsock, &g_context.readsave);
+-					close(g_context.outsock);
+-					g_context.outsock = -1;
++					jc_socket_close(g_context.outsock);
++					g_context.outsock = INVALID_SOCKET;
+ 				}
+ 			}
+-			if((g_context.errsock >= 0) && FD_ISSET(g_context.errsock, &readset))
++			if((g_context.errsock != INVALID_SOCKET) && FD_ISSET(g_context.errsock, &readset))
+ 			{
+ 				if(read_errsocket(g_context.errsock) < 0)
+ 				{
+ 					FD_CLR(g_context.errsock, &g_context.readsave);
+-					close(g_context.errsock);
+-					g_context.errsock = -1;
++					jc_socket_close(g_context.errsock);
++					g_context.errsock = INVALID_SOCKET;
+ 				}
+ 			}
+ 
+-			if((g_context.fssock >= 0) && FD_ISSET(g_context.fssock, &readset))
++			if((g_context.fssock != INVALID_SOCKET) && FD_ISSET(g_context.fssock, &readset))
+ 			{
+ 				if(read_fssocket(g_context.fssock) < 0)
+ 				{
+ 					FD_CLR(g_context.fssock, &g_context.readsave);
+-					close(g_context.fssock);
+-					g_context.fssock = -1;
++					jc_socket_close(g_context.fssock);
++					g_context.fssock = INVALID_SOCKET;
+ 				}
+ 			}
+ 					
+@@ -1954,25 +1974,25 @@
+ 
+ void shutdown_app(void)
+ {
+-	if(g_context.sock >= 0)
++	if(g_context.sock != INVALID_SOCKET)
+ 	{
+-		close(g_context.sock);
+-		g_context.sock = -1;
++		jc_socket_close(g_context.sock);
++		g_context.sock = INVALID_SOCKET;
+ 	}
+-	if(g_context.outsock >= 0)
++	if(g_context.outsock != INVALID_SOCKET)
+ 	{
+-		close(g_context.outsock);
+-		g_context.outsock = -1;
++		jc_socket_close(g_context.outsock);
++		g_context.outsock = INVALID_SOCKET;
+ 	}
+-	if(g_context.errsock >= 0)
++	if(g_context.errsock != INVALID_SOCKET)
+ 	{
+-		close(g_context.errsock);
+-		g_context.errsock = -1;
++		jc_socket_close(g_context.errsock);
++		g_context.errsock = INVALID_SOCKET;
+ 	}
+-	if(g_context.fssock >= 0)
++	if(g_context.fssock != INVALID_SOCKET)
+ 	{
+-		close(g_context.fssock);
+-		g_context.fssock = -1;
++		jc_socket_close(g_context.fssock);
++		g_context.fssock = INVALID_SOCKET;
+ 	}
+ 
+ 	if(!g_context.args.script)
+@@ -2016,13 +2036,15 @@
+ 
+ int main(int argc, char **argv)
+ {
++	jc_socket_startup;
++	
+ 	int ret = 1;
+ 
+ 	memset(&g_context, 0, sizeof(g_context));
+-	g_context.sock = -1;
+-	g_context.outsock = -1;
+-	g_context.errsock = -1;
+-	g_context.fssock = -1;
++	g_context.sock = INVALID_SOCKET;
++	g_context.outsock = INVALID_SOCKET;
++	g_context.errsock = INVALID_SOCKET;
++	g_context.fssock = INVALID_SOCKET;
+ 	g_context.fstdout = stdout;
+ 	g_context.fstderr = stderr;
+ 	if(parse_args(argc, argv, &g_context.args))
+Index: psplinkusb/tools/remotejoy/pcsdl/jetcompat.c
+===================================================================
+--- psplinkusb/tools/remotejoy/pcsdl/jetcompat.c	(revision 0)
++++ psplinkusb/tools/remotejoy/pcsdl/jetcompat.c	(revision 0)
+@@ -0,0 +1,63 @@
++#include <stdio.h>
++#include "jetcompat.h"
++
++void jc_perror(const char *s)
++{
++	unsigned int winerr;
++
++	winerr = WSAGetLastError();
++	
++	switch(winerr)
++	{
++    case WSAEINTR: printf("%s: Interrupted system call\n", s); return;
++    case WSAEBADF: printf("%s: Bad file number\n", s); return;
++    case WSAEACCES: printf("%s: Permission denied\n", s); return;
++    case WSAEFAULT: printf("%s: Bad address\n", s); return;
++    case WSAEINVAL: printf("%s: Invalid argument\n", s); return;
++    case WSAEMFILE: printf("%s: Too many open sockets\n", s); return;
++    case WSAEWOULDBLOCK: printf("%s: Operation would block\n", s); return;
++    case WSAEINPROGRESS: printf("%s: Operation now in progress\n", s); return;
++    case WSAEALREADY: printf("%s: Operation already in progress\n", s); return;
++    case WSAENOTSOCK: printf("%s: Socket operation on non-socket\n", s); return;
++    case WSAEDESTADDRREQ: printf("%s: Destination address required\n", s); return;
++    case WSAEMSGSIZE: printf("%s: Message too long\n", s); return;
++    case WSAEPROTOTYPE: printf("%s: Protocol wrong type for socket\n", s); return;
++    case WSAENOPROTOOPT: printf("%s: Bad protocol option\n", s); return;
++    case WSAEPROTONOSUPPORT: printf("%s: Protocol not supported\n", s); return;
++    case WSAESOCKTNOSUPPORT: printf("%s: Socket type not supported\n", s); return;
++    case WSAEOPNOTSUPP: printf("%s: Operation not supported on socket\n", s); return;
++    case WSAEPFNOSUPPORT: printf("%s: Protocol family not supported\n", s); return;
++    case WSAEAFNOSUPPORT: printf("%s: Address family not supported\n", s); return;
++    case WSAEADDRINUSE: printf("%s: Address already in use\n", s); return;
++    case WSAEADDRNOTAVAIL: printf("%s: Can't assign requested address\n", s); return;
++    case WSAENETDOWN: printf("%s: Network is down\n", s); return;
++    case WSAENETUNREACH: printf("%s: Network is unreachable\n", s); return;
++    case WSAENETRESET: printf("%s: Net connection reset\n", s); return;
++    case WSAECONNABORTED: printf("%s: Software caused connection abort\n", s); return;
++    case WSAECONNRESET: printf("%s: Connection reset by peer\n", s); return;
++    case WSAENOBUFS: printf("%s: No buffer space available\n", s); return;
++    case WSAEISCONN: printf("%s: Socket is already connected\n", s); return;
++    case WSAENOTCONN: printf("%s: Socket is not connected\n", s); return;
++    case WSAESHUTDOWN: printf("%s: Can't send after socket shutdown\n", s); return;
++    case WSAETOOMANYREFS: printf("%s: Too many references, can't splice\n", s); return;
++    case WSAETIMEDOUT: printf("%s: Connection timed out\n", s); return;
++    case WSAECONNREFUSED: printf("%s: Connection refused\n", s); return;
++    case WSAELOOP: printf("%s: Too many levels of symbolic links\n", s); return;
++    case WSAENAMETOOLONG: printf("%s: File name too long\n", s); return;
++    case WSAEHOSTDOWN: printf("%s: Host is down\n", s); return;
++    case WSAEHOSTUNREACH: printf("%s: No route to host\n", s); return;
++    case WSAENOTEMPTY: printf("%s: Directory not empty\n", s); return;
++    case WSAEPROCLIM: printf("%s: Too many processes\n", s); return;
++    case WSAEUSERS: printf("%s: Too many users\n", s); return;
++    case WSAEDQUOT: printf("%s: Disc quota exceeded\n", s); return;
++    case WSAESTALE: printf("%s: Stale NFS file handle\n", s); return;
++    case WSAEREMOTE: printf("%s: Too many levels of remote in path\n", s); return;
++    case WSASYSNOTREADY: printf("%s: Network system is unavailable\n", s); return;
++    case WSAVERNOTSUPPORTED: printf("%s: Winsock version out of range\n", s); return;
++    case WSANOTINITIALISED: printf("%s: WSAStartup not yet called\n", s); return;
++    case WSAEDISCON: printf("%s: Graceful shutdown in progress\n", s); return;
++    case WSAHOST_NOT_FOUND: printf("%s: Host not found\n", s); return;
++    case WSANO_DATA: printf("%s: No host data of that type was found\n", s); return;
++	}
++	perror(s);
++}
+Index: psplinkusb/tools/remotejoy/pcsdl/jetcompat.h
+===================================================================
+--- psplinkusb/tools/remotejoy/pcsdl/jetcompat.h	(revision 0)
++++ psplinkusb/tools/remotejoy/pcsdl/jetcompat.h	(revision 0)
+@@ -0,0 +1,46 @@
++#ifndef __JETDRONE_WIN32_COMPAT
++#define __JETDRONE_WIN32_COMPAT
++#include <errno.h>
++
++#if defined(__MINGW32__) && !defined(__CYGWIN__)
++#include <conio.h>
++#include <stdio.h>
++
++#include <winsock2.h>
++
++/* This is a broken replacement since I am ignoring the 3rd argument */
++#define setenv(a,b,c) SetEnvironmentVariable(a,b)
++#define unsetenv(a) SetEnvironmentVariable(a,NULL)
++
++void jc_perror(const char *s);
++
++#define jc_socket_startup WSADATA wsaData; (void) WSAStartup(MAKEWORD(2,2), &wsaData)
++
++#define jc_socket_write(a,b,c) send(a,b,c,0)
++#define jc_socket_read(a,b,c) recv(a,(char*)b,c,0)
++#define jc_socket_close(a) closesocket(a)
++
++#define PATH_MAX 255
++
++#else
++#include <sys/select.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++#include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <netdb.h>
++#include <limits.h>
++
++#define jc_socket_startup
++
++#define jc_perror(a) perror(a)
++#define jc_socket_write(a,b,c) write(a,b,c)
++#define jc_socket_read(a,b,c) read(a,b,c)
++#define jc_socket_close(a) close(a)
++
++#define INVALID_SOCKET -1
++#define SOCKET int
++
++#endif
++
++#endif
+Index: psplinkusb/tools/remotejoy/pcsdl/Makefile
+===================================================================
+--- psplinkusb/tools/remotejoy/pcsdl/Makefile	(revision 2494)
++++ psplinkusb/tools/remotejoy/pcsdl/Makefile	(working copy)
+@@ -1,14 +1,21 @@
+-OUTPUT=remotejoy
+-OBJS=remotejoy.o font.o
++OBJS=remotejoy.o font.o jetcompat.o
+ 
+-CFLAGS=-O2 -Wall -g $(shell sdl-config --cflags)
++CFLAGS=-O2 -W -Wall -g $(shell sdl-config --cflags)
+ 
+ PREFIX=$(shell psp-config --pspdev-path 2> /dev/null)
+ 
++ifdef BUILD_WIN32
++OUTPUT=remotejoy.exe
++LIBS=-lws2_32 $(shell sdl-config --libs)
++else
++OUTPUT=remotejoy
++LIBS=$(shell sdl-config --libs)
++endif
++
+ all: $(OUTPUT)
+ 
+ $(OUTPUT): $(OBJS)
+-	$(CC) -o $@ $^ $(shell sdl-config --libs)
++	$(CC) -s -o $@ $^ $(LIBS)
+ 
+ install: $(OUTPUT)
+ 	@echo "Installing $(OUTPUT)..."
+Index: psplinkusb/tools/remotejoy/pcsdl/remotejoy.c
+===================================================================
+--- psplinkusb/tools/remotejoy/pcsdl/remotejoy.c	(revision 2494)
++++ psplinkusb/tools/remotejoy/pcsdl/remotejoy.c	(working copy)
+@@ -13,14 +13,7 @@
+ #include <stdio.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+-#include <sys/select.h>
+-#include <sys/socket.h>
+ #include <sys/stat.h>
+-#include <fcntl.h>
+-#include <netinet/in.h>
+-#include <netinet/tcp.h>
+-#include <netdb.h>
+-#include <limits.h>
+ #include <errno.h>
+ #include <ctype.h>
+ #include <signal.h>
+@@ -28,6 +21,7 @@
+ #include <SDL.h>
+ #include <SDL_thread.h>
+ #include "../remotejoy.h"
++#include "jetcompat.h"
+ 
+ #define DEFAULT_PORT 10004
+ #define DEFAULT_IP   "localhost"
+@@ -212,7 +206,7 @@
+ 
+ #define VERBOSE (g_context.args.verbose)
+ 
+-int fixed_write(int s, const void *buf, int len)
++int fixed_write(SOCKET s, const void *buf, int len)
+ {
+ 	int written = 0;
+ 
+@@ -220,12 +214,12 @@
+ 	{
+ 		int ret;
+ 
+-		ret = write(s, buf+written, len-written);
++		ret = jc_socket_write(s, buf+written, len-written);
+ 		if(ret < 0)
+ 		{
+ 			if(errno != EINTR)
+ 			{
+-				perror("write");
++				jc_perror("write");
+ 				written = -1;
+ 				break;
+ 			}
+@@ -335,36 +329,36 @@
+ 	return 1;
+ }
+ 
+-int connect_to(const char *ipaddr, unsigned short port)
++SOCKET connect_to(const char *ipaddr, unsigned short port)
+ {
+ 	struct sockaddr_in name;
+-	int sock = -1;
++	SOCKET sock = INVALID_SOCKET;
+ 	int flag = 1;
+ 
+ 	sock = socket(PF_INET, SOCK_STREAM, 0);
+ 
+-	if(sock < 0)
++	if(sock == INVALID_SOCKET)
+ 	{
+-		perror("socket");
+-		return -1;
++		jc_perror("socket");
++		return INVALID_SOCKET;
+ 	}
+ 
+ 	if(!init_sockaddr(&name, ipaddr, port))
+ 	{
+ 		printf("Could not initialise socket address\n");
+-		close(sock);
+-		return -1;
++		jc_socket_close(sock);
++		return INVALID_SOCKET;
+ 	}
+ 
+ 	if(connect(sock, (struct sockaddr *) &name, sizeof(name)) < 0)
+ 	{
+-		perror("connect");
+-		close(sock);
+-		return -1;
++		jc_perror("connect");
++		jc_socket_close(sock);
++		return INVALID_SOCKET;
+ 	}
+ 
+ 	/* Disable NAGLE's algorithm to prevent the packets being joined */
+-	setsockopt(sock, SOL_TCP, TCP_NODELAY, &flag, sizeof(int));
++	setsockopt(sock, SOL_TCP, TCP_NODELAY,  (char*)&flag, sizeof(int));
+ 
+ 	return sock;
+ }
+@@ -504,11 +498,11 @@
+ 	return 1;
+ }
+ 
+-int send_event(int sock, int type, unsigned int value)
++int send_event(SOCKET sock, int type, unsigned int value)
+ {
+ 	struct JoyEvent event;
+ 
+-	if(sock < 0)
++	if(sock == INVALID_SOCKET)
+ 	{
+ 		return 0;
+ 	}
+@@ -539,7 +533,7 @@
+ 	SDL_PushEvent(&event);
+ }
+ 
+-int flush_socket(int sock)
++int flush_socket(SOCKET sock)
+ {
+ 	/* If we encounter some horrible error which means we are desynced
+ 	 * then send a video off packet to remotejoy, wait around for a second sucking up
+@@ -582,7 +576,7 @@
+ 	int frame = 0;
+ 	fd_set saveset, readset;
+ 	int count;
+-	int sock = *(int *) p;
++	SOCKET sock = *(SOCKET *) p;
+ 	struct JoyScrHeader head;
+ 
+ 	FD_ZERO(&saveset);
+@@ -602,7 +596,7 @@
+ 
+ 			if(FD_ISSET(sock, &readset))
+ 			{
+-				ret = read(sock, &head, sizeof(head));
++				ret = jc_socket_read(sock, &head, sizeof(head));
+ 				if((ret != sizeof(head)) || (LE32(head.magic) != JOY_MAGIC))
+ 				{
+ 					fprintf(stderr, "Error in socket %d, magic %08X\n", ret, head.magic);
+@@ -647,12 +641,12 @@
+ 						count = select(FD_SETSIZE, &readset, NULL, NULL, NULL);
+ 						if(count > 0)
+ 						{
+-							ret = read(sock, &(g_buffers[frame].buf[loc]), size-loc);
++							ret = jc_socket_read(sock, &(g_buffers[frame].buf[loc]), size-loc);
+ 							if(ret < 0)
+ 							{
+ 								if(errno != EINTR)
+ 								{
+-									perror("read:");
++									jc_perror("read:");
+ 									err = 1;
+ 									break;
+ 								}
+@@ -674,7 +668,7 @@
+ 						{
+ 							if(errno != EINTR)
+ 							{
+-								perror("select:");
++								jc_perror("select:");
+ 								err = 1;
+ 								break;
+ 							}
+@@ -700,7 +694,7 @@
+ 		{
+ 			if(errno != EINTR)
+ 			{
+-				perror("select:");
++				jc_perror("select:");
+ 				err = 1;
+ 			}
+ 		}
+@@ -805,7 +799,7 @@
+ 	SDL_Thread *thread = NULL;
+ 	int currw, currh;
+ 	int sdl_init = 0;
+-	int sock = -1;
++	SOCKET sock = INVALID_SOCKET;
+ 	unsigned int button_state = 0;
+ 	int currmode[2] = { 3, 3 };
+ 	int flags = SDL_HWSURFACE;
+@@ -902,7 +896,7 @@
+ 		}
+ 
+ 		sock = connect_to(g_context.args.ip, g_context.args.port);
+-		if(sock < 0)
++		if(sock == INVALID_SOCKET)
+ 		{
+ 			break;
+ 		}
+@@ -1324,9 +1318,9 @@
+ 		SDL_Quit();
+ 	}
+ 
+-	if(sock >= 0)
++	if(sock != INVALID_SOCKET)
+ 	{
+-		close(sock);
++		jc_socket_close(sock);
+ 	}
+ 
+ 	if(g_buttmap)
+@@ -1339,7 +1333,9 @@
+ 
+ int main(int argc, char **argv)
+ {
+-	fprintf(stderr, "Remote Joy SDL for PSP (c) TyRaNiD 2k6\n");
++	jc_socket_startup;
++	jc_perror("main");
++	fprintf(stderr, "Remote Joy SDL for PSP (c) TyRaNiD, jetdrone 2k10\n");
+ 	fprintf(stderr, "Built %s %s - $Revision: 2398 $\n", __DATE__, __TIME__);
+ 	memset(&g_context, 0, sizeof(g_context));
+ 	if(parse_args(argc, argv, &g_context.args))

@@ -30,7 +30,8 @@ Portable handheld videogame system.
  Changelog
 ===============================================================================
 0.9.6
-* pspsh builds as a native app on win32 too (no need for cygwin) WIP
+* pspsh does not depend on cygwin and is native
+* remotejoy SDL is also included as a native binary (no cygwin)
 * win32 dependencies updated
  - zlib 1.2.5
  - SDL 1.2.14

@@ -685,11 +685,13 @@ function installExtraBinaries {
 
 function installPSPLinkUSB {
 	svnGet psp "svn://svn.ps2dev.org/psp/trunk" "psplinkusb"
-
 	cd psp
 	if [ "$OS" == "MINGW32_NT" ]; then
-		# pspsh + usbhostfs_pc
-		cp ../mingw/bin/pspsh.exe $INSTALLDIR/bin
+		cd psplinkusb
+		CC=gcc CXX=g++ BUILD_WIN32=1 make -C pspsh install
+		CC=gcc CXX=g++ BUILD_WIN32=1 make -C tools/remotejoy/pcsdl install
+		cd ..
+		# usbhostfs_pc (not yet ported to native win32)
 		cp ../mingw/bin/usbhostfs_pc.exe $INSTALLDIR/bin
 		cp ../mingw/bin/cygncurses-8.dll $INSTALLDIR/bin
 		cp ../mingw/bin/cygreadline6.dll $INSTALLDIR/bin
@@ -728,7 +730,7 @@ function installPSPLinkUSB {
 	make -f Makefile.psp release
 	cd release
 
-	mkdir -p $INSTALLDIR/psplink/psp
+	install -d $INSTALLDIR/psplink/psp
 	install -d $INSTALLDIR/psplink/psp/scripts
 	install -m 644 scripts/loadvsh.sh $INSTALLDIR/psplink/psp/scripts
 	install -m 644 scripts/README $INSTALLDIR/psplink/psp/scripts
@@ -985,8 +987,6 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-buildBaseDevpaks
-exit
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
