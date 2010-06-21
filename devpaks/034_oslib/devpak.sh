@@ -11,9 +11,11 @@ cd build
 
 cp ../Doxyfile OSLib_210_src/$LIBNAME
 cd OSLib_210_src/$LIBNAME
+mv zlibInterface.h tmp
+mv tmp zlibinterface.h
 make lib
 
-mkdir -p ../../target/psp/include/oslib ../../target/psp/lib ../../target/doc/$LIBNAME
+mkdir -p ../../target/psp/include/oslib ../../target/psp/lib ../../target/doc/Oslib
 cp libosl.a ../../target/psp/lib
 
 cp audio.h ../../target/psp/include/oslib
@@ -30,8 +32,8 @@ cp vram_mgr.h ../../target/psp/include/oslib
 
 doxygen
 
-cp -fR ../../target/doc/oslib/html/* ../../target/doc/oslib
-rm -fR ../../target/doc/oslib/html
+cp -fR ../../target/doc/Oslib/html/* ../../target/doc/Oslib
+rm -fR ../../target/doc/Oslib/html
 
 cd ../../..
 
