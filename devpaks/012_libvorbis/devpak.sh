@@ -14,9 +14,11 @@ LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --
 make
 
 make install
+
 cd doc
-make install
+make install || true
 cd ..
+
 mkdir -p ../target/doc
 mv ../target/psp/share/doc/libvorbis-1.1.1 ../target/doc/libvorbis-1.1.2
 rm -fR ../target/psp/share
