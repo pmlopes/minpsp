@@ -7,9 +7,8 @@ VERSION=0.10.0
 
 svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
-cd build
-mkdir build
-cd build
+cd build/$LIBNAME
+rm -Rf autom4te.cache
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lstdc++ -lpsplibc -lpspuser" ../$LIBNAME/configure --host=psp --disable-shared --prefix=$(pwd)/../target/psp
 
 make
@@ -23,4 +22,3 @@ cd ../..
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-

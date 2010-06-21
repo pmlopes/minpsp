@@ -264,7 +264,7 @@ function svnGet {
 #arg4 installer path
 function buildAndInstallDevPak {
 	cd $1/$2_$3
-	rm -Rf build
+	rm -Rf build || true
 	./devpak.sh
 	tar -C $(psp-config --pspdev-path) -xjf $1/$2_$3/build/$3-*.tar.bz2
 	# only install if we are on windows
