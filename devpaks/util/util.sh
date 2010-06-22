@@ -211,10 +211,8 @@ function makeInstaller {
 	cat build/$1-$2-psp.tar.bz2 >> $NIXINSTALLER
 	chmod a+x $NIXINSTALLER
 
-	if [ -e makensis ]; then
-		cd build
-		makensis ../$1.nsi
-		cd ..
+	if [ "$OS" == "MINGW32_NT" ]; then
+		makensis $1.nsi || true
 	fi
 }
 

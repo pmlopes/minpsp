@@ -56,7 +56,7 @@ Section -Main SEC0000
     # install
     SetOutPath $0
     SetOverwrite on
-    File /r target\*
+    File /r build\target\*
     WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" ${UNIX_NAME} ${VERSION}
 SectionEnd
 

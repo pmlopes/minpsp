@@ -47,16 +47,9 @@ Section -Main SEC0000
     StrCmp $0 '' +1 +3
     MessageBox MB_OK|MB_ICONSTOP 'PSP DevKit missing'
     Quit
-    # check for internal dependencies
-    #ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" ${UNIX_NAME}
-    # check for core dependency
-    #StrCmp $1 '1.2.2' +3 +1
-    #MessageBox MB_OK|MB_ICONSTOP 'Required devpak ZLIB (1.2.2) missing'
-    #Quit
-    # install
     SetOutPath $0
     SetOverwrite on
-    File /r target\*
+    File /r build\target\*
     WriteRegStr HKLM "SOFTWARE\PSP DevKit\devpak" ${UNIX_NAME} ${VERSION}
 SectionEnd
 
