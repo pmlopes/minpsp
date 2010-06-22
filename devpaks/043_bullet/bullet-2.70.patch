@@ -46,76 +46,76 @@ diff -Naur src/Makefile.libbulletcollision src/Makefile.libbulletcollision
 +++ src/Makefile.libbulletcollision	2009-01-06 17:44:33 +0100
 @@ -0,0 +1,81 @@
 +TARGET_LIB = libbulletcollision.a
-+OBJS = BulletCollision\BroadphaseCollision\btAxisSweep3.o \
-+BulletCollision\BroadphaseCollision\btBroadphaseProxy.o \
-+BulletCollision\BroadphaseCollision\btCollisionAlgorithm.o \
-+BulletCollision\BroadphaseCollision\btDbvt.o \
-+BulletCollision\BroadphaseCollision\btDbvtBroadphase.o \
-+BulletCollision\BroadphaseCollision\btDispatcher.o \
-+BulletCollision\BroadphaseCollision\btMultiSapBroadphase.o \
-+BulletCollision\BroadphaseCollision\btOverlappingPairCache.o \
-+BulletCollision\BroadphaseCollision\btSimpleBroadphase.o \
-+BulletCollision\CollisionDispatch\btBoxBoxCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btBoxBoxDetector.o \
-+BulletCollision\CollisionDispatch\btCollisionDispatcher.o \
-+BulletCollision\CollisionDispatch\btCollisionObject.o \
-+BulletCollision\CollisionDispatch\btCollisionWorld.o \
-+BulletCollision\CollisionDispatch\btCompoundCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btConvexConcaveCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btConvexConvexAlgorithm.o \
-+BulletCollision\CollisionDispatch\btConvexPlaneCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btDefaultCollisionConfiguration.o \
-+BulletCollision\CollisionDispatch\btEmptyCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btManifoldResult.o \
-+BulletCollision\CollisionDispatch\btSimulationIslandManager.o \
-+BulletCollision\CollisionDispatch\btSphereBoxCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btSphereSphereCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btSphereTriangleCollisionAlgorithm.o \
-+BulletCollision\CollisionDispatch\btUnionFind.o \
-+BulletCollision\CollisionDispatch\SphereTriangleDetector.o \
-+BulletCollision\CollisionShapes\btBoxShape.o \
-+BulletCollision\CollisionShapes\btBvhTriangleMeshShape.o \
-+BulletCollision\CollisionShapes\btCapsuleShape.o \
-+BulletCollision\CollisionShapes\btCollisionShape.o \
-+BulletCollision\CollisionShapes\btCompoundShape.o \
-+BulletCollision\CollisionShapes\btConcaveShape.o \
-+BulletCollision\CollisionShapes\btConeShape.o \
-+BulletCollision\CollisionShapes\btConvexHullShape.o \
-+BulletCollision\CollisionShapes\btConvexInternalShape.o \
-+BulletCollision\CollisionShapes\btConvexShape.o \
-+BulletCollision\CollisionShapes\btConvexTriangleMeshShape.o \
-+BulletCollision\CollisionShapes\btCylinderShape.o \
-+BulletCollision\CollisionShapes\btEmptyShape.o \
-+BulletCollision\CollisionShapes\btHeightfieldTerrainShape.o \
-+BulletCollision\CollisionShapes\btMinkowskiSumShape.o \
-+BulletCollision\CollisionShapes\btMultimaterialTriangleMeshShape.o \
-+BulletCollision\CollisionShapes\btMultiSphereShape.o \
-+BulletCollision\CollisionShapes\btOptimizedBvh.o \
-+BulletCollision\CollisionShapes\btPolyhedralConvexShape.o \
-+BulletCollision\CollisionShapes\btShapeHull.o \
-+BulletCollision\CollisionShapes\btSphereShape.o \
-+BulletCollision\CollisionShapes\btStaticPlaneShape.o \
-+BulletCollision\CollisionShapes\btStridingMeshInterface.o \
-+BulletCollision\CollisionShapes\btTetrahedronShape.o \
-+BulletCollision\CollisionShapes\btTriangleBuffer.o \
-+BulletCollision\CollisionShapes\btTriangleCallback.o \
-+BulletCollision\CollisionShapes\btTriangleIndexVertexArray.o \
-+BulletCollision\CollisionShapes\btTriangleIndexVertexMaterialArray.o \
-+BulletCollision\CollisionShapes\btTriangleMesh.o \
-+BulletCollision\CollisionShapes\btTriangleMeshShape.o \
-+BulletCollision\CollisionShapes\btUniformScalingShape.o \
-+BulletCollision\NarrowPhaseCollision\btContinuousConvexCollision.o \
-+BulletCollision\NarrowPhaseCollision\btConvexCast.o \
-+BulletCollision\NarrowPhaseCollision\btGjkConvexCast.o \
-+BulletCollision\NarrowPhaseCollision\btGjkEpa.o \
-+BulletCollision\NarrowPhaseCollision\btGjkEpa2.o \
-+BulletCollision\NarrowPhaseCollision\btGjkEpaPenetrationDepthSolver.o \
-+BulletCollision\NarrowPhaseCollision\btGjkPairDetector.o \
-+BulletCollision\NarrowPhaseCollision\btMinkowskiPenetrationDepthSolver.o \
-+BulletCollision\NarrowPhaseCollision\btPersistentManifold.o \
-+BulletCollision\NarrowPhaseCollision\btRaycastCallback.o \
-+BulletCollision\NarrowPhaseCollision\btSubSimplexConvexCast.o \
-+BulletCollision\NarrowPhaseCollision\btVoronoiSimplexSolver.o	 
++OBJS = BulletCollision/BroadphaseCollision/btAxisSweep3.o \
++BulletCollision/BroadphaseCollision/btBroadphaseProxy.o \
++BulletCollision/BroadphaseCollision/btCollisionAlgorithm.o \
++BulletCollision/BroadphaseCollision/btDbvt.o \
++BulletCollision/BroadphaseCollision/btDbvtBroadphase.o \
++BulletCollision/BroadphaseCollision/btDispatcher.o \
++BulletCollision/BroadphaseCollision/btMultiSapBroadphase.o \
++BulletCollision/BroadphaseCollision/btOverlappingPairCache.o \
++BulletCollision/BroadphaseCollision/btSimpleBroadphase.o \
++BulletCollision/CollisionDispatch/btBoxBoxCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btBoxBoxDetector.o \
++BulletCollision/CollisionDispatch/btCollisionDispatcher.o \
++BulletCollision/CollisionDispatch/btCollisionObject.o \
++BulletCollision/CollisionDispatch/btCollisionWorld.o \
++BulletCollision/CollisionDispatch/btCompoundCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btConvexConcaveCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.o \
++BulletCollision/CollisionDispatch/btConvexPlaneCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.o \
++BulletCollision/CollisionDispatch/btEmptyCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btManifoldResult.o \
++BulletCollision/CollisionDispatch/btSimulationIslandManager.o \
++BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btSphereSphereCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btSphereTriangleCollisionAlgorithm.o \
++BulletCollision/CollisionDispatch/btUnionFind.o \
++BulletCollision/CollisionDispatch/SphereTriangleDetector.o \
++BulletCollision/CollisionShapes/btBoxShape.o \
++BulletCollision/CollisionShapes/btBvhTriangleMeshShape.o \
++BulletCollision/CollisionShapes/btCapsuleShape.o \
++BulletCollision/CollisionShapes/btCollisionShape.o \
++BulletCollision/CollisionShapes/btCompoundShape.o \
++BulletCollision/CollisionShapes/btConcaveShape.o \
++BulletCollision/CollisionShapes/btConeShape.o \
++BulletCollision/CollisionShapes/btConvexHullShape.o \
++BulletCollision/CollisionShapes/btConvexInternalShape.o \
++BulletCollision/CollisionShapes/btConvexShape.o \
++BulletCollision/CollisionShapes/btConvexTriangleMeshShape.o \
++BulletCollision/CollisionShapes/btCylinderShape.o \
++BulletCollision/CollisionShapes/btEmptyShape.o \
++BulletCollision/CollisionShapes/btHeightfieldTerrainShape.o \
++BulletCollision/CollisionShapes/btMinkowskiSumShape.o \
++BulletCollision/CollisionShapes/btMultimaterialTriangleMeshShape.o \
++BulletCollision/CollisionShapes/btMultiSphereShape.o \
++BulletCollision/CollisionShapes/btOptimizedBvh.o \
++BulletCollision/CollisionShapes/btPolyhedralConvexShape.o \
++BulletCollision/CollisionShapes/btShapeHull.o \
++BulletCollision/CollisionShapes/btSphereShape.o \
++BulletCollision/CollisionShapes/btStaticPlaneShape.o \
++BulletCollision/CollisionShapes/btStridingMeshInterface.o \
++BulletCollision/CollisionShapes/btTetrahedronShape.o \
++BulletCollision/CollisionShapes/btTriangleBuffer.o \
++BulletCollision/CollisionShapes/btTriangleCallback.o \
++BulletCollision/CollisionShapes/btTriangleIndexVertexArray.o \
++BulletCollision/CollisionShapes/btTriangleIndexVertexMaterialArray.o \
++BulletCollision/CollisionShapes/btTriangleMesh.o \
++BulletCollision/CollisionShapes/btTriangleMeshShape.o \
++BulletCollision/CollisionShapes/btUniformScalingShape.o \
++BulletCollision/NarrowPhaseCollision/btContinuousConvexCollision.o \
++BulletCollision/NarrowPhaseCollision/btConvexCast.o \
++BulletCollision/NarrowPhaseCollision/btGjkConvexCast.o \
++BulletCollision/NarrowPhaseCollision/btGjkEpa.o \
++BulletCollision/NarrowPhaseCollision/btGjkEpa2.o \
++BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.o \
++BulletCollision/NarrowPhaseCollision/btGjkPairDetector.o \
++BulletCollision/NarrowPhaseCollision/btMinkowskiPenetrationDepthSolver.o \
++BulletCollision/NarrowPhaseCollision/btPersistentManifold.o \
++BulletCollision/NarrowPhaseCollision/btRaycastCallback.o \
++BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.o \
++BulletCollision/NarrowPhaseCollision/btVoronoiSimplexSolver.o	 
 +
 +PSPSDK = $(shell psp-config --pspsdk-path)
 +PSPPATH = $(shell psp-config --psp-prefix)
@@ -131,27 +131,27 @@ diff -Naur src/Makefile.libbulletdynamics src/Makefile.libbulletdynamics
 +++ src/Makefile.libbulletdynamics	2009-01-06 17:45:17 +0100
 @@ -0,0 +1,32 @@
 +TARGET_LIB = libbulletdynamics.a
-+OBJS = BulletDynamics\ConstraintSolver\btConeTwistConstraint.o \
-+BulletDynamics\ConstraintSolver\btContactConstraint.o \
-+BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.o \
-+BulletDynamics\ConstraintSolver\btHingeConstraint.o \
-+BulletDynamics\ConstraintSolver\btOdeContactJoint.o \
-+BulletDynamics\ConstraintSolver\btOdeJoint.o \
-+BulletDynamics\ConstraintSolver\btOdeQuickstepConstraintSolver.o \
-+BulletDynamics\ConstraintSolver\btOdeTypedJoint.o \
-+BulletDynamics\ConstraintSolver\btPoint2PointConstraint.o \
-+BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.o \
-+BulletDynamics\ConstraintSolver\btSliderConstraint.o \
-+BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.o \
-+BulletDynamics\ConstraintSolver\btSorLcp.o \
-+BulletDynamics\ConstraintSolver\btTypedConstraint.o \
-+BulletDynamics\Dynamics\btContinuousDynamicsWorld.o \
-+BulletDynamics\Dynamics\btDiscreteDynamicsWorld.o \
-+BulletDynamics\Dynamics\btRigidBody.o \
-+BulletDynamics\Dynamics\btSimpleDynamicsWorld.o \
-+BulletDynamics\Dynamics\Bullet-C-API.o \
-+BulletDynamics\Vehicle\btRaycastVehicle.o \
-+BulletDynamics\Vehicle\btWheelInfo.o  	 
++OBJS = BulletDynamics/ConstraintSolver/btConeTwistConstraint.o \
++BulletDynamics/ConstraintSolver/btContactConstraint.o \
++BulletDynamics/ConstraintSolver/btGeneric6DofConstraint.o \
++BulletDynamics/ConstraintSolver/btHingeConstraint.o \
++BulletDynamics/ConstraintSolver/btOdeContactJoint.o \
++BulletDynamics/ConstraintSolver/btOdeJoint.o \
++BulletDynamics/ConstraintSolver/btOdeQuickstepConstraintSolver.o \
++BulletDynamics/ConstraintSolver/btOdeTypedJoint.o \
++BulletDynamics/ConstraintSolver/btPoint2PointConstraint.o \
++BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.o \
++BulletDynamics/ConstraintSolver/btSliderConstraint.o \
++BulletDynamics/ConstraintSolver/btSolve2LinearConstraint.o \
++BulletDynamics/ConstraintSolver/btSorLcp.o \
++BulletDynamics/ConstraintSolver/btTypedConstraint.o \
++BulletDynamics/Dynamics/btContinuousDynamicsWorld.o \
++BulletDynamics/Dynamics/btDiscreteDynamicsWorld.o \
++BulletDynamics/Dynamics/btRigidBody.o \
++BulletDynamics/Dynamics/btSimpleDynamicsWorld.o \
++BulletDynamics/Dynamics/Bullet-C-API.o \
++BulletDynamics/Vehicle/btRaycastVehicle.o \
++BulletDynamics/Vehicle/btWheelInfo.o  	 
 +
 +PSPSDK = $(shell psp-config --pspsdk-path)
 +PSPPATH = $(shell psp-config --psp-prefix)
@@ -167,10 +167,10 @@ diff -Naur src/Makefile.libbulletmath src/Makefile.libbulletmath
 +++ src/Makefile.libbulletmath	2009-01-06 17:30:40 +0100
 @@ -0,0 +1,15 @@
 +TARGET_LIB = libbulletmath.a
-+OBJS = LinearMath\btAlignedAllocator.o \
-+		LinearMath\btConvexHull.o \
-+		LinearMath\btGeometryUtil.o \
-+		LinearMath\btQuickprof.o 
++OBJS = LinearMath/btAlignedAllocator.o \
++		LinearMath/btConvexHull.o \
++		LinearMath/btGeometryUtil.o \
++		LinearMath/btQuickprof.o 
 +
 +PSPSDK = $(shell psp-config --pspsdk-path)
 +PSPPATH = $(shell psp-config --psp-prefix)
@@ -186,13 +186,13 @@ diff -Naur src/Makefile.libbulletsoftbody src/Makefile.libbulletsoftbody
 +++ src/Makefile.libbulletsoftbody	2009-01-06 17:46:04 +0100
 @@ -0,0 +1,18 @@
 +TARGET_LIB = libbulletsoftbody.a
-+OBJS = BulletSoftBody\btSoftBody.o \
-+BulletSoftBody\btSoftBodyConcaveCollisionAlgorithm.o \
-+BulletSoftBody\btSoftBodyHelpers.o \
-+BulletSoftBody\btSoftBodyRigidBodyCollisionConfiguration.o \
-+BulletSoftBody\btSoftRigidCollisionAlgorithm.o \
-+BulletSoftBody\btSoftRigidDynamicsWorld.o \
-+BulletSoftBody\btSoftSoftCollisionAlgorithm.o 	 
++OBJS = BulletSoftBody/btSoftBody.o \
++BulletSoftBody/btSoftBodyConcaveCollisionAlgorithm.o \
++BulletSoftBody/btSoftBodyHelpers.o \
++BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.o \
++BulletSoftBody/btSoftRigidCollisionAlgorithm.o \
++BulletSoftBody/btSoftRigidDynamicsWorld.o \
++BulletSoftBody/btSoftSoftCollisionAlgorithm.o 	 
 +
 +PSPSDK = $(shell psp-config --pspsdk-path)
 +PSPPATH = $(shell psp-config --psp-prefix)
