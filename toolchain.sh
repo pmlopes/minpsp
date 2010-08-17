@@ -957,7 +957,7 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
-	buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+	#buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
 	#buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
@@ -968,7 +968,8 @@ function buildBaseDevpaks {
 	#buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
-	#buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
 
 	# restore
 	if [ "$OS" == "MINGW32_NT" ]; then
