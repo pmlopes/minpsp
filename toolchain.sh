@@ -964,8 +964,7 @@ function buildBaseDevpaks {
 	buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
-	# still waiting for 4.4 fix from diedel
-	#buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+	buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
 	buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
