@@ -3,30 +3,17 @@ set -e
 . ../util/util.sh
 
 LIBNAME=allegro
-VERSION=4.2.3
+VERSION=4.4.1.1
 
-downloadHTTP http://static.allegro.cc/file/library/$LIBNAME-$VERSION/$LIBNAME-$VERSION.tar.gz
+download build "http://downloads.sourceforge.net/alleg" $LIBNAME-$VERSION tar.gz
 
-if [ ! -d $LIBNAME-$VERSION ]
-then
-	tar -zxf $LIBNAME-$VERSION.tar.gz
-fi
-
-cd $LIBNAME-$VERSION
-
-CFLAGS="-G0" LDFLAGS="-L$(psp-config --psp-prefix)/lib -L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lstdc++ -lpsplibc -lpspuser" ./configure --host=psp --disable-shared --disable-threads --prefix=$(pwd)/../target/psp
-
-# patch -p0 -i ../../$LIBNAME-$VERSION.patch || { echo "Error patching $LIBNAME"; exit; }
+cd build/$LIBNAME-$VERSION
+cmake -DWANT_TESTS=off -DWANT_TOOLS=off -DWANT_LOGG=off -DWANT_ALLEGROGL=off -DSHARED=off -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-psp-gcc.cmake -DCMAKE_INSTALL_PREFIX=../target/psp .
 make
+make install
 
-make install || { echo "Error building $LIBNAME"; exit 1; }
-mv ../target/psp/share/doc ../target
-mv ../target/psp/share/man ../target
-rm -rf ../target/psp/share
+cd ../..
 
-cd ..
-
-makeInstaller $LIBNAME $VERSION
+makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8
 
 echo "Done!"
-

@@ -1,0 +1,2381 @@
+diff -Naur addons/jpgalleg/CMakeLists.txt addons/jpgalleg/CMakeLists.txt
+--- addons/jpgalleg/CMakeLists.txt	2010-08-25 09:43:51.040263999 +0200
++++ addons/jpgalleg/CMakeLists.txt	2010-05-16 15:21:31.000000000 +0200
+@@ -74,6 +74,9 @@
+         OUTPUT_NAME examples/${nm}
+         )
+     target_link_libraries(${nm}_jpg jpgalleg)
++    if(PSP)
++        add_psp_executable(${nm}_jpg)
++    endif(PSP)
+ endfunction()
+ 
+ if(WANT_EXAMPLES)
+diff -Naur addons/loadpng/CMakeLists.txt addons/loadpng/CMakeLists.txt
+--- addons/loadpng/CMakeLists.txt	2010-08-25 09:43:50.075782000 +0200
++++ addons/loadpng/CMakeLists.txt	2010-05-15 22:51:35.000000000 +0200
+@@ -40,6 +40,10 @@
+ 
+ set_our_framework_properties(loadpng loadpng)
+ 
++if(PSP)
++    target_link_libraries(loadpng ${PNG_LIBRARIES} allegro)
++endif(PSP)
++
+ target_link_libraries(loadpng allegro ${PNG_LIBRARIES})
+ 
+ sanitize_cmake_link_flags(static_link_with ${PNG_LIBRARIES})
+@@ -67,6 +71,9 @@
+         OUTPUT_NAME examples/${nm}
+         )
+     target_link_libraries(${nm}_png loadpng)
++    if(PSP)
++        add_psp_executable(${nm}_png)
++    endif(PSP)
+ endfunction()
+ 
+ if(WANT_EXAMPLES)
+diff -Naur cmake/Common.cmake cmake/Common.cmake
+--- cmake/Common.cmake	2010-08-25 09:43:32.338917877 +0200
++++ cmake/Common.cmake	2010-05-15 19:14:29.000000000 +0200
+@@ -51,6 +51,9 @@
+ function(add_our_executable nm)
+     add_executable(${nm} ${ARGN})
+     target_link_libraries(${nm} allegro)
++    if(PSP)
++        add_psp_executable(${nm})
++    endif(PSP)
+ endfunction()
+ 
+ # Oh my. CMake really is bad for this - but I couldn't find a better
+diff -Naur cmake/FileList.cmake cmake/FileList.cmake
+--- cmake/FileList.cmake	2010-08-25 09:43:32.338917877 +0200
++++ cmake/FileList.cmake	2010-04-11 23:35:42.000000000 +0200
+@@ -328,10 +328,14 @@
+         src/psp/pdrivers.c
+         src/psp/pfile.c
+         src/psp/pgfx.c
++        src/psp/pjoy.c
+         src/psp/pkey.c
+-        src/psp/pmain.c
++        src/psp/pmouse.c
+         src/psp/psound.c
+         src/psp/psystem.c
++        src/psp/ptimer.c
++        src/psp/pvram.c
++        src/psp/pvtable8.c
+         src/misc/colconv.c
+         )
+ 
+diff -Naur cmake/Toolchain-psp-gcc.cmake cmake/Toolchain-psp-gcc.cmake
+--- cmake/Toolchain-psp-gcc.cmake	1970-01-01 01:00:00.000000000 +0100
++++ cmake/Toolchain-psp-gcc.cmake	2010-05-16 14:19:14.000000000 +0200
+@@ -0,0 +1,73 @@
++# Use this command to build the PSP port of Allegro:
++#
++#   cmake -DWANT_TESTS=off -DWANT_TOOLS=off -DWANT_LOGG=off -DWANT_ALLEGROGL=off -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-psp-gcc.cmake .
++#
++# or for out of source:
++#
++#   cmake -DWANT_TESTS=off -DWANT_TOOLS=off -DWANT_LOGG=off -DWANT_ALLEGROGL=off -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-psp-gcc.cmake ..
++#
++# You will need at least CMake 2.6.0.
++#
++# Adjust the following paths to suit your environment.
++#
++# This file was based on http://www.cmake.org/Wiki/CmakeMingw
++
++# The name of the target operating system.
++set(CMAKE_SYSTEM_NAME Generic)
++
++# Location of target environment.
++find_program(psp-config_SCRIPT psp-config)
++if (psp-config_SCRIPT)
++    execute_process(COMMAND ${psp-config_SCRIPT}
++                    ARGS --psp-prefix
++                    OUTPUT_VARIABLE PSP_PREFIX
++                    OUTPUT_STRIP_TRAILING_WHITESPACE)
++    execute_process(COMMAND ${psp-config_SCRIPT}
++                    ARGS --pspsdk-path
++                    OUTPUT_VARIABLE PSPSDK_PATH
++                    OUTPUT_STRIP_TRAILING_WHITESPACE)
++else (psp-config_SCRIPT)
++    message(FATAL_ERROR "psp-config was not found.\nInstall the PSPDEV toolchain or update the $PATH environment variable.")
++endif (psp-config_SCRIPT)
++
++set(CMAKE_SYSTEM_INCLUDE_PATH "${PSP_PREFIX}/include")
++set(CMAKE_SYSTEM_LIBRARY_PATH "${PSP_PREFIX}/lib")
++set(CMAKE_SYSTEM_PROGRAM_PATH "${PSP_PREFIX}/bin")
++
++# Which compilers to use for C and C++.
++set(CMAKE_C_COMPILER psp-gcc)
++set(CMAKE_CXX_COMPILER psp-g++)
++
++# Needed to pass the compiler tests.
++set(LINK_DIRECTORIES ${PSPSDK_PATH}/lib)
++set(LINK_LIBRARIES -lc -lpspuser -lpspkernel -lc)
++
++# Adjust the default behaviour of the FIND_XXX() commands:
++# search headers and libraries in the target environment, search
++# programs in the host environment.
++set(CMAKE_FIND_ROOT_PATH ${PSP_PREFIX})
++set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
++set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
++set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
++
++# After building the ELF binary build the PSP executable.
++function(add_psp_executable nm)
++    get_target_property(PSP_EXECUTABLE_OUTPUT_NAME ${nm} OUTPUT_NAME)
++    if (NOT PSP_EXECUTABLE_OUTPUT_NAME)
++        set(PSP_EXECUTABLE_OUTPUT_NAME ${nm})
++    endif(NOT PSP_EXECUTABLE_OUTPUT_NAME)
++    set_target_properties(
++        ${nm}
++        PROPERTIES LINK_FLAGS "-specs=${PSPSDK_PATH}/lib/prxspecs -Wl,-q,-T${PSPSDK_PATH}/lib/linkfile.prx ${PSPSDK_PATH}/lib/prxexports.o -L${PSPSDK_PATH}/lib"
++        )
++    add_custom_command(
++        TARGET ${nm}
++        POST_BUILD 
++        COMMAND psp-fixup-imports ${PSP_EXECUTABLE_OUTPUT_NAME}
++        COMMAND mksfo '${PSP_EXECUTABLE_OUTPUT_NAME}' PARAM.SFO
++        COMMAND psp-prxgen ${PSP_EXECUTABLE_OUTPUT_NAME} ${PSP_EXECUTABLE_OUTPUT_NAME}.prx
++        COMMAND pack-pbp EBOOT.PBP PARAM.SFO NULL NULL NULL NULL NULL ${PSP_EXECUTABLE_OUTPUT_NAME}.prx NULL
++    )
++endfunction()
++
++set(PSP 1)
+diff -Naur CMakeLists.txt CMakeLists.txt
+--- CMakeLists.txt	2010-08-25 09:43:54.958221999 +0200
++++ CMakeLists.txt	2010-05-16 14:19:56.000000000 +0200
+@@ -294,6 +294,12 @@
+     set(ALLEGRO_UNIX 1)
+ endif()
+ 
++if(PSP)
++    set(ALLEGRO_PSP 1)
++    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -G0")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -G0 -fno-exceptions -fno-rtti")
++endif(PSP)
++
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WFLAGS} ${WFLAGS_C_ONLY}")
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WFLAGS}")
+ 
+@@ -624,6 +631,16 @@
+ 	)
+ endif(ALLEGRO_MACOSX)
+ 
++# -- PSP --
++
++if(PSP)
++    include_directories(SYSTEM ${PSPSDK_PATH}/include)
++    link_directories(${PSPSDK_PATH}/lib)
++    list(APPEND PLATFORM_SOURCES ${ALLEGRO_SRC_PSP_FILES})
++    list(APPEND PLATFORM_LIBS
++    m pspaudio pspgu psprtc pspdebug pspdisplay pspge pspctrl pspsdk c pspnet pspnet_inet pspnet_resolver psputility pspuser pspkernel)
++endif(PSP)
++
+ #-----------------------------------------------------------------------------#
+ #
+ # Generate and install headers
+@@ -793,6 +810,20 @@
+     install_our_library(alleg-main)
+ endif(APPLE AND SHARED OR WANT_FRAMEWORKS)
+ 
++if(PSP)
++    add_our_library(alleg-main STATIC
++	src/psp/pmain.c
++	)
++    set_target_properties(alleg-main
++	PROPERTIES
++	OUTPUT_NAME alleg-main${BUILD_TYPE_SUFFIX}
++	COMPILE_FLAGS -DALLEGRO_SRC
++	)
++    target_link_libraries(alleg-main pspuser pspkernel)
++    target_link_libraries(allegro alleg-main)
++    install_our_library(alleg-main)
++endif(PSP)
++
+ #-----------------------------------------------------------------------------#
+ #
+ # allegro-config script
+diff -Naur include/allegro/platform/aintpsp.h include/allegro/platform/aintpsp.h
+--- include/allegro/platform/aintpsp.h	2010-08-25 09:43:32.911204512 +0200
++++ include/allegro/platform/aintpsp.h	2009-01-24 18:17:05.000000000 +0100
+@@ -20,18 +20,54 @@
+ #define AINTPSP_H
+ 
+ 
+-#define DEFAULT_SCREEN_WIDTH       480
+-#define DEFAULT_SCREEN_HEIGHT      272
+-#define DEFAULT_COLOR_DEPTH         16
++/* For accelerated blitting support .*/
++AL_FUNC(BITMAP *, psp_create_bitmap, (int color_depth, int width, int height));
++AL_FUNC(int, psp_destroy_bitmap, (BITMAP *bitmap));
+ 
+-#define BMP_EXTRA(bmp)		    ((BMP_EXTRA_INFO *)((bmp)->extra))
++/* Extra bitmap info. */
++#define BMP_EXTRA(bmp)         ((BMP_EXTRA_INFO *)((bmp)->extra))
+ 
+ typedef struct BMP_EXTRA_INFO
+ {
+    int pitch;
+-   BITMAP *parent;
++   /* For video bitmaps. */
++   int size;
++   uintptr_t hw_addr;
+ } BMP_EXTRA_INFO;
+ 
++#define ALIGN_TO(v,n)          ((v + n-1) & ~(n-1))
++
++
++/* For 8 bpp support. */
++AL_VAR(GFX_VTABLE, psp_vtable8);
++AL_FUNC(void, psp_do_stretch_blit8, (BITMAP *source, BITMAP *dest, int source_x, int source_y, int source_width, int source_height, int dest_x, int dest_y, int dest_width, int dest_height, int masked));
++
++/* The video bitmap actually displayed on the PSP. */
++BITMAP *displayed_video_bitmap;
++
++AL_FUNC(void, psp_draw_to_screen, (void));
++
++
++/* Video memory manager stuff. */
++#define VMM_NO_MEM             ((uintptr_t)0)
++
++typedef struct VRAM_HOLE
++{
++   uintptr_t h_base;
++   unsigned int h_len;
++   struct VRAM_HOLE *h_next;
++} VRAM_HOLE;
++
++AL_FUNC(void, vmm_init, (uintptr_t base, unsigned int available_vram));
++AL_FUNC(uintptr_t, vmm_alloc_mem, (unsigned int size));
++AL_FUNC(void, vmm_free_mem, (uintptr_t base, unsigned int size));
++
++
++/* PSP controller stuff. */
++#define SAMPLING_CYCLE 0
++#define SAMPLING_MODE  PSP_CTRL_MODE_DIGITAL
++
++AL_FUNC(void, _psp_init_controller, (int cycle, int mode));
+ 
+ #endif
+ 
+diff -Naur include/allegro/platform/alpspcfg.h include/allegro/platform/alpspcfg.h
+--- include/allegro/platform/alpspcfg.h	2010-08-25 09:43:32.911204512 +0200
++++ include/allegro/platform/alpspcfg.h	2009-01-22 16:42:53.000000000 +0100
+@@ -29,7 +29,7 @@
+    #define ALLEGRO_MAGIC_MAIN
+    #define main _mangled_main
+    #undef END_OF_MAIN
+-   #define END_OF_MAIN() void *_mangled_main_address = _mangled_main;
++   #define END_OF_MAIN() void *_mangled_main_address = (void *) _mangled_main;
+ #else
+    #undef END_OF_MAIN
+    #define END_OF_MAIN() void *_mangled_main_address;
+diff -Naur include/allegro/platform/alpsp.h include/allegro/platform/alpsp.h
+--- include/allegro/platform/alpsp.h	2010-08-25 09:43:32.911204512 +0200
++++ include/allegro/platform/alpsp.h	2010-04-12 22:22:37.000000000 +0200
+@@ -23,7 +23,6 @@
+    #error bad include
+ #endif
+ 
+-#include <stdio.h>
+ 
+ /* System driver */
+ #define SYSTEM_PSP              AL_ID('P','S','P',' ')
+@@ -37,6 +36,10 @@
+ #define KEYSIM_PSP              AL_ID('P','S','P','K')
+ AL_VAR(KEYBOARD_DRIVER, keybd_simulator_psp);
+ 
++/* Mouse drivers */
++#define MOUSE_PSP               AL_ID('P','S','P','M')
++AL_VAR(MOUSE_DRIVER, mouse_psp);
++
+ /* Gfx driver */
+ #define GFX_PSP                 AL_ID('P','S','P','G')
+ AL_VAR(GFX_DRIVER, gfx_psp);
+diff -Naur src/fli.c src/fli.c
+--- src/fli.c	2010-08-25 09:43:40.422958000 +0200
++++ src/fli.c	2010-04-18 19:26:59.000000000 +0200
+@@ -193,7 +193,7 @@
+ #define READ_CHAR_NC(p)    (*(signed char *)(p)++)
+ #endif
+ 
+-#if (defined ALLEGRO_GCC) && (defined ALLEGRO_LITTLE_ENDIAN) && (!defined ALLEGRO_ARM)
++#if (defined ALLEGRO_GCC) && (defined ALLEGRO_LITTLE_ENDIAN) && (!defined ALLEGRO_ARM) && (!defined ALLEGRO_PSP)
+ 
+ #if 0
+ /* the "cast expression as lvalue" extension is deprecated in GCC 3.4 */
+diff -Naur src/psp/pdatafile.c src/psp/pdatafile.c
+--- src/psp/pdatafile.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pdatafile.c	1970-01-01 01:00:00.000000000 +0100
+@@ -1,52 +0,0 @@
+-/*         ______   ___    ___
+- *        /\  _  \ /\_ \  /\_ \
+- *        \ \ \L\ \\//\ \ \//\ \      __     __   _ __   ___
+- *         \ \  __ \ \ \ \  \ \ \   /'__`\ /'_ `\/\`'__\/ __`\
+- *          \ \ \/\ \ \_\ \_ \_\ \_/\  __//\ \L\ \ \ \//\ \L\ \
+- *           \ \_\ \_\/\____\/\____\ \____\ \____ \ \_\\ \____/
+- *            \/_/\/_/\/____/\/____/\/____/\/___L\ \/_/ \/___/
+- *                                           /\____/
+- *                                           \_/__/
+- *
+- *      PSP datafile bitmap objects reading routines.
+- *      Used by the PSP gfx drivers with scaling capabilities.
+- *
+- *      By diedel.
+- *
+- *      See readme.txt for copyright information.
+- */
+-
+-
+-#include "allegro.h"
+-#include "allegro/internal/aintern.h"
+-
+-
+-static BITMAP *psp_scaled_read_bitmap(PACKFILE *f, int bits, int allowconv)
+-{
+-   /* Sustituimos la llamada original a create_bitmap_ex por esta
+-    * para que no haga escalado. */
+-   bmp = psp_create_bitmap_ex(color_depth, width, height, FALSE);
+-
+-   /******************************************************************/
+-   /* Código justo a continuación del código original de read_bitmap */
+-   BITMAP *tmp = bmp;
+-   bmp = psp_create_bitmap_ex(destbits, w*scale_factor, h*scale_factor, FALSE);
+-   if (!bmp) {
+-      *allegro_errno = ENOMEM;
+-      return NULL;
+-   }
+-
+-   /* Escalamos el bitmap leído del datafile */
+-   stretch_blit(tmp, bmp, 0, 0, tmp->w, tmp->h, 0, 0, bmp->w, bmp->h);
+-
+-   destroy_bitmap(tmp);
+-}
+-
+-
+-
+-static void *psp_load_bitmap_object(PACKFILE *f, long size)
+-{
+-   short bits = pack_mgetw(f);
+-
+-   return psp_scaled_read_bitmap(f, bits, TRUE);
+-}
+diff -Naur src/psp/pdrivers.c src/psp/pdrivers.c
+--- src/psp/pdrivers.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pdrivers.c	2010-04-11 23:34:09.000000000 +0200
+@@ -40,14 +40,14 @@
+ 
+ _DRIVER_INFO _timer_driver_list[] =
+ {
+- //  { TIMER_PSP,               &timer_psp,               TRUE  },
++   { TIMER_PSP,               &timer_psp,               TRUE  },
+    { 0,                       NULL,                     0     }
+ };
+ 
+ 
+ _DRIVER_INFO _mouse_driver_list[] =
+ {
+-// { MOUSE_PSP,               &mouse_psp,               TRUE  },
++   { MOUSE_PSP,               &mouse_psp,               TRUE  },
+    { 0,                       NULL,                     0     }
+ };
+ 
+@@ -66,12 +66,11 @@
+ };
+ 
+ 
+-_DRIVER_INFO _midi_driver_list[] =
+-{
+-   { 0,                        NULL,                    0     }
+-};
++BEGIN_MIDI_DRIVER_LIST
++MIDI_DRIVER_DIGMID
++END_MIDI_DRIVER_LIST
+ 
+ 
+ BEGIN_JOYSTICK_DRIVER_LIST
+-//{   JOYSTICK_PSP,              &joystick_psp,           TRUE  },
++{   JOYSTICK_PSP,              &joystick_psp,           TRUE  },
+ END_JOYSTICK_DRIVER_LIST
+diff -Naur src/psp/pfile.c src/psp/pfile.c
+--- src/psp/pfile.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pfile.c	2008-10-29 22:11:30.000000000 +0100
+@@ -85,3 +85,8 @@
+ {
+ }
+ 
++
++
++void _al_detect_filename_encoding(void)
++{
++}
+diff -Naur src/psp/pgfx.c src/psp/pgfx.c
+--- src/psp/pgfx.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pgfx.c	2010-05-14 22:53:09.000000000 +0200
+@@ -12,41 +12,55 @@
+  *
+  *      By diedel.
+  *
+- *      The blit to screen routine is based on the Basilisk II PSP refresh
+- *      routines by J.F.
++ *      The psp_draw_to_screen() routine is based on the Basilisk II
++ *      PSP refresh routines by J.F.
+  *
+  *      See readme.txt for copyright information.
+  */
+ 
++
+ #include "allegro.h"
+ #include "allegro/internal/aintern.h"
+ #include "allegro/platform/aintpsp.h"
+-#include <stdio.h>
++#include <math.h>
+ #include <pspdisplay.h>
+ #include <pspgu.h>
++#include <psputils.h>
+ 
+ #ifndef ALLEGRO_PSP
+    #error something is wrong with the makefile
+ #endif
+ 
+ 
+-#define BUF_WIDTH       640
+-#define SCR_WIDTH       480
+-#define SCR_HEIGHT      272
+-#define PIXEL_SIZE        4
+-
+-static unsigned int FRAME_SIZE = BUF_WIDTH * SCR_HEIGHT * PIXEL_SIZE;
+-static unsigned int DISP_BUF = 0;
+-static unsigned int DRAW_BUF;
+-static unsigned int TEX_BUF;
+-static unsigned int DEBUG_BUF;
++#define MAX_SCR_WIDTH                  (480)
++#define MAX_SCR_HEIGHT                 (272)
++#define MIN_BUF_WIDTH                  (512)
++#define PALETTE_PIXEL_SIZE               (4)
++#define VIDEO_REFRESH_RATE              (60)
++#define DISPLAY_SIZE     (MIN_BUF_WIDTH * MAX_SCR_HEIGHT * PALETTE_PIXEL_SIZE)
++
+ 
++/* The width in pixels of the display framebuffer. */
++static unsigned int framebuf_width;
+ 
+-static enum PspDisplayPixelFormats psp_display_pixel_format;
++/* The PSP pixel format. */
+ static int gu_psm_format;
+ 
++/* Pointer to the texture area actually displayed onto the screen.
++ * Only for the 8 bpp mode.
++ */
++static unsigned char *texture_start;
++
++/* Number of vertical black pulses at the start of
++ * a triple buffering operation. */
++static unsigned int vcount_start = 0;
++
+ static unsigned int __attribute__((aligned(16))) list[16384];
+ 
++/* The current palette in 8 bpp mode. */
++static unsigned int __attribute__((aligned(16))) clut[256];
++
++
+ struct TEX_VERTEX
+ {
+    unsigned short u, v;
+@@ -54,13 +68,24 @@
+ };
+ 
+ 
++/* Software version of some blitting methods */
++static void (*_orig_blit) (BITMAP * source, BITMAP * dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
+ 
+-static BITMAP *psp_display_init(int, int, int, int, int);
+-static void setup_gu(void);
+-static void psp_created_sub_bitmap(BITMAP *bmp, BITMAP *parent);
+-static void psp_blit_to_self(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
+-static void psp_draw_to_screen(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
+ 
++static BITMAP *psp_display_init(int w, int h, int v_w, int v_h, int color_depth);
++static void gfx_psp_enable_acceleration(GFX_VTABLE *vtable);
++static void gfx_psp_enable_triple_buffering(GFX_DRIVER *drv);
++static void setup_gu(void);
++static int psp_scroll(int x, int y);
++static void psp_vsync(void);
++static void psp_hw_blit(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height);
++static void psp_set_palette(AL_CONST RGB *p, int from, int to, int retracesync);
++static int psp_request_scroll(int x, int y);
++static int psp_poll_scroll(void);
++static BITMAP *psp_create_video_bitmap(int width, int height);
++static void psp_destroy_video_bitmap(BITMAP *bitmap);
++static int psp_show_video_bitmap(BITMAP *bitmap);
++static int psp_request_video_bitmap(BITMAP *bitmap);
+ 
+ 
+ GFX_DRIVER gfx_psp =
+@@ -71,15 +96,15 @@
+    "PSP gfx driver",
+    psp_display_init,             /* AL_METHOD(struct BITMAP *, init, (int w, int h, int v_w, int v_h, int color_depth)); */
+    NULL,                         /* AL_METHOD(void, exit, (struct BITMAP *b)); */
+-   NULL,                         /* AL_METHOD(int, scroll, (int x, int y)); */
+-   NULL,//sceDisplayWaitVblankStart,    /* AL_METHOD(void, vsync, (void)); */
+-   NULL,                         /* AL_METHOD(void, set_palette, (AL_CONST struct RGB *p, int from, int to, int retracesync)); */
++   psp_scroll,                   /* AL_METHOD(int, scroll, (int x, int y)); */
++   psp_vsync,                    /* AL_METHOD(void, vsync, (void)); */
++   psp_set_palette,              /* AL_METHOD(void, set_palette, (AL_CONST struct RGB *p, int from, int to, int retracesync)); */
+    NULL,                         /* AL_METHOD(int, request_scroll, (int x, int y)); */
+    NULL,                         /* AL_METHOD(int, poll_scroll, (void)); */
+    NULL,                         /* AL_METHOD(void, enable_triple_buffer, (void)); */
+-   NULL, //   create_psp_video_bitmap,                         /* AL_METHOD(struct BITMAP *, create_video_bitmap, (int width, int height)); */
+-   NULL, //   destroy_psp_video_bitmap,                        /* AL_METHOD(void, destroy_video_bitmap, (struct BITMAP *bitmap)); */
+-   NULL,                         /* AL_METHOD(int, show_video_bitmap, (BITMAP *bitmap)); */
++   psp_create_video_bitmap,      /* AL_METHOD(struct BITMAP *, create_video_bitmap, (int width, int height)); */
++   psp_destroy_video_bitmap,     /* AL_METHOD(void, destroy_video_bitmap, (struct BITMAP *bitmap)); */
++   psp_show_video_bitmap,        /* AL_METHOD(int, show_video_bitmap, (BITMAP *bitmap)); */
+    NULL,                         /* AL_METHOD(int, request_video_bitmap, (BITMAP *bitmap)); */
+    NULL,                         /* AL_METHOD(BITMAP *, create_system_bitmap, (int width, int height)); */
+    NULL,                         /* AL_METHOD(void, destroy_system_bitmap, (BITMAP *bitmap)); */
+@@ -103,27 +128,32 @@
+ 
+ 
+ 
++
+ /* psp_display_init:
+  *  Initializes the gfx mode.
+- *  If the screen dimensions (w, h) are greater than the PSP
+- *  screen dimensions we downscale it.
+- *  TODO: Support for virtual screens, scrolling and triple buffer.
+  */
+ static BITMAP *psp_display_init(int w, int h, int v_w, int v_h, int color_depth)
+ {
++   GFX_VTABLE *vtable = _get_vtable(color_depth);
+    BITMAP *psp_screen;
+-   void *vram_start;
+-   int bytes_per_line;
++   uintptr_t vram_start, screen_start;
++   int available_vram, framebuf_height, framebuf_size;
++   int top_margin, left_margin, bytes_per_line;
+ 
+    switch (color_depth) {
+-      // TODO: Support 8 and maybe 24 bpp.
++      case  8:
++         gu_psm_format = GU_PSM_T8;
++         break;
++
++      case  15:
++         gu_psm_format = GU_PSM_5551;
++         break;
++
+       case 16:
+-         psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_565;
+          gu_psm_format = GU_PSM_5650;
+          break;
+ 
+       case 32:
+-         psp_display_pixel_format = PSP_DISPLAY_PIXEL_FORMAT_8888;
+          gu_psm_format = GU_PSM_8888;
+          break;
+ 
+@@ -132,59 +162,163 @@
+          return NULL;
+    }
+ 
+-   //printf_file = fopen("printf.log", "w");
++   if (w > MAX_SCR_WIDTH || h > MAX_SCR_HEIGHT) {
++      ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Resolution not supported"));
++      return NULL;
++   }
+ 
+-   //vram_start = (void *)sceGeEdramGetAddr();
+-   vram_start = (void *)( 0x40000000 | (uint32_t)sceGeEdramGetAddr() );
+-   bytes_per_line = BYTES_PER_PIXEL(color_depth) * BUF_WIDTH;
+-   psp_screen = _make_bitmap(w, h, (uintptr_t)vram_start, &gfx_psp, color_depth, bytes_per_line);
+-   if (!psp_screen) {
++   /* Virtual screen management. */
++   if (v_w < w)
++      v_w = w;
++   if (v_h < h)
++      v_h = h;
++
++   if ( (gu_psm_format != GU_PSM_T8) && ((v_w > w && w < MAX_SCR_WIDTH) || (v_h > h && h < MAX_SCR_HEIGHT)) ) {
++      ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Virtual screen not valid"));
++      return NULL;
++   }
++
++   /* How many VRAM we need? */
++   available_vram = sceGeEdramGetSize();
++   vram_start =  (uintptr_t)sceGeEdramGetAddr();
++   if (gu_psm_format == GU_PSM_T8) {
++      /* To support the 8 bpp mode we have to set the framebuffer as
++       * a palettized texture outside the display area.
++       */
++      available_vram -= DISPLAY_SIZE;
++      vram_start += DISPLAY_SIZE;
++      screen_start = vram_start;
++      texture_start = (unsigned char *)screen_start;
++      framebuf_width = ALIGN_TO(v_w, 16);
++      framebuf_height = v_h;
++   }
++   else {
++      framebuf_width = ALIGN_TO(v_w ,64);
++      framebuf_width = MAX(MIN_BUF_WIDTH, framebuf_width);
++      framebuf_height = MAX(MAX_SCR_HEIGHT, v_h);
++
++      /* Center the screen. */
++      top_margin = (MAX_SCR_HEIGHT - h) / 2;
++      left_margin = (MAX_SCR_WIDTH - w) / 2;
++      screen_start = vram_start + (top_margin * framebuf_width + left_margin) * BYTES_PER_PIXEL(color_depth);
++      screen_start |= 0x40000000;
++   }
++   bytes_per_line = framebuf_width * BYTES_PER_PIXEL(color_depth);
++   framebuf_size = framebuf_height * bytes_per_line;
++   if ( framebuf_size > available_vram) {
++      ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Virtual screen size too large"));
++      return NULL;
++   }
++
++   /* Create the Allegro screen bitmap. */
++   psp_screen = _make_bitmap(v_w, v_h, screen_start, &gfx_psp, color_depth, bytes_per_line);
++   if (psp_screen)
++      psp_screen->extra = _AL_MALLOC(sizeof(struct BMP_EXTRA_INFO));
++   if (!psp_screen || !psp_screen->extra) {
+       ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Not enough memory"));
+       return NULL;
+    }
+ 
+-   DRAW_BUF = FRAME_SIZE;
+-   TEX_BUF = DRAW_BUF + FRAME_SIZE;
+-   DEBUG_BUF = TEX_BUF + 64*4*576;
++   /* Used in the scrolling routines. */
++   BMP_EXTRA(psp_screen)->hw_addr = vram_start;
++
++   available_vram -= framebuf_size;
++   vram_start += framebuf_size;
++
++   BMP_EXTRA(psp_screen)->pitch = framebuf_width;
+ 
++   /* Initialize the PSP video. */
+    setup_gu();
+-   //sceGuInit();
+-   //sceDisplaySetFrameBuf(vram_start, BUF_WIDTH, psp_display_pixel_format, PSP_DISPLAY_SETBUF_NEXTFRAME);
++
++   _set_current_refresh_rate(VIDEO_REFRESH_RATE);
++
++   /* Initialize the video memory manager. */
++   vmm_init(vram_start, available_vram);
+ 
+    /* physical (not virtual!) screen size */
+    gfx_psp.w = psp_screen->cr = w;
+    gfx_psp.h = psp_screen->cb = h;
+ 
+-   /* We install the blit accelerated versions and other specific functions. */
+-   __linear_vtable16.created_sub_bitmap = psp_created_sub_bitmap;
+-   _screen_vtable.blit_from_memory = psp_draw_to_screen;
+-   __linear_vtable16.blit_to_self = psp_blit_to_self;
+-
+-   /* We register our load_bitmap_object routine. */
+-//   register_datafile_object(DAT_BITMAP, psp_load_bitmap_object, NULL);
+-   /* TODO: register our .pcx, .bmp, ... reading routines. */
++   if (gu_psm_format == GU_PSM_T8) {
++      /* Special routines to manage the 8 bpp color depth. */
++      vtable->do_stretch_blit = psp_do_stretch_blit8;
++      memcpy(&_screen_vtable, &psp_vtable8, sizeof(GFX_VTABLE));
++   }
++   else {
++      /* Only supported in truecolor modes. */
++      gfx_psp_enable_acceleration(vtable);
++      gfx_psp_enable_triple_buffering(&gfx_psp);
++   }
++
++   displayed_video_bitmap = psp_screen;
+ 
+    return psp_screen;
+ }
+ 
+ 
+ 
++/* gfx_psp_enable_acceleration:
++ *  Installs and activates some routines to accelerate Allegro.
++ */
++static void gfx_psp_enable_acceleration(GFX_VTABLE *vtable)
++{
++   /* Keep the original blitting methods */
++   _orig_blit = vtable->blit_to_self;
++
++   /* Accelerated blits. */
++   vtable->blit_from_memory = psp_hw_blit;
++   vtable->blit_to_memory = psp_hw_blit;
++   vtable->blit_from_system = psp_hw_blit;
++   vtable->blit_to_system = psp_hw_blit;
++   vtable->blit_to_self = psp_hw_blit;
++
++   _screen_vtable.blit_from_memory = psp_hw_blit;
++   _screen_vtable.blit_to_memory = psp_hw_blit;
++   _screen_vtable.blit_from_system = psp_hw_blit;
++   _screen_vtable.blit_to_system = psp_hw_blit;
++   _screen_vtable.blit_to_self = psp_hw_blit;
++
++   /* Supporting routines. */
++   system_driver->create_bitmap = psp_create_bitmap;
++   system_driver->destroy_bitmap = psp_destroy_bitmap;
++
++   gfx_capabilities |= (GFX_HW_VRAM_BLIT | GFX_HW_MEM_BLIT);
++}
++
++
++
++/* gfx_psp_enable_triple_buffering:
++ *  Installs the triple buffering capability.
++ */
++static void gfx_psp_enable_triple_buffering(GFX_DRIVER *drv)
++{
++   drv->request_scroll = psp_request_scroll;
++   drv->poll_scroll = psp_poll_scroll;
++   drv->request_video_bitmap = psp_request_video_bitmap;
++
++   gfx_capabilities |= GFX_CAN_TRIPLE_BUFFER;
++
++}
++
++
++
++/* setup_gu:
++ *  Initializes the PSP graphics hardware.
++ */
+ static void setup_gu(void)
+ {
+    sceGuInit();
+    sceGuStart(GU_DIRECT, list);
+-   sceGuDrawBuffer(gu_psm_format, 0, BUF_WIDTH);
+-   sceGuDispBuffer(SCR_WIDTH, SCR_HEIGHT, 0, BUF_WIDTH);
+-   sceGuDepthBuffer((void*)DEBUG_BUF,BUF_WIDTH);
+-   sceGuOffset(2048 - (SCR_WIDTH/2),2048 - (SCR_HEIGHT/2));
+-   sceGuViewport(2048,2048,SCR_WIDTH,SCR_HEIGHT);
+-   sceGuDepthRange(65535,0);
+-   sceGuDepthMask(GU_TRUE);
+-   sceGuDisable(GU_DEPTH_TEST);
+-   sceGuDisable(GU_BLEND);
+-   sceGuScissor(0,0,SCR_WIDTH,SCR_HEIGHT);
++   if (gu_psm_format == GU_PSM_T8) {
++      sceGuDrawBuffer(GU_PSM_8888, 0, MIN_BUF_WIDTH);
++      sceGuDispBuffer(MAX_SCR_WIDTH, MAX_SCR_HEIGHT, 0, MIN_BUF_WIDTH);
++   }
++   else {
++      sceGuDrawBuffer(gu_psm_format, 0, framebuf_width);
++      sceGuDispBuffer(MAX_SCR_WIDTH, MAX_SCR_HEIGHT, 0, framebuf_width);
++   }
++   sceGuScissor(0, 0, MAX_SCR_WIDTH, MAX_SCR_HEIGHT);
+    sceGuEnable(GU_SCISSOR_TEST);
+-   sceGuFrontFace(GU_CW);
+    sceGuEnable(GU_TEXTURE_2D);
+    sceGuClear(GU_COLOR_BUFFER_BIT);
+    sceGuFinish();
+@@ -195,129 +329,369 @@
+ 
+ 
+ 
+-/* psp_created_sub_bitmap:
+- *  We need some parent bitmap info when blitting sub bitmaps.
++/* psp_scroll:
++ *  PSP scrolling routine.
++ *  This handle horizontal scrolling in 8 pixel increments under 15 or 16
++ *  bpp modes and 4 pixel increments under 32 bpp mode.
++ *  The 8 bpp mode has no restrictions.
+  */
+-static void psp_created_sub_bitmap(BITMAP *bmp, BITMAP *parent)
++static int psp_scroll(int x, int y)
+ {
+-   bmp->extra = malloc(sizeof(struct BMP_EXTRA_INFO));
+-   BMP_EXTRA(bmp)->parent = parent;
++   uintptr_t new_addr;
++
++   if (_wait_for_vsync)
++      sceDisplayWaitVblankStart();
++
++   if (gu_psm_format == GU_PSM_T8) {
++      /* We position the texture data pointer at the requested coordinates
++       * and the screen display is updated.
++       */
++      displayed_video_bitmap = screen;
++      texture_start = screen->line[y] + x;
++      psp_draw_to_screen();
++   }
++   else {
++      /* Truecolor pixel formats. */
++      new_addr =  BMP_EXTRA(screen)->hw_addr + (y * framebuf_width + x) * BYTES_PER_PIXEL(bitmap_color_depth(screen));
++      sceDisplaySetFrameBuf((void *)new_addr, framebuf_width, gu_psm_format, PSP_DISPLAY_SETBUF_IMMEDIATE);
++   }
++
++   return 0;
+ }
+ 
+ 
+ 
+-/* psp_blit_to_self:
+- *  Accelerated ram -> ram blitting routine.
++/* psp_vsync:
++ *  Waits for a retrace.
+  */
+-static void psp_blit_to_self(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
++void psp_vsync(void)
+ {
+-   if (is_sub_bitmap(source)) {
+-      source_x = source->x_ofs + source_x;
+-      source_y = source->y_ofs + source_y;
+-      source=BMP_EXTRA(source)->parent;
+-   }
++   sceDisplayWaitVblankStart();
++}
+ 
+-   if (is_sub_bitmap(dest)) {
+-      dest_x = dest->x_ofs + dest_x;
+-      dest_y = dest->y_ofs + dest_y;
+-      dest=BMP_EXTRA(dest)->parent;
+-   }
++
++
++/* psp_hw_blit:
++ *  PSP accelerated blitting routine.
++ */
++static void psp_hw_blit(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
++{
++   void *source_ptr, *dest_ptr;
++
++   /* sceGuCopyImage() can transfer blocks of size <=1024x1024.
++    * Also the pitch of the source and destination buffers is limited
++    * to 2048 pixels.
++    */
++   if (width > 1024 || height > 1024 || BMP_EXTRA(source)->pitch > 2048 || BMP_EXTRA(dest)->pitch > 2048)
++      return _orig_blit(source, dest, source_x, source_y, dest_x, dest_y, width, height);
++
++   /* We position the pixel data pointers at the requested coordinates
++    * and we align it to 16 bytes. The x,y coordinates are modified accordly.
++    */
++   source_ptr = source->line[source_y] + source_x * BYTES_PER_PIXEL(bitmap_color_depth(source));
++   source_x = ((unsigned int)source_ptr & 0xF) / BYTES_PER_PIXEL(bitmap_color_depth(source));
++   source_y = 0;
++   source_ptr = (void *)((unsigned int)source_ptr & ~0xF);
++
++   dest_ptr = dest->line[dest_y] + dest_x * BYTES_PER_PIXEL(bitmap_color_depth(dest));
++   dest_x = ((unsigned int)dest_ptr & 0xF) / BYTES_PER_PIXEL(bitmap_color_depth(dest));
++   dest_y = 0;
++   dest_ptr = (void *)((unsigned int)dest_ptr & ~0xF);
+ 
+    /* The interesting part. */
++   sceKernelDcacheWritebackAll();
+    sceGuStart(GU_DIRECT,list);
+-   sceGuCopyImage(gu_psm_format, source_x, source_y, width, height, BMP_EXTRA(source)->pitch, source->line[0],
+-                   dest_x, dest_y, BMP_EXTRA(dest)->pitch, dest->line[0]);
++   sceGuCopyImage(gu_psm_format, source_x, source_y, width, height, BMP_EXTRA(source)->pitch, source_ptr, dest_x, dest_y, BMP_EXTRA(dest)->pitch, dest_ptr);
+    sceGuFinish();
+    sceGuSync(0,0);
+-
+-   return;
+ }
+ 
+ 
+ 
+ /* psp_draw_to_screen:
+- *  Accelerated ram -> screen blitting routine using textures
+- *  and maximizing the use of the texture-cache.
++ *  ONLY in 8 bpp video mode.
++ *  Draws the texture representing the screen to the PSP display
++ *  maximizing the use of the texture-cache.
+  */
+-static void psp_draw_to_screen(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
++void psp_draw_to_screen()
+ {
+-   unsigned int tex_slice;
+-   int h_slice = 64;
+-   int v_slice = height;
+-
+-   //int bpp = BYTES_PER_PIXEL(source->vtable->color_depth);
+-   int bpp = 2;
+-
+-   int i, j;
++   unsigned short texture_x;
++   unsigned char *texture_ptr;
++   short dest_x, dest_y;
++   int slice_w = 64;
++   int num_slices = ceil(SCREEN_W/(float)(slice_w));
++   int i;
+    struct TEX_VERTEX *vertices;
+ 
+-   int temp=width/h_slice;
+-   //unsigned int base_addr= 0x40000000 | ((unsigned int)sceGeEdramGetAddr() + TEX_BUF);
++   /* We align the texture data pointer to 16 bytes.
++    * The texture u coordinate is modified accordly.
++    */
++   texture_x = (unsigned int)texture_start & 0xF;
++   texture_ptr = (unsigned char *)((unsigned int)texture_start & ~0xF);
++
++   /* Blit the texture at the center of the screen. */
++   dest_x = (MAX_SCR_WIDTH - SCREEN_W) / 2;
++   dest_y = (MAX_SCR_HEIGHT - SCREEN_H) / 2;
++
++   sceKernelDcacheWritebackAll();
+ 
+    sceGuStart(GU_DIRECT,list);
++   sceGuTexMode(GU_PSM_T8,0,0,0);
++   sceGuTexImage(0, 512, 512, framebuf_width, texture_ptr);
++   sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
++   sceGuTexFilter(GU_LINEAR, GU_LINEAR);
+ 
+-   // copy the block to vram
+-   //sceGuCopyImage(gu_psm_format, 0, 0, BMP_EXTRA(source)->pitch, height, BMP_EXTRA(source)->pitch, source->dat, 0, 0, BMP_EXTRA(source)->pitch, (void*)base_addr);
+-   //sceGuTexSync();
++   for (i=0; i < num_slices; i++) {
++      vertices = (struct TEX_VERTEX*)sceGuGetMemory(2 * sizeof(struct TEX_VERTEX));
+ 
+-   sceGuEnable(GU_TEXTURE_2D);
+-   sceGuTexMode(gu_psm_format,0,0,0);
+-   sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
+-   sceGuTexFilter(GU_NEAREST, GU_NEAREST);
++      vertices[0].u = texture_x + i * slice_w;
++      vertices[0].v = 0;
++      vertices[1].u = vertices[0].u + slice_w;
++      if (vertices[1].u > texture_x + SCREEN_W)
++         vertices[1].u = texture_x + SCREEN_W;
++      vertices[1].v = vertices[0].v + SCREEN_H;
++
++      vertices[0].x =  dest_x + i * slice_w;
++      vertices[0].y = dest_y;
++      vertices[0].z = 0;
++      vertices[1].x = vertices[0].x + slice_w;
++      if (vertices[1].x > dest_x + SCREEN_W)
++         vertices[1].x = dest_x + SCREEN_W;
++      vertices[1].y = vertices[0].y + SCREEN_H;
++      vertices[1].z = 0;
+ 
+-   for (j=0; j<height/v_slice; j++)
+-      for (i=0; i<temp; i++) {
++      sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2,0,vertices);
++   }
+ 
+-         /* The texture chunk to draw. */
+-         //tex_slice = base_addr + j * v_slice * 640 * bpp + i * h_slice * bpp;
+-         tex_slice = (unsigned int)(source->dat) + j * v_slice * 640 * bpp + i * h_slice * bpp;
+-         sceGuTexImage(0, h_slice, 512, BMP_EXTRA(source)->pitch, (void *)tex_slice);
+-         sceGuTexSync();
+-
+-         vertices = (struct TEX_VERTEX*)sceGuGetMemory(2 * sizeof(struct TEX_VERTEX));
+-
+-         /* These chunk texture coordinates map to... */
+-         vertices[0].u = 0;
+-         vertices[0].v = 0;
+-
+-         vertices[1].u = h_slice;
+-         vertices[1].v = v_slice;
+-
+-         /* ... these PSP screen coordinates. */
+-         vertices[0].x = i * h_slice * SCR_WIDTH / width;
+-         vertices[0].y = j * v_slice * SCR_HEIGHT / height;
+-         vertices[0].z = 0;
+-
+-         vertices[1].x = (i+1) * h_slice * SCR_WIDTH / width;
+-         if (vertices[1].x > SCR_WIDTH)
+-            vertices[1].x = SCR_WIDTH;
+-         vertices[1].y = (j+1) * v_slice * SCR_HEIGHT / height;
+-         if (vertices[1].y > SCR_HEIGHT)
+-            vertices[1].y = SCR_HEIGHT;
+-         vertices[1].z = 0;
++   sceGuFinish();
++   sceGuSync(0,0);
++}
+ 
+-         /* Finally we draw the texture chunk. */
+-         sceGuDrawArray(GU_SPRITES,GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2,0,vertices);
+-      }
+ 
++
++/* psp_set_palette:
++ *  Sets the hardware palette for the 8 bpp video mode.
++ */
++static void psp_set_palette(AL_CONST RGB *p, int from, int to, int retracesync)
++{
++   int c;
++
++   /* Update the palette. */
++   for (c=from; c<=to; c++) {
++      clut[c] = makecol32(_rgb_scale_6[p[c].r], _rgb_scale_6[p[c].g], _rgb_scale_6[p[c].b]);
++   }
++   sceKernelDcacheWritebackAll();
++
++   if (retracesync)
++      sceDisplayWaitVblankStart();
++
++   sceGuStart(GU_DIRECT,list);
++   sceGuClutMode(GU_PSM_8888,0,0xff,0);   /* 32-bit palette */
++   sceGuClutLoad((256/8),clut);           /* upload 32 blocks of 8 entries (256) */
+    sceGuFinish();
+    sceGuSync(0,0);
++
++   psp_draw_to_screen();
+ }
+ 
+ 
+-/*static void scaled_blit_to_self(BITMAP *source, BITMAP *dest, int source_x, int source_y, int dest_x, int dest_y, int width, int height)
++
++/* psp_request_scroll:
++ *  Attempts to initiate a triple buffered hardware scroll, which will
++ *  take place during the next retrace. Returns 0 on success.
++ */ 
++static int psp_request_scroll(int x, int y)
+ {
+-   if (!source->extra->scaled) {
+-      BITMAP *tmp = source;
+-      source = create_bitmap(source->w * scale_factor, source->h * scale_factor);
+-      if (!bmp) {
+-         *allegro_errno = ENOMEM;
+-         return NULL;
++   uintptr_t new_addr;
++   
++   new_addr =  BMP_EXTRA(screen)->hw_addr + (y * framebuf_width + x) * BYTES_PER_PIXEL(bitmap_color_depth(screen));
++
++   vcount_start = sceDisplayGetVcount();
++   sceDisplaySetFrameBuf((void *)new_addr, framebuf_width, gu_psm_format, PSP_DISPLAY_SETBUF_NEXTFRAME);
++
++   return 0;
++}
++
++
++
++/* psp_poll_scroll:
++ *  This function is used for triple buffering. It checks the status of
++ *  a hardware scroll previously initiated by the request_scroll() or by
++ *  the request_video_bitmap() routines. 
++ */
++static int psp_poll_scroll(void)
++{
++   int ret;
++
++   /* A new vertical blank pulse has arrived? */
++   if (sceDisplayGetVcount() - vcount_start > 0) {
++      vcount_start = 0;
++      ret = 0;
++   }
++   else
++      ret = -1;
++
++   return ret;
++}
++
++
++
++/* psp_create_video_bitmap:
++ *  Attempts to make a bitmap object for accessing offscreen video memory.
++ */
++static BITMAP *psp_create_video_bitmap(int width, int height)
++{
++   uintptr_t vram_addr, bitmap_offset = 0;
++   GFX_VTABLE *vtable;
++   BITMAP *bitmap;
++   int pitch, used_height = height;
++   int i, size, top_margin, left_margin;
++
++   if (_color_depth == 8) {
++      if (width >= SCREEN_W && height >= SCREEN_H)
++         /* This video bitmap or the derived sub bitmaps can be used for
++          * page flipping. The pitch is calculated so that sceGuTexImage()
++          * works correctly in that case.
++          */
++         pitch = ALIGN_TO(width, 16);
++      else
++         /* A regular 8 bpp video bitmap. */
++         pitch = width;
++   }
++   else {
++      if (width == SCREEN_W && height == SCREEN_H) {
++         /* Special code for video bitmaps created under truecolor modes that
++          * can be used with the show_video_bitmap() and request_video_bitmap()
++          * functions for page flipping and triple buffering.
++          */
++         pitch = MIN_BUF_WIDTH;
++         used_height = MAX_SCR_HEIGHT;
++
++         /* Center the bitmap. */
++         top_margin = (MAX_SCR_HEIGHT - height) / 2;
++         left_margin = (MAX_SCR_WIDTH - width) / 2;
++         bitmap_offset = (top_margin * MIN_BUF_WIDTH + left_margin) * BYTES_PER_PIXEL(_color_depth);
+       }
++      else
++         /* A regular truecolor video bitmap.
++          * Its width must be multiple of 8 pixels in order to 
++          * blit properly using sceGuCopyImage().
++          */
++         pitch = ALIGN_TO(width, 8);
++   }
+ 
+-      stretch_blit(tmp, source, 0, 0,
++   /* Allocate video memory for the pixel data. */
++   size = pitch * used_height * BYTES_PER_PIXEL(_color_depth);
++   vram_addr = vmm_alloc_mem(size);
++   if (!vram_addr)
++      return NULL;
++
++   /* Clean it. */
++   for (i=0; i<size ;i++)
++      *((unsigned char *)(vram_addr+i)) = 0;
++
++   /* Create the Allegro bitmap. */
++   if (_color_depth == 8)
++      vtable = &psp_vtable8;
++   else
++      vtable = _get_vtable(_color_depth);
++   bitmap = _AL_MALLOC(sizeof(BITMAP) + (sizeof(char *) * height));
++   if (!vtable || !bitmap) {
++      vmm_free_mem(vram_addr, size);
++      return NULL;
++   }
++   bitmap->w = bitmap->cr = width;
++   bitmap->h = bitmap->cb = height;
++   bitmap->clip = TRUE;
++   bitmap->cl = bitmap->ct = 0;
++   bitmap->vtable = vtable;
++   bitmap->write_bank = bitmap->read_bank = _stub_bank_switch;
++   bitmap->id = BMP_ID_VIDEO;
++   bitmap->x_ofs = 0;
++   bitmap->y_ofs = 0;
++   bitmap->seg = _video_ds();
++
++   if (height > 0) {
++      bitmap->line[0] = (unsigned char *)(vram_addr + bitmap_offset);
++      for (i=1; i<height; i++)
++         bitmap->line[i] = bitmap->line[i-1] + pitch * BYTES_PER_PIXEL(_color_depth);
++   }
++
++   /* Setup info structure to store additional information. */
++   bitmap->extra = _AL_MALLOC(sizeof(struct BMP_EXTRA_INFO));
++   if (!bitmap->extra) {
++      vmm_free_mem(vram_addr, size);
++      _AL_FREE(bitmap);
++      return NULL;
+    }
++   BMP_EXTRA(bitmap)->pitch = pitch;
++   BMP_EXTRA(bitmap)->size = size;
++   BMP_EXTRA(bitmap)->hw_addr = vram_addr;
++
++   return bitmap;
++}
++
++
++
++/* psp_destroy_video_bitmap:
++ *  Restores the video ram used for the video bitmap and the system ram
++ *  used for the bitmap management structures.
++ */
++static void psp_destroy_video_bitmap(BITMAP *bitmap)
++{
++   if (!is_sub_bitmap(bitmap))
++      vmm_free_mem(BMP_EXTRA(bitmap)->hw_addr, BMP_EXTRA(bitmap)->size);
++
++   _AL_FREE(bitmap->extra);
++   _AL_FREE(bitmap);
++}
++
++
++
++/* psp_show_video_bitmap:
++ *  Page flipping function: swaps to display the specified video memory 
++ *  bitmap object (this must be the same size as the physical screen).
++ */
++int psp_show_video_bitmap(BITMAP *bitmap)
++{
++   if (_wait_for_vsync)
++      sceDisplayWaitVblankStart();
++
++   if (gu_psm_format == GU_PSM_T8) {
++      /* We position the texture data pointer at the new bitmap
++       * and the screen display is updated.
++       */
++      displayed_video_bitmap = bitmap;
++      texture_start = bitmap->line[0];
++      psp_draw_to_screen();
++   }
++   else {
++      /* Truecolor pixel formats. */
++      
++      /* No sub bitmaps are allowed. */
++      if (is_sub_bitmap(bitmap))
++         return -1;
++
++      sceDisplaySetFrameBuf((void *)BMP_EXTRA(bitmap)->hw_addr, BMP_EXTRA(bitmap)->pitch, gu_psm_format, PSP_DISPLAY_SETBUF_IMMEDIATE);
++   }
++
++   return 0;
++}
++
++
++
++/* psp_request_video_bitmap:
++ *  Triple buffering function: triggers a swap to display the specified 
++ *  video memory bitmap object, which will take place on the next retrace.
++ */
++static int psp_request_video_bitmap(BITMAP *bitmap)
++{
++   /* No sub bitmaps are allowed. */
++   if (is_sub_bitmap(bitmap))
++      return -1;
++
++   vcount_start = sceDisplayGetVcount();
++   sceDisplaySetFrameBuf((void *)BMP_EXTRA(bitmap)->hw_addr, BMP_EXTRA(bitmap)->pitch, gu_psm_format, PSP_DISPLAY_SETBUF_NEXTFRAME);
+ 
+-   return;
++   return 0;
+ }
+-*/
+diff -Naur src/psp/pjoy.c src/psp/pjoy.c
+--- src/psp/pjoy.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pjoy.c	2010-05-14 23:39:37.000000000 +0200
+@@ -15,13 +15,39 @@
+  *      See readme.txt for copyright information.
+  */
+ 
++
+ #include "allegro.h"
+ #include "allegro/internal/aintern.h"
++#include "allegro/platform/aintpsp.h"
++#include <pspctrl.h>
+ 
+ #ifndef ALLEGRO_PSP
+ #error something is wrong with the makefile
+ #endif
+ 
++#define PREFIX_I                "al-pjoy INFO: "
++#define PREFIX_W                "al-pjoy WARNING: "
++#define PREFIX_E                "al-pjoy ERROR: "
++
++
++/* The PSP controller no directional buttons. */
++struct _PSP_BUTTON
++{
++   char *name;
++   enum PspCtrlButtons code;
++} psp_controller_buttons[] = {
++   {"TRIANGLE", PSP_CTRL_TRIANGLE},
++   {"CIRCLE",   PSP_CTRL_CIRCLE},
++   {"CROSS",    PSP_CTRL_CROSS},
++   {"SQUARE",   PSP_CTRL_SQUARE},
++   {"LTRIGGER", PSP_CTRL_LTRIGGER},
++   {"RTRIGGER", PSP_CTRL_RTRIGGER},
++   {"SELECT",   PSP_CTRL_SELECT},
++   {"START",    PSP_CTRL_START}
++};
++
++#define NBUTTONS (sizeof psp_controller_buttons / sizeof psp_controller_buttons[0])
++
+ 
+ static int psp_joy_init(void);
+ static void psp_joy_exit(void);
+@@ -32,7 +58,7 @@
+    JOYSTICK_PSP,         // int  id;
+    empty_string,         // AL_CONST char *name;
+    empty_string,         // AL_CONST char *desc;
+-   "PSP Controller",     // AL_CONST char *ascii_name;
++   "PSP Digital Pad",    // AL_CONST char *ascii_name;
+    psp_joy_init,         // AL_METHOD(int, init, (void));
+    psp_joy_exit,         // AL_METHOD(void, exit, (void));
+    psp_joy_poll,         // AL_METHOD(int, poll, (void));
+@@ -49,6 +75,27 @@
+  */
+ static int psp_joy_init(void)
+ {
++   uint8_t b;
++
++   _psp_init_controller(SAMPLING_CYCLE, SAMPLING_MODE);
++
++   num_joysticks = 1;
++
++   for (b=0; b<NBUTTONS; b++) {
++      joy[0].button[b].name = psp_controller_buttons[b].name;
++      joy[0].num_buttons++;
++   }
++
++   joy[0].num_sticks = 1;
++   joy[0].stick[0].flags = JOYFLAG_DIGITAL;
++   joy[0].stick[0].num_axis = 2;
++   joy[0].stick[0].axis[0].name = "X axis";
++   joy[0].stick[0].axis[1].name = "Y axis";
++   joy[0].stick[0].name = "PSP digital pad";
++
++   TRACE(PREFIX_I "PSP digital pad installed\n");
++
++   return 0;
+ }
+ 
+ 
+@@ -67,4 +114,32 @@
+  */
+ static int psp_joy_poll(void)
+ {
++   SceCtrlData pad;
++   int buffers_to_read = 1;
++   uint8_t b;
++
++   sceCtrlPeekBufferPositive(&pad, buffers_to_read);
++
++   /* Report the status of the no directional buttons. */
++   for (b=0; b<NBUTTONS; b++)
++      joy[0].button[b].b = pad.Buttons & psp_controller_buttons[b].code;
++
++   /* Report the status of the directional buttons. */
++   joy[0].stick[0].axis[0].d1 = pad.Buttons & PSP_CTRL_LEFT;
++   joy[0].stick[0].axis[0].d2 = pad.Buttons & PSP_CTRL_RIGHT;
++   joy[0].stick[0].axis[1].d1 = pad.Buttons & PSP_CTRL_UP;
++   joy[0].stick[0].axis[1].d2 = pad.Buttons & PSP_CTRL_DOWN;
++
++   return 0;
++}
++
++
++
++/* _psp_init_controller:
++ *  Internal routine to initialize the PSP controller.
++ */
++void _psp_init_controller(int cycle, int mode)
++{
++   sceCtrlSetSamplingCycle(cycle);
++   sceCtrlSetSamplingMode(mode);
+ }
+diff -Naur src/psp/pkey.c src/psp/pkey.c
+--- src/psp/pkey.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pkey.c	2010-05-15 21:46:50.000000000 +0200
+@@ -19,6 +19,7 @@
+ 
+ #include "allegro.h"
+ #include "allegro/internal/aintern.h"
++#include "allegro/platform/aintpsp.h"
+ #include <pspctrl.h>
+ 
+ #ifndef ALLEGRO_PSP
+@@ -29,9 +30,6 @@
+ #define PREFIX_W                "al-pkey WARNING: "
+ #define PREFIX_E                "al-pkey ERROR: "
+ 
+-#define SAMPLING_CYCLE 0
+-#define SAMPLING_MODE  PSP_CTRL_MODE_DIGITAL
+-
+ 
+ static int psp_keyboard_init(void);
+ static void psp_keyboard_exit(void);
+@@ -42,23 +40,25 @@
+  * TODO: Choose an alternative mapping?
+  */
+ static const int psp_to_scancode[][2] = {
+-   { PSP_CTRL_SELECT,     KEY_ESC   },
+-   { PSP_CTRL_START,      KEY_ENTER },
+-   { PSP_CTRL_UP,         KEY_UP    },
+-   { PSP_CTRL_RIGHT,      KEY_RIGHT },
+-   { PSP_CTRL_DOWN,       KEY_DOWN  },
+-   { PSP_CTRL_LEFT,       KEY_LEFT  },
+-   { PSP_CTRL_TRIANGLE,   KEY_SPACE },
+-   { PSP_CTRL_CIRCLE,     KEY_SPACE },
+-   { PSP_CTRL_CROSS,      KEY_SPACE },
+-   { PSP_CTRL_SQUARE,     KEY_SPACE }
++   { PSP_CTRL_SELECT,     KEY_ESC      },
++   { PSP_CTRL_START,      KEY_ENTER    },
++   { PSP_CTRL_UP,         KEY_UP       },
++   { PSP_CTRL_RIGHT,      KEY_RIGHT    },
++   { PSP_CTRL_DOWN,       KEY_DOWN     },
++   { PSP_CTRL_LEFT,       KEY_LEFT     },
++   { PSP_CTRL_TRIANGLE,   KEY_LCONTROL },
++   { PSP_CTRL_CIRCLE,     KEY_ALT      },
++   { PSP_CTRL_CROSS,      KEY_SPACE    },
++   { PSP_CTRL_SQUARE,     KEY_TAB      },
++   { PSP_CTRL_LTRIGGER,   KEY_LSHIFT   },
++   { PSP_CTRL_RTRIGGER,   KEY_RSHIFT    }
+ };
+ 
+ #define NKEYS (sizeof psp_to_scancode / sizeof psp_to_scancode[0])
+ 
+ 
+ /* The last polled input. */
+-static SceCtrlData old_pad = {0, 0, 0, 0};
++static SceCtrlData old_pad = {0, 0, 0, 0, {0,0,0,0,0,0}};
+ 
+ 
+ KEYBOARD_DRIVER keybd_simulator_psp =
+@@ -86,8 +86,7 @@
+  */
+ static int psp_keyboard_init(void)
+ {
+-   sceCtrlSetSamplingCycle(SAMPLING_CYCLE);
+-   sceCtrlSetSamplingMode(SAMPLING_MODE);
++   _psp_init_controller(SAMPLING_CYCLE, SAMPLING_MODE);
+    TRACE(PREFIX_I "PSP keyboard installed\n");
+ 
+    /* TODO: Maybe write a keyboard "interrupt" handler using a dedicated thread
+@@ -112,7 +111,8 @@
+ {
+    SceCtrlData pad;
+    int buffers_to_read = 1;
+-   int i, changed;
++   uint8_t i;
++   int changed;
+ 
+    sceCtrlPeekBufferPositive(&pad, buffers_to_read);
+ 
+@@ -121,7 +121,7 @@
+       if (changed) {
+          if (pad.Buttons & psp_to_scancode[i][0]) {
+             TRACE(PREFIX_I "PSP Keyboard: [%d] pressed\n", psp_to_scancode[i][1]);
+-            _handle_key_press(0, psp_to_scancode[i][1]);
++            _handle_key_press(scancode_to_ascii(psp_to_scancode[i][1]), psp_to_scancode[i][1]);
+          }
+          else {
+             TRACE(PREFIX_I "PSP Keyboard: [%d] released\n", psp_to_scancode[i][1]);
+diff -Naur src/psp/pmain.c src/psp/pmain.c
+--- src/psp/pmain.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/pmain.c	2009-01-25 18:17:32.000000000 +0100
+@@ -17,9 +17,8 @@
+  *      See readme.txt for copyright information.
+  */
+ 
+-#include <pspkernel.h>
+ 
+-#undef main
++#include <pspkernel.h>
+ 
+ 
+ extern void *_mangled_main_address;
+@@ -29,6 +28,7 @@
+ /* Define the module info section */
+ PSP_MODULE_INFO("Allegro Application", PSP_MODULE_USER, 1, 1);
+ PSP_MAIN_THREAD_ATTR(PSP_THREAD_ATTR_USER);
++PSP_MAIN_THREAD_STACK_SIZE_KB(270);
+ PSP_HEAP_SIZE_KB(-256);
+ 
+ 
+@@ -75,11 +75,11 @@
+ /* main:
+  *  Replacement for main function.
+  */
+-int main(void)
++int main(int argc, char *argv[])
+ {
+-   int (*real_main) (void) = (int (*) (void)) _mangled_main_address;
++   int (*real_main) (int, char *[]) = (int (*) (int, char *[])) _mangled_main_address;
+ 
+    setup_callback();
+-   return (*real_main)();
++   return (*real_main)(argc, argv);
+ }
+ 
+diff -Naur src/psp/pmouse.c src/psp/pmouse.c
+--- src/psp/pmouse.c	1970-01-01 01:00:00.000000000 +0100
++++ src/psp/pmouse.c	2010-05-15 16:30:38.000000000 +0200
+@@ -0,0 +1,189 @@
++/*         ______   ___    ___
++ *        /\  _  \ /\_ \  /\_ \
++ *        \ \ \L\ \\//\ \ \//\ \      __     __   _ __   ___
++ *         \ \  __ \ \ \ \  \ \ \   /'__`\ /'_ `\/\`'__\/ __`\
++ *          \ \ \/\ \ \_\ \_ \_\ \_/\  __//\ \L\ \ \ \//\ \L\ \
++ *           \ \_\ \_\/\____\/\____\ \____\ \____ \ \_\\ \____/
++ *            \/_/\/_/\/____/\/____/\/____/\/___L\ \/_/ \/___/
++ *                                           /\____/
++ *                                           \_/__/
++ *
++ *      PSP mouse driver.
++ *      TODO:.
++ *
++ *      By sauron_le_noir some part of psp_mouse_timer_poll based on
++ *                        the sdl code of Nekuz0r
++ *
++ *      See readme.txt for copyright information.
++ */
++
++#include "allegro.h"
++#include "allegro/internal/aintern.h"
++#include "allegro/platform/aintpsp.h"
++
++#include "math.h"
++#include <pspctrl.h>
++
++#ifndef ALLEGRO_PSP
++#error something is wrong with the makefile
++#endif
++
++static int  psp_mouse_init(void);
++static void psp_mouse_exit(void);
++static void psp_mouse_position(int, int);
++static void psp_mouse_set_range(int, int, int, int);
++static void psp_mouse_get_mickeys(int *, int *);
++static void psp_mouse_timer_poll(void);
++
++
++MOUSE_DRIVER mouse_psp =
++{
++   MOUSE_PSP,
++   empty_string,
++   empty_string,
++   "psp mouse",
++   psp_mouse_init,
++   psp_mouse_exit,
++   NULL,       // AL_METHOD(void, poll, (void));
++   psp_mouse_timer_poll,                 // AL_METHOD(void, timer_poll, (void));
++   psp_mouse_position,
++   psp_mouse_set_range,
++   NULL,       // AL_METHOD(void, set_speed, (int xspeed, int yspeed));
++   psp_mouse_get_mickeys,
++   NULL,       // AL_METHOD(int,  analyse_data, (AL_CONST char *buffer, int size));
++   NULL,       // AL_METHOD(void,  enable_hardware_cursor, (AL_CONST int mode));
++   NULL        // AL_METHOD(int,  select_system_cursor, (AL_CONST int cursor));
++};
++
++static int mouse_minx = 0;
++static int mouse_miny = 0;
++static int mouse_maxx = 479;  /* 0 to 479 = 480 */
++static int mouse_maxy = 271;  /* 0 to 272 = 272 */   /* 480x272 is the resolution of the psp display */
++
++static SceCtrlData pad;
++static int aStickX = 0;
++static int aStickY = 0;
++static float aStickR;
++static float aStickA;
++static int x,y;
++static float Precision = 360.0f;
++
++
++
++static int getSqrRadius(int X, int Y) 
++{
++   return sqrt((X * X) + (Y * Y));
++}
++
++
++
++static int psp_mouse_init(void)
++{
++   sceCtrlSetSamplingCycle(0);
++   sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
++
++   return 3; //Num of buttons.
++}
++
++
++
++static void psp_mouse_timer_poll(void)
++{
++   sceCtrlPeekBufferPositive(&pad, 1);
++
++   if (pad.Buttons != 0)
++   {
++     sceCtrlReadBufferPositive(&pad, 1);
++     _mouse_b = 0;
++     if (pad.Buttons & PSP_CTRL_LTRIGGER) _mouse_b = 1;
++     if (pad.Buttons & PSP_CTRL_RTRIGGER) _mouse_b = 2;
++     if ( (pad.Buttons & PSP_CTRL_LTRIGGER) && (pad.Buttons & PSP_CTRL_RTRIGGER)) _mouse_b = 4;
++   }
++   aStickX = pad.Ly - 128;
++   aStickY = pad.Lx - 128;
++
++   aStickR = getSqrRadius(aStickX, aStickY);
++   if (aStickR > 100) {
++      if (getSqrRadius(aStickX, aStickY) > 30) {
++         aStickA = ((atan2f(aStickX, -aStickY) + M_PI) / (M_PI * 2)) * Precision;
++      } else {
++         aStickA = -1;     
++      }
++
++      //1° a 89°
++      if (aStickA >= 1 && aStickA <= (89 * (Precision / 360.0f))) {
++         x += (10 * (1 - (aStickA / (Precision / 360.0f) / 90)));
++         y -= (10 * (0 + (aStickA / (Precision / 360.0f) / 90)));
++      }
++      else if (aStickA >= (91 * (Precision / 360.0f)) && aStickA <= (179 * (Precision / 360.0f))) {
++         x -= (10 * (0 + (((aStickA / (Precision / 360.0f)) - 89) / 90)));
++         y -= (10 * (1 - (((aStickA / (Precision / 360.0f)) - 89) / 90)));
++      }
++      else if (aStickA >= (181 * (Precision / 360.0f)) && aStickA <= (269 * (Precision / 360.0f))) {
++         x -= (10 * (1 - (((aStickA / (Precision / 360.0f)) - 179) / 90)));
++         y += (10 * (0 + (((aStickA / (Precision / 360.0f)) - 179) / 90)));
++      }
++      else if (aStickA >= (271 * (Precision / 360.0f)) && aStickA <= (359 * (Precision / 360.0f))) {
++         x += (10 * (0 + (((aStickA / (Precision / 360.0f)) - 269) / 90)));
++         y += (10 * (1 - (((aStickA / (Precision / 360.0f)) - 269) / 90)));
++      }
++      else if (aStickA == 0) {
++         x += 10;
++      }
++      else if (aStickA == (90 * (Precision / 360.0f))) {
++         y -= 10;
++      }
++      else if (aStickA == (180 * (Precision / 360.0f))) {
++         x -= 10;
++      }
++      else if (aStickR == (270 * (Precision / 360.0f))) {
++         y += 10;
++      }
++   }
++   if (x < 0)
++      x = 0;
++
++   if (x > 479)
++      x = 479;
++
++   if (y < 0)
++      y = 0;
++
++   if (y > 271)
++      y = 271;
++
++   _mouse_x = x;
++   _mouse_y = y;
++}
++
++
++
++static void psp_mouse_position(int x, int y)
++{
++   _mouse_x = x;
++   if (_mouse_x <  mouse_minx) _mouse_x = 0;
++   if (_mouse_x > mouse_maxx)  _mouse_x = mouse_maxx;
++   _mouse_y = y;
++   if (_mouse_y < mouse_miny) _mouse_y = 0;
++   if (_mouse_y > mouse_maxy) _mouse_y = mouse_maxy;
++}
++
++
++
++static void psp_mouse_set_range(int x1, int y1, int x2, int y2)
++{
++}
++
++
++
++static void psp_mouse_get_mickeys(int *mickeyx, int *mickeyy)
++{
++   *mickeyx = 0;
++   *mickeyy = 0;
++}
++
++
++
++static void psp_mouse_exit(void)
++{
++}
+diff -Naur src/psp/psound.c src/psp/psound.c
+--- src/psp/psound.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/psound.c	2008-11-02 11:10:02.000000000 +0100
+@@ -35,7 +35,7 @@
+ static int digi_psp_detect(int);
+ static int digi_psp_init(int, int);
+ static void digi_psp_exit(int);
+-//static int digi_psp_buffer_size();
++static int digi_psp_buffer_size();
+ //static int digi_psp_set_mixer_volume(int);
+ 
+ 
+@@ -65,7 +65,7 @@
+ 
+    NULL,
+    NULL,
+-   NULL,     //digi_psp_buffer_size,
++   digi_psp_buffer_size,
+    _mixer_init_voice,
+    _mixer_release_voice,
+    _mixer_start_voice,
+@@ -225,15 +225,16 @@
+ 
+ 
+ 
+-/*static int digi_psp_buffer_size()
++static int digi_psp_buffer_size()
+ {
+    return SAMPLES_PER_BUFFER;
+ }
+ 
+ 
+-
++/*
+ static int digi_set_mixer_volume(int volume)
+ {
+    return sceAudioChangeChannelVolume(int channel, int leftvol, int rightvol);
+ }
+ */
++
+diff -Naur src/psp/psystem.c src/psp/psystem.c
+--- src/psp/psystem.c	2010-08-25 09:43:37.925710000 +0200
++++ src/psp/psystem.c	2009-01-26 18:18:20.000000000 +0100
+@@ -19,20 +19,26 @@
+ #include "allegro.h"
+ #include "allegro/internal/aintern.h"
+ #include "allegro/platform/aintpsp.h"
++//#include <malloc.h>
+ #include <pspkernel.h>
++#include <pspctrl.h>
++#include <pspdebug.h>
+ 
+ #ifndef ALLEGRO_PSP
+    #error something is wrong with the makefile
+ #endif
+ 
+ 
++#define DEFAULT_SCREEN_WIDTH       480
++#define DEFAULT_SCREEN_HEIGHT      272
++#define DEFAULT_COLOR_DEPTH         16
++
++
+ static int psp_sys_init(void);
+ static void psp_sys_exit(void);
+-BITMAP * psp_create_bitmap_ex(int color_depth, int width, int height, int do_scaling);
+-static BITMAP * psp_create_bitmap(int color_depth, int width, int height);
++static void psp_message(AL_CONST char *msg);
++static void psp_created_sub_bitmap(BITMAP *bmp, BITMAP *parent);
+ static void psp_get_gfx_safe_mode(int *driver, struct GFX_MODE *mode);
+-static int align_to_16(int width, int color_depth);
+-static int next_power_of_2(int width);
+ 
+ 
+ 
+@@ -48,14 +54,14 @@
+    NULL,  /* AL_METHOD(int, find_resource, (char *dest, AL_CONST char *resource, int size)); */
+    NULL,  /* AL_METHOD(void, set_window_title, (AL_CONST char *name)); */
+    NULL,  /* AL_METHOD(int, set_close_button_callback, (AL_METHOD(void, proc, (void)))); */
+-   NULL,  /* AL_METHOD(void, message, (AL_CONST char *msg)); */
++   psp_message,  /* AL_METHOD(void, message, (AL_CONST char *msg)); */
+    NULL,  /* AL_METHOD(void, assert, (AL_CONST char *msg)); */
+    NULL,  /* AL_METHOD(void, save_console_state, (void)); */
+    NULL,  /* AL_METHOD(void, restore_console_state, (void)); */
+-   psp_create_bitmap,  /* AL_METHOD(struct BITMAP *, create_bitmap, (int color_depth, int width, int height)); */
++   NULL,  /* AL_METHOD(struct BITMAP *, create_bitmap, (int color_depth, int width, int height)); */
+    NULL,  /* AL_METHOD(void, created_bitmap, (struct BITMAP *bmp)); */
+    NULL,  /* AL_METHOD(struct BITMAP *, create_sub_bitmap, (struct BITMAP *parent, int x, int y, int width, int height)); */
+-   NULL,  /* AL_METHOD(void, created_sub_bitmap, (struct BITMAP *bmp, struct BITMAP *parent)); */
++   psp_created_sub_bitmap,  /* AL_METHOD(void, created_sub_bitmap, (struct BITMAP *bmp, struct BITMAP *parent)); */
+    NULL,  /* AL_METHOD(int, destroy_bitmap, (struct BITMAP *bitmap)); */
+    NULL,  /* AL_METHOD(void, read_hardware_palette, (void)); */
+    NULL,  /* AL_METHOD(void, set_palette_range, (AL_CONST struct RGB *p, int from, int to, int retracesync)); */
+@@ -80,29 +86,6 @@
+ };
+ 
+ 
+-/* align_to_16:
+- *  Aligns a bitmap width to 16.
+- */
+-static int align_to_16(int width, int color_depth)
+-{
+-   return ((width * BYTES_PER_PIXEL(color_depth) + 15) & ~15) / BYTES_PER_PIXEL(color_depth);
+-}
+-
+-
+-/* next_power_of_2:
+- *
+- */
+-static int next_power_of_2(int width)
+-{
+-   int i;
+-
+-   width--;
+-   for (i = 1; i < sizeof(int) * 8; i *= 2)
+-      width = width | width >> i;
+-   return width + 1;
+-}
+-
+-
+ 
+ /* psp_sys_init:
+  *  Initializes the PSP system driver.
+@@ -127,22 +110,37 @@
+ 
+ 
+ 
+-/* psp_create_bitmap_ex:
++/* psp_message:
++ *  Prints a text message in the PSP system dependent format.
++ */
++static void psp_message(AL_CONST char *msg)
++{
++   SceCtrlData pad;
++   int buffers_to_read = 1;
++
++   pspDebugScreenInit();
++   pspDebugScreenPrintf(msg);
++
++   /* The message is displayed until a button is pressed. */
++   _psp_init_controller(SAMPLING_CYCLE, SAMPLING_MODE);
++   do {
++      sceCtrlPeekBufferPositive(&pad, buffers_to_read);
++   } while (!pad.Buttons);
++}
++
++
++
++/* psp_create_bitmap:
+  *  Creates a RAM bitmap with proper PSP pitch.
+  */
+-BITMAP * psp_create_bitmap_ex(int color_depth, int width, int height, int do_scaling)
++BITMAP * psp_create_bitmap(int color_depth, int width, int height)
+ {
+    GFX_VTABLE *vtable;
+    BITMAP *bitmap;
+    int nr_pointers;
+-   int padding;
+    int i;
+    int pitch;
+ 
+-   ASSERT(width >= 0);
+-   ASSERT(height > 0);
+-   ASSERT(system_driver);
+-
+    vtable = _get_vtable(color_depth);
+    if (!vtable)
+       return NULL;
+@@ -156,24 +154,13 @@
+    if (!bitmap)
+       return NULL;
+ 
+-   /* This avoids a crash for assembler code accessing the last pixel, as it
+-    * read 4 bytes instead of 3.
+-    */
+-   padding = (color_depth == 24) ? 1 : 0;
+-
+-   /* The memory bitmap width in bytes must be multiple of 16
++   /* The memory bitmap width must be multiple of 8 pixels
+     * in order to blit properly using sceGuCopyImage().
+     */
+-   pitch = align_to_16(width, color_depth);
+-   //pitch = next_power_of_2(width);
+-   //if (pitch == 2048)
+-   //pitch = 2032;
+-   //pitch=width;
+-
+-   bitmap->dat = memalign(64, pitch * height * BYTES_PER_PIXEL(color_depth) + padding);
+-   //bitmap->dat = (unsigned int)bitmap->dat | 0x40000000;
+-   //sceKernelDcacheWritebackInvalidateAll();
+-   //bitmap->dat = _AL_MALLOC_ATOMIC(pitch * height * BYTES_PER_PIXEL(color_depth) + padding);
++   pitch = ALIGN_TO(width, 8);
++
++   //bitmap->dat = memalign(64, pitch * height * BYTES_PER_PIXEL(color_depth));
++   bitmap->dat = _AL_MALLOC_ATOMIC(pitch * height * BYTES_PER_PIXEL(color_depth));
+    if (!bitmap->dat) {
+       _AL_FREE(bitmap);
+       return NULL;
+@@ -196,10 +183,10 @@
+          bitmap->line[i] = bitmap->line[i-1] + pitch * BYTES_PER_PIXEL(color_depth);
+    }
+ 
+-   /* Setup info structure to store additional information */
++   /* Setup info structure to store additional information. */
+    bitmap->extra = malloc(sizeof(struct BMP_EXTRA_INFO));
+    if (!bitmap->extra) {
+-      free(bitmap);
++      _AL_FREE(bitmap);
+       return NULL;
+    }
+    BMP_EXTRA(bitmap)->pitch = pitch;
+@@ -209,13 +196,28 @@
+ 
+ 
+ 
+-/* psp_create_bitmap:
+- *  Creates a RAM bitmap with proper PSP pitch.
++/* psp_created_sub_bitmap:
++ *  Set the needed sub bitmap info.
++ */
++static void psp_created_sub_bitmap(BITMAP *bmp, BITMAP *parent)
++{
++   if (BMP_EXTRA(parent)) {
++      bmp->extra = malloc(sizeof(struct BMP_EXTRA_INFO));
++      if (bmp->extra)
++         BMP_EXTRA(bmp)->pitch = BMP_EXTRA(parent)->pitch;
++   }
++}
++
++
++
++/* psp_destroy_bitmap:
++ *  Destroys the bitmap extra info structure.
+  */
+-static BITMAP * psp_create_bitmap(int color_depth, int width, int height)
++int psp_destroy_bitmap(BITMAP *bitmap)
+ {
+-   int do_scaling = TRUE;
+-   return psp_create_bitmap_ex(color_depth, width, height, do_scaling);
++   _AL_FREE(bitmap->extra);
++
++   return 0;
+ }
+ 
+ 
+@@ -230,3 +232,5 @@
+    mode->height = DEFAULT_SCREEN_HEIGHT;
+    mode->bpp = DEFAULT_COLOR_DEPTH;
+ }
++
++
+diff -Naur src/psp/ptimer.c src/psp/ptimer.c
+--- src/psp/ptimer.c	1970-01-01 01:00:00.000000000 +0100
++++ src/psp/ptimer.c	2008-10-28 21:56:38.000000000 +0100
+@@ -0,0 +1,124 @@
++/*         ______   ___    ___
++ *        /\  _  \ /\_ \  /\_ \
++ *        \ \ \L\ \\//\ \ \//\ \      __     __   _ __   ___
++ *         \ \  __ \ \ \ \  \ \ \   /'__`\ /'_ `\/\`'__\/ __`\
++ *          \ \ \/\ \ \_\ \_ \_\ \_/\  __//\ \L\ \ \ \//\ \L\ \
++ *           \ \_\ \_\/\____\/\____\ \____\ \____ \ \_\\ \____/
++ *            \/_/\/_/\/____/\/____/\/____/\/___L\ \/_/ \/___/
++ *                                           /\____/
++ *                                           \_/__/
++ *
++ *      Timer driver for the PSP.
++ *      TODO: Thread synchronization.
++ * 
++ *      By diedel.
++ *
++ *      See readme.txt for copyright information.
++ */
++
++
++#include "allegro.h"
++#include "allegro/internal/aintern.h"
++#include <pspthreadman.h>
++#include <psprtc.h>
++
++
++#define TIMER_TO_USEC(t)      ((SceUInt)((float)(t) / TIMERS_PER_SECOND * 1000000))
++#define PSPTIMER_TO_TIMER(t)  ((int)((t) * (TIMERS_PER_SECOND / (float)psp_tick_resolution)))
++
++
++static int psp_timer_thread();
++static int psp_timer_init(void);
++static void psp_timer_exit(void);
++
++
++static uint32_t psp_tick_resolution;
++static int psp_timer_on = FALSE;
++static SceUID timer_thread_UID;
++
++
++TIMER_DRIVER timer_psp =
++{
++   TIMER_PSP,
++   empty_string,
++   empty_string,
++   "PSP timer",
++   psp_timer_init,
++   psp_timer_exit,
++   NULL, NULL,   /* install_int, remove_int */
++   NULL, NULL,   /* install_param_int, remove_param_int */
++   NULL, NULL,   /* can_simulate_retrace, simulate_retrace */
++   NULL          /* rest */
++};
++
++
++
++/* psp_timer_thread:
++ *  This PSP thread measures the elapsed time.
++ */
++static int psp_timer_thread()
++{
++   uint64_t old_tick, new_tick;
++   int interval;
++   long delay;
++
++   sceRtcGetCurrentTick(&old_tick);
++
++   while (psp_timer_on) {
++      /* Calculate actual time elapsed. */
++      sceRtcGetCurrentTick(&new_tick);
++      interval = PSPTIMER_TO_TIMER(new_tick - old_tick);
++      old_tick = new_tick;
++
++      /* Handle a tick and rest. */
++      delay = _handle_timer_tick(interval);
++      sceKernelDelayThreadCB(TIMER_TO_USEC(delay));
++   }
++   
++   sceKernelExitThread(0);
++
++   return 0;
++}
++
++
++
++/* psp_timer_init:
++ *  Installs the PSP timer thread.
++ */
++static int psp_timer_init(void)
++{
++   /* Get the PSP ticks per second */
++   psp_tick_resolution = sceRtcGetTickResolution();
++   
++   psp_timer_on = TRUE;
++
++   timer_thread_UID = sceKernelCreateThread("psp_timer_thread",(void *)&psp_timer_thread,
++                                             0x18, 0x10000, 0, NULL);
++   
++   if (timer_thread_UID < 0) {
++      ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Cannot create timer thread"));
++      psp_timer_exit();
++      return -1;
++   }
++   
++   if (sceKernelStartThread(timer_thread_UID, 0, NULL) != 0) {
++      ustrzcpy(allegro_error, ALLEGRO_ERROR_SIZE, get_config_text("Cannot start timer thread"));
++      psp_timer_exit();
++      return -1;
++   }
++
++   return 0;
++}
++
++
++
++/* psp_timer_exit:
++ *  Shuts down the PSP timer thread.
++ */
++static void psp_timer_exit(void)
++{
++   psp_timer_on = FALSE;
++   sceKernelDeleteThread(timer_thread_UID);
++   
++   return;
++}
+diff -Naur src/psp/pvram.c src/psp/pvram.c
+--- src/psp/pvram.c	1970-01-01 01:00:00.000000000 +0100
++++ src/psp/pvram.c	2009-01-11 15:08:59.000000000 +0100
+@@ -0,0 +1,180 @@
++/*         ______   ___    ___ 
++ *        /\  _  \ /\_ \  /\_ \ 
++ *        \ \ \L\ \\//\ \ \//\ \      __     __   _ __   ___ 
++ *         \ \  __ \ \ \ \  \ \ \   /'__`\ /'_ `\/\`'__\/ __`\
++ *          \ \ \/\ \ \_\ \_ \_\ \_/\  __//\ \L\ \ \ \//\ \L\ \
++ *           \ \_\ \_\/\____\/\____\ \____\ \____ \ \_\\ \____/
++ *            \/_/\/_/\/____/\/____/\/____/\/___L\ \/_/ \/___/
++ *                                           /\____/
++ *                                           \_/__/
++ *
++ *      Video memory manager routines for the PSP.
++ *
++ *      By diedel, heavily based upon Minix OS code.
++ *
++ *      See readme.txt for copyright information.
++ */
++
++
++#include "allegro.h"
++#include "allegro/internal/aintern.h"
++#include "allegro/platform/aintpsp.h"
++
++
++
++#define PREFIX_I                "al-pvram INFO: "
++#define PREFIX_W                "al-pvram WARNING: "
++#define PREFIX_E                "al-pvram ERROR: "
++
++
++
++/* Pointer to the first element of the holes list. */
++static VRAM_HOLE *hole_head;
++
++
++static void vmm_del_slot(VRAM_HOLE *prev_ptr, VRAM_HOLE *hp);
++static void vmm_merge(VRAM_HOLE *hp);
++
++
++
++/* vmm_init:
++ *  Initializes the vram holes list.
++ *  Initially this list contains an element with the available video memory.
++ */
++void vmm_init(uintptr_t base, unsigned int available_vram)
++{
++   VRAM_HOLE *new_h;
++
++   new_h = _AL_MALLOC(sizeof(VRAM_HOLE));
++   if (new_h) {
++      new_h->h_base = base;
++      new_h->h_len = available_vram;
++      new_h->h_next = NULL;
++      hole_head = new_h;
++   }
++
++   TRACE(PREFIX_I "Available VRAM: %u bytes  Base: %x\n", new_h->h_len, new_h->h_base);
++
++}
++
++
++
++/* vmm_alloc_mem:
++ *  Assigns a free video memory block from the first hole with enough space.
++ */
++uintptr_t vmm_alloc_mem(unsigned int size)
++{
++   VRAM_HOLE *hp, *prev_ptr = NULL;
++   uintptr_t old_base;
++
++   hp = hole_head;
++   while (hp != NULL) {
++      if (hp->h_len >= size) {
++         /* We have found a hole big enough. */
++         old_base = hp->h_base;
++         hp->h_base += size;
++         hp->h_len -= size;
++
++         if (hp->h_len == 0)
++            /* The hole has no more space. Update the holes list. */
++            vmm_del_slot(prev_ptr, hp);
++
++         TRACE(PREFIX_I "%u bytes assigned starting at %x\n", size, old_base);
++         return old_base;
++      }
++
++      prev_ptr = hp;
++      hp = hp->h_next;
++   }
++
++   return VMM_NO_MEM;
++}
++
++
++
++/* vmm_free_mem:
++ *  Returns a video memory block to the holes list.
++ *  If it's adjacent to some of the existing holes we merge it.
++ */
++void vmm_free_mem(uintptr_t base, unsigned int size)
++{
++   VRAM_HOLE *hp, *new_ptr, *prev_ptr;
++
++   new_ptr = _AL_MALLOC(sizeof(VRAM_HOLE));
++   if (new_ptr) {
++      new_ptr->h_base = base;
++      new_ptr->h_len = size;
++      TRACE(PREFIX_I "New hole: %u bytes at %x\n", new_ptr->h_len, new_ptr->h_base);
++
++      hp = hole_head;
++      if (hp == NULL || base <= hp->h_base) {
++         /* The free block becomes the head of the holes list. */
++         new_ptr->h_next = hp;
++         hole_head = new_ptr;
++         vmm_merge(new_ptr);
++      }
++      else {
++         while ( hp != NULL && base > hp->h_base) {
++            prev_ptr  = hp;
++            hp = hp->h_next;
++         }
++
++         /* Insert it after prev_ptr. */
++         new_ptr->h_next = prev_ptr->h_next;
++         prev_ptr->h_next = new_ptr;
++
++         /* We try to merge the sequence 'prev_ptr', 'new_ptr', 'hp' */
++         vmm_merge(prev_ptr);
++      }
++   }
++}
++
++
++
++/* vmm_del_slot:
++ *  Destroy an element of the holes list.
++ */
++static void vmm_del_slot(VRAM_HOLE *prev_ptr, VRAM_HOLE *hp)
++{
++   TRACE(PREFIX_I "Slot deleted: %u bytes at %x\n", hp->h_len, hp->h_base);
++   if (hp == hole_head)
++      hole_head = hp->h_next;
++   else
++      prev_ptr->h_next = hp->h_next;
++
++   _AL_FREE(hp);
++}
++
++
++
++/* vmm_merge:
++ *  Try to merge a freed video memory block with the adjacent holes.
++ *  'hp' is the first of a three holes chain potentially mergeable.
++ */
++static void vmm_merge(VRAM_HOLE *hp)
++{
++   VRAM_HOLE *next_ptr;
++
++   if ((next_ptr = hp->h_next) != NULL) {
++      if (hp->h_base + hp->h_len == next_ptr->h_base) {
++         /* The first absorbs the second. */
++         TRACE(PREFIX_I "Hole 1 %u bytes at %x merged with hole 2 %u bytes at %x\n",
++               hp->h_len, hp->h_base, next_ptr->h_len, next_ptr->h_base);
++         hp->h_len += next_ptr->h_len;
++         vmm_del_slot(hp, next_ptr);
++      }
++      else
++         hp = next_ptr;
++
++      /* Now try to merge with the third. */
++      if ((next_ptr = hp->h_next) != NULL) {
++         if (hp->h_base + hp->h_len == next_ptr->h_base) {
++            /* Absorb the third. */
++            TRACE(PREFIX_I "Hole 1/2 %u bytes at %x merged with hole 3 %u bytes at %x\n",
++               hp->h_len, hp->h_base, next_ptr->h_len, next_ptr->h_base);
++            hp->h_len += next_ptr->h_len;
++            vmm_del_slot(hp, next_ptr);
++         }
++      }
++   }
++}
+diff -Naur src/psp/pvtable8.c src/psp/pvtable8.c
+--- src/psp/pvtable8.c	1970-01-01 01:00:00.000000000 +0100
++++ src/psp/pvtable8.c	2009-01-24 18:47:18.000000000 +0100
+@@ -0,0 +1,157 @@
++/*         ______   ___    ___ 
++ *        /\  _  \ /\_ \  /\_ \ 
++ *        \ \ \L\ \\//\ \ \//\ \      __     __   _ __   ___ 
++ *         \ \  __ \ \ \ \  \ \ \   /'__`\ /'_ `\/\`'__\/ __`\
++ *          \ \ \/\ \ \_\ \_ \_\ \_/\  __//\ \L\ \ \ \//\ \L\ \
++ *           \ \_\ \_\/\____\/\____\ \____\ \____ \ \_\\ \____/
++ *            \/_/\/_/\/____/\/____/\/____/\/___L\ \/_/ \/___/
++ *                                           /\____/
++ *                                           \_/__/
++ *
++ *      PSP screen gfx vtable for 8 bpp support.
++ * 
++ *      By diedel.
++ *
++ *      See readme.txt for copyright information.
++ */
++
++
++#include "allegro.h"
++#include "allegro/internal/aintern.h"
++#include "allegro/platform/aintpsp.h"
++
++
++#define CONSTRUCT_8BPP_VERSION(type, func, args, params)                  \
++   type psp_##func##8 args                                                \
++   {                                                                      \
++      bmp->vtable = &__linear_vtable8;                                    \
++                                                                          \
++      /* Call the original function. */                                   \
++      __linear_vtable8.func params ;                                      \
++                                                                          \
++      if (is_same_bitmap(bmp, displayed_video_bitmap))                    \
++         /* Show the screen texture. */                                   \
++         psp_draw_to_screen();                                            \
++                                                                          \
++      bmp->vtable = &psp_vtable8;                                         \
++   }
++
++
++CONSTRUCT_8BPP_VERSION(void, putpixel, (BITMAP *bmp, int x, int y, int color), (bmp, x, y, color));
++CONSTRUCT_8BPP_VERSION(void, vline, (BITMAP *bmp, int x, int y_1, int y2, int color), (bmp, x, y_1, y2, color));
++CONSTRUCT_8BPP_VERSION(void, hline, (BITMAP *bmp, int x1, int y, int x2, int color), (bmp, x1, y, x2, color));
++CONSTRUCT_8BPP_VERSION(void, hfill, (BITMAP *bmp, int x1, int y, int x2, int color), (bmp, x1, y, x2, color));
++CONSTRUCT_8BPP_VERSION(void, line, (BITMAP *bmp, int x1, int y_1, int x2, int y2, int color), (bmp, x1, y_1, x2, y2, color));
++CONSTRUCT_8BPP_VERSION(void, fastline, (BITMAP *bmp, int x1, int y_1, int x2, int y2, int color), (bmp, x1, y_1, x2, y2, color));
++CONSTRUCT_8BPP_VERSION(void, rectfill, (BITMAP *bmp, int x1, int y_1, int x2, int y2, int color), (bmp, x1, y_1, x2, y2, color));
++CONSTRUCT_8BPP_VERSION(void, triangle, (BITMAP *bmp, int x1, int y_1, int x2, int y2, int x3, int y3, int color), (bmp, x1, y_1, x2, y2, x3, y3, color));
++CONSTRUCT_8BPP_VERSION(void, draw_sprite, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_256_sprite, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_sprite_v_flip, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_sprite_h_flip, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_sprite_vh_flip, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_trans_sprite, (BITMAP *bmp, BITMAP *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_lit_sprite, (BITMAP *bmp, BITMAP *sprite, int x, int y, int color), (bmp, sprite, x, y, color));
++CONSTRUCT_8BPP_VERSION(void, draw_rle_sprite, (BITMAP *bmp, AL_CONST RLE_SPRITE *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_trans_rle_sprite, (BITMAP *bmp, AL_CONST RLE_SPRITE *sprite, int x, int y), (bmp, sprite, x, y));
++CONSTRUCT_8BPP_VERSION(void, draw_lit_rle_sprite, (BITMAP *bmp, AL_CONST RLE_SPRITE *sprite, int x, int y, int color), (bmp, sprite, x, y, color));
++CONSTRUCT_8BPP_VERSION(void, draw_character, (BITMAP *bmp, BITMAP *sprite, int x, int y, int color, int bg), (bmp, sprite, x, y, color, bg));
++CONSTRUCT_8BPP_VERSION(void, draw_glyph, (BITMAP *bmp, AL_CONST FONT_GLYPH *glyph, int x, int y, int color, int bg), (bmp, glyph, x, y, color, bg));
++CONSTRUCT_8BPP_VERSION(void, blit_from_memory, (BITMAP *source, BITMAP *bmp, int source_x, int source_y, int dest_x, int dest_y, int width, int height), (source, bmp, source_x, source_y, dest_x, dest_y, width, height));
++CONSTRUCT_8BPP_VERSION(void, blit_from_system, (BITMAP *source, BITMAP *bmp, int source_x, int source_y, int dest_x, int dest_y, int width, int height), (source, bmp, source_x, source_y, dest_x, dest_y, width, height));
++CONSTRUCT_8BPP_VERSION(void, blit_to_self, (BITMAP *source, BITMAP *bmp, int source_x, int source_y, int dest_x, int dest_y, int width, int height), (source, bmp, source_x, source_y, dest_x, dest_y, width, height));
++CONSTRUCT_8BPP_VERSION(void, clear_to_color, (BITMAP *bmp, int color), (bmp, color));
++CONSTRUCT_8BPP_VERSION(void, pivot_scaled_sprite_flip, (BITMAP *bmp, BITMAP *sprite, fixed x, fixed y, fixed cx, fixed cy, fixed angle, fixed scale, int v_flip), (bmp, sprite, x, y, cx, cy, angle, scale, v_flip));
++CONSTRUCT_8BPP_VERSION(void, polygon, (BITMAP *bmp, int vertices, AL_CONST int *points, int color), (bmp, vertices, points, color));
++CONSTRUCT_8BPP_VERSION(void, rect, (BITMAP *bmp, int x1, int y_1, int x2, int y2, int color), (bmp, x1, y_1, x2, y2, color));
++CONSTRUCT_8BPP_VERSION(void, circle, (BITMAP *bmp, int x, int y, int radius, int color), (bmp, x, y, radius, color));
++CONSTRUCT_8BPP_VERSION(void, circlefill, (BITMAP *bmp, int x, int y, int radius, int color), (bmp, x, y, radius, color));
++CONSTRUCT_8BPP_VERSION(void, ellipse, (BITMAP *bmp, int x, int y, int rx, int ry, int color), (bmp, x, y, rx, ry, color));
++CONSTRUCT_8BPP_VERSION(void, ellipsefill, (BITMAP *bmp, int x, int y, int rx, int ry, int color), (bmp, x, y, rx, ry, color));
++CONSTRUCT_8BPP_VERSION(void, arc, (BITMAP *bmp, int x, int y, fixed ang1, fixed ang2, int r, int color), (bmp, x, y, ang1, ang2, r, color));
++CONSTRUCT_8BPP_VERSION(void, spline, (BITMAP *bmp, AL_CONST int points[8], int color), (bmp, points, color));
++CONSTRUCT_8BPP_VERSION(void, floodfill, (BITMAP *bmp, int x, int y, int color), (bmp, x, y, color));
++
++
++/* psp_do_stretch_blit8:
++ *  Hook to capture the call to stretch_blit().
++ */
++void psp_do_stretch_blit8(BITMAP *source, BITMAP *dest, int source_x, int source_y, int source_width, int source_height, int dest_x, int dest_y, int dest_width, int dest_height, int masked)
++{
++   source->vtable->do_stretch_blit = NULL;
++
++   stretch_blit(source, dest, source_x, source_y, source_width, source_height, dest_x, dest_y, dest_width, dest_height);
++   if (is_same_bitmap(dest, displayed_video_bitmap))
++      psp_draw_to_screen();
++
++   source->vtable->do_stretch_blit = psp_do_stretch_blit8;
++}
++
++
++
++GFX_VTABLE psp_vtable8 =
++{
++   8,
++   MASK_COLOR_8,
++   _stub_unbank_switch,
++   NULL,
++   NULL,
++   NULL,
++   NULL,
++   NULL,
++   _linear_getpixel8,
++   psp_putpixel8,
++   psp_vline8,
++   psp_hline8,
++   psp_hfill8,
++   psp_line8,
++   psp_fastline8,
++   psp_rectfill8,
++   psp_triangle8,
++   psp_draw_sprite8,
++   psp_draw_256_sprite8,
++   psp_draw_sprite_v_flip8,
++   psp_draw_sprite_h_flip8,
++   psp_draw_sprite_vh_flip8,
++   psp_draw_trans_sprite8,
++   NULL,
++   psp_draw_lit_sprite8,
++   psp_draw_rle_sprite8,
++   psp_draw_trans_rle_sprite8,
++   NULL,
++   psp_draw_lit_rle_sprite8,
++   psp_draw_character8,
++   psp_draw_glyph8,
++   psp_blit_from_memory8,
++   _linear_blit8,
++   psp_blit_from_system8,
++   _linear_blit8,
++   psp_blit_to_self8,
++   NULL, //_blit_to_self_forward8,
++   NULL, //_blit_to_self_backward8,
++   NULL, //_blit_between_formats8,
++   NULL, //_masked_blit8,
++   psp_clear_to_color8,
++   psp_pivot_scaled_sprite_flip8,
++   NULL,
++   NULL, //_draw_gouraud_sprite8,
++   NULL, //_draw_sprite_end8,
++   NULL, //_blit_end8,
++   psp_polygon8,
++   psp_rect8,
++   psp_circle8,
++   psp_circlefill8,
++   psp_ellipse8,
++   psp_ellipsefill8,
++   psp_arc8,
++   psp_spline8,
++   psp_floodfill8,
++
++   NULL, //_polygon3d8,
++   NULL, //_polygon3d_f8,
++   NULL, //_triangle3d8,
++   NULL, //_triangle3d_f8,
++   NULL, //_quad3d8,
++   NULL, //_quad3d_f8,
++   NULL //_draw_sprite_ex8
++};
