@@ -10,7 +10,6 @@ PSPSDK_VERSION=0.9.7
 
 # sdk versions
 BINUTILS_VER=2.18
-GCC_TC_VER=4.3.2
 GCC_VER=4.3.5
 NEWLIB_VER=1.18.0
 #debugger version
@@ -462,7 +461,6 @@ function installSDL {
 
 function downloadPatches {
 	svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
-	cp psp/patches/gcc-$GCC_TC_VER-PSP.patch psp/patches/gcc-$GCC_VER-PSP.patch 
 }
 
 function buildBinutils {
@@ -991,14 +989,14 @@ prepare
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
-#downloadPatches
+downloadPatches
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-#buildBinutils
-#buildXGCC
-#bootstrapSDK
-#buildNewlib
+buildBinutils
+buildXGCC
+bootstrapSDK
+buildNewlib
 buildGCC
 buildSDK
 validateSDK

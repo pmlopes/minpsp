@@ -13,7 +13,7 @@ diff -Naur sdk.orig/lib/build.mak sdk/lib/build.mak
 +
  CC       = psp-gcc
  CXX      = psp-g++
- AS       = psp-gcc
+ GDC      = psp-gdc
 @@ -157,17 +163,17 @@
  all: $(EXTRA_TARGETS) $(FINAL_TARGET)
  
@@ -46,7 +46,7 @@ diff -Naur sdk.orig/lib/build.mak sdk/lib/build.mak
  
  %.prx: %.elf
 @@ -207,6 +213,6 @@
- 	$(CC) $(CFLAGS) -c -o $@ $<
+ 	$(GDC) $(DFLAGS) -c -o $@ $<
  
  clean: 
 -	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
@@ -68,9 +68,9 @@ diff -Naur sdk.orig/lib/build_prx.mak sdk/lib/build_prx.mak
 +
  CC       = psp-gcc
  CXX      = psp-g++
- AS       = psp-gcc
+ GDC      = psp-gdc
 @@ -89,6 +95,6 @@
- 	$(CC) $(CFLAGS) -c -o $@ $<
+ 	$(GDC) $(DFLAGS) -c -o $@ $<
  
  clean: $(EXTRA_CLEAN)
 -	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)

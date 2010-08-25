@@ -1464,6 +1464,104 @@ Index: pspsdk/src/fpu/pspfpu.c
 +	x = x*x;
 +	return pspFpuAtan(__builtin_allegrex_sqrt_s((1.0f-x)/x));
 +}
+Index: d/main.d
+===================================================================
+--- d/main.d	(revision 0)
++++ d/main.d	(revision 0)
+@@ -0,0 +1,31 @@
++// imports
++//
++extern (C) void pspDebugScreenInit();
++extern (C) void pspDebugScreenPrintf(char*,...);
++extern (C) int SetupCallbacks();
++extern (C) int sceKernelSleepThread();
++
++import std.string;
++
++class HelloPsp
++{
++public:
++	void sayHello()
++	{
++		pspDebugScreenPrintf(toStringz(m_msg));
++	}
++	char[] m_msg = "Hello D on Psp\n";
++}
++
++int main()
++{
++	SetupCallbacks();
++
++	pspDebugScreenInit();
++	
++	auto hello = new HelloPsp();
++	hello.sayHello();
++
++	sceKernelSleepThread();
++	return 0;
++}
+Index: d/module.c
+===================================================================
+--- d/module.c	(revision 0)
++++ d/module.c	(revision 0)
+@@ -0,0 +1,36 @@
++#include <pspkernel.h>
++#include <pspdebug.h> 
++#include <pspsuspend.h>
++
++PSP_MODULE_INFO("Blit Sample", 0, 1, 1);
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER);
++
++/* Exit callback */
++static int exit_callback(int arg1, int arg2, void *common) {
++	sceKernelExitGame();
++	return 0;
++}
++
++/* Callback thread */
++static int CallbackThread(SceSize args, void *argp) {
++	int cbid;
++
++	cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
++	sceKernelRegisterExitCallback(cbid);
++
++	sceKernelSleepThreadCB();
++
++	return 0;
++}
++
++/* Sets up the callback thread and returns its thread id */
++int SetupCallbacks(void) {
++	int thid = 0;
++
++	thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
++	if(thid >= 0) {
++		  sceKernelStartThread(thid, 0, 0);
++	}
++
++	return thid;
++} 
+Index: d/Makefile.sample
+===================================================================
+--- d/Makefile.sample	(revision 0)
++++ d/Makefile.sample	(revision 0)
+@@ -0,0 +1,16 @@
++TARGET = HelloPspInD
++OBJS = module.o main.o
++
++CFLAGS = -O2 -Wall
++CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LIBS = -lgphobos -lm
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = Hello World
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak 
 Index: pspsdk/src/samples/obj-c/main.m
 ===================================================================
 --- pspsdk/src/samples/obj-c/main.m	(revision 0)
@@ -1559,22 +1657,31 @@ Index: pspsdk/src/samples/Makefile.am
 ===================================================================
 --- pspsdk/src/samples/Makefile.am	(revision 2458)
 +++ pspsdk/src/samples/Makefile.am	(working copy)
-@@ -81,7 +81,9 @@
+@@ -81,7 +81,10 @@
  	utility/systemparam \
  	utility/osk \
  	me/basic \
 -	wlan
 +	wlan \
 +	obj-c \
-+	exceptions
++	exceptions \
++	d
  
  all:
  
 Index: pspsdk/src/base/build_prx.mak
 ===================================================================
---- pspsdk/src/base/build_prx.mak	(revision 2458)
-+++ pspsdk/src/base/build_prx.mak	(working copy)
-@@ -37,6 +37,11 @@
+--- build_prx.mak       (revision 2494)
++++ build_prx.mak       (working copy)
+@@ -17,6 +17,7 @@
+ 
+ CC       = psp-gcc
+ CXX      = psp-g++
++GDC      = psp-gdc
+ AS       = psp-gcc
+ LD       = psp-gcc
+ FIXUP    = psp-fixup-imports
+@@ -37,6 +38,11 @@
  
  CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
  
@@ -1586,24 +1693,35 @@ Index: pspsdk/src/base/build_prx.mak
  # Library selection.  By default we link with Newlib's libc.  Allow the
  # user to link with PSPSDK's libc if USE_PSPSDK_LIBC is set to 1.
  
-@@ -80,6 +85,12 @@
+@@ -80,6 +86,15 @@
  %.c: %.exp
- 	psp-build-exports -b $< > $@
+        psp-build-exports -b $< > $@
  
 +%.o: %.m
-+	$(CC) $(CFLAGS) -c -o $@ $<
++       $(CC) $(CFLAGS) -c -o $@ $<
 +
 +%.o: %.mm
-+	$(CXX) $(CXXFLAGS) -c -o $@ $<
++       $(CXX) $(CXXFLAGS) -c -o $@ $<
++
++%.o: %.d
++       $(GDC) $(DFLAGS) -c -o $@ $<
 +
  clean: $(EXTRA_CLEAN)
- 	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
+        -rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
  
 Index: pspsdk/src/base/build.mak
 ===================================================================
---- pspsdk/src/base/build.mak	(revision 2458)
-+++ pspsdk/src/base/build.mak	(working copy)
-@@ -45,6 +45,11 @@
+--- build.mak   (revision 2494)
++++ build.mak   (working copy)
+@@ -17,6 +17,7 @@
+ 
+ CC       = psp-gcc
+ CXX      = psp-g++
++GDC      = psp-gdc
+ AS       = psp-gcc
+ LD       = psp-gcc
+ AR       = psp-ar
+@@ -45,6 +46,11 @@
  CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
  CXXFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
  
@@ -1615,16 +1733,19 @@ Index: pspsdk/src/base/build.mak
  ifeq ($(BUILD_PRX),1)
  LDFLAGS  := $(addprefix -L,$(LIBDIR)) -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx $(LDFLAGS)
  EXTRA_CLEAN += $(TARGET).elf
-@@ -198,6 +203,12 @@
+@@ -198,6 +204,15 @@
  %.c: %.exp
- 	psp-build-exports -b $< > $@
+        psp-build-exports -b $< > $@
  
 +%.o: %.m
-+	$(CC) $(CFLAGS) -c -o $@ $<
++       $(CC) $(CFLAGS) -c -o $@ $<
 +
 +%.o: %.mm
-+	$(CXX) $(CXXFLAGS) -c -o $@ $<
++       $(CXX) $(CXXFLAGS) -c -o $@ $<
++
++%.o: %.d
++       $(GDC) $(DFLAGS) -c -o $@ $<
 +
  clean: 
- 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
+        -rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
  
