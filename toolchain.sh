@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.9.6
+PSPSDK_VERSION=0.9.7
 
 # sdk versions
 BINUTILS_VER=2.18
@@ -590,7 +590,7 @@ function buildGCC {
 		../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
 				--prefix=$INSTALLDIR \
 				--target=psp \
-				--enable-languages="c,c++,objc,obj-c++" \
+				--enable-languages="c,c++,objc,obj-c++,d" \
 				--enable-cxx-flags="-G0" \
 				--with-newlib \
 				--with-headers \
@@ -991,14 +991,14 @@ prepare
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
-downloadPatches
+#downloadPatches
 #---------------------------------------------------------------------------------
 # build sdk
 #---------------------------------------------------------------------------------
-buildBinutils
-buildXGCC
-bootstrapSDK
-buildNewlib
+#buildBinutils
+#buildXGCC
+#bootstrapSDK
+#buildNewlib
 buildGCC
 buildSDK
 validateSDK

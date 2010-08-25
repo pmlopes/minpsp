@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-VERSION=0.9.6
+VERSION=0.9.7
 
 rm -Rf minpspw-$VERSION || true
 mkdir minpspw-$VERSION
@@ -21,12 +21,12 @@ tar czf data.tar.gz ./opt
 # create control file
 cat >> control <<EOF
 Package: minpspw-pspsdk
-Version: 0.9.6
+Version: $VERSION
 Maintainer: Paulo Lopes <pmlopes@gmail.com>
 Installed-Size: `du -ks opt|cut -f 1`
 Priority: optional
 Homepage: http://www.jetdrone.com/
-Description: PSP Homebrew Development Kit 0.9.6
+Description: PSP Homebrew Development Kit $VERSION
  The MinPSPW is a development environment for building applications,
  games, and components targetting the Playstation Portable.
 EOF
