@@ -29,6 +29,15 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+0.9.7
+* new devpaks
+  - allegro 4.4.1.1
+  - OSLib replaced with OSLib_MOD
+  - Bullet Physics
+  - CubicVR game engine
+* Added D programming language D 1.060 as a supported language (experimental)
+  - Added a sample Hello World to the SDK
+
 0.9.6
 * pspsh does not depend on cygwin and is native
 * remotejoy SDL is also included as a native binary (no cygwin)

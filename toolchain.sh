@@ -497,6 +497,9 @@ function buildXGCC {
 
 	if [ ! -d psp/build/x$GCC_SRCDIR ]
 	then
+		# the patch does not keep the exec bit
+		chmod a+x psp/$GCC_SRCDIR/libphobos/config/x3
+
 		mkdir -p psp/build/x$GCC_SRCDIR
 		cd psp/build/x$GCC_SRCDIR
 

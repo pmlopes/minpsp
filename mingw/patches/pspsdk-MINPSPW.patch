@@ -1464,10 +1464,10 @@ Index: pspsdk/src/fpu/pspfpu.c
 +	x = x*x;
 +	return pspFpuAtan(__builtin_allegrex_sqrt_s((1.0f-x)/x));
 +}
-Index: d/main.d
+Index: pspsdk/src/samples/d/main.d
 ===================================================================
---- d/main.d	(revision 0)
-+++ d/main.d	(revision 0)
+--- pspsdk/src/samples/d/main.d	(revision 0)
++++ pspsdk/src/samples/d/main.d	(revision 0)
 @@ -0,0 +1,31 @@
 +// imports
 +//
@@ -1500,10 +1500,10 @@ Index: d/main.d
 +	sceKernelSleepThread();
 +	return 0;
 +}
-Index: d/module.c
+Index: pspsdk/src/samples/d/module.c
 ===================================================================
---- d/module.c	(revision 0)
-+++ d/module.c	(revision 0)
+--- pspsdk/src/samples/d/module.c	(revision 0)
++++ pspsdk/src/samples/d/module.c	(revision 0)
 @@ -0,0 +1,36 @@
 +#include <pspkernel.h>
 +#include <pspdebug.h> 
@@ -1541,10 +1541,10 @@ Index: d/module.c
 +
 +	return thid;
 +} 
-Index: d/Makefile.sample
+Index: pspsdk/src/samples/d/Makefile.sample
 ===================================================================
---- d/Makefile.sample	(revision 0)
-+++ d/Makefile.sample	(revision 0)
+--- pspsdk/src/samples/d/Makefile.sample	(revision 0)
++++ pspsdk/src/samples/d/Makefile.sample	(revision 0)
 @@ -0,0 +1,16 @@
 +TARGET = HelloPspInD
 +OBJS = module.o main.o
@@ -1671,8 +1671,8 @@ Index: pspsdk/src/samples/Makefile.am
  
 Index: pspsdk/src/base/build_prx.mak
 ===================================================================
---- build_prx.mak       (revision 2494)
-+++ build_prx.mak       (working copy)
+--- pspsdk/src/base/build_prx.mak       (revision 2494)
++++ pspsdk/src/base/build_prx.mak       (working copy)
 @@ -17,6 +17,7 @@
  
  CC       = psp-gcc
@@ -1695,24 +1695,24 @@ Index: pspsdk/src/base/build_prx.mak
  
 @@ -80,6 +86,15 @@
  %.c: %.exp
-        psp-build-exports -b $< > $@
+ 	psp-build-exports -b $< > $@
  
 +%.o: %.m
-+       $(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
 +
 +%.o: %.mm
-+       $(CXX) $(CXXFLAGS) -c -o $@ $<
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
 +
 +%.o: %.d
-+       $(GDC) $(DFLAGS) -c -o $@ $<
++	$(GDC) $(DFLAGS) -c -o $@ $<
 +
  clean: $(EXTRA_CLEAN)
-        -rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
+ 	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
  
 Index: pspsdk/src/base/build.mak
 ===================================================================
---- build.mak   (revision 2494)
-+++ build.mak   (working copy)
+--- pspsdk/src/base/build.mak   (revision 2494)
++++ pspsdk/src/base/build.mak   (working copy)
 @@ -17,6 +17,7 @@
  
  CC       = psp-gcc
@@ -1735,17 +1735,17 @@ Index: pspsdk/src/base/build.mak
  EXTRA_CLEAN += $(TARGET).elf
 @@ -198,6 +204,15 @@
  %.c: %.exp
-        psp-build-exports -b $< > $@
+ 	psp-build-exports -b $< > $@
  
 +%.o: %.m
-+       $(CC) $(CFLAGS) -c -o $@ $<
++	$(CC) $(CFLAGS) -c -o $@ $<
 +
 +%.o: %.mm
-+       $(CXX) $(CXXFLAGS) -c -o $@ $<
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
 +
 +%.o: %.d
-+       $(GDC) $(DFLAGS) -c -o $@ $<
++	$(GDC) $(DFLAGS) -c -o $@ $<
 +
  clean: 
-        -rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
+ 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
  
