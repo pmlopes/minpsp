@@ -100,7 +100,8 @@ function prepare {
 		# since I'm running this under a Xeon processor, I don't want it to be
 		# build that cpu, so I must instruct mingw to target a i686
 		EXTRA_BUILD_CFG="--build=i686-pc-mingw32"
-		INSTALLDIR="/c/pspsdk"
+		# GDC has a bug that forces the install to be hardcoded
+		INSTALLDIR="/pspsdk"
 		INSTALLERDIR="/c/pspsdk-installer"
 		GMP_INCLUDE=/usr/local/include
 		MPFR_INCLUDE=/usr/local/include
@@ -512,6 +513,8 @@ function buildXGCC {
 				--disable-libssp \
 				--disable-win32-registry \
 				--disable-nls \
+				--disable-multilib \
+				--disable-shared \
 				--with-gmp-include=$GMP_INCLUDE \
 				--with-gmp-lib=$GMP_LIB \
 				--with-mpfr-include=$MPFR_INCLUDE \
@@ -599,6 +602,8 @@ function buildGCC {
 				--disable-nls \
 				--enable-c99 \
 				--enable-long-long \
+				--disable-multilib \
+				--disable-shared \
 				--with-gmp-include=$GMP_INCLUDE \
 				--with-gmp-lib=$GMP_LIB \
 				--with-mpfr-include=$MPFR_INCLUDE \
@@ -627,7 +632,14 @@ function buildSDK {
 }
 
 function validateSDK {
+	if [ "$OS" == "MINGW32_NT" ]; then
+		# GDC on windows must be installed on this path it is a bug, known one!!!
+		cp -Rf $INSTALLDIR /c/$INSTALLDIR
+	fi
 	find $INSTALLDIR/psp/sdk/samples -type f -name "Makefile" | xargs $(pwd)/mingw/build-sample.sh $1
+	if [ "$OS" == "MINGW32_NT" ]; then
+		rm -Rf /c/$INSTALLDIR
+	fi
 }
 
 function buildGDB {
