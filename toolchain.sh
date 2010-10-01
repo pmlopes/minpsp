@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.9.7
+PSPSDK_VERSION=0.10.0
 
 # sdk versions
 BINUTILS_VER=2.18
@@ -513,8 +513,6 @@ function buildXGCC {
 				--disable-libssp \
 				--disable-win32-registry \
 				--disable-nls \
-				--disable-multilib \
-				--disable-shared \
 				--with-gmp-include=$GMP_INCLUDE \
 				--with-gmp-lib=$GMP_LIB \
 				--with-mpfr-include=$MPFR_INCLUDE \
@@ -602,8 +600,6 @@ function buildGCC {
 				--disable-nls \
 				--enable-c99 \
 				--enable-long-long \
-				--disable-multilib \
-				--disable-shared \
 				--with-gmp-include=$GMP_INCLUDE \
 				--with-gmp-lib=$GMP_LIB \
 				--with-mpfr-include=$MPFR_INCLUDE \

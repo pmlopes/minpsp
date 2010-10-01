@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-VERSION=0.9.7
+VERSION=0.10
 
 rm -Rf minpspw-$VERSION || true
 mkdir minpspw-$VERSION
