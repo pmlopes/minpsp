@@ -422,4 +422,8 @@ void vfpu_quaternion_hermite_tangent(ScePspQuatMatrix *qout, ScePspQuatMatrix *p
 **/
 void vfpu_quaternion_to_matrix(ScePspQuatMatrix *q, ScePspFMatrix4 *m);
 
+#if defined(__cplusplus)
+}
+#endif
+
 #endif

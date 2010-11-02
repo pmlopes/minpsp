@@ -23,13 +23,17 @@ Portable handheld videogame system.
 ===============================================================================
  TODO
 ===============================================================================
-0.10 Still to decide....
+0.11 Still to decide....
 
 
 ===============================================================================
  Changelog
 ===============================================================================
-0.9.7
+0.10.1
+* fixed pspmath.h file for C++
+* Added D support to GDB
+
+0.10.0
 * new devpaks
   - allegro 4.4.1.1
   - OSLib replaced with OSLib_MOD
@@ -373,7 +377,7 @@ To build run the toolchain script:
 ## Install the required packages.
  sudo apt-get install build-essential autoconf automake bison flex \
   libncurses5-dev libreadline-dev libusb-dev texinfo libgmp3-dev libmpfr-dev \
-  subversion doxygen graphviz libtool unrar nsis mingw32 unzip cmake
+  subversion doxygen graphviz libtool unrar unzip cmake
 
  ## Build and install the toolchain + sdk.
  sudo ./toolchain.sh

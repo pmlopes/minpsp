@@ -12,3 +12,701 @@ diff -Naur gdb-6.8.orig/gdb/tui/tui-io.c gdb-6.8/gdb/tui/tui-io.c
  
  /* TUI output files.  */
  static struct ui_file *tui_stdout;
+diff -Naur gdb-6.8.orig/gdb/c-lang.c gdb-6.8/gdb/c-lang.c
+--- gdb-6.8.orig/gdb/c-lang.c	2008-02-06 00:17:40.000000000 +0200
++++ gdb-6.8/gdb/c-lang.c	2008-12-11 02:31:13.877415511 +0200
+@@ -25,6 +25,7 @@
+ #include "parser-defs.h"
+ #include "language.h"
+ #include "c-lang.h"
++#include "d-lang.h"
+ #include "valprint.h"
+ #include "macroscope.h"
+ #include "gdb_assert.h"
+@@ -618,10 +619,47 @@
+   LANG_MAGIC
+ };
+ 
++const struct language_defn d_language_defn =
++{
++  "d",                         /* Language name */
++  language_d,
++  range_check_off,
++  type_check_off,
++  case_sensitive_on,
++  array_row_major,
++  &exp_descriptor_standard,
++  c_preprocess_and_parse,
++  c_error,
++  null_post_parser,
++  c_printchar,			/* Print a character constant */
++  c_printstr,			/* Function to print string constant */
++  c_emit_char,			/* Print a single char */
++  c_print_type,			/* Print a type using appropriate syntax */
++  d_val_print,			/* Print a value using appropriate syntax */
++  c_value_print,		/* Print a top-level value */
++  NULL,				/* Language specific skip_trampoline */
++  NULL,				/* value_of_this */
++  basic_lookup_symbol_nonlocal,	/* lookup_symbol_nonlocal */
++  basic_lookup_transparent_type,/* lookup_transparent_type */
++  d_demangle,			/* Language specific symbol demangler */
++  NULL,				/* Language specific class_name_from_physname */
++  c_op_print_tab,		/* expression operators for printing */
++  1,				/* c-style arrays */
++  0,				/* String lower bound */
++  default_word_break_characters,
++  default_make_symbol_completion_list,
++  c_language_arch_info,
++  default_print_array_index,
++  default_pass_by_reference,
++  LANG_MAGIC
++};
++
++
+ void
+ _initialize_c_language (void)
+ {
+   add_language (&c_language_defn);
++  add_language (&d_language_defn);
+   add_language (&cplus_language_defn);
+   add_language (&asm_language_defn);
+   add_language (&minimal_language_defn);
+diff -Naur gdb-6.8.orig/gdb/defs.h gdb-6.8/gdb/defs.h
+--- gdb-6.8.orig/gdb/defs.h	2008-01-18 19:07:39.000000000 +0200
++++ gdb-6.8/gdb/defs.h	2008-12-11 02:31:13.877915156 +0200
+@@ -174,6 +174,7 @@
+     language_auto,		/* Placeholder for automatic setting */
+     language_c,			/* C */
+     language_cplus,		/* C++ */
++    language_d,                 /* D */
+     language_objc,		/* Objective-C */
+     language_java,		/* Java */
+     language_fortran,		/* Fortran */
+diff -Naur gdb-6.8.orig/gdb/d-lang.c gdb-6.8/gdb/d-lang.c
+--- gdb-6.8.orig/gdb/d-lang.c	1970-01-01 03:00:00.000000000 +0300
++++ gdb-6.8/gdb/d-lang.c	2008-12-10 13:24:22.000000000 +0200
+@@ -0,0 +1,241 @@
++
++/* C language support routines for GDB, the GNU debugger.
++   Copyright 1992, 1993, 1994, 1995, 1996, 1998, 1999, 2000, 2002, 2003, 2004
++   Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.  */
++
++#include "defs.h"
++#include "symtab.h"
++#include "language.h"
++#include "d-lang.h"
++#include "c-lang.h"
++#include "gdb_string.h"
++
++#include <ctype.h>
++
++typedef struct {
++  size_t len;
++  char* str;
++  char* pos;
++} String;
++
++static size_t str_left(String* str) {
++  return (str->len - (str->pos - str->str));
++}
++
++static void str_resize(String* str, size_t new_size) {
++  int pos = str->pos - str->str;
++  if (new_size == 0)
++    new_size = strlen(str->str) + 1;
++  str->str = xrealloc(str->str, new_size);
++  str->len = new_size;
++  str->pos = str->str + pos;
++}
++
++static void append_len(String* str, char* src, size_t i) {
++  size_t amnt = str_left(str);
++  if (i > amnt) {
++    str_resize(str, str->len + i + 20);
++  }
++  memcpy(str->pos, src, i);
++  str->pos += i;
++}
++
++static void append(String* str, char* src) {
++  append_len(str, src, strlen(src));
++}
++
++static int extractidentifiers(String* output, String* mangled) {
++  long i = 0;
++  while (isdigit(*mangled->pos)) {
++    i = strtol(mangled->pos, &mangled->pos, 10);
++    if (i == 0 || i == LONG_MAX || i == LONG_MIN) {
++      return -1;
++    }
++    if (strlen(mangled->pos) < i)
++      return -1;
++    append_len(output, mangled->pos, i);
++    mangled->pos += i;
++    append(output, ".");
++  }
++  if (*mangled->pos == '\0' || i == 0)
++    return -1;
++  output->pos--;
++  return 1;
++}
++
++static int extracttypeinfo(String* dest, String* id) {
++  if (*id->pos == '\0')
++    return -1;
++  // Extract the type info:
++  switch (*id->pos++) {
++    // array, static array, dynamic array:
++  case 'A': case 'G': case 'H':
++    if (extracttypeinfo(dest, id) == -1)
++      return -1;
++    append(dest, "[]");
++    return 1;
++    // pointer:
++  case 'P':
++    if (extracttypeinfo(dest, id) == -1)
++      return -1;
++    append(dest, "*");
++    return 1;
++    // reference:
++  case 'R':
++    if (extracttypeinfo(dest, id) == -1)
++      return -1;
++    append(dest, "&");
++    return 1;
++    // return value:
++  case 'Z':
++    return extracttypeinfo(dest, id);
++    // out:
++  case 'J':
++    append(dest, "out ");
++    return extracttypeinfo(dest, id);
++    // inout:
++  case 'K':
++    append(dest, "inout ");
++    return extracttypeinfo(dest, id);
++    
++    // enum:
++  case 'E': case 'T': case 'D': case 'C': case 'S': case 'I':
++    return extractidentifiers(dest, id);
++    
++    // basic types:
++  case 'n': append(dest, "none"); return 1;  // ever used?
++  case 'v': append(dest, "void"); return 1;
++  case 'g': append(dest, "byte"); return 1;
++  case 'h': append(dest, "ubyte"); return 1;
++  case 's': append(dest, "short"); return 1;
++  case 't': append(dest, "ushort"); return 1;
++  case 'i': append(dest, "int"); return 1;
++  case 'k': append(dest, "uint"); return 1;
++  case 'l': append(dest, "long"); return 1;
++  case 'm': append(dest, "ulong"); return 1;
++  case 'f': append(dest, "float"); return 1;
++  case 'd': append(dest, "double"); return 1;
++  case 'e': append(dest, "real"); return 1;
++
++  // imaginary and complex:
++  case 'o': append(dest, "ifloat"); return 1;
++  case 'p': append(dest, "idouble"); return 1;
++  case 'j': append(dest, "ireal"); return 1;
++  case 'q': append(dest, "cfloat"); return 1;
++  case 'r': append(dest, "cdouble"); return 1;
++  case 'c': append(dest, "creal"); return 1;
++
++  // other types:
++  case 'b': append(dest, "bit"); return 1;
++  case 'a': append(dest, "char"); return 1;
++  case 'u': append(dest, "wchar"); return 1;
++  case 'w': append(dest, "dchar"); return 1;
++
++  // typeinfo, error, instance:
++  case '@': return extractidentifiers(dest, id); // BUG: is this right?
++
++  default: append(dest, "unknown"); return 1;
++  }
++}
++
++char* d_demangle(const char* symbol_, int options) {
++  String output;
++  String mangled;
++  unsigned char isFunc = 0;
++  char* symbol;
++  //printf("%s: ", symbol);
++  if (symbol_ == NULL) {
++    //printf("NULL1\n");
++    return NULL;
++  } else if (strcmp(symbol_, "_Dmain") == 0) {
++    return strdup("D main");
++  }
++
++  symbol = xstrdup(symbol_);
++  mangled.len = strlen(symbol);
++  mangled.str = symbol;
++  mangled.pos = symbol;
++
++  output.len = 2;
++  output.str = xmalloc(output.len);
++  output.pos = output.str;
++
++  if (symbol == strstr(symbol, "_D")) {
++    mangled.pos += 2;
++    isFunc = 1;
++  } else if (symbol == strstr(symbol, "__Class_")) {
++    mangled.pos += 8;
++  } else if (symbol == strstr(symbol, "__init_")) {
++    mangled.pos += 7;
++  } else if (symbol == strstr(symbol, "__vtbl_")) {
++    mangled.pos += 7;
++  } else if (symbol == strstr(symbol, "__modctor_")) {
++    mangled.pos += 10;
++  } else if (symbol == strstr(symbol, "__moddtor_")) {
++    mangled.pos += 10;
++  } else if (symbol == strstr(symbol, "__ModuleInfo_")) {
++    mangled.pos += 13;
++  } else {
++    xfree(output.str);
++    xfree(symbol);
++    //printf("NULL2\n");
++    return NULL;
++  }
++  
++  
++  if (extractidentifiers(&output, &mangled) < 0) {
++    xfree(output.str);
++    xfree(symbol);
++    //printf("NULL3\n");
++    return NULL;
++  }
++
++
++
++  append(&output, "(");
++  if (isFunc == 1 && *mangled.pos == 'F') {
++    mangled.pos++;
++    while (*mangled.pos != '\0' && *mangled.pos != 'Z') {
++      if (isFunc == 1) {
++	isFunc++;
++      } else {
++	append(&output, ", ");
++      }
++      if (extracttypeinfo(&output, &mangled) < 0) {
++	xfree(output.str);
++    xfree(symbol);
++	return NULL;
++      }
++    }
++  }
++  append(&output, ")");
++
++  //Doesn't display the return type, but wouldn't be too hard to do.
++
++  append_len(&output, "", 1);
++  str_resize(&output, 0);
++  //printf("%s\n", output.str);
++  xfree(symbol);
++  return output.str;
++}
++
++char* d_sym_demangle(const struct general_symbol_info *gsymbol) {
++  return d_demangle(gsymbol->name, 0);
++}
+diff -Naur gdb-6.8.orig/gdb/d-lang.h gdb-6.8/gdb/d-lang.h
+--- gdb-6.8.orig/gdb/d-lang.h	1970-01-01 03:00:00.000000000 +0300
++++ gdb-6.8/gdb/d-lang.h	2008-12-10 14:09:10.000000000 +0200
+@@ -0,0 +1,41 @@
++/* C language support definitions for GDB, the GNU debugger.
++   Copyright 1992, 1994, 1995, 1996, 1997, 1998, 2000, 2002
++   Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 2 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program; if not, write to the Free Software
++   Foundation, Inc., 59 Temple Place - Suite 330,
++   Boston, MA 02111-1307, USA.  */
++
++
++#if !defined (D_LANG_H)
++#define D_LANG_H 1
++
++#include "symtab.h"
++
++/*****************************
++ D Language stuff
++******************************/
++
++char* d_demangle(const char* mangled, int options);
++
++char* d_sym_demangle(const struct general_symbol_info *gsymbol);
++
++int d_val_print (struct type *type, const gdb_byte *valaddr,
++                int embedded_offset, CORE_ADDR address,
++                struct ui_file *stream, int format, int deref_ref,
++                int recurse, enum val_prettyprint pretty);
++
++#endif /* !defined (D_LANG_H) */
+diff -Naur gdb-6.8.orig/gdb/d-valprint.c gdb-6.8/gdb/d-valprint.c
+--- gdb-6.8.orig/gdb/d-valprint.c	1970-01-01 03:00:00.000000000 +0300
++++ gdb-6.8/gdb/d-valprint.c	2008-12-11 02:26:16.000000000 +0200
+@@ -0,0 +1,109 @@
++/* Support for printing D values for GDB, the GNU debugger.
++
++   Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
++   2008 Free Software Foundation, Inc.
++
++   This file is part of GDB.
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License as published by
++   the Free Software Foundation; either version 3 of the License, or
++   (at your option) any later version.
++
++   This program is distributed in the hope that it will be useful,
++   but WITHOUT ANY WARRANTY; without even the implied warranty of
++   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++   GNU General Public License for more details.
++
++   You should have received a copy of the GNU General Public License
++   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
++
++#include "defs.h"
++#include "symtab.h"
++#include "gdbtypes.h"
++#include "gdbcore.h"
++#include "expression.h"
++#include "value.h"
++#include "demangle.h"
++#include "valprint.h"
++#include "language.h"
++#include "d-lang.h"
++#include "c-lang.h"
++#include "annotate.h"
++#include "gdb_string.h"
++
++static int
++dynamic_array_type (struct type *type, const gdb_byte *valaddr,
++		    int embedded_offset, CORE_ADDR address,
++		    struct ui_file *stream, int format, int deref_ref,
++		    int recurse, enum val_prettyprint pretty)
++{
++  if (TYPE_NFIELDS (type) == 2
++      && TYPE_CODE (TYPE_FIELD_TYPE (type, 0)) == TYPE_CODE_INT
++      && strcmp (TYPE_FIELD_NAME (type, 0), "length") == 0
++      && strcmp (TYPE_FIELD_NAME (type, 1), "ptr") == 0)
++    {
++      CORE_ADDR addr;
++      struct type *elttype;
++      struct type *true_type;
++      struct type *ptr_type;
++      struct type *range_type;
++      const gdb_byte *ptraddr;
++      struct value *val;
++      int length;
++
++      length = unpack_field_as_long (type, valaddr + embedded_offset, 0);
++
++      ptr_type = TYPE_FIELD_TYPE (type, 1);
++      elttype = check_typedef (TYPE_TARGET_TYPE (ptr_type));
++      addr = unpack_pointer (ptr_type, valaddr +TYPE_FIELD_BITPOS (type, 1) / 8 + embedded_offset);
++      true_type = check_typedef (elttype);
++
++      range_type = create_range_type (NULL, builtin_type_int32, 0, length - 1);
++      true_type = create_array_type (NULL, true_type, range_type);
++      val = value_at(true_type, addr);
++      ptraddr = value_contents(val);
++
++      val_print (true_type,
++		 ptraddr, 0,
++		 addr,
++		 stream, format, 0, recurse + 1, pretty);
++      return 1;
++    }
++  return 0;
++}
++
++
++/* Print data of type TYPE located at VALADDR (within GDB), which came from
++   the inferior at address ADDRESS, onto stdio stream STREAM according to
++   FORMAT (a letter or 0 for natural format).  The data at VALADDR is in
++   target byte order.
++
++   If the data are a string pointer, returns the number of string characters
++   printed.
++
++   If DEREF_REF is nonzero, then dereference references, otherwise just print
++   them like pointers.
++
++   The PRETTY parameter controls prettyprinting.  */
++
++int
++d_val_print (struct type *type, const gdb_byte *valaddr,
++		int embedded_offset, CORE_ADDR address,
++		struct ui_file *stream, int format, int deref_ref,
++		int recurse, enum val_prettyprint pretty)
++{
++  CHECK_TYPEDEF (type);
++  switch (TYPE_CODE (type))
++    {
++    case TYPE_CODE_STRUCT:
++      if (dynamic_array_type (type, valaddr, embedded_offset, address, stream,
++	  format, deref_ref, recurse, pretty))
++	  break;
++    default:
++      return c_val_print (type, valaddr, embedded_offset, address, stream,
++			  format, deref_ref, recurse, pretty);
++    }
++
++  return 0;
++}
+diff -Naur gdb-6.8.orig/gdb/dwarf2read.c gdb-6.8/gdb/dwarf2read.c
+--- gdb-6.8.orig/gdb/dwarf2read.c	2008-03-10 16:18:10.000000000 +0200
++++ gdb-6.8/gdb/dwarf2read.c	2008-12-11 02:31:13.881914756 +0200
+@@ -6473,6 +6473,9 @@
+     case DW_LANG_C_plus_plus:
+       cu->language = language_cplus;
+       break;
++    case DW_LANG_D:
++      cu->language = language_d;
++      break;
+     case DW_LANG_Fortran77:
+     case DW_LANG_Fortran90:
+     case DW_LANG_Fortran95:
+@@ -7004,7 +7007,7 @@
+                 else
+                   {
+                     fe = &lh->file_names[file - 1];
+-                    if (fe->dir_index)
++                    if (fe->dir_index && lh->include_dirs != NULL)
+                       dir = lh->include_dirs[fe->dir_index - 1];
+                     if (!decode_for_pst_p)
+                       {
+diff -Naur gdb-6.8.orig/gdb/language.c gdb-6.8/gdb/language.c
+--- gdb-6.8.orig/gdb/language.c	2008-02-06 00:17:40.000000000 +0200
++++ gdb-6.8/gdb/language.c	2008-12-11 02:31:13.881914756 +0200
+@@ -539,6 +539,7 @@
+     {
+     case language_c:
+     case language_cplus:
++    case language_d:
+     case language_objc:
+       if (TYPE_CODE (t1) == TYPE_CODE_FLT)
+ 	return TYPE_CODE (t2) == TYPE_CODE_FLT && l2 > l1 ?
+@@ -650,6 +651,7 @@
+     {
+     case language_c:
+     case language_cplus:
++    case language_d:
+     case language_objc:
+       return (TYPE_CODE (type) != TYPE_CODE_INT) &&
+ 	(TYPE_CODE (type) != TYPE_CODE_ENUM) ? 0 : 1;
+@@ -690,6 +692,7 @@
+ 
+     case language_c:
+     case language_cplus:
++    case language_d:
+     case language_objc:
+       return (TYPE_CODE (type) == TYPE_CODE_INT) &&
+ 	TYPE_LENGTH (type) == sizeof (char)
+@@ -712,6 +715,7 @@
+ 
+     case language_c:
+     case language_cplus:
++    case language_d:
+     case language_objc:
+       /* C does not have distinct string type. */
+       return (0);
+@@ -731,6 +735,7 @@
+     {
+     case language_c:
+     case language_cplus:
++    case language_d:
+     case language_objc:
+       /* Might be more cleanly handled by having a
+          TYPE_CODE_INT_NOT_BOOL for (the deleted) CHILL and such
+@@ -804,6 +809,7 @@
+ 	}
+       return builtin_type_f_logical_s2;
+     case language_cplus:
++    case language_d:
+     case language_pascal:
+     case language_ada:
+       if (current_language->la_language==language_cplus)
+diff -Naur gdb-6.8.orig/gdb/Makefile.in gdb-6.8/gdb/Makefile.in
+--- gdb-6.8.orig/gdb/Makefile.in	2008-03-17 14:15:08.000000000 +0200
++++ gdb-6.8/gdb/Makefile.in	2008-12-10 14:02:49.000000000 +0200
+@@ -596,6 +596,7 @@
+ 	charset.c cli-out.c coffread.c coff-pe-read.c \
+ 	complaints.c completer.c corefile.c \
+ 	cp-abi.c cp-support.c cp-namespace.c cp-valprint.c \
++	d-lang.c d-valprint.c \
+ 	cp-name-parser.y \
+ 	dbxread.c demangle.c dictionary.c disasm.c doublest.c dummy-frame.c \
+ 	dwarf2expr.c dwarf2loc.c dwarf2read.c dwarf2-frame.c \
+@@ -749,6 +750,7 @@
+ completer_h = completer.h
+ cp_abi_h = cp-abi.h
+ cp_support_h = cp-support.h $(symtab_h)
++d_lang_h = d-lang.h $(symtab_h)
+ dcache_h = dcache.h
+ defs_h = defs.h $(config_h) $(ansidecl_h) $(gdb_locale_h) $(gdb_signals_h) \
+ 	$(libiberty_h) $(bfd_h) $(ui_file_h) $(nm_h) \
+@@ -1050,7 +1052,7 @@
+ 	dbxread.o coffread.o coff-pe-read.o \
+ 	dwarf2read.o mipsread.o stabsread.o corefile.o \
+ 	dwarf2expr.o dwarf2loc.o dwarf2-frame.o \
+-	ada-lang.o c-lang.o f-lang.o objc-lang.o \
++	ada-lang.o c-lang.o d-lang.o f-lang.o objc-lang.o \
+ 	ui-out.o cli-out.o \
+ 	varobj.o vec.o wrapper.o \
+ 	jv-lang.o jv-valprint.o jv-typeprint.o \
+@@ -1059,7 +1061,7 @@
+ 	sentinel-frame.o \
+ 	complaints.o typeprint.o \
+ 	ada-typeprint.o c-typeprint.o f-typeprint.o m2-typeprint.o \
+-	ada-valprint.o c-valprint.o cp-valprint.o f-valprint.o m2-valprint.o \
++	ada-valprint.o c-valprint.o cp-valprint.o d-valprint.o f-valprint.o m2-valprint.o \
+ 	serial.o mdebugread.o top.o utils.o \
+ 	ui-file.o \
+ 	user-regs.o \
+@@ -2026,6 +2028,9 @@
+ c-valprint.o: c-valprint.c $(defs_h) $(gdb_string_h) $(symtab_h) \
+ 	$(gdbtypes_h) $(expression_h) $(value_h) $(valprint_h) $(language_h) \
+ 	$(c_lang_h) $(cp_abi_h) $(target_h)
++d-lang.o: d-lang.c $(defs_h) $(symtab_h) $(gdbtypes_h) $(expression_h) \
++	$(parser_defs_h) $(language_h) $(c_lang_h) $(valprint_h) \
++	$(macroscope_h) $(gdb_assert_h) $(charset_h) $(gdb_string_h)
+ dbug-rom.o: dbug-rom.c $(defs_h) $(gdbcore_h) $(target_h) $(monitor_h) \
+ 	$(serial_h) $(regcache_h) $(m68k_tdep_h)
+ dbxread.o: dbxread.c $(defs_h) $(gdb_string_h) $(gdb_obstack_h) \
+@@ -2860,7 +2865,7 @@
+ 	$(gdb_obstack_h) $(exceptions_h) $(language_h) $(bcache_h) \
+ 	$(block_h) $(gdb_regex_h) $(gdb_stat_h) $(dictionary_h) \
+ 	$(gdb_string_h) $(readline_h)
+-symtab.o: symtab.c $(defs_h) $(symtab_h) $(gdbtypes_h) $(gdbcore_h) \
++symtab.o: symtab.c $(defs_h) $(d_lang_h) $(symtab_h) $(gdbtypes_h) $(gdbcore_h) \
+ 	$(frame_h) $(target_h) $(value_h) $(symfile_h) $(objfiles_h) \
+ 	$(gdbcmd_h) $(call_cmds_h) $(gdb_regex_h) $(expression_h) \
+ 	$(language_h) $(demangle_h) $(inferior_h) $(linespec_h) $(source_h) \
+diff -Naur gdb-6.8.orig/gdb/symfile.c gdb-6.8/gdb/symfile.c
+--- gdb-6.8.orig/gdb/symfile.c	2008-01-30 00:47:20.000000000 +0200
++++ gdb-6.8/gdb/symfile.c	2008-12-11 02:31:13.884915557 +0200
+@@ -2672,6 +2672,7 @@
+       filename_language_table =
+ 	xmalloc (fl_table_size * sizeof (*filename_language_table));
+       add_filename_language (".c", language_c);
++      add_filename_language (".d", language_d);
+       add_filename_language (".C", language_cplus);
+       add_filename_language (".cc", language_cplus);
+       add_filename_language (".cp", language_cplus);
+diff -Naur gdb-6.8.orig/gdb/symtab.c gdb-6.8/gdb/symtab.c
+--- gdb-6.8.orig/gdb/symtab.c	2008-02-06 00:17:40.000000000 +0200
++++ gdb-6.8/gdb/symtab.c	2008-12-11 02:31:13.886915112 +0200
+@@ -41,6 +41,7 @@
+ #include "objc-lang.h"
+ #include "ada-lang.h"
+ #include "p-lang.h"
++#include "d-lang.h"
+ 
+ #include "hashtab.h"
+ 
+@@ -394,6 +395,7 @@
+ {
+   gsymbol->language = language;
+   if (gsymbol->language == language_cplus
++      || gsymbol->language == language_d
+       || gsymbol->language == language_java
+       || gsymbol->language == language_objc)
+     {
+@@ -440,6 +442,15 @@
+   if (gsymbol->language == language_unknown)
+     gsymbol->language = language_auto;
+ 
++  if (gsymbol->language == language_d
++      || gsymbol->language == language_auto) {
++    demangled = d_demangle(mangled, 0);
++    if (demangled != NULL) {
++      gsymbol->language = language_d;
++      return demangled;
++    }
++  }
++
+   if (gsymbol->language == language_objc
+       || gsymbol->language == language_auto)
+     {
+@@ -617,6 +628,7 @@
+ 
+   demangled = symbol_find_demangled_name (gsymbol, mangled);
+   if (gsymbol->language == language_cplus
++      || gsymbol->language == language_d
+       || gsymbol->language == language_java
+       || gsymbol->language == language_objc)
+     {
+@@ -646,6 +658,7 @@
+   switch (gsymbol->language) 
+     {
+     case language_cplus:
++    case language_d:
+     case language_java:
+     case language_objc:
+       if (gsymbol->language_specific.cplus_specific.demangled_name != NULL)
+@@ -671,6 +684,7 @@
+   switch (gsymbol->language) 
+     {
+     case language_cplus:
++    case language_d:
+     case language_java:
+     case language_objc:
+       if (gsymbol->language_specific.cplus_specific.demangled_name != NULL)
+@@ -1100,7 +1114,7 @@
+ 
+   modified_name = name;
+ 
+-  /* If we are using C++ or Java, demangle the name before doing a lookup, so
++  /* If we are using C++, D, or Java, demangle the name before doing a lookup, so
+      we can always binary search. */
+   if (lang == language_cplus)
+     {
+@@ -1112,6 +1126,16 @@
+ 	  needtofreename = 1;
+ 	}
+     }
++    else if (current_language->la_language == language_d)
++    {
++      demangled_name = d_demangle (name, 0);
++      if (demangled_name)
++   {
++     mangled_name = name;
++     modified_name = demangled_name;
++     needtofreename = 1;
++   }
++    }
+   else if (lang == language_java)
+     {
+       demangled_name = cplus_demangle (name, 
