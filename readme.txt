@@ -377,12 +377,52 @@ To build run the toolchain script:
 ## Install the required packages.
  sudo apt-get install build-essential autoconf automake bison flex \
   libncurses5-dev libreadline-dev libusb-dev texinfo libgmp3-dev libmpfr-dev \
-  subversion doxygen graphviz libtool unrar unzip cmake
+  subversion doxygen graphviz libtool unrar unzip cmake wget
 
  ## Build and install the toolchain + sdk.
- sudo ./toolchain.sh
+ ./toolchain.sh
 
 
+===============================================================================
+ How to build it myself (Ubuntu 64bit)?
+===============================================================================
+
+For some unknown reason GCC 4.3 fails to build the cross compiler in a 64bit
+mode, in order to overcome this we can use the 32bit support from Linux to
+build a working compiler. Initially I used a virtual machine but I've now moved
+to a chroot environment since it is lightweight and enough for the task.
+
+1st install required packages:
+ sudo apt-get install dchroot debootstrap
+
+2nd create the environment config
+ sudo nano /etc/schroot/schroot.conf and add:
+
+  [maverick32]
+  type=directory
+  description=Ubuntu Maverick 32bit
+  directory=/chroot/maverick32
+  priority=3
+  users=<your user>
+  groups=<your user>
+  root-groups=root
+
+3rd create the chroot directory
+ mkdir -p /chroot/maverick32
+
+4th bootstrap the chroot environment
+ sudo debootstrap --variant=buildd --arch i386 maverick \
+  /chroot/maverick32 http://<your closest ubuntu mirror>/ubuntu/
+
+5th If you are using an encrypted home you need to change
+ /etc/schroot/mount-defaults and add:
+  /home/<username>	/home/<username>	none	rw,bind	0	0
+
+5th enter the chroot environment and install add the software as described
+ above
+  sudo schroot -c maverick32
+  sudo apt-get install ...
+  ./toolchain.sh
 ===============================================================================
  How to build it myself (OpenSolaris)?
 ===============================================================================
