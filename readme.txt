@@ -406,6 +406,7 @@ to a chroot environment since it is lightweight and enough for the task.
   users=<your user>
   groups=<your user>
   root-groups=root
+  personality=linux32
 
 3rd create the chroot directory
  mkdir -p /chroot/maverick32
