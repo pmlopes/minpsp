@@ -412,7 +412,7 @@ to a chroot environment since it is lightweight and enough for the task.
  mkdir -p /chroot/maverick32
 
 4th bootstrap the chroot environment
- sudo debootstrap --variant=buildd --arch i386 maverick \
+ sudo debootstrap --variant=buildd --arch=i386 maverick \
   /chroot/maverick32 http://<your closest ubuntu mirror>/ubuntu/
 
 5th If you are using an encrypted home you need to change

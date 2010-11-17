@@ -3,7 +3,7 @@ set -e
 . ../util/util.sh
 
 LIBNAME=cubicvr
-VERSION=1232
+VERSION=1237
 
 svnGet build https://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr cubicvr
 svnGet build https://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr psp

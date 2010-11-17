@@ -478,6 +478,8 @@ function buildBinutils {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-install-libbfd \
+        --disable-shared \
+        --with-stabs \
         --disable-werror \
         --disable-nls
   else
@@ -508,6 +510,8 @@ function buildXGCC {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-languages="c" \
+        --disable-multilib \
+        --disable-shared \
         --with-newlib \
         --without-headers \
         --disable-libssp \
@@ -593,6 +597,8 @@ function buildGCC {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-languages="c,c++,objc,obj-c++,d" \
+        --disable-multilib \
+        --disable-shared \
         --enable-cxx-flags="-G0" \
         --with-newlib \
         --with-headers \
@@ -652,6 +658,7 @@ function buildGDB {
         --prefix=$INSTALLDIR \
         --target=psp \
         --disable-nls \
+        --disable-shared \
         --disable-werror
   else
     cd psp/build/$GDB_SRCDIR

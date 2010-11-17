@@ -1,7 +1,14 @@
 #!/bin/sh
 set -e
 
-VERSION=0.10
+VERSION=`grep PSPSDK_VERSION= toolchain.sh|cut -d= -f2`
+MACHINE=$(uname -m)
+if [ "$MACHINE" == "i386" ]; then
+  ARCH=i386
+fi
+if [ "$MACHINE" == "x86_64" ]; then
+  ARCH=amd64
+fi
 
 rm -Rf minpspw-$VERSION || true
 mkdir minpspw-$VERSION
@@ -16,7 +23,7 @@ echo 2.0 > debian-binary
 mkdir -p opt
 cp -Rf $(pwd)/../../pspsdk opt
 chown -R root:root ./opt
-tar czf data.tar.gz ./opt
+GZIP=--best tar czf data.tar.gz ./opt
 
 # create control file
 cat >> control <<EOF
@@ -25,6 +32,8 @@ Version: $VERSION
 Maintainer: Paulo Lopes <pmlopes@gmail.com>
 Installed-Size: `du -ks opt|cut -f 1`
 Priority: optional
+Architecture: $ARCH
+Section: devel
 Homepage: http://www.jetdrone.com/
 Description: PSP Homebrew Development Kit $VERSION
  The MinPSPW is a development environment for building applications,
@@ -47,10 +56,10 @@ exit 0
 EOF
 chmod a+x postrm
 
-tar czf control.tar.gz control preinst postrm
+GZIP=--best tar czf control.tar.gz control preinst postrm
 
 # create deb
-ar -r ../minpspw_$VERSION-1ubuntu0.deb debian-binary control.tar.gz data.tar.gz
+ar -r ../minpspw_$VERSION-1ubuntu0_$ARCH.deb debian-binary control.tar.gz data.tar.gz
 
 cd ..
-
+rm -Rf minpspw-$VERSION
