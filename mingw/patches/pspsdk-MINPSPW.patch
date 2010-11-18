@@ -1,524 +1,423 @@
-Index: pspsdk/src/samples/exceptions/main.cpp
-===================================================================
---- pspsdk/src/samples/exceptions/main.cpp	(revision 0)
-+++ pspsdk/src/samples/exceptions/main.cpp	(revision 0)
-@@ -0,0 +1,51 @@
-+#include <pspkernel.h>
-+#include <pspdebug.h>
-+#include <pspctrl.h>
-+
-+/* Define printf, just to make typing easier */
-+#define printf  pspDebugScreenPrintf
-+
-+/* Define the module info section */
-+PSP_MODULE_INFO("cppException", 0, 1, 1);
-+
-+/* Define the main thread's attribute value (optional) */
-+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
-+
-+#include <exception>
-+using namespace std;
-+
-+class myexception: public exception
-+{
-+	virtual const char* what() const throw()
-+	{
-+		return "My exception happened";
-+	}
-+} myex;
-+
-+int main (void)
-+{
-+	pspDebugScreenInit();
-+	SceCtrlData pad;
-+	
-+	try
-+	{
-+		throw myex;
-+	}
-+	catch (exception& e)
-+	{
-+		printf("%s\n", e.what());
-+	}
-+	
-+	printf("\nPress X to quit.\n");
-+
-+	for (;;)
-+	{
-+		sceCtrlReadBufferPositive(&pad, 1);
-+		if (pad.Buttons & PSP_CTRL_CROSS)
-+			break;
-+	}
-+	sceKernelExitGame();
-+
-+	return 0;
-+}
-+
-Index: pspsdk/src/samples/exceptions/Makefile.sample
-===================================================================
---- pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
-+++ pspsdk/src/samples/exceptions/Makefile.sample	(revision 0)
-@@ -0,0 +1,18 @@
-+TARGET = CppException
-+OBJS = main.o
-+LIBS = -lstdc++
-+
-+INCDIR =
-+CFLAGS = -G0 -Wall -O2
-+CXXFLAGS = $(CFLAGS) -fno-rtti -fexceptions
-+ASFLAGS = $(CFLAGS)
-+
-+LIBDIR =
-+LDFLAGS =
-+
-+EXTRA_TARGETS = EBOOT.PBP
-+PSP_EBOOT_TITLE = C++ Exception Sample
-+
-+PSPSDK=$(shell psp-config --pspsdk-path)
-+include $(PSPSDK)/lib/build.mak
-+
-Index: pspsdk/src/fpu/pspfpu.h
-===================================================================
---- pspsdk/src/fpu/pspfpu.h	(revision 2489)
-+++ pspsdk/src/fpu/pspfpu.h	(working copy)
-@@ -5,6 +5,7 @@
-  *
-  * pspfpu.h - Prototypes for the FPU library
-  *
-+ * Copyright (c) 2009 JetCube
-  * Copyright (c) 2006 TyRaNiD (James F.) 
-  *
-  * $Id: pspfpu.h 1782 2006-02-04 12:57:05Z tyranid $
-@@ -23,131 +24,131 @@
+diff -Naur pspsdk.orig/src/atrac3/pspatrac3.h pspsdk/src/atrac3/pspatrac3.h
+--- pspsdk.orig/src/atrac3/pspatrac3.h	2010-11-18 14:05:31.607438192 +0100
++++ pspsdk/src/atrac3/pspatrac3.h	2010-11-18 09:23:44.347438189 +0100
+@@ -18,6 +18,57 @@
+ extern "C" {
  #endif
  
- /** Enumeration for FPU rounding modes */
--enum FpuRoundMode
-+enum PspFpuRoundMode
- {
- 	/** Round to nearest representable value */
--	FPU_RN = 0,
-+	PSP_FPU_RN = 0,
- 	/** Round towards zero */
--	FPU_RZ = 1,
-+	PSP_FPU_RZ = 1,
- 	/** Round towards plus infinity */
--	FPU_RP = 2,
-+	PSP_FPU_RP = 2,
- 	/** Round towards minus infinity */ 
--	FPU_RM = 3,
-+	PSP_FPU_RM = 3,
- };
- 
- /** Mask value for rounding mode */
--#define FPU_RM_MASK 0x03 
-+#define PSP_FPU_RM_MASK 0x03 
- 
- /** Enumeration for FPU exceptions */
--enum FpuExceptions
-+enum PspFpuExceptions
- {
- 	/** Inexact operation exception */
--	FPU_EXCEPTION_INEXACT   = 0x01,
-+	PSP_FPU_EXCEPTION_INEXACT   = 0x01,
- 	/** Underflow exception */
--	FPU_EXCEPTION_UNDERFLOW = 0x02,
-+	PSP_FPU_EXCEPTION_UNDERFLOW = 0x02,
- 	/** Overflow exception */
--	FPU_EXCEPTION_OVERFLOW  = 0x04,
-+	PSP_FPU_EXCEPTION_OVERFLOW  = 0x04,
- 	/** Division by zero exception */
--	FPU_EXCEPTION_DIVBYZERO = 0x08,
-+	PSP_FPU_EXCEPTION_DIVBYZERO = 0x08,
- 	/** Invalid operation exception */
--	FPU_EXCEPTION_INVALIDOP = 0x10,
-+	PSP_FPU_EXCEPTION_INVALIDOP = 0x10,
- 	/** Unimplemented operation exception (only supported in the cause bits) */
--	FPU_EXCEPTION_UNIMPOP   = 0x20,
-+	PSP_FPU_EXCEPTION_UNIMPOP   = 0x20,
- 	/** All exceptions */
--	FPU_EXCEPTION_ALL       = 0x3F
-+	PSP_FPU_EXCEPTION_ALL       = 0x3F
- };
- 
- /** Bit position of the flag bits */
--#define FPU_FLAGS_POS   2
-+#define PSP_FPU_FLAGS_POS   2
- /** Bit position of the enable bits */
--#define FPU_ENABLE_POS 7
-+#define PSP_FPU_ENABLE_POS 7
- /** Bit position of the cause bits */
--#define FPU_CAUSE_POS  12
-+#define PSP_FPU_CAUSE_POS  12
- /** Bit position of the cc0 bit */
--#define FPU_CC0_POS    23
-+#define PSP_FPU_CC0_POS    23
- /** Bit position of the fs bit */
--#define FPU_FS_POS     24
-+#define PSP_FPU_FS_POS     24
- /** Bit position of the cc1->7 bits */
--#define FPU_CC17_POS   25
-+#define PSP_FPU_CC17_POS   25
- 
--#define FPU_FLAGS_MASK  (0x1F << FPU_FLAGS_POS)
--#define FPU_ENABLE_MASK (0x1F << FPU_ENABLE_POS)
--#define FPU_CAUSE_MASK  (0x3F << FPU_CAUSE_POS)
--#define FPU_CC0_MASK    (1 << FPU_CC0_POS)
--#define FPU_FS_MASK     (1 << FPU_FS_POS)
--#define FPU_CC17_MASK   (0x7F << FPU_CC17_POS)
-+#define PSP_FPU_FLAGS_MASK  (0x1F << PSP_FPU_FLAGS_POS)
-+#define PSP_FPU_ENABLE_MASK (0x1F << PSP_FPU_ENABLE_POS)
-+#define PSP_FPU_CAUSE_MASK  (0x3F << PSP_FPU_CAUSE_POS)
-+#define PSP_FPU_CC0_MASK    (1 << PSP_FPU_CC0_POS)
-+#define PSP_FPU_FS_MASK     (1 << PSP_FPU_FS_POS)
-+#define PSP_FPU_CC17_MASK   (0x7F << PSP_FPU_CC17_POS)
- 
++/* Error code definition */
++#define PSP_ATRAC_SUCCESS                       SCE_OK
++
++#define PSP_ATRAC_ERROR_PARAM_FAIL              (0x80630001)
++#define PSP_ATRAC_ERROR_API_FAIL                (0x80630002)
++#define PSP_ATRAC_ERROR_NO_ATRACID              (0x80630003)
++#define PSP_ATRAC_ERROR_BAD_CODECTYPE           (0x80630004)
++#define PSP_ATRAC_ERROR_BAD_ATRACID             (0x80630005)
++#define PSP_ATRAC_ERROR_UNKNOWN_FORMAT          (0x80630006)
++#define PSP_ATRAC_ERROR_UNMATCH_FORMAT          (0x80630007)
++#define PSP_ATRAC_ERROR_BAD_DATA                (0x80630008)
++#define PSP_ATRAC_ERROR_ALLDATA_IS_ONMEMORY     (0x80630009)
++#define PSP_ATRAC_ERROR_UNSET_DATA              (0x80630010)
++
++#define PSP_ATRAC_ERROR_READSIZE_IS_TOO_SMALL   (0x80630011)
++#define PSP_ATRAC_ERROR_NEED_SECOND_BUFFER      (0x80630012)
++#define PSP_ATRAC_ERROR_READSIZE_OVER_BUFFER    (0x80630013)
++#define PSP_ATRAC_ERROR_NOT_4BYTE_ALIGNMENT     (0x80630014)
++#define PSP_ATRAC_ERROR_BAD_SAMPLE              (0x80630015)
++#define PSP_ATRAC_ERROR_WRITEBYTE_FIRST_BUFFER  (0x80630016)
++#define PSP_ATRAC_ERROR_WRITEBYTE_SECOND_BUFFER (0x80630017)
++#define PSP_ATRAC_ERROR_ADD_DATA_IS_TOO_BIG     (0x80630018)
++
++#define PSP_ATRAC_ERROR_UNSET_PARAM             (0x80630021)
++#define PSP_ATRAC_ERROR_NONEED_SECOND_BUFFER    (0x80630022)
++#define PSP_ATRAC_ERROR_NODATA_IN_BUFFER        (0x80630023)
++#define PSP_ATRAC_ERROR_ALLDATA_WAS_DECODED     (0x80630024)
++
++/* Audio Codec ID */
++#define PSP_ATRAC_AT3PLUS        (0x00001000)
++#define PSP_ATRAC_AT3            (0x00001001)
++
++/* Remain Frame typical Status */
++#define PSP_ATRAC_ALLDATA_IS_ON_MEMORY             (-1)
++#define PSP_ATRAC_NONLOOP_STREAM_DATA_IS_ON_MEMORY (-2)
++#define PSP_ATRAC_LOOP_STREAM_DATA_IS_ON_MEMORY    (-3)
++
++typedef struct {
++	u8 *pucWritePositionFirstBuf;
++	u32 uiWritableByteFirstBuf;
++	u32 uiMinWriteByteFirstBuf;
++	u32 uiReadPositionFirstBuf;
++
++	u8 *pucWritePositionSecondBuf;
++	u32 uiWritableByteSecondBuf;
++	u32 uiMinWriteByteSecondBuf;
++	u32 uiReadPositionSecondBuf;
++} PspBufferInfo;
++
++int sceAtracGetAtracID(uint  uiCodecType);
++
  /**
-  * Get the current value of the control/status register
+  * Creates a new Atrac ID from the specified data
   *
-  * @return The value of the control/status register
+@@ -132,6 +183,30 @@
   */
--uint32_t pspfpu_get_fcr31(void);
-+uint32_t pspFpuGetFCR31(void);
+ int sceAtracGetMaxSample(int atracID, int *outMax); 
  
- /**
-  * Set the current value of the control/status register
-  *
-  * @param var - The value to set.
-  */
--void pspfpu_set_fcr31(uint32_t var);
-+void pspFpuSetFCR31(uint32_t var);
- 
- /**
-  * Set the current round mode
-  *
-- * @param mode - The rounding mode to set, one of ::FpuRoundMode
-+ * @param mode - The rounding mode to set, one of ::PspFpuRoundMode
-  */
--void pspfpu_set_roundmode(enum FpuRoundMode mode);
-+void pspFpuSetRoundmode(enum PspFpuRoundMode mode);
- 
- /**
-  * Get the current round mode
-  *
-- * @return The round mode, one of ::FpuRoundMode
-+ * @return The round mode, one of ::PspFpuRoundMode
-  */
--enum FpuRoundMode pspfpu_get_roundmode(void);
-+enum PspFpuRoundMode pspFpuGetRoundmode(void);
- 
- /**
-  * Get the exception flags (set when an exception occurs but
-  * the actual exception bit is not enabled)
-  *
-- * @return Bitmask of the flags, zero or more of ::FpuExceptions
-+ * @return Bitmask of the flags, zero or more of ::PspFpuExceptions
-  */
--uint32_t pspfpu_get_flags(void);
-+uint32_t pspFpuGetFlags(void);
- 
- /** 
-  * Clear the flags bits
-  *
-- * @param clear - Bitmask of the bits to clear, one or more of ::FpuExceptions
-+ * @param clear - Bitmask of the bits to clear, one or more of ::PspFpuExceptions
-  */
--void pspfpu_clear_flags(uint32_t clear);
-+void pspFpuClearFlags(uint32_t clear);
- 
- /**
-  * Get the exception enable flags
-  *
-- * @return Bitmask of the flags, zero or more of ::FpuExceptions
-+ * @return Bitmask of the flags, zero or more of ::PspFpuExceptions
-  */
--uint32_t pspfpu_get_enable(void);
-+uint32_t pspFpuGetEnable(void);
- 
- /** 
-  * Set the enable flags bits
-  *
-- * @param enable - Bitmask of exceptions to enable, zero or more of ::FpuExceptions
-+ * @param enable - Bitmask of exceptions to enable, zero or more of ::PspFpuExceptions
-  */
--void pspfpu_set_enable(uint32_t enable);
-+void pspFpuSetEnable(uint32_t enable);
- 
- /**
-  * Get the cause bits (only useful if you installed your own exception handler)
-  *
-- * @return Bitmask of flags, zero or more of ::FpuExceptions
-+ * @return Bitmask of flags, zero or more of ::PspFpuExceptions
-  */
--uint32_t pspfpu_get_cause(void);
-+uint32_t pspFpuGetCause(void);
- 
- /**
-  * Clear the cause bits
-  *
-- * @param clear - Bitmask of the bits to clear, one or more of ::FpuExceptions
-+ * @param clear - Bitmask of the bits to clear, one or more of ::PspFpuExceptions
-  *
-  */
--void pspfpu_clear_cause(uint32_t clear);
-+void pspFpuClearCause(uint32_t clear);
- 
- /**
-  * Get the current value of the FS bit (if FS is 0 then an exception occurs with
-@@ -155,29 +156,244 @@
-  *
-  * @return The current state of the FS bit (0 or 1)
-  */
--uint32_t pspfpu_get_fs(void);
-+uint32_t pspFpuGetFS(void);
- 
- /**
-  * Set the FS bit
-  *
-  * @param fs - 0 or 1 to unset or set fs
-  */
--void pspfpu_set_fs(uint32_t fs);
-+void pspFpuSetFS(uint32_t fs);
- 
- /**
-  * Get the condition flags (8 bits)
-  *
-  * @return The current condition flags
-  */
--uint32_t pspfpu_get_condbits(void);
-+uint32_t pspFpuGetCondbits(void);
- 
- /**
-  * Clear the condition bits
-  *
-  * @param clear - Bitmask of the bits to clear
-  */
--void pspfpu_clear_condbits(uint32_t clear);
-+void pspFpuClearCondbits(uint32_t clear);
- 
-+/**
-+ * returns absolute value
-+ */
-+float pspFpuAbs(float f);
++int sceAtracGetBufferInfoForReseting(int atracID, u32 uiSample, PspBufferInfo *pBufferInfo);
 +
-+/**
-+ * Round up 
-+ */
-+int   pspFpuCeil(float f);
++int sceAtracGetChannel(int atracID, u32 *puiChannel);
 +
-+/**
-+ * Truncate 
-+ */
-+int   pspFpuFloor(float f);
++int sceAtracGetInternalErrorInfo(int atracID, int *piResult);
 +
-+/**
-+ * select maximum value
-+ */
-+float pspFpuMax(float f1, float f2);
++int sceAtracGetLoopStatus(int atracID, int *piLoopNum, u32 *puiLoopStatus);
 +
-+/**
-+ * select minimum value 
-+ */
-+float pspFpuMin(float f1, float f2);
++int sceAtracGetNextDecodePosition(int atracID, u32 *puiSamplePosition);
 +
-+/**
-+ * Sign reversal 
-+ */
-+float pspFpuNeg(float f);
++int sceAtracGetSecondBufferInfo(int atracID, u32 *puiPosition, u32 *puiDataByte);
 +
-+/**
-+ * Round to nearest 
-+ */
-+int pspFpuRound(float f);
++int sceAtracGetSoundSample(int atracID, int *piEndSample, int *piLoopStartSample, int *piLoopEndSample);
 +
-+/*
-+ * Reciprocal of square root
-+ */
-+float pspFpuRsqrt(float f);
++int sceAtracResetPlayPosition(int atracID, u32 uiSample, u32 uiWriteByteFirstBuf, u32 uiWriteByteSecondBuf);
 +
-+/**
-+ * Square root
-+ */
-+float pspFpuSqrt(float f);
++int sceAtracSetData(int atracID, u8 *pucBufferAddr, u32 uiBufferByte);
 +
-+/**
-+ * Round towards zero
-+ */
-+int pspFpuTrunc(float f);
++int sceAtracSetHalfwayBuffer(int atracID, u8 *pucBufferAddr, u32 uiReadByte, u32 uiBufferByte);
 +
-+/**
-+ * 
-+ */
-+float pspFpuFmod(float fs, float fd);
++int sceAtracSetHalfwayBufferAndGetID(u8 *pucBufferAddr, u32 uiReadByte, u32 uiBufferByte);
 +
-+/**
-+ * 
-+ */
-+float pspFpuFrac(float f);
-+
-+/**
-+ * 
-+ */
-+float pspFpuReinterpretFloat(uint32_t ui);
-+
-+/**
-+ * 
-+ */
-+uint32_t pspFpuReinterpretUint(float f);
-+
-+/**
-+ * 
-+ */
-+int pspFpuIsEqual(float f1, float f2);
-+
-+/**
-+ * 
-+ */
-+float pspFpuSignFloat(float f);
-+
-+/**
-+ *
-+ */
-+int pspFpuSignInt(float f);
-+
-+/**
-+ * Positive zero
-+ */
-+float pspFpuPositiveZero(void);
-+
-+/**
-+ * Negative zero
-+ */
-+float pspFpuNegativeZero(void);
-+
-+/**
-+ * Test for zero value
-+ */
-+int pspFpuIsZero(float f);
-+
-+/**
-+ * Test for positive zero
-+ */
-+int pspFpuIsPositiveZero(float f);
-+
-+/**
-+ * Test for negative zero
-+ */
-+int pspFpuIsNegativeZero(float f);
-+
-+/**
-+ * Test for denormalized number
-+ */
-+int pspFpuIsDenormal(float f);
-+
-+/**
-+ * Test for zero or denormalized number
-+ */
-+int pspFpuIsZeroOrDenormal(float f);
-+
-+/**
-+ * Positive infinity
-+ */
-+float pspFpuPositiveInf(void);
-+
-+/**
-+ * Negative infinity
-+ */
-+float pspFpuNegativeInf(void);
-+
-+/**
-+ * Test for infinity
-+ */
-+int pspFpuIsInf(float f);
-+
-+/** 
-+ * NaN (positive SNaN)
-+ */
-+float pspFpuPositiveNaN(void);
-+
-+/**
-+ * NaN (negative SNaN)
-+ */
-+float pspFpuNegativeNaN(void);
-+
-+/**
-+ * Quiet NaN (positive QNaN)
-+ */
-+float pspFpuPositiveQNaN(void);
-+
-+/**
-+ * Quiet NaN (positive QNaN)
-+ */
-+float pspFpuNegativeQNaN(void);
-+
-+/**
-+ * Signaling NaN (positive SNaN)
-+ */
-+float pspFpuPositiveSNaN(unsigned int uiSignal);
-+
-+/**
-+ * Signaling NaN (negative SNaN)
-+ */
-+float pspFpuNegativeSNaN(unsigned int uiSignal);
-+
-+/**
-+ * Test for NaN
-+ */
-+int pspFpuIsNaN(float f);
-+
-+/**
-+ * Test for infinity or NaN
-+ */
-+int pspFpuIsInfOrNaN(float f);
-+
-+/**
-+ *
-+ */
-+float pspFpuNormalizePhase(float f);
-+
-+/**
-+ * Sine
-+ */
-+float pspFpuSin(float x);
-+
-+/**
-+ * Cosine
-+ */
-+float pspFpuCos(float x);
-+
-+/**
-+ * Arc tangent
-+ */
-+float pspFpuAtan(float x);
-+
-+/**
-+ * Natural Logarithm
-+ */
-+float pspFpuLog(float x);
-+
-+/**
-+ * Exponential
-+ */
-+float pspFpuExp(float x);
-+
-+/**
-+ * convert float to double
-+ */
-+double pspFpuFloatToDouble(float a);
-+
-+/**
-+ * convert double to float
-+ */
-+float  pspFpuDoubleToFloat(double a);
++int sceAtracSetSecondBuffer(int atracID, u8 *pucSecondBufferAddr, u32 uiSecondBufferByte);
 +
  #ifdef __cplusplus
  }
  #endif
-Index: pspsdk/src/fpu/pspfpu.c
-===================================================================
---- pspsdk/src/fpu/pspfpu.c	(revision 2489)
-+++ pspsdk/src/fpu/pspfpu.c	(working copy)
-@@ -5,147 +5,891 @@
+diff -Naur pspsdk.orig/src/base/build.mak pspsdk/src/base/build.mak
+--- pspsdk.orig/src/base/build.mak	2010-11-18 14:05:30.947438192 +0100
++++ pspsdk/src/base/build.mak	2010-11-18 09:05:40.657438188 +0100
+@@ -17,6 +17,7 @@
+ 
+ CC       = psp-gcc
+ CXX      = psp-g++
++GDC      = psp-gdc
+ AS       = psp-gcc
+ LD       = psp-gcc
+ AR       = psp-ar
+@@ -45,6 +46,11 @@
+ CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
+ CXXFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
+ 
++# Objective-C selection. All Objective C code must be linked against libobjc.a
++ifeq ($(USE_OBJC),1)
++LIBS     := $(LIBS) -lobjc
++endif
++
+ ifeq ($(BUILD_PRX),1)
+ LDFLAGS  := $(addprefix -L,$(LIBDIR)) -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx $(LDFLAGS)
+ EXTRA_CLEAN += $(TARGET).elf
+@@ -198,6 +204,15 @@
+ %.c: %.exp
+ 	psp-build-exports -b $< > $@
+ 
++%.o: %.m
++	$(CC) $(CFLAGS) -c -o $@ $<
++
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
++%.o: %.d
++	$(GDC) $(DFLAGS) -c -o $@ $<
++
+ clean: 
+ 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
+ 
+diff -Naur pspsdk.orig/src/base/build_prx.mak pspsdk/src/base/build_prx.mak
+--- pspsdk.orig/src/base/build_prx.mak	2010-11-18 14:05:30.947438192 +0100
++++ pspsdk/src/base/build_prx.mak	2010-11-18 09:05:40.657438188 +0100
+@@ -17,6 +17,7 @@
+ 
+ CC       = psp-gcc
+ CXX      = psp-g++
++GDC      = psp-gdc
+ AS       = psp-gcc
+ LD       = psp-gcc
+ FIXUP    = psp-fixup-imports
+@@ -37,6 +38,11 @@
+ 
+ CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
+ 
++# Objective-C selection. All Objective C code must be linked against libobjc.a
++ifeq ($(USE_OBJC),1)
++LIBS     := $(LIBS) -lobjc
++endif
++
+ # Library selection.  By default we link with Newlib's libc.  Allow the
+ # user to link with PSPSDK's libc if USE_PSPSDK_LIBC is set to 1.
+ 
+@@ -80,6 +86,15 @@
+ %.c: %.exp
+ 	psp-build-exports -b $< > $@
+ 
++%.o: %.m
++	$(CC) $(CFLAGS) -c -o $@ $<
++
++%.o: %.mm
++	$(CXX) $(CXXFLAGS) -c -o $@ $<
++
++%.o: %.d
++	$(GDC) $(DFLAGS) -c -o $@ $<
++
+ clean: $(EXTRA_CLEAN)
+ 	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
+ 
+diff -Naur pspsdk.orig/src/display/pspdisplay.h pspsdk/src/display/pspdisplay.h
+--- pspsdk.orig/src/display/pspdisplay.h	2010-11-18 14:05:31.047438192 +0100
++++ pspsdk/src/display/pspdisplay.h	2010-11-18 09:23:44.347438189 +0100
+@@ -122,6 +122,31 @@
+  */
+ int sceDisplayWaitVblankCB(void);
+ 
++/**
++ * Get accumlated HSYNC count
++ */
++int sceDisplayGetAccumulatedHcount(void);
++
++/**
++ * Get current HSYNC count
++ */
++int sceDisplayGetCurrentHcount(void);
++
++/**
++ * Get number of frames per second 
++ */
++float sceDisplayGetFramePerSec(void);
++
++/**
++ * Get whether or not frame buffer is being displayed
++ */
++int sceDisplayIsForeground(void);
++
++/**
++ * Test whether VBLANK is active
++ */
++int sceDisplayIsVblank(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -Naur pspsdk.orig/src/fpu/double.S pspsdk/src/fpu/double.S
+--- pspsdk.orig/src/fpu/double.S	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/fpu/double.S	2010-11-18 12:35:52.457438211 +0100
+@@ -0,0 +1,196 @@
++#define zero	$0	/* wired zero */
++#define at	$1	/* assembler temp */
++#define v0	$2	/* return value */
++#define v1	$3
++#define a0	$4	/* argument registers */
++#define a1	$5
++#define a2	$6
++#define a3	$7
++#define t0	$8	/* caller saved */
++#define t1	$9
++#define t2	$10
++#define t3	$11
++#define t4	$12
++#define t5	$13
++#define t6	$14
++#define t7	$15
++#define s0	$16	/* callee saved */
++#define s1	$17
++#define s2	$18
++#define s3	$19
++#define s4	$20
++#define s5	$21
++#define s6	$22
++#define s7	$23
++#define t8	$24	/* code generator */
++#define t9	$25
++#define k0	$26	/* kernel temporary */
++#define k1	$27
++#define gp	$28	/* global pointer */
++#define sp	$29	/* stack pointer */
++#define fp	$30	/* frame pointer */
++#define ra	$31	/* return address */
++
++#define fv0	$f0
++#define fv1	$f1
++#define ft0	$f2
++#define ft1	$f3
++#define ft2	$f4
++#define ft3	$f5
++#define ft4	$f6
++#define ft5	$f7
++#define ft6	$f8
++#define ft7	$f9
++#define ft8	$f10
++#define ft9	$f11
++#define fa0	$f12
++#define fa1	$f13
++#define fa2	$f14
++#define fa3	$f15
++#define fa4	$f16
++#define fa5	$f17
++#define fa6	$f18
++#define fa7	$f19
++#define fs0	$f20
++#define fs1	$f21
++#define fs2	$f22
++#define fs3	$f23
++#define fs4	$f24
++#define fs5	$f25
++#define fs6	$f26
++#define fs7	$f27
++#define fs8	$f28
++#define fs9	$f29
++#define fs10	$f30
++#define fs11	$f31
++
++.set	noreorder
++.set	noat
++
++.text
++.align	4
++
++.global	pspFpuFloatToDouble
++.global	pspFpuDoubleToFloat
++
++/**
++ * convert float to double
++ * double pspFpuFloatToDouble(float a);
++ *
++ * input: fa0
++ * output: v0,v1
++ * clobber: t0,t1
++ */
++.ent	pspFpuFloatToDouble
++pspFpuFloatToDouble:
++	mfc1	t0, fa0				/* t0 = fa0 */
++	ext	t1, t0, 23, 8			/* t1 = (t0 >> 23) & 0xFF */
++	beq	t1, zero, ftod_denormal		/* if (t1==0) goto ftod_denormal */
++	addiu	v0, t1, (-0x7F+0x3FF)		/* v0 = t1 - 0x7F + 0x3FF */
++	xori	t1, t1, 0xFF			/* t1 = t1 ^ 0xFF */
++	li	v1, 0x7FF			/* v1 = 0x7FF */
++	movz	v0, v1, t1			/* v0 = (t1==0) ? v1 : v0 */
++	ext	v1, t0,  3, 20			/* v1 = (t0 >> 3 ) & 0x00FFFFF */
++	ins	v1, v0, 20, 11			/* v1 = (v1 & 0x800FFFFF) | ((v0<<20) & 0x7FF00000) */
++	sll	v0, t0, 29			/* v0 = (t0 << 29) */
++	srl	t0, t0, 31			/* t0 = (t0 >> 31) & 1 */
++	jr	ra				/* return */
++	ins	v1, t0, 31, 1			/* v1 = (v1 & 0x7FFFFFFF) | ((t0<<31) & 0x80000000) */
++
++ftod_denormal:
++	sll	v0, t0, 9			/* v0 = t0 << 9 */
++	beql	v0, zero, ftod_zero		/* if (v0==0) goto ftod_zero */
++	move	v1, zero			/* v1 = 0 */
++	li	v1, 0x380			/* v1 = 0x380 */
++	clz	t1, v0				/* t1 = clz(v0) */
++	subu	v0, v1, t1			/* v0 = v1 - v0 = 0x380 - clz(t1) */
++	sllv	t1, t0, t1			/* t1 = t0 << t1 */
++	ext	v1, t1,  2, 20			/* v1 = (t1 >> 2 ) & 0x00FFFFF */
++	ins	v1, v0, 20, 11			/* v1 = (v1 & 0x800FFFFF) | ((v0<<20) & 0x7FF00000) */
++	sll	v0, t1, 30			/* v0 = (t1 << 30) */
++ftod_zero:
++	srl	t0, t0, 31			/* t0 = (t0 >> 31) & 1 */
++	jr	ra				/* return */
++	ins	v1, t0, 31, 1			/* v1 = (v1 & 0x7FFFFFFF) | ((t0<<31) & 0x80000000) */
++.end	pspFpuFloatToDouble
++
++/**
++ * convert double to float
++ * float pspFpuDoubleToFloat(double a);
++ * input: a0,a1
++ * output: fv0
++ * clobber: t0,t1,t2,v0
++ */
++.ent	pspFpuDoubleToFloat
++pspFpuDoubleToFloat:
++	ext	t0, a1, 20, 11		/* t0 = (a1>>20) & 0x000007FF */
++	beq	t0, zero, dtof_zero	/* if (t0==0) goto dtof_zero */
++	xori	t1, t0, 0x7FF		/* t1 = t0 ^ 0x7FF */
++	beq	t1, zero, dtof_naninf	/* if (t1==0) goto dtof_naninf */
++	addiu	t1, t0, (+0x7F-0x3FF)	/* t1 = t0 + 0x7F - 0x3FF */
++	blez	t1, dtof_denormal	/* if (t1<=0) goto dtof_denormal */
++	addiu	t2, t1, -0xFE		/* t2 = t1 - 0xFE */
++	bgtz	t2, dtof_inf		/* if (t2 > 0) goto dtof_inf */
++	move	v0, zero		/* v0 = 0 */
++
++	srl	v0, a0, 29			/* v0 = (a0>>29) & 0x00000007 */
++	ins	v0, a1, 3, 20			/* v0 = (v0 & 0xFF800007) | ((a1 & 0FFFFF)<<3) */
++	beq	t2, zero, dtof_inf_normal	/* if (t2==0) goto dtof_inf_normal */
++dtof_normal:
++	srl	t2, a1, 31		/* t2 = (a1>>31) & 1 */
++	ins	v0, t2, 31, 1		/* v0 = (v0 & 0x7FFFFFFF) | (t2 << 31) */
++	ins	v0, t1, 23, 8		/* v0 = (v0 & 0x8007FFFF) | (t1 << 23) */
++	jr	ra			/* return */
++	mtc1	v0, fv0			/* fv0 = v0 */
++dtof_denormal:
++	sll	t0, a1, 12		/* t0 = a1 << 12 */
++	srl	v0, t0, 10		/* v0 = t0 >> 10 */
++	srl	t0, a0, 30		/* t0 = t0 >> 30 */
++	or	v0, v0, t0		/* v0 = v0 | t0 */
++	li	t0, 0x00400000		/* t0 = 0x00400000 */
++	or	v0, v0, t0		/* v0 = v0 | t0 */
++	subu	t0, zero, t1		/* t0 = zero - t1 */
++	sltiu	t1, t0, 22		/* t1 = (t0 < 22) */
++	beq	t1, zero, dtof_min	/* if (t1==0) goto dtof_min */
++	srlv	v0, v0, t0		/* v0 = v0 >> t0 */
++	srl	t2, a1, 31		/* t2 = (a1>>31) & 1 */
++	ins	v0, t2, 31, 1		/* v0 = (v0 & 0x7FFFFFFF) | (t2 << 31) */
++	jr	ra			/* return */
++	mtc1	v0, fv0			/* fv0 = v0 */
++dtof_zero:
++	sll	t0, a1, 12		/* t0 = a1 << 12 */
++	or	t0, t0, a0		/* t0 = t0 | a0 */
++dtof_min:
++	li	v0, 0x00000001		/* v0 = 0x00000001 */
++	movz	v0, zero, t0		/* v0 = (t0==0) ? zero : v0 */
++	srl	t0, a1, 31		/* t0 = (a1 >> 31) & 1 */
++	ins	v0, t0, 31, 1		/* v0 = (v0 & 0x7FFFFFFF) | ((t0<<31) & 0x80000000) */
++	jr	ra			/* return */
++	mtc1	v0, fv0			/* fv0 = v0 */
++dtof_inf_normal:
++	nor	t0, zero, a1		/* t0 = ~a1 */
++	sll	t0, t0, 12		/* t0 = t0 << 12 */
++	bne	t0, zero, dtof_normal	/* if (t0!=0) goto dtof_normal */
++	srl	t0, a0, 28		/* t0 = a0 >> 28 */
++	sltiu	t0, t0, 0xF		/* t0 = (t0 < 0xF) */
++	bne	t0, zero, dtof_normal	/* if (t0!=0) goto dtof_normal */
++	nop				/* waste delay slot */
++	j	dtof_inf		/* goto dtof_inf */
++	move	v0, zero		/* v0 = 0 */
++dtof_naninf:
++	sll	t0, a1, 12		/* t0 = a1 << 12 */
++	or	t1, t0, a0		/* t1 = t0 | a0 */
++	srl	v0, t0, 9		/* v0 = t0 >> 9 */
++	srl	t0, a0, 29		/* t0 = t0 >> 29 */
++	or	v0, v0, t0		/* v0 = v0 | t0 */
++	sltiu	t0, v0, 1		/* t0 = (v0 < 1) */
++	or	v0, v0, t0		/* v0 = v0 | t0 */
++	movz	v0, zero, t1		/* v0 = (t1==0) ? zero : v0 */
++dtof_inf:
++	li	t0, 0x7F800000		/* t0 = 0x7F800000 */
++	or	v0, v0, t0		/* v0 = v0 | t0 */
++	srl	t0, a1, 31		/* t0 = (a1 >> 31) & 1 */
++	ins	v0, t0, 31, 1		/* v0 = (v0 & 0x7FFFFFFF) | ((t0<<31) & 0x80000000) */
++	jr	ra			/* return */
++	mtc1	v0, fv0			/* fv0 = v0 */
++.end	pspFpuDoubleToFloat
+diff -Naur pspsdk.orig/src/fpu/Makefile.am pspsdk/src/fpu/Makefile.am
+--- pspsdk.orig/src/fpu/Makefile.am	2010-11-18 14:05:31.207438192 +0100
++++ pspsdk/src/fpu/Makefile.am	2010-11-18 12:36:55.337438190 +0100
+@@ -14,5 +14,5 @@
+ libpspfpuinclude_HEADERS = pspfpu.h
+ 
+ lib_LIBRARIES = libpspfpu.a
+-libpspfpu_a_SOURCES = pspfpu.c
+-libpspfpu_a_LIBADD  = 
++libpspfpu_a_SOURCES = pspfpu.c double.S
++libpspfpu_a_LIBADD  =
+diff -Naur pspsdk.orig/src/fpu/pspfpu.c pspsdk/src/fpu/pspfpu.c
+--- pspsdk.orig/src/fpu/pspfpu.c	2010-11-18 14:05:31.207438192 +0100
++++ pspsdk/src/fpu/pspfpu.c	2010-11-18 11:44:21.597438202 +0100
+@@ -5,147 +5,940 @@
   *
   * pspfpu.h - PSP FPU library
   *
@@ -530,12 +429,12 @@ Index: pspsdk/src/fpu/pspfpu.c
  #include "pspfpu.h"
  
 -uint32_t pspfpu_get_fcr31(void)
-+#define PSP_MATH_PI		3.14159265358979323846		/* pi           */
-+#define PSP_MATH_TWOPI	(PSP_MATH_PI * 2.0)			/* 2 * pi       */
-+
-+#define PSP_MATH_SQRT2	1.41421356237309504880		/* sqrt(2)      */
-+
-+#define COS_SIN_DIV 0.208
++#define PSP_MATH_PI             3.14159265358979323846
++#define PSP_MATH_TWOPI          (PSP_MATH_PI * 2.0)
++#define PSP_MATH_SQRT2          1.41421356237309504880
++#define PSP_MATH_LN2            0.69314718055994530942
++#define PSP_MATH_LOG2E          1.4426950408889634074
++#define COS_SIN_DIV             0.208
 +
 +static const float logPoly[] = {
 +	 4194305.0 / (1024.0 * 1024.0 *  2.0), /* arround 2.0 */
@@ -746,10 +645,9 @@ Index: pspsdk/src/fpu/pspfpu.c
 +	fcr = pspFpuGetFCR31();
 +	fcr &= ~((clear & 1) << PSP_FPU_CC0_POS);
 +	fcr &= ~((clear & 0xFE) << (PSP_FPU_CC17_POS-1));
- 
--	pspfpu_set_fcr31(fcr);
++
 +	pspFpuSetFCR31(fcr);
- }
++}
 +
 +float pspFpuAbs(float fs)
 +{
@@ -1123,7 +1021,8 @@ Index: pspsdk/src/fpu/pspfpu.c
 +	);
 +	return (v);
 +}
-+
+ 
+-	pspfpu_set_fcr31(fcr);
 +float pspFpuNegativeNaN(void)
 +{
 +	float v;
@@ -1314,6 +1213,55 @@ Index: pspsdk/src/fpu/pspfpu.c
 +	return z + x * (((logPoly[2] * y + logPoly[1]) * y) + logPoly[0]);
 +}
 +
++float pspFpuExp(float x)
++{
++	/*
++	 * exp(x)=e^x=e^(y * log2)=2^Y
++	 *  =2^z * 2^y
++	 *  =2^z * (2^(y/2))^2
++	 *  =2^z * (e^(f/2))^2
++	 *  =2^z * (e^(f/4))^4
++	 * where y=x/log 2
++	 * z=nearest(y) , -0.5 <= f=y-z < 0.5
++	 */
++	union {
++		float f;
++		int i;
++	} fi;
++	float z, f;
++
++	fi.f = x;
++	fi.i &= 0x7fffffff;
++	if (fi.i >= 0x42b00f34) {/* arround 88.03 */
++		/* overflow */
++		if (x != x) {
++			return x; /* NaN */
++		}
++		if (fi.i < 0) {
++			return 0.0; /* underflow */
++		}
++		fi.i = 0x7f800000;
++		return fi.f; /* +INF */
++	}
++
++	f = fi.f * (float)PSP_MATH_LOG2E;
++
++	z = __builtin_allegrex_round_w_s(f);
++	f = f-z;
++	fi.i = z;
++	if (x < 0)
++		fi.i = -fi.i;
++	fi.i = (fi.i+127) << 23;
++
++	/* use Pade aprox. */
++	f = (6.0f + (float)(4.0*PSP_MATH_LN2 * 0.25)*f
++	     + (float)(0.9996*PSP_MATH_LN2*0.25*PSP_MATH_LN2*0.25)*f*f)
++	    / (6.0f - (float)(2.0*PSP_MATH_LN2 * 0.25)*f);
++	f *= f;
++	fi.f *= f*f;
++	return fi.f;
++}
++
 +static float _pspFpuSinMain(float x)
 +{
 +	float y = x*x;
@@ -1463,11 +1411,627 @@ Index: pspsdk/src/fpu/pspfpu.c
 +{
 +	x = x*x;
 +	return pspFpuAtan(__builtin_allegrex_sqrt_s((1.0f-x)/x));
-+}
-Index: pspsdk/src/samples/d/main.d
-===================================================================
---- pspsdk/src/samples/d/main.d	(revision 0)
-+++ pspsdk/src/samples/d/main.d	(revision 0)
+ }
+diff -Naur pspsdk.orig/src/fpu/pspfpu.h pspsdk/src/fpu/pspfpu.h
+--- pspsdk.orig/src/fpu/pspfpu.h	2010-11-18 14:05:31.207438192 +0100
++++ pspsdk/src/fpu/pspfpu.h	2010-11-18 11:41:22.347438190 +0100
+@@ -5,6 +5,7 @@
+  *
+  * pspfpu.h - Prototypes for the FPU library
+  *
++ * Copyright (c) 2009 JetCube
+  * Copyright (c) 2006 TyRaNiD (James F.) 
+  *
+  * $Id: pspfpu.h 1782 2006-02-04 12:57:05Z tyranid $
+@@ -23,131 +24,131 @@
+ #endif
+ 
+ /** Enumeration for FPU rounding modes */
+-enum FpuRoundMode
++enum PspFpuRoundMode
+ {
+ 	/** Round to nearest representable value */
+-	FPU_RN = 0,
++	PSP_FPU_RN = 0,
+ 	/** Round towards zero */
+-	FPU_RZ = 1,
++	PSP_FPU_RZ = 1,
+ 	/** Round towards plus infinity */
+-	FPU_RP = 2,
++	PSP_FPU_RP = 2,
+ 	/** Round towards minus infinity */ 
+-	FPU_RM = 3,
++	PSP_FPU_RM = 3,
+ };
+ 
+ /** Mask value for rounding mode */
+-#define FPU_RM_MASK 0x03 
++#define PSP_FPU_RM_MASK 0x03 
+ 
+ /** Enumeration for FPU exceptions */
+-enum FpuExceptions
++enum PspFpuExceptions
+ {
+ 	/** Inexact operation exception */
+-	FPU_EXCEPTION_INEXACT   = 0x01,
++	PSP_FPU_EXCEPTION_INEXACT   = 0x01,
+ 	/** Underflow exception */
+-	FPU_EXCEPTION_UNDERFLOW = 0x02,
++	PSP_FPU_EXCEPTION_UNDERFLOW = 0x02,
+ 	/** Overflow exception */
+-	FPU_EXCEPTION_OVERFLOW  = 0x04,
++	PSP_FPU_EXCEPTION_OVERFLOW  = 0x04,
+ 	/** Division by zero exception */
+-	FPU_EXCEPTION_DIVBYZERO = 0x08,
++	PSP_FPU_EXCEPTION_DIVBYZERO = 0x08,
+ 	/** Invalid operation exception */
+-	FPU_EXCEPTION_INVALIDOP = 0x10,
++	PSP_FPU_EXCEPTION_INVALIDOP = 0x10,
+ 	/** Unimplemented operation exception (only supported in the cause bits) */
+-	FPU_EXCEPTION_UNIMPOP   = 0x20,
++	PSP_FPU_EXCEPTION_UNIMPOP   = 0x20,
+ 	/** All exceptions */
+-	FPU_EXCEPTION_ALL       = 0x3F
++	PSP_FPU_EXCEPTION_ALL       = 0x3F
+ };
+ 
+ /** Bit position of the flag bits */
+-#define FPU_FLAGS_POS   2
++#define PSP_FPU_FLAGS_POS   2
+ /** Bit position of the enable bits */
+-#define FPU_ENABLE_POS 7
++#define PSP_FPU_ENABLE_POS 7
+ /** Bit position of the cause bits */
+-#define FPU_CAUSE_POS  12
++#define PSP_FPU_CAUSE_POS  12
+ /** Bit position of the cc0 bit */
+-#define FPU_CC0_POS    23
++#define PSP_FPU_CC0_POS    23
+ /** Bit position of the fs bit */
+-#define FPU_FS_POS     24
++#define PSP_FPU_FS_POS     24
+ /** Bit position of the cc1->7 bits */
+-#define FPU_CC17_POS   25
++#define PSP_FPU_CC17_POS   25
+ 
+-#define FPU_FLAGS_MASK  (0x1F << FPU_FLAGS_POS)
+-#define FPU_ENABLE_MASK (0x1F << FPU_ENABLE_POS)
+-#define FPU_CAUSE_MASK  (0x3F << FPU_CAUSE_POS)
+-#define FPU_CC0_MASK    (1 << FPU_CC0_POS)
+-#define FPU_FS_MASK     (1 << FPU_FS_POS)
+-#define FPU_CC17_MASK   (0x7F << FPU_CC17_POS)
++#define PSP_FPU_FLAGS_MASK  (0x1F << PSP_FPU_FLAGS_POS)
++#define PSP_FPU_ENABLE_MASK (0x1F << PSP_FPU_ENABLE_POS)
++#define PSP_FPU_CAUSE_MASK  (0x3F << PSP_FPU_CAUSE_POS)
++#define PSP_FPU_CC0_MASK    (1 << PSP_FPU_CC0_POS)
++#define PSP_FPU_FS_MASK     (1 << PSP_FPU_FS_POS)
++#define PSP_FPU_CC17_MASK   (0x7F << PSP_FPU_CC17_POS)
+ 
+ /**
+  * Get the current value of the control/status register
+  *
+  * @return The value of the control/status register
+  */
+-uint32_t pspfpu_get_fcr31(void);
++uint32_t pspFpuGetFCR31(void);
+ 
+ /**
+  * Set the current value of the control/status register
+  *
+  * @param var - The value to set.
+  */
+-void pspfpu_set_fcr31(uint32_t var);
++void pspFpuSetFCR31(uint32_t var);
+ 
+ /**
+  * Set the current round mode
+  *
+- * @param mode - The rounding mode to set, one of ::FpuRoundMode
++ * @param mode - The rounding mode to set, one of ::PspFpuRoundMode
+  */
+-void pspfpu_set_roundmode(enum FpuRoundMode mode);
++void pspFpuSetRoundmode(enum PspFpuRoundMode mode);
+ 
+ /**
+  * Get the current round mode
+  *
+- * @return The round mode, one of ::FpuRoundMode
++ * @return The round mode, one of ::PspFpuRoundMode
+  */
+-enum FpuRoundMode pspfpu_get_roundmode(void);
++enum PspFpuRoundMode pspFpuGetRoundmode(void);
+ 
+ /**
+  * Get the exception flags (set when an exception occurs but
+  * the actual exception bit is not enabled)
+  *
+- * @return Bitmask of the flags, zero or more of ::FpuExceptions
++ * @return Bitmask of the flags, zero or more of ::PspFpuExceptions
+  */
+-uint32_t pspfpu_get_flags(void);
++uint32_t pspFpuGetFlags(void);
+ 
+ /** 
+  * Clear the flags bits
+  *
+- * @param clear - Bitmask of the bits to clear, one or more of ::FpuExceptions
++ * @param clear - Bitmask of the bits to clear, one or more of ::PspFpuExceptions
+  */
+-void pspfpu_clear_flags(uint32_t clear);
++void pspFpuClearFlags(uint32_t clear);
+ 
+ /**
+  * Get the exception enable flags
+  *
+- * @return Bitmask of the flags, zero or more of ::FpuExceptions
++ * @return Bitmask of the flags, zero or more of ::PspFpuExceptions
+  */
+-uint32_t pspfpu_get_enable(void);
++uint32_t pspFpuGetEnable(void);
+ 
+ /** 
+  * Set the enable flags bits
+  *
+- * @param enable - Bitmask of exceptions to enable, zero or more of ::FpuExceptions
++ * @param enable - Bitmask of exceptions to enable, zero or more of ::PspFpuExceptions
+  */
+-void pspfpu_set_enable(uint32_t enable);
++void pspFpuSetEnable(uint32_t enable);
+ 
+ /**
+  * Get the cause bits (only useful if you installed your own exception handler)
+  *
+- * @return Bitmask of flags, zero or more of ::FpuExceptions
++ * @return Bitmask of flags, zero or more of ::PspFpuExceptions
+  */
+-uint32_t pspfpu_get_cause(void);
++uint32_t pspFpuGetCause(void);
+ 
+ /**
+  * Clear the cause bits
+  *
+- * @param clear - Bitmask of the bits to clear, one or more of ::FpuExceptions
++ * @param clear - Bitmask of the bits to clear, one or more of ::PspFpuExceptions
+  *
+  */
+-void pspfpu_clear_cause(uint32_t clear);
++void pspFpuClearCause(uint32_t clear);
+ 
+ /**
+  * Get the current value of the FS bit (if FS is 0 then an exception occurs with
+@@ -155,28 +156,253 @@
+  *
+  * @return The current state of the FS bit (0 or 1)
+  */
+-uint32_t pspfpu_get_fs(void);
++uint32_t pspFpuGetFS(void);
+ 
+ /**
+  * Set the FS bit
+  *
+  * @param fs - 0 or 1 to unset or set fs
+  */
+-void pspfpu_set_fs(uint32_t fs);
++void pspFpuSetFS(uint32_t fs);
+ 
+ /**
+  * Get the condition flags (8 bits)
+  *
+  * @return The current condition flags
+  */
+-uint32_t pspfpu_get_condbits(void);
++uint32_t pspFpuGetCondbits(void);
+ 
+ /**
+  * Clear the condition bits
+  *
+  * @param clear - Bitmask of the bits to clear
+  */
+-void pspfpu_clear_condbits(uint32_t clear);
++void pspFpuClearCondbits(uint32_t clear);
++
++/**
++ * returns absolute value
++ */
++float pspFpuAbs(float f);
++
++/**
++ * Round up 
++ */
++int   pspFpuCeil(float f);
++
++/**
++ * Truncate 
++ */
++int   pspFpuFloor(float f);
++
++/**
++ * select maximum value
++ */
++float pspFpuMax(float f1, float f2);
++
++/**
++ * select minimum value 
++ */
++float pspFpuMin(float f1, float f2);
++
++/**
++ * Sign reversal 
++ */
++float pspFpuNeg(float f);
++
++/**
++ * Round to nearest 
++ */
++int pspFpuRound(float f);
++
++/*
++ * Reciprocal of square root
++ */
++float pspFpuRsqrt(float f);
++
++/**
++ * Square root
++ */
++float pspFpuSqrt(float f);
++
++/**
++ * Round towards zero
++ */
++int pspFpuTrunc(float f);
++
++/**
++ * 
++ */
++float pspFpuFmod(float fs, float fd);
++
++/**
++ * 
++ */
++float pspFpuFrac(float f);
++
++/**
++ * 
++ */
++float pspFpuReinterpretFloat(uint32_t ui);
++
++/**
++ * 
++ */
++uint32_t pspFpuReinterpretUint(float f);
++
++/**
++ * 
++ */
++int pspFpuIsEqual(float f1, float f2);
++
++/**
++ * 
++ */
++float pspFpuSignFloat(float f);
++
++/**
++ *
++ */
++int pspFpuSignInt(float f);
++
++/**
++ * Positive zero
++ */
++float pspFpuPositiveZero(void);
++
++/**
++ * Negative zero
++ */
++float pspFpuNegativeZero(void);
++
++/**
++ * Test for zero value
++ */
++int pspFpuIsZero(float f);
++
++/**
++ * Test for positive zero
++ */
++int pspFpuIsPositiveZero(float f);
++
++/**
++ * Test for negative zero
++ */
++int pspFpuIsNegativeZero(float f);
++
++/**
++ * Test for denormalized number
++ */
++int pspFpuIsDenormal(float f);
++
++/**
++ * Test for zero or denormalized number
++ */
++int pspFpuIsZeroOrDenormal(float f);
++
++/**
++ * Positive infinity
++ */
++float pspFpuPositiveInf(void);
++
++/**
++ * Negative infinity
++ */
++float pspFpuNegativeInf(void);
++
++/**
++ * Test for infinity
++ */
++int pspFpuIsInf(float f);
++
++/** 
++ * NaN (positive SNaN)
++ */
++float pspFpuPositiveNaN(void);
++
++/**
++ * NaN (negative SNaN)
++ */
++float pspFpuNegativeNaN(void);
++
++/**
++ * Quiet NaN (positive QNaN)
++ */
++float pspFpuPositiveQNaN(void);
++
++/**
++ * Quiet NaN (positive QNaN)
++ */
++float pspFpuNegativeQNaN(void);
++
++/**
++ * Signaling NaN (positive SNaN)
++ */
++float pspFpuPositiveSNaN(unsigned int uiSignal);
++
++/**
++ * Signaling NaN (negative SNaN)
++ */
++float pspFpuNegativeSNaN(unsigned int uiSignal);
++
++/**
++ * Test for NaN
++ */
++int pspFpuIsNaN(float f);
++
++/**
++ * Test for infinity or NaN
++ */
++int pspFpuIsInfOrNaN(float f);
++
++/**
++ *
++ */
++float pspFpuNormalizePhase(float f);
++
++/**
++ * Sine
++ */
++float pspFpuSin(float x);
++
++/**
++ * Cosine
++ */
++float pspFpuCos(float x);
++
++/**
++ * Arc tangent
++ */
++float pspFpuAtan(float x);
++
++/**
++ * Natural Logarithm
++ */
++float pspFpuLog(float x);
++
++/**
++ * Exponential
++ */
++float pspFpuExp(float x);
++
++/**
++ * ArcSin
++ */
++float pspFpuAsin(float x);
++
++/**
++ * ArcCos
++ */
++float pspFpuAcos(float x);
++
++/**
++ * convert float to double
++ */
++double pspFpuFloatToDouble(float a);
++
++/**
++ * convert double to float
++ */
++float  pspFpuDoubleToFloat(double a);
+ 
+ #ifdef __cplusplus
+ }
+diff -Naur pspsdk.orig/src/ge/pspge.h pspsdk/src/ge/pspge.h
+--- pspsdk.orig/src/ge/pspge.h	2010-11-18 14:05:30.957438192 +0100
++++ pspsdk/src/ge/pspge.h	2010-11-18 09:23:44.347438189 +0100
+@@ -46,6 +46,13 @@
+ } PspGeListArgs;
+ 
+ /**
++ * Drawing queue interruption parameter
++ */
++typedef struct PspGeBreakParam {
++	unsigned int	buf[4];
++} PspGeBreakParam;
++
++/**
+  * Get the size of VRAM.
+  *
+  * @return The size of VRAM (in bytes).
+@@ -206,6 +213,22 @@
+   */
+ int sceGeUnsetCallback(int cbid);
+ 
++/**
++ * Interrupt drawing queue
++ */
++int sceGeBreak(int mode, PspGeBreakParam *pParam);
++
++/**
++ * Restart drawing queue 
++ */
++int sceGeContinue(void);
++
++/**
++ * Set Graphics Engine eDRAM address translation mode
++ */
++int sceGeEdramSetAddrTranslation(int width);
++
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -Naur pspsdk.orig/src/net/psphttp.h pspsdk/src/net/psphttp.h
+--- pspsdk.orig/src/net/psphttp.h	2010-11-18 14:05:31.657438192 +0100
++++ pspsdk/src/net/psphttp.h	2010-11-18 09:23:44.347438189 +0100
+@@ -19,12 +19,53 @@
+ 
+ typedef enum
+ {
++	PSP_HTTP_VERSION_1_0,
++	PSP_HTTP_VERSION_1_1
++} PspHttpHttpVersion;
++
++typedef enum
++{
+ 	PSP_HTTP_METHOD_GET,
+ 	PSP_HTTP_METHOD_POST,
+ 	PSP_HTTP_METHOD_HEAD
+ 	
+ } PspHttpMethod;
+ 
++typedef enum
++{
++	PSP_HTTP_AUTH_BASIC,
++	PSP_HTTP_AUTH_DIGEST
++} PspHttpAuthType;
++
++
++typedef enum
++{
++	PSP_HTTP_PROXY_AUTO,
++	PSP_HTTP_PROXY_MANUAL
++} PspHttpProxyMode;
++
++typedef enum
++{
++	PSP_HTTP_HEADER_OVERWRITE,
++	PSP_HTTP_HEADER_ADD
++} PspHttpAddHeaderMode;
++
++/* Memory function types */
++typedef void *(*PspHttpMallocFunction)(SceSize size);
++typedef void *(*PspHttpReallocFunction)(void *p, SceSize size);
++typedef void (*PspHttpFreeFunction)(void *p);
++
++typedef int (*PspHttpPasswordCB)(
++	int request,
++	PspHttpAuthType auth_type,
++	const unsigned char *realm,
++	unsigned char *username,
++	unsigned char *password,
++	SceBool need_entity,
++	unsigned char **entity_body,
++	SceSize *entity_size,
++	SceBool *save);
++
+ /**
+  * Init the http library.
+  *
+@@ -319,6 +360,32 @@
+ */
+ int sceHttpsLoadDefaultCert(int unknown1, int unknown2);
+ 
++int sceHttpDisableAuth(int id);
++
++int sceHttpDisableCache(int id);
++
++int sceHttpEnableAuth(int id);
++
++int sceHttpEnableCache(int id);
++
++int sceHttpEndCache(void);
++
++int sceHttpGetAllHeader(int request, unsigned char **header, unsigned int *header_size);
++
++int sceHttpGetNetworkErrno(int request, int *err_num);
++
++int sceHttpGetProxy(int id, int *activate_flag, int *mode, unsigned char *proxy_host, SceSize len, unsigned short *proxy_port);
++
++int sceHttpInitCache(SceSize max_size);
++
++int sceHttpSetAuthInfoCB(int id, PspHttpPasswordCB cbfunc);
++
++int sceHttpSetProxy(int id, int activate_flag, int mode, const unsigned char *new_proxy_host, unsigned short new_proxy_port);
++
++int sceHttpSetResHeaderMaxSize(int id, unsigned int header_size);
++
++int sceHttpSetMallocFunction(PspHttpMallocFunction malloc_func, PspHttpFreeFunction free_func, PspHttpReallocFunction realloc_func);
++
+ #if defined(__cplusplus)
+ };
+ #endif
+diff -Naur pspsdk.orig/src/rtc/psprtc.h pspsdk/src/rtc/psprtc.h
+--- pspsdk.orig/src/rtc/psprtc.h	2010-11-18 14:05:31.827438192 +0100
++++ pspsdk/src/rtc/psprtc.h	2010-11-18 09:23:44.347438189 +0100
+@@ -249,14 +249,31 @@
+ int sceRtcGetWin32FileTime(pspTime* date, u64* win32Time);
+ 
+ int sceRtcParseDateTime(u64 *destTick, const char *dateString);
+-/*
+-sceRtcFormatRFC2822
+-sceRtcFormatRFC2822LocalTime
+-sceRtcFormatRFC3339
+-sceRtcFormatRFC3339LocalTime
+ 
+-sceRtcParseRFC3339
+-*/
++/**
++ * Format Tick-representation UTC time in RFC2822 format
++ */
++int sceRtcFormatRFC2822(char *pszDateTime, const u64 *pUtc, int iTimeZoneMinutes);
++
++/**
++ * Format Tick-representation UTC time in RFC2822 format
++ */
++int sceRtcFormatRFC2822LocalTime(char *pszDateTime, const u64 *pUtc);
++
++/**
++ * Format Tick-representation UTC time in RFC3339(ISO8601) format
++ */
++int sceRtcFormatRFC3339(char *pszDateTime, const u64 *pUtc, int iTimeZoneMinutes);
++
++/**
++ * Format Tick-representation UTC time in RFC3339(ISO8601) format
++ */
++int sceRtcFormatRFC3339LocalTime(char *pszDateTime, const u64 *pUtc);
++
++/**
++ * Parse time information represented in RFC3339 format
++ */
++int sceRtcParseRFC3339(u64 *pUtc, const char *pszDateTime);
+ 
+ #ifdef __cplusplus
+ }
+diff -Naur pspsdk.orig/src/samples/d/main.d pspsdk/src/samples/d/main.d
+--- pspsdk.orig/src/samples/d/main.d	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/d/main.d	2010-11-18 09:05:40.657438188 +0100
 @@ -0,0 +1,31 @@
 +// imports
 +//
@@ -1500,10 +2064,29 @@ Index: pspsdk/src/samples/d/main.d
 +	sceKernelSleepThread();
 +	return 0;
 +}
-Index: pspsdk/src/samples/d/module.c
-===================================================================
---- pspsdk/src/samples/d/module.c	(revision 0)
-+++ pspsdk/src/samples/d/module.c	(revision 0)
+diff -Naur pspsdk.orig/src/samples/d/Makefile.sample pspsdk/src/samples/d/Makefile.sample
+--- pspsdk.orig/src/samples/d/Makefile.sample	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/d/Makefile.sample	2010-11-18 09:05:40.657438188 +0100
+@@ -0,0 +1,16 @@
++TARGET = HelloPspInD
++OBJS = module.o main.o
++
++CFLAGS = -O2 -Wall
++CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LIBS = -lgphobos -lm
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = Hello World
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak 
+diff -Naur pspsdk.orig/src/samples/d/module.c pspsdk/src/samples/d/module.c
+--- pspsdk.orig/src/samples/d/module.c	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/d/module.c	2010-11-18 09:05:40.657438188 +0100
 @@ -0,0 +1,36 @@
 +#include <pspkernel.h>
 +#include <pspdebug.h> 
@@ -1541,31 +2124,101 @@ Index: pspsdk/src/samples/d/module.c
 +
 +	return thid;
 +} 
-Index: pspsdk/src/samples/d/Makefile.sample
-===================================================================
---- pspsdk/src/samples/d/Makefile.sample	(revision 0)
-+++ pspsdk/src/samples/d/Makefile.sample	(revision 0)
-@@ -0,0 +1,16 @@
-+TARGET = HelloPspInD
-+OBJS = module.o main.o
+diff -Naur pspsdk.orig/src/samples/exceptions/main.cpp pspsdk/src/samples/exceptions/main.cpp
+--- pspsdk.orig/src/samples/exceptions/main.cpp	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/exceptions/main.cpp	2010-11-18 09:05:40.657438188 +0100
+@@ -0,0 +1,51 @@
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspctrl.h>
 +
-+CFLAGS = -O2 -Wall
-+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++/* Define printf, just to make typing easier */
++#define printf  pspDebugScreenPrintf
++
++/* Define the module info section */
++PSP_MODULE_INFO("cppException", 0, 1, 1);
++
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++
++#include <exception>
++using namespace std;
++
++class myexception: public exception
++{
++	virtual const char* what() const throw()
++	{
++		return "My exception happened";
++	}
++} myex;
++
++int main (void)
++{
++	pspDebugScreenInit();
++	SceCtrlData pad;
++	
++	try
++	{
++		throw myex;
++	}
++	catch (exception& e)
++	{
++		printf("%s\n", e.what());
++	}
++	
++	printf("\nPress X to quit.\n");
++
++	for (;;)
++	{
++		sceCtrlReadBufferPositive(&pad, 1);
++		if (pad.Buttons & PSP_CTRL_CROSS)
++			break;
++	}
++	sceKernelExitGame();
++
++	return 0;
++}
++
+diff -Naur pspsdk.orig/src/samples/exceptions/Makefile.sample pspsdk/src/samples/exceptions/Makefile.sample
+--- pspsdk.orig/src/samples/exceptions/Makefile.sample	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/exceptions/Makefile.sample	2010-11-18 09:05:40.657438188 +0100
+@@ -0,0 +1,18 @@
++TARGET = CppException
++OBJS = main.o
++LIBS = -lstdc++
++
++INCDIR =
++CFLAGS = -G0 -Wall -O2
++CXXFLAGS = $(CFLAGS) -fno-rtti -fexceptions
 +ASFLAGS = $(CFLAGS)
 +
 +LIBDIR =
-+LIBS = -lgphobos -lm
 +LDFLAGS =
 +
 +EXTRA_TARGETS = EBOOT.PBP
-+PSP_EBOOT_TITLE = Hello World
++PSP_EBOOT_TITLE = C++ Exception Sample
 +
 +PSPSDK=$(shell psp-config --pspsdk-path)
-+include $(PSPSDK)/lib/build.mak 
-Index: pspsdk/src/samples/obj-c/main.m
-===================================================================
---- pspsdk/src/samples/obj-c/main.m	(revision 0)
-+++ pspsdk/src/samples/obj-c/main.m	(revision 0)
++include $(PSPSDK)/lib/build.mak
++
+diff -Naur pspsdk.orig/src/samples/Makefile.am pspsdk/src/samples/Makefile.am
+--- pspsdk.orig/src/samples/Makefile.am	2010-11-18 14:05:31.367438192 +0100
++++ pspsdk/src/samples/Makefile.am	2010-11-18 09:05:40.657438188 +0100
+@@ -81,7 +81,10 @@
+ 	utility/systemparam \
+ 	utility/osk \
+ 	me/basic \
+-	wlan
++	wlan \
++	obj-c \
++	exceptions \
++	d
+ 
+ all:
+ 
+diff -Naur pspsdk.orig/src/samples/obj-c/main.m pspsdk/src/samples/obj-c/main.m
+--- pspsdk.orig/src/samples/obj-c/main.m	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/obj-c/main.m	2010-11-18 09:05:40.657438188 +0100
 @@ -0,0 +1,62 @@
 +#include <objc/Object.h>
 +
@@ -1629,10 +2282,9 @@ Index: pspsdk/src/samples/obj-c/main.m
 +	return 0;
 +}
 +
-Index: pspsdk/src/samples/obj-c/Makefile.sample
-===================================================================
---- pspsdk/src/samples/obj-c/Makefile.sample	(revision 0)
-+++ pspsdk/src/samples/obj-c/Makefile.sample	(revision 0)
+diff -Naur pspsdk.orig/src/samples/obj-c/Makefile.sample pspsdk/src/samples/obj-c/Makefile.sample
+--- pspsdk.orig/src/samples/obj-c/Makefile.sample	1970-01-01 01:00:00.000000000 +0100
++++ pspsdk/src/samples/obj-c/Makefile.sample	2010-11-18 09:05:40.657438188 +0100
 @@ -0,0 +1,19 @@
 +TARGET = ObjC
 +OBJS = main.o
@@ -1653,99 +2305,3 @@ Index: pspsdk/src/samples/obj-c/Makefile.sample
 +PSPSDK=$(shell psp-config --pspsdk-path)
 +include $(PSPSDK)/lib/build.mak
 +
-Index: pspsdk/src/samples/Makefile.am
-===================================================================
---- pspsdk/src/samples/Makefile.am	(revision 2458)
-+++ pspsdk/src/samples/Makefile.am	(working copy)
-@@ -81,7 +81,10 @@
- 	utility/systemparam \
- 	utility/osk \
- 	me/basic \
--	wlan
-+	wlan \
-+	obj-c \
-+	exceptions \
-+	d
- 
- all:
- 
-Index: pspsdk/src/base/build_prx.mak
-===================================================================
---- pspsdk/src/base/build_prx.mak       (revision 2494)
-+++ pspsdk/src/base/build_prx.mak       (working copy)
-@@ -17,6 +17,7 @@
- 
- CC       = psp-gcc
- CXX      = psp-g++
-+GDC      = psp-gdc
- AS       = psp-gcc
- LD       = psp-gcc
- FIXUP    = psp-fixup-imports
-@@ -37,6 +38,11 @@
- 
- CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
- 
-+# Objective-C selection. All Objective C code must be linked against libobjc.a
-+ifeq ($(USE_OBJC),1)
-+LIBS     := $(LIBS) -lobjc
-+endif
-+
- # Library selection.  By default we link with Newlib's libc.  Allow the
- # user to link with PSPSDK's libc if USE_PSPSDK_LIBC is set to 1.
- 
-@@ -80,6 +86,15 @@
- %.c: %.exp
- 	psp-build-exports -b $< > $@
- 
-+%.o: %.m
-+	$(CC) $(CFLAGS) -c -o $@ $<
-+
-+%.o: %.mm
-+	$(CXX) $(CXXFLAGS) -c -o $@ $<
-+
-+%.o: %.d
-+	$(GDC) $(DFLAGS) -c -o $@ $<
-+
- clean: $(EXTRA_CLEAN)
- 	-rm -f $(FINAL_TARGET) $(TARGET).elf $(OBJS)
- 
-Index: pspsdk/src/base/build.mak
-===================================================================
---- pspsdk/src/base/build.mak   (revision 2494)
-+++ pspsdk/src/base/build.mak   (working copy)
-@@ -17,6 +17,7 @@
- 
- CC       = psp-gcc
- CXX      = psp-g++
-+GDC      = psp-gdc
- AS       = psp-gcc
- LD       = psp-gcc
- AR       = psp-ar
-@@ -45,6 +46,11 @@
- CFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
- CXXFLAGS += -D_PSP_FW_VERSION=$(PSP_FW_VERSION)
- 
-+# Objective-C selection. All Objective C code must be linked against libobjc.a
-+ifeq ($(USE_OBJC),1)
-+LIBS     := $(LIBS) -lobjc
-+endif
-+
- ifeq ($(BUILD_PRX),1)
- LDFLAGS  := $(addprefix -L,$(LIBDIR)) -specs=$(PSPSDK)/lib/prxspecs -Wl,-q,-T$(PSPSDK)/lib/linkfile.prx $(LDFLAGS)
- EXTRA_CLEAN += $(TARGET).elf
-@@ -198,6 +204,15 @@
- %.c: %.exp
- 	psp-build-exports -b $< > $@
- 
-+%.o: %.m
-+	$(CC) $(CFLAGS) -c -o $@ $<
-+
-+%.o: %.mm
-+	$(CXX) $(CXXFLAGS) -c -o $@ $<
-+
-+%.o: %.d
-+	$(GDC) $(DFLAGS) -c -o $@ $<
-+
- clean: 
- 	-rm -f $(FINAL_TARGET) $(EXTRA_CLEAN) $(OBJS) $(PSP_EBOOT_SFO) $(PSP_EBOOT) $(EXTRA_TARGETS)
- 
