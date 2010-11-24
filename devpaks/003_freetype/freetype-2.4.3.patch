@@ -1,0 +1,30 @@
+diff -Naur builds/unix/config.sub builds/unix/config.sub
+--- builds/unix/config.sub	2010-10-03 20:45:06.000000000 +0200
++++ builds/unix/config.sub	2010-11-24 13:33:11.499432999 +0100
+@@ -279,6 +279,7 @@
+ 	| mipsisa64sb1 | mipsisa64sb1el \
+ 	| mipsisa64sr71k | mipsisa64sr71kel \
+ 	| mipstx39 | mipstx39el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mn10200 | mn10300 \
+ 	| moxie \
+ 	| mt \
+@@ -376,6 +377,7 @@
+ 	| mipsisa64sb1-* | mipsisa64sb1el-* \
+ 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
+ 	| mipstx39-* | mipstx39el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mmix-* \
+ 	| mt-* \
+ 	| msp430-* \
+@@ -773,6 +775,10 @@
+ 		basic_machine=m68k-atari
+ 		os=-mint
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	mips3*-*)
+ 		basic_machine=`echo $basic_machine | sed -e 's/mips3/mips64/'`
+ 		;;

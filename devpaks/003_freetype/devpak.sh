@@ -3,14 +3,12 @@ set -e
 . ../util/util.sh
 
 LIBNAME=freetype
-VERSION=2.1.10
+VERSION=2.4.3
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://download.savannah.gnu.org/releases/freetype" $LIBNAME-$VERSION "tar.bz2"
 
-cd build/$LIBNAME
-
-sh autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp
+cd build/$LIBNAME-$VERSION
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 make
 
 make install
@@ -28,4 +26,3 @@ cd ..
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-
