@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME jpeg
-!define VERSION 6.2
+!define VERSION 8.0
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

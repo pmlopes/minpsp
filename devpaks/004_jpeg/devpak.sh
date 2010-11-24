@@ -3,11 +3,11 @@ set -e
 . ../util/util.sh
 
 LIBNAME=jpeg
-VERSION=6.2
+VERSION=8b
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://www.ijg.org/files" jpegsrc.v$VERSION "tar.gz"
 
-cd build/$LIBNAME
+cd build/$LIBNAME-$VERSION
 make
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
