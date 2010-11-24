@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME libzip2
-!define VERSION 1.0.4
+!define VERSION 1.0.6
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

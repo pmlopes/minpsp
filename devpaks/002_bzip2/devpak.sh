@@ -3,11 +3,11 @@ set -e
 . ../util/util.sh
 
 LIBNAME=bzip2
-VERSION=1.0.4
+VERSION=1.0.6
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://bzip.org/$VERSION" $LIBNAME-$VERSION "tar.gz"
 
-cd build/$LIBNAME
+cd build/$LIBNAME-$VERSION
 make
 
 make PREFIX=$(pwd)/../target/psp install
