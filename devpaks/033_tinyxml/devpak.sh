@@ -3,9 +3,9 @@ set -e
 . ../util/util.sh
 
 LIBNAME=tinyxml
-VERSION=2.5.3
+VERSION=2.6.1
 
-download build "http://downloads.sourceforge.net/tinyxml" ${LIBNAME}_2_5_3 "tar.gz"
+download build "http://downloads.sourceforge.net/tinyxml" ${LIBNAME}_2_6_1 "tar.gz"
 
 cp Makefile.PSP build/$LIBNAME
 
