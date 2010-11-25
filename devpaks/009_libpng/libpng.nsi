@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME libpng
-!define VERSION 1.2.8
+!define VERSION 1.4.4
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

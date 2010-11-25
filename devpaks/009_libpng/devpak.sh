@@ -3,18 +3,15 @@ set -e
 . ../util/util.sh
 
 LIBNAME=libpng
-VERSION=1.2.8
+VERSION=1.4.4
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
-
+download build "http://downloads.sourceforge.net/libpng" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 make
-
-mkdir -p ../target/psp/include ../target/psp/lib ../target/man/man3
-cp png.h pngconf.h ../target/psp/include
-cp libpng.a ../target/psp/lib
-cp libpng.3 ../target/man/man3
+make install
+mkdir -p ../target/psp/sdk/samples/libpng/screenshot
+cp screenshot/* ../target/psp/sdk/samples/libpng/screenshot
 
 cd ../..
 
