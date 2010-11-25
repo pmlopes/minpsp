@@ -1,0 +1,97 @@
+diff -Naur frame.c frame.c
+--- frame.c	2004-02-04 23:59:19.000000000 +0100
++++ frame.c	2010-11-25 10:59:29.917629000 +0100
+@@ -52,7 +52,11 @@
+ };
+ 
+ static
+-unsigned int const samplerate_table[3] = { 44100, 48000, 32000 };
++unsigned int const samplerate_table[3] __attribute__((aligned (16))) = {
++  44100,
++  48000,
++  32000
++};
+ 
+ static
+ int (*const decoder_table[3])(struct mad_stream *, struct mad_frame *) = {
+diff -Naur mad.h mad.h
+--- mad.h	2004-02-17 03:55:44.000000000 +0100
++++ mad.h	2010-11-25 11:04:08.747628995 +0100
+@@ -24,7 +24,7 @@
+ extern "C" {
+ # endif
+ 
+-# define FPM_INTEL
++# define FPM_MIPS
+ 
+ 
+ 
+diff -Naur config.h config.h
+--- config.h	1970-01-01 01:00:00.000000000 +0100
++++ config.h	2010-11-25 11:12:07.327628997 +0100
+@@ -0,0 +1,43 @@
++/*
++ * libmad - MPEG audio decoder library
++ * Copyright (C) 2000-2001 Robert Leslie
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * If you would like to negotiate alternate licensing terms, you may do
++ * so by contacting the author: Robert Leslie <rob@mars.org>
++ *
++ * $Id: config.h,v 1.1 2005/02/14 01:29:02 rinco Exp $
++ *
++ * This file is specific to ps2 adaptation of rob's libmad to ps2
++ *
++ */
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define SIZEOF_INT 4
++#define SIZEOF_LONG 4
++#define SIZEOF_LONG_LONG 8
++
++#define FPM_DEFAULT
++#define _LIB
++#define OPT_SPEED
++#define HAVE_MADD_ASM
++
++#ifdef __cplusplus
++}
++#endif
+diff -Naur Makefile Makefile
+--- Makefile	1970-01-01 01:00:00.000000000 +0100
++++ Makefile	2010-11-25 11:07:41.967628996 +0100
+@@ -0,0 +1,18 @@
++PSPSDK=$(shell psp-config --pspsdk-path)
++PSPDIR = $(shell psp-config --psp-prefix)
++
++TARGET_LIB = libmad.a
++OBJS = bit.o decoder.o fixed.o frame.o huffman.o layer12.o layer3.o \
++	stream.o synth.o timer.o version.o
++
++CFLAGS += -DHAVE_CONFIG_H -DHAVE_SYS_TYPES_H -DHAVE_ERRNO_H -DHAVE_UNISTD_H \
++	-DHAVE_FCNTL_H -I$(PSPSDK)/include/sys/  -I.
++
++include $(PSPSDK)/lib/build.mak
++
++install: $(PSP_LIB)
++	@echo "Installing libmad into $(PSPLIBSDIR)/libmad"
++	@mkdir -p $(PSPDIR)/include $(PSPDIR)/lib
++	@cp ../include/mad.h $(PSPDIR)/include
++	@cp ../lib/libmad.a  $(PSPDIR)/lib
++	@echo "Done."

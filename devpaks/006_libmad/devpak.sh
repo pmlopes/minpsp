@@ -3,20 +3,18 @@ set -e
 . ../util/util.sh
 
 LIBNAME=libmad
-VERSION=0.15.1
+VERSION=0.15.1b
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
+download build "http://downloads.sourceforge.net/mad" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
 make
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 cp README ../target/doc/$LIBNAME.txt
-cp include/mad.h ../target/psp/include
-cp lib/libmad.a  ../target/psp/lib
+cp mad.h ../target/psp/include
+cp libmad.a  ../target/psp/lib
 cd ../..
 
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-
