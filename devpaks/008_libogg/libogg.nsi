@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME libogg
-!define VERSION 1.1.2
+!define VERSION 1.2.1
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

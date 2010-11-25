@@ -3,19 +3,18 @@ set -e
 . ../util/util.sh
 
 LIBNAME=libogg
-VERSION=1.1.2
+VERSION=1.2.1
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://downloads.xiph.org/releases/ogg" $LIBNAME-$VERSION "tar.bz2"
 
-cd build/$LIBNAME
-
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host psp --prefix=$(pwd)/../target/psp
+cd build/$LIBNAME-$VERSION
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 
 make
 
 make install
 mkdir -p $(pwd)/../target/doc
-mv $(pwd)/../target/psp/share/doc/libogg-1.1.2 $(pwd)/../target/doc
+mv $(pwd)/../target/psp/share/doc/$LIBNAME-$VERSION $(pwd)/../target/doc
 rm -fR $(pwd)/../target/psp/share
 
 cd ../..
@@ -23,4 +22,3 @@ cd ../..
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-

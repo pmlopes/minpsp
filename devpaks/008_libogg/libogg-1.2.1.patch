@@ -1,0 +1,60 @@
+diff -Naur config.sub config.sub
+--- config.sub	2006-08-10 17:17:12.000000000 +0200
++++ config.sub	2010-11-25 11:54:14.027628994 +0100
+@@ -267,6 +267,7 @@
+ 	| mipsisa64sb1 | mipsisa64sb1el \
+ 	| mipsisa64sr71k | mipsisa64sr71kel \
+ 	| mipstx39 | mipstx39el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mn10200 | mn10300 \
+ 	| mt \
+ 	| msp430 \
+@@ -347,6 +348,7 @@
+ 	| mipsisa64sb1-* | mipsisa64sb1el-* \
+ 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
+ 	| mipstx39-* | mipstx39el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mmix-* \
+ 	| mt-* \
+ 	| msp430-* \
+@@ -875,6 +877,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32
+diff -Naur configure configure
+--- configure	2010-11-01 21:18:05.000000000 +0100
++++ configure	2010-11-25 11:56:59.927628994 +0100
+@@ -11106,6 +11106,11 @@
+ 		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+ 		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+ 		;;
++	mipsallegrex*-*-*)
++		DEBUG="-g -Wall -fsigned-char"
++		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char"
++		;;
+         *)
+                 DEBUG="-g -Wall -fsigned-char"
+                 CFLAGS="-O20 -fsigned-char"
+diff -Naur configure.in configure.in
+--- configure.in	2010-11-01 21:13:42.000000000 +0100
++++ configure.in	2010-11-25 11:56:31.677628999 +0100
+@@ -59,6 +59,11 @@
+ 		CFLAGS="-fno-common -O4 -Wall -fsigned-char -ffast-math"
+ 		PROFILE="-fno-common -O4 -Wall -pg -g -fsigned-char -ffast-math"
+ 		;;
++	mipsallegrex*-*-*)
++		DEBUG="-g -Wall -fsigned-char"
++		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char"
++		;;
+         *)
+                 DEBUG="-g -Wall -fsigned-char"
+                 CFLAGS="-O20 -fsigned-char"
