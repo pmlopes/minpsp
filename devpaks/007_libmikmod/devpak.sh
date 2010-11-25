@@ -5,9 +5,9 @@ set -e
 LIBNAME=libmikmod
 VERSION=3.1.11
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://mikmod.raphnet.net/files" $LIBNAME-$VERSION "tar.gz"
 
-cd build/$LIBNAME
+cd build/$LIBNAME-$VERSION
 make -f Makefile.psp
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc

@@ -1,0 +1,1697 @@
+diff -Naur config.h config.h
+--- config.h	1970-01-01 01:00:00.000000000 +0100
++++ config.h	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,154 @@
++/* config.h.in.  Generated automatically from configure.in by autoheader.  */
++
++/* Define if on AIX 3.
++   System headers sometimes define this.
++   We just want to avoid a redefinition error message.  */
++#ifndef _ALL_SOURCE
++//#undef _ALL_SOURCE
++#endif
++
++/* Define to empty if the keyword does not work.  */
++#undef const
++
++/* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
++#undef HAVE_SYS_WAIT_H
++
++/* Define to `int' if <sys/types.h> doesn't define.  */
++#undef pid_t
++
++/* Define to `unsigned' if <sys/types.h> doesn't define.  */
++#undef size_t
++
++/* Define if you have the ANSI C header files.  */
++#undef STDC_HEADERS
++
++/* Define if your system supports binary pipes (i.e. Unix) */
++#undef DRV_PIPE
++
++#undef DRV_RAW
++/* Define if the AudioFile driver is compiled */
++#undef DRV_AF
++/* Define if the AIX audio driver is compiled */
++#undef DRV_AIX
++/* Define if the Linux ALSA driver is compiled */
++#undef DRV_ALSA
++/* Define if the Enlightened Sound Daemon driver is compiled */
++#undef DRV_ESD
++/* Define if the HP-UX audio driver is compiled */
++#undef DRV_HP
++/* Define if the Open Sound System driver is compiled */
++#undef DRV_OSS
++/* Define if the Linux SAM9407 driver is compiled */
++#undef DRV_SAM9407
++/* Define if the SGI audio driver is compiled */
++#undef DRV_SGI
++/* Define if the Sun audio driver or compatible (NetBSD, OpenBSD)
++   is compiled */
++#undef DRV_SUN
++/* Define if the Linux Ultra driver is compiled */
++#undef DRV_ULTRA
++
++#define DRV_PSP
++
++/* Define if you want a debug version of the library */
++#undef MIKMOD_DEBUG
++/* Define if you want runtime dynamic linking of ALSA and EsounD drivers */
++#undef MIKMOD_DYNAMIC
++/* Define if your system provides POSIX.4 threads */
++#undef HAVE_PTHREAD
++
++/* Define if your system is SunOS 4.* */
++#undef SUNOS
++/* Define if your system is AIX 3.* - might be needed for 4.* too */
++#undef AIX
++/* Define if your system defines random(3) and srandom(3) in math.h instead
++   of stdlib.h */
++#undef SRANDOM_IN_MATH_H
++/* Define if EsounD driver depends on ALSA */
++#undef MIKMOD_DYNAMIC_ESD_NEEDS_ALSA
++/* Define if your system has RTLD_GLOBAL defined in <dlfcn.h> */
++#undef HAVE_RTLD_GLOBAL
++/* Define if your system needs leading underscore to function names in dlsym() calls */
++#undef DLSYM_NEEDS_UNDERSCORE
++
++/* Define if you have the setenv function.  */
++#undef HAVE_SETENV
++
++/* Define if you have the snprintf function.  */
++#undef HAVE_SNPRINTF
++
++/* Define if you have the srandom function.  */
++//#define HAVE_SRANDOM 1
++
++/* Define if you have the strcasecmp function.  */
++#define  HAVE_STRCASECMP 1
++
++/* Define if you have the strdup function.  */
++#define HAVE_STRDUP 1
++
++/* Define if you have the strstr function.  */
++#define HAVE_STRSTR 1
++
++/* Define if you have the <AF/AFlib.h> header file.  */
++#undef HAVE_AF_AFLIB_H
++
++/* Define if you have the <dl.h> header file.  */
++#undef HAVE_DL_H
++
++/* Define if you have the <dlfcn.h> header file.  */
++#undef HAVE_DLFCN_H
++
++/* Define if you have the <dmedia/audio.h> header file.  */
++#undef HAVE_DMEDIA_AUDIO_H
++
++/* Define if you have the <fcntl.h> header file.  */
++#undef HAVE_FCNTL_H
++
++/* Define if you have the <libgus.h> header file.  */
++#undef HAVE_LIBGUS_H
++
++/* Define if you have the <machine/soundcard.h> header file.  */
++#undef HAVE_MACHINE_SOUNDCARD_H
++
++/* Define if you have the <malloc.h> header file.  */
++#define HAVE_MALLOC_H 1
++
++/* Define if you have the <memory.h> header file.  */
++#undef HAVE_MEMORY_H
++
++/* Define if you have the <strings.h> header file.  */
++#undef HAVE_STRINGS_H
++
++/* Define if you have the <sun/audioio.h> header file.  */
++#undef HAVE_SUN_AUDIOIO_H
++
++/* Define if you have the <sys/acpa.h> header file.  */
++#undef HAVE_SYS_ACPA_H
++
++/* Define if you have the <sys/asoundlib.h> header file.  */
++#undef HAVE_SYS_ASOUNDLIB_H
++
++/* Define if you have the <sys/audio.h> header file.  */
++#undef HAVE_SYS_AUDIO_H
++
++/* Define if you have the <sys/audioio.h> header file.  */
++#undef HAVE_SYS_AUDIOIO_H
++
++/* Define if you have the <sys/ioctl.h> header file.  */
++#undef HAVE_SYS_IOCTL_H
++
++/* Define if you have the <sys/sam9407.h> header file.  */
++#undef HAVE_SYS_SAM9407_H
++
++/* Define if you have the <sys/soundcard.h> header file.  */
++#undef HAVE_SYS_SOUNDCARD_H
++
++/* Define if you have the <unistd.h> header file.  */
++#define HAVE_UNISTD_H 1
++
++/* Name of package */
++#define PACKAGE "libmikmod"
++
++/* Version number of package */
++#define VERSION "3.1.10"
++
+diff -Naur drivers/drv_psp.c drivers/drv_psp.c
+--- drivers/drv_psp.c	1970-01-01 01:00:00.000000000 +0100
++++ drivers/drv_psp.c	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,182 @@
++/*	MikMod sound library
++	(c) 1998, 1999, 2000 Miodrag Vallat and others - see file AUTHORS for
++	complete list.
++
++	This library is free software; you can redistribute it and/or modify
++	it under the terms of the GNU Library General Public License as
++	published by the Free Software Foundation; either version 2 of
++	the License, or (at your option) any later version.
++
++	This program is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++	GNU Library General Public License for more details.
++
++	You should have received a copy of the GNU Library General Public
++	License along with this library; if not, write to the Free Software
++	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
++	02111-1307, USA.
++*/
++
++/*==============================================================================
++
++  $Id: drv_win.c,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
++
++  Output data to PSP audio device
++
++==============================================================================*/
++
++/*
++
++By sweetlilmre 12 November 2005, (mikmod 3.1.11 port), original by Jim Shaw.
++Public Domain
++*/
++
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include "mikmod_internals.h"
++
++#ifdef DRV_PSP
++
++#include <pspkernel.h>
++#include <pspaudio.h>
++#include <pspaudiolib.h>
++#include <string.h>
++
++
++static int audio_ready=0;
++static int audio_handle = -1;
++static volatile int audio_terminate=0;
++static volatile int bufidx=0;
++
++static short mkimod_sndbuf[2][PSP_NUM_AUDIO_SAMPLES][2];
++
++
++static volatile int playing = 0;
++
++static void PSP_Update(void)
++{
++	if (audio_terminate == 0)
++  {
++		void *bufptr=&mkimod_sndbuf[bufidx];
++    if (playing)
++    {
++      VC_WriteBytes(bufptr, PSP_NUM_AUDIO_SAMPLES*4);
++    }
++    else
++    {
++      memset(bufptr, 0, PSP_NUM_AUDIO_SAMPLES*4);
++    }
++    if (audio_ready)
++    {
++      sceAudioOutputPannedBlocking(audio_handle, PSP_VOLUME_MAX, PSP_VOLUME_MAX, bufptr);
++    }
++		bufidx=(bufidx?0:1);
++	}
++}
++
++
++static BOOL PSP_IsThere(void)
++{
++	return 1;
++}
++
++
++static BOOL PSP_Init(void)
++{
++	if (VC_Init())
++		return 1;
++    
++	audio_terminate=0;
++	audio_ready=0;
++  audio_handle = -1;
++
++  if ((audio_handle = sceAudioChReserve(-1,PSP_NUM_AUDIO_SAMPLES,0))<0) 
++  {
++    return 1;
++	}
++  
++	audio_ready = 1;
++	return 0;
++}
++
++static void PSP_Exit(void)
++{
++	audio_ready=0;
++	audio_terminate=1;
++
++  if (audio_handle != -1)
++  {
++    sceAudioChRelease(audio_handle);
++    audio_handle = -1;
++  }
++
++	VC_Exit();
++}
++
++
++static BOOL PSP_Reset(void)
++{
++	VC_Exit();
++	return VC_Init();
++}
++
++static BOOL PSP_PlayStart(void)
++{
++	VC_PlayStart();
++	playing = 1;
++	return 0;
++}
++
++static void PSP_PlayStop(void)
++{
++	playing = 0;
++	VC_PlayStop();
++}
++
++MIKMODAPI MDRIVER drv_psp =
++{
++	NULL,
++	"PSP Audio",
++	"PSP Output Driver v1.1 - by sweetlilmre, original by Jim Shaw",
++	0,255,
++	"pspdrv",
++
++	NULL,
++	PSP_IsThere,
++	VC_SampleLoad,
++	VC_SampleUnload,
++	VC_SampleSpace,
++	VC_SampleLength,
++  PSP_Init,
++	PSP_Exit,
++	PSP_Reset,
++  
++	VC_SetNumVoices,
++	PSP_PlayStart,
++	PSP_PlayStop,
++	PSP_Update,
++  NULL,
++  
++	VC_VoiceSetVolume,
++	VC_VoiceGetVolume,
++	VC_VoiceSetFrequency,
++	VC_VoiceGetFrequency,
++	VC_VoiceSetPanning,
++	VC_VoiceGetPanning,
++	VC_VoicePlay,
++	VC_VoiceStop,
++	VC_VoiceStopped,
++	VC_VoiceGetPosition,
++	VC_VoiceRealVolume
++};
++
++#else
++
++MISSING(drv_psp);
++
++#endif
++
++
+diff -Naur drivers/drv_psp_thread.c drivers/drv_psp_thread.c
+--- drivers/drv_psp_thread.c	1970-01-01 01:00:00.000000000 +0100
++++ drivers/drv_psp_thread.c	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,139 @@
++/*
++
++Name:
++drv_psp.c
++Output data to PSP audio device
++
++By Jim Shaw 9 July 2005
++Public Domain
++
++*/
++
++#include <pspkernel.h>
++#include <pspaudiolib.h>
++
++#include <string.h>
++
++#include "mikmod.h"
++//#include "mmio.h"
++
++static int playing = 0;
++
++static BOOL PSP_IsThere(void)
++{
++	return 1;
++}
++
++static void sound_callback(void *buf, unsigned int reqn, void *userdata)
++{
++	if (playing)
++	{
++		VC_WriteBytes(buf, reqn*4);
++	}
++	else
++	{
++		memset(buf, 0, reqn*4);
++	}
++}
++
++static BOOL PSP_Init(void)
++{
++	if (VC_Init())
++		return 1;
++
++	pspAudioInit();
++	pspAudioSetChannelCallback(0, (void *)sound_callback, NULL);
++
++	return 0;
++}
++
++static void PSP_Exit(void)
++{
++	pspAudioEndPre();
++	pspAudioEnd();
++	VC_Exit();
++}
++
++static void PSP_Update(void)
++{
++}
++
++static BOOL PSP_Reset(void)
++{
++	VC_Exit();
++	return VC_Init();
++}
++
++static BOOL PSP_PlayStart(void)
++{
++	VC_PlayStart();
++	playing = 1;
++	return 0;
++}
++
++static void PSP_PlayStop(void)
++{
++	playing = 0;
++	VC_PlayStop();
++}
++
++MIKMODAPI MDRIVER drv_psp =
++{
++	NULL,
++	"PSP Audio",
++	"PSP Output Driver v1.0 - by Jim Shaw",
++	0,255,
++	"psp",
++	NULL,	//command line
++	PSP_IsThere,
++	VC_SampleLoad,
++	VC_SampleUnload,
++	VC_SampleSpace,
++	VC_SampleLength,
++	PSP_Init,
++	PSP_Exit,
++	PSP_Reset,
++	VC_SetNumVoices,
++	PSP_PlayStart,
++	PSP_PlayStop,
++	PSP_Update,
++	NULL,	//pause
++	VC_VoiceSetVolume,
++	VC_VoiceGetVolume,
++	VC_VoiceSetFrequency,
++	VC_VoiceGetFrequency,
++	VC_VoiceSetPanning,
++	VC_VoiceGetPanning,
++	VC_VoicePlay,
++	VC_VoiceStop,
++	VC_VoiceStopped,
++	VC_VoiceGetPosition,
++	VC_VoiceRealVolume
++};
++/*
++	NULL,
++	"PSP Audio",
++	"PSP Output Driver v1.0 - by Jim Shaw",
++	0,255,
++	PSP_IsThere,
++	VC_SampleLoad,
++	VC_SampleUnload,
++	VC_SampleSpace,
++	VC_SampleLength,
++	PSP_Init,
++	PSP_Exit,
++	PSP_Reset,
++	VC_SetNumVoices,
++	PSP_PlayStart,
++	PSP_PlayStop,
++	PSP_Update,
++	VC_VoiceSetVolume,
++	VC_VoiceSetFrequency,
++	VC_VoiceSetPanning,
++	VC_VoicePlay,
++	VC_VoiceStop,
++	VC_VoiceStopped,
++	VC_VoiceReleaseSustain,
++	VC_VoiceGetPosition,
++	VC_VoiceRealVolume
++*/
+diff -Naur example.c example.c
+--- example.c	1970-01-01 01:00:00.000000000 +0100
++++ example.c	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,248 @@
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspctrl.h>
++#include <pspdisplay.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "mikmod.h"
++
++
++#define true 1
++#define false 0
++
++/* Define the module info section */
++PSP_MODULE_INFO("LIBMIKMODTEST", 0x1000, 1, 1);
++
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++
++/* Define printf, just to make typing easier */
++#define printf	pspDebugScreenPrintf
++
++int done = 0;
++extern int _mm_errno;
++extern BOOL _mm_critical;
++extern char *_mm_errmsg[];
++int mikModThreadID = -1;
++
++
++/* Exit callback */
++int exit_callback(int arg1, int arg2, void *common)
++{
++	done = 1;
++	return 0;
++}
++
++/* Callback thread */
++int CallbackThread(SceSize args, void *argp)
++{
++	int cbid;
++
++	cbid = sceKernelCreateCallback("Exit Callback", exit_callback, NULL);
++	sceKernelRegisterExitCallback(cbid);
++	sceKernelSleepThreadCB();
++
++	return 0;
++}
++
++/* Sets up the callback thread and returns its thread id */
++int SetupCallbacks(void)
++{
++	int thid = 0;
++
++  thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
++	if(thid >= 0)
++	{
++		sceKernelStartThread(thid, 0, 0);
++	}
++
++	return thid;
++}
++
++
++
++void my_error_handler(void)
++{
++	printf("_mm_critical %d\n", MikMod_critical);
++	printf("_mm_errno %d\n", MikMod_errno);
++	printf("%s\n", MikMod_strerror(MikMod_errno));
++	return;
++}
++static int AudioChannelThread(int args, void *argp)
++{
++  while (!done)
++  {
++    MikMod_Update();
++    // We have to sleep here to allow other threads a chance to process.
++    // with no sleep this thread will take over when the output is disabled via MikMod_DisableOutput()
++    // co-operative threading sucks bigtime...
++    sceKernelDelayThread(1);
++  }
++  return (0);
++}
++
++extern UWORD md_mode;
++extern UBYTE md_reverb;
++extern UBYTE md_pansep;
++
++int main(void)
++{
++	SceCtrlData pad, lastpad;
++	
++	int maxchan = 128;
++	MODULE *mf = NULL; // for mod
++	SAMPLE *sf = NULL; // for wav
++	int voice = 0; 	   // for wav
++	int pan = 127;
++	int vol = 127;
++	int freq = 22000;
++
++
++	pspDebugScreenInit();
++	SetupCallbacks();
++
++	sceCtrlSetSamplingCycle(0);
++	sceCtrlSetSamplingMode(1);
++	if (!MikMod_InitThreads())
++  {
++    printf("MikMod thread init failed\n");
++  }
++  
++	MikMod_RegisterErrorHandler(my_error_handler);
++  /* register all the drivers */
++  MikMod_RegisterAllDrivers();
++  /* register all the module loaders */
++  MikMod_RegisterAllLoaders();
++
++    /* initialize the library */
++	md_mode = DMODE_16BITS|DMODE_STEREO|DMODE_SOFT_SNDFX|DMODE_SOFT_MUSIC; 
++	md_reverb = 0;
++	md_pansep = 128;
++  if (MikMod_Init(""))
++  {
++    printf("Could not initialize sound, reason: %s\n", MikMod_strerror(MikMod_errno));
++    sceKernelExitGame();
++    return 0;
++  }
++  
++  MikMod_SetNumVoices(-1, 8);
++	/* get ready to play */
++
++	sf = Sample_Load("ms0:/sound.wav");
++	
++	printf("Starting.\n");
++  MikMod_EnableOutput();
++  BOOL outputEnabled = true;
++
++  if ((mikModThreadID = sceKernelCreateThread("MikMod" ,(void*)&AudioChannelThread,0x12,0x10000,0,NULL)) > 0)
++  {
++    sceKernelStartThread(mikModThreadID, 0 , NULL);
++  }
++  else
++  {
++    printf("Play thread create failed!\n");
++  }
++
++	sceCtrlReadBufferPositive(&lastpad, 1);
++	do
++  {
++		sceCtrlReadBufferPositive(&pad, 1);
++		
++		if(pad.Buttons != lastpad.Buttons)
++    {
++			if(pad.Buttons & PSP_CTRL_CROSS)
++      {
++				voice = Sample_Play(sf,0,0);
++				Voice_SetPanning(voice, pan);
++			}
++
++			if(pad.Buttons & PSP_CTRL_SQUARE)
++      {
++				outputEnabled = !outputEnabled;
++				outputEnabled?MikMod_EnableOutput():MikMod_DisableOutput();
++			}
++			
++			if(pad.Buttons & PSP_CTRL_CIRCLE)
++      {
++        mf = Player_Load("ms0:/MUSIC.XM", maxchan, 0);
++        if (NULL != mf)
++        {
++          mf->wrap = 1;
++				  Player_Start(mf);
++        }
++			}
++
++			if(pad.Buttons & PSP_CTRL_TRIANGLE)
++      {
++        if (NULL != mf)
++        {
++				  Player_Stop();
++				  Player_Free(mf); // To stop the song for real, it needs to be freed. I know, weird...
++          mf = NULL;
++        }
++			}
++			
++			if(pad.Buttons & PSP_CTRL_SELECT)
++				printf("Player is %s\n", Player_Active()?"On":"Off");
++        
++      lastpad = pad;
++		}
++				
++		if(pad.Buttons & PSP_CTRL_LTRIGGER)
++    {
++			Voice_SetPanning(voice, (pan<2)?pan:--pan);
++			printf("pan is %d\n", pan);
++		}
++		
++    if(pad.Buttons & PSP_CTRL_RTRIGGER)
++    {
++			Voice_SetPanning(voice, (pan>254)?pan:++pan);
++			printf("pan is %d\n", pan);
++		}
++			
++		if(pad.Buttons & PSP_CTRL_UP)
++    {
++			Voice_SetVolume(voice, (vol>254)?vol:++vol);
++			printf("vol is %d\n", vol);
++		}
++		
++    if(pad.Buttons & PSP_CTRL_DOWN)
++    {
++			Voice_SetVolume(voice, (vol<2)?vol:--vol);
++			printf("vol is %d\n", vol);
++		}
++			
++		if(pad.Buttons & PSP_CTRL_LEFT)
++    {
++			Voice_SetFrequency(voice, (freq<1001)?freq:(freq -=1000));
++			printf("freq is %d\n", freq);
++		}
++		
++    if(pad.Buttons & PSP_CTRL_RIGHT)
++    {
++			Voice_SetFrequency(voice, (freq>44000)?freq:(freq +=1000));
++			printf("freq is %d\n", freq);
++		}
++		sceDisplayWaitVblankStart();
++		
++	} while(!((pad.Buttons & PSP_CTRL_START) || done));
++
++	printf("Stopping.\n");
++  
++  // allow audio thread to terminate cleanly
++  done = true;
++  if (mikModThreadID > 0)
++  {
++    SceUInt timeout = 100000;
++    sceKernelWaitThreadEnd(mikModThreadID, &timeout);
++    // not 100% sure if this is necessary after a clean exit, but just to make sure any resources are freed:
++    sceKernelDeleteThread(mikModThreadID);
++  }
++	Player_Stop();
++	Player_Free(mf);
++	MikMod_Exit();
++
++	sceKernelExitGame();
++	return 0;
++}
+diff -Naur include/mikmod_build.h include/mikmod_build.h
+--- include/mikmod_build.h	1970-01-01 01:00:00.000000000 +0100
++++ include/mikmod_build.h	2010-08-16 20:40:15.000000000 +0200
+@@ -0,0 +1,719 @@
++/*	MikMod sound library
++	(c) 1998, 1999, 2000 Miodrag Vallat and others - see file AUTHORS
++	for complete list.
++
++	This library is free software; you can redistribute it and/or modify
++	it under the terms of the GNU Library General Public License as
++	published by the Free Software Foundation; either version 2 of
++	the License, or (at your option) any later version.
++ 
++	This program is distributed in the hope that it will be useful,
++	but WITHOUT ANY WARRANTY; without even the implied warranty of
++	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++	GNU Library General Public License for more details.
++ 
++	You should have received a copy of the GNU Library General Public
++	License along with this library; if not, write to the Free Software
++	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
++	02111-1307, USA.
++*/
++
++/*==============================================================================
++
++  $Id: mikmod.h.in,v 1.1.1.1 2004/01/21 01:36:35 raph Exp $
++
++  MikMod sound library include file
++
++==============================================================================*/
++
++#ifndef _MIKMOD_H_
++#define _MIKMOD_H_
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/*
++ * ========== Compiler magic for shared libraries
++ */
++
++#if defined WIN32 && defined _DLL
++#ifdef DLL_EXPORTS
++#define MIKMODAPI __declspec(dllexport)
++#else
++#define MIKMODAPI __declspec(dllimport)
++#endif
++#else
++#define MIKMODAPI
++#endif
++
++/*
++ *	========== Library version
++ */
++
++#define LIBMIKMOD_VERSION_MAJOR 3L
++#define LIBMIKMOD_VERSION_MINOR 1L
++#define LIBMIKMOD_REVISION      11L
++
++#define LIBMIKMOD_VERSION \
++	((LIBMIKMOD_VERSION_MAJOR<<16)| \
++	 (LIBMIKMOD_VERSION_MINOR<< 8)| \
++	 (LIBMIKMOD_REVISION))
++
++MIKMODAPI extern long MikMod_GetVersion(void);
++
++/*
++ *	========== Platform independent-type definitions
++ */
++
++#ifdef WIN32
++#define WIN32_LEAN_AND_MEAN
++#include <windows.h>
++#include <io.h>
++#include <mmsystem.h>
++#endif
++
++#if defined(__OS2__)||defined(__EMX__)
++#define INCL_DOSSEMAPHORES
++#include <os2.h>
++#else
++typedef char CHAR;
++#endif
++
++
++
++#if defined(__arch64__) || defined(__alpha)
++/* 64 bit architectures */
++
++typedef signed char     SBYTE;      /* 1 byte, signed */
++typedef unsigned char   UBYTE;      /* 1 byte, unsigned */
++typedef signed short    SWORD;      /* 2 bytes, signed */
++typedef unsigned short  UWORD;      /* 2 bytes, unsigned */
++typedef signed int      SLONG;      /* 4 bytes, signed */
++typedef unsigned int    ULONG;      /* 4 bytes, unsigned */
++typedef int             BOOL;       /* 0=false, <>0 true */
++
++#else
++/* 32 bit architectures */
++
++typedef signed char     SBYTE;      /* 1 byte, signed */
++typedef unsigned char   UBYTE;      /* 1 byte, unsigned */
++typedef signed short    SWORD;      /* 2 bytes, signed */
++typedef unsigned short  UWORD;      /* 2 bytes, unsigned */
++typedef signed long     SLONG;      /* 4 bytes, signed */
++#if !defined(__OS2__)&&!defined(__EMX__)&&!defined(WIN32)
++typedef unsigned long   ULONG;      /* 4 bytes, unsigned */
++typedef int             BOOL;       /* 0=false, <>0 true */
++#endif
++#endif
++
++/*
++ *	========== Error codes
++ */
++
++enum {
++	MMERR_OPENING_FILE = 1,
++	MMERR_OUT_OF_MEMORY,
++	MMERR_DYNAMIC_LINKING,
++
++	MMERR_SAMPLE_TOO_BIG,
++	MMERR_OUT_OF_HANDLES,
++	MMERR_UNKNOWN_WAVE_TYPE,
++
++	MMERR_LOADING_PATTERN,
++	MMERR_LOADING_TRACK,
++	MMERR_LOADING_HEADER,
++	MMERR_LOADING_SAMPLEINFO,
++	MMERR_NOT_A_MODULE,
++	MMERR_NOT_A_STREAM,
++	MMERR_MED_SYNTHSAMPLES,
++	MMERR_ITPACK_INVALID_DATA,
++
++	MMERR_DETECTING_DEVICE,
++	MMERR_INVALID_DEVICE,
++	MMERR_INITIALIZING_MIXER,
++	MMERR_OPENING_AUDIO,
++	MMERR_8BIT_ONLY,
++	MMERR_16BIT_ONLY,
++	MMERR_STEREO_ONLY,
++	MMERR_ULAW,
++	MMERR_NON_BLOCK,
++
++	MMERR_AF_AUDIO_PORT,
++
++	MMERR_AIX_CONFIG_INIT,
++	MMERR_AIX_CONFIG_CONTROL,
++	MMERR_AIX_CONFIG_START,
++
++	MMERR_GUS_SETTINGS,
++	MMERR_GUS_RESET,
++	MMERR_GUS_TIMER,
++
++	MMERR_HP_SETSAMPLESIZE,
++	MMERR_HP_SETSPEED,
++	MMERR_HP_CHANNELS,
++	MMERR_HP_AUDIO_OUTPUT,
++	MMERR_HP_AUDIO_DESC,
++	MMERR_HP_BUFFERSIZE,
++
++	MMERR_OSS_SETFRAGMENT,
++	MMERR_OSS_SETSAMPLESIZE,
++	MMERR_OSS_SETSTEREO,
++	MMERR_OSS_SETSPEED,
++
++	MMERR_SGI_SPEED,
++	MMERR_SGI_16BIT,
++	MMERR_SGI_8BIT,
++	MMERR_SGI_STEREO,
++	MMERR_SGI_MONO,
++
++	MMERR_SUN_INIT,
++
++	MMERR_OS2_MIXSETUP,
++	MMERR_OS2_SEMAPHORE,
++	MMERR_OS2_TIMER,
++	MMERR_OS2_THREAD,
++
++	MMERR_DS_PRIORITY,
++	MMERR_DS_BUFFER,
++	MMERR_DS_FORMAT,
++	MMERR_DS_NOTIFY,
++	MMERR_DS_EVENT,
++	MMERR_DS_THREAD,
++	MMERR_DS_UPDATE,
++
++	MMERR_WINMM_HANDLE,
++	MMERR_WINMM_ALLOCATED,
++	MMERR_WINMM_DEVICEID,
++	MMERR_WINMM_FORMAT,
++	MMERR_WINMM_UNKNOWN,
++
++	MMERR_MAC_SPEED,
++	MMERR_MAC_START,
++
++	MMERR_MAX
++};
++
++/*
++ *	========== Error handling
++ */
++
++typedef void (MikMod_handler)(void);
++typedef MikMod_handler *MikMod_handler_t;
++
++MIKMODAPI extern int  MikMod_errno;
++MIKMODAPI extern BOOL MikMod_critical;
++MIKMODAPI extern char *MikMod_strerror(int);
++
++MIKMODAPI extern MikMod_handler_t MikMod_RegisterErrorHandler(MikMod_handler_t);
++
++/*
++ *	========== Library initialization and core functions
++ */
++
++struct MDRIVER;
++
++MIKMODAPI extern void   MikMod_RegisterAllDrivers(void);
++
++MIKMODAPI extern CHAR*  MikMod_InfoDriver(void);
++MIKMODAPI extern void   MikMod_RegisterDriver(struct MDRIVER*);
++MIKMODAPI extern int    MikMod_DriverFromAlias(CHAR*);
++
++MIKMODAPI extern BOOL   MikMod_Init(CHAR*);
++MIKMODAPI extern void   MikMod_Exit(void);
++MIKMODAPI extern BOOL   MikMod_Reset(CHAR*);
++MIKMODAPI extern BOOL   MikMod_SetNumVoices(int,int);
++MIKMODAPI extern BOOL   MikMod_Active(void);
++MIKMODAPI extern BOOL   MikMod_EnableOutput(void);
++MIKMODAPI extern void   MikMod_DisableOutput(void);
++MIKMODAPI extern void   MikMod_Update(void);
++
++MIKMODAPI extern BOOL   MikMod_InitThreads(void);
++MIKMODAPI extern void   MikMod_Lock(void);
++MIKMODAPI extern void   MikMod_Unlock(void);
++
++/*
++ *	========== Reader, Writer
++ */
++
++typedef struct MREADER {
++	BOOL (*Seek)(struct MREADER*,long,int);
++	long (*Tell)(struct MREADER*);
++	BOOL (*Read)(struct MREADER*,void*,size_t);
++	int  (*Get)(struct MREADER*);
++	BOOL (*Eof)(struct MREADER*);
++} MREADER;
++
++typedef struct MWRITER {
++	BOOL (*Seek)(struct MWRITER*,long,int);
++	long (*Tell)(struct MWRITER*);
++	BOOL (*Write)(struct MWRITER*,void*,size_t);
++	BOOL (*Put)(struct MWRITER*,int);
++} MWRITER;
++
++/*
++ *	========== Samples
++ */
++
++/* Sample playback should not be interrupted */
++#define SFX_CRITICAL 1
++
++/* Sample format [loading and in-memory] flags: */
++#define SF_16BITS       0x0001
++#define SF_STEREO       0x0002
++#define SF_SIGNED       0x0004
++#define SF_BIG_ENDIAN   0x0008
++#define SF_DELTA        0x0010
++#define SF_ITPACKED		0x0020
++
++#define	SF_FORMATMASK	0x003F
++
++/* General Playback flags */
++
++#define SF_LOOP         0x0100
++#define SF_BIDI         0x0200
++#define SF_REVERSE      0x0400
++#define SF_SUSTAIN      0x0800
++
++#define SF_PLAYBACKMASK	0x0C00
++
++/* Module-only Playback Flags */
++
++#define SF_OWNPAN		0x1000
++#define SF_UST_LOOP     0x2000
++
++#define SF_EXTRAPLAYBACKMASK	0x3000
++
++/* Panning constants */
++#define PAN_LEFT		0
++#define PAN_HALFLEFT 	64
++#define PAN_CENTER		128
++#define PAN_HALFRIGHT	192
++#define PAN_RIGHT		255
++#define PAN_SURROUND	512 /* panning value for Dolby Surround */
++
++typedef struct SAMPLE {
++	SWORD  panning;     /* panning (0-255 or PAN_SURROUND) */
++	ULONG  speed;       /* Base playing speed/frequency of note */
++	UBYTE  volume;      /* volume 0-64 */
++	UWORD  inflags;		/* sample format on disk */
++	UWORD  flags;       /* sample format in memory */
++	ULONG  length;      /* length of sample (in samples!) */
++	ULONG  loopstart;   /* repeat position (relative to start, in samples) */
++	ULONG  loopend;     /* repeat end */
++	ULONG  susbegin;    /* sustain loop begin (in samples) \  Not Supported */
++	ULONG  susend;      /* sustain loop end                /      Yet! */
++
++	/* Variables used by the module player only! (ignored for sound effects) */
++	UBYTE  globvol;     /* global volume */
++	UBYTE  vibflags;    /* autovibrato flag stuffs */
++	UBYTE  vibtype;     /* Vibratos moved from INSTRUMENT to SAMPLE */
++	UBYTE  vibsweep;
++	UBYTE  vibdepth;
++	UBYTE  vibrate;
++	CHAR*  samplename;  /* name of the sample */
++
++	/* Values used internally only */
++	UWORD  avibpos;     /* autovibrato pos [player use] */
++	UBYTE  divfactor;   /* for sample scaling, maintains proper period slides */
++	ULONG  seekpos;     /* seek position in file */
++	SWORD  handle;      /* sample handle used by individual drivers */
++} SAMPLE;
++
++/* Sample functions */
++
++MIKMODAPI extern SAMPLE *Sample_Load(CHAR*);
++MIKMODAPI extern SAMPLE *Sample_LoadFP(FILE*);
++MIKMODAPI extern SAMPLE *Sample_LoadGeneric(MREADER*);
++MIKMODAPI extern void   Sample_Free(SAMPLE*);
++MIKMODAPI extern SBYTE  Sample_Play(SAMPLE*,ULONG,UBYTE);
++
++MIKMODAPI extern void   Voice_SetVolume(SBYTE,UWORD);
++MIKMODAPI extern UWORD  Voice_GetVolume(SBYTE);
++MIKMODAPI extern void   Voice_SetFrequency(SBYTE,ULONG);
++MIKMODAPI extern ULONG  Voice_GetFrequency(SBYTE);
++MIKMODAPI extern void   Voice_SetPanning(SBYTE,ULONG);
++MIKMODAPI extern ULONG  Voice_GetPanning(SBYTE);
++MIKMODAPI extern void   Voice_Play(SBYTE,SAMPLE*,ULONG);
++MIKMODAPI extern void   Voice_Stop(SBYTE);
++MIKMODAPI extern BOOL   Voice_Stopped(SBYTE);
++MIKMODAPI extern SLONG  Voice_GetPosition(SBYTE);
++MIKMODAPI extern ULONG  Voice_RealVolume(SBYTE);
++
++/*
++ *	========== Internal module representation (UniMod)
++ */
++
++/*
++	Instrument definition - for information only, the only field which may be
++	of use in user programs is the name field
++*/
++
++/* Instrument note count */
++#define INSTNOTES 120
++
++/* Envelope point */
++typedef struct ENVPT {
++	SWORD pos;
++	SWORD val;
++} ENVPT;
++
++/* Envelope point count */
++#define ENVPOINTS 32
++
++/* Instrument structure */
++typedef struct INSTRUMENT {
++	CHAR* insname;
++
++	UBYTE flags;
++	UWORD samplenumber[INSTNOTES];
++	UBYTE samplenote[INSTNOTES];
++
++	UBYTE nnatype;
++	UBYTE dca;              /* duplicate check action */
++	UBYTE dct;              /* duplicate check type */
++	UBYTE globvol;
++	UWORD volfade;
++	SWORD panning;          /* instrument-based panning var */
++
++	UBYTE pitpansep;        /* pitch pan separation (0 to 255) */
++	UBYTE pitpancenter;     /* pitch pan center (0 to 119) */
++	UBYTE rvolvar;          /* random volume varations (0 - 100%) */
++	UBYTE rpanvar;          /* random panning varations (0 - 100%) */
++
++	/* volume envelope */
++	UBYTE volflg;           /* bit 0: on 1: sustain 2: loop */
++	UBYTE volpts;
++	UBYTE volsusbeg;
++	UBYTE volsusend;
++	UBYTE volbeg;
++	UBYTE volend;
++	ENVPT volenv[ENVPOINTS];
++	/* panning envelope */
++	UBYTE panflg;           /* bit 0: on 1: sustain 2: loop */
++	UBYTE panpts;
++	UBYTE pansusbeg;
++	UBYTE pansusend;
++	UBYTE panbeg;
++	UBYTE panend;
++	ENVPT panenv[ENVPOINTS];
++	/* pitch envelope */
++	UBYTE pitflg;           /* bit 0: on 1: sustain 2: loop */
++	UBYTE pitpts;
++	UBYTE pitsusbeg;
++	UBYTE pitsusend;
++	UBYTE pitbeg;
++	UBYTE pitend;
++	ENVPT pitenv[ENVPOINTS];
++} INSTRUMENT;
++
++struct MP_CONTROL;
++struct MP_VOICE;
++
++/*
++	Module definition
++*/
++
++/* maximum master channels supported */
++#define UF_MAXCHAN	64
++
++/* Module flags */
++#define UF_XMPERIODS	0x0001 /* XM periods / finetuning */
++#define UF_LINEAR		0x0002 /* LINEAR periods (UF_XMPERIODS must be set) */
++#define UF_INST			0x0004 /* Instruments are used */
++#define UF_NNA			0x0008 /* IT: NNA used, set numvoices rather
++								  than numchn */
++#define UF_S3MSLIDES	0x0010 /* uses old S3M volume slides */
++#define UF_BGSLIDES		0x0020 /* continue volume slides in the background */
++#define UF_HIGHBPM		0x0040 /* MED: can use >255 bpm */
++#define UF_NOWRAP		0x0080 /* XM-type (i.e. illogical) pattern break
++								  semantics */
++#define UF_ARPMEM		0x0100 /* IT: need arpeggio memory */
++#define UF_FT2QUIRKS	0x0200 /* emulate some FT2 replay quirks */
++#define UF_PANNING		0x0400 /* module uses panning effects or have
++								  non-tracker default initial panning */
++
++typedef struct MODULE {
++	/* general module information */
++		CHAR*       songname;    /* name of the song */
++		CHAR*       modtype;     /* string type of module loaded */
++		CHAR*       comment;     /* module comments */
++
++		UWORD       flags;       /* See module flags above */
++		UBYTE       numchn;      /* number of module channels */
++		UBYTE       numvoices;   /* max # voices used for full NNA playback */
++		UWORD       numpos;      /* number of positions in this song */
++		UWORD       numpat;      /* number of patterns in this song */
++		UWORD       numins;      /* number of instruments */
++		UWORD       numsmp;      /* number of samples */
++struct  INSTRUMENT* instruments; /* all instruments */
++struct  SAMPLE*     samples;     /* all samples */
++		UBYTE       realchn;     /* real number of channels used */
++		UBYTE       totalchn;    /* total number of channels used (incl NNAs) */
++
++	/* playback settings */
++		UWORD       reppos;      /* restart position */
++		UBYTE       initspeed;   /* initial song speed */
++		UWORD       inittempo;   /* initial song tempo */
++		UBYTE       initvolume;  /* initial global volume (0 - 128) */
++		UWORD       panning[UF_MAXCHAN]; /* panning positions */
++		UBYTE       chanvol[UF_MAXCHAN]; /* channel positions */
++		UWORD       bpm;         /* current beats-per-minute speed */
++		UWORD       sngspd;      /* current song speed */
++		SWORD       volume;      /* song volume (0-128) (or user volume) */
++
++		BOOL        extspd;      /* extended speed flag (default enabled) */
++		BOOL        panflag;     /* panning flag (default enabled) */
++		BOOL        wrap;        /* wrap module ? (default disabled) */
++		BOOL        loop;		 /* allow module to loop ? (default enabled) */
++		BOOL        fadeout;	 /* volume fade out during last pattern */
++
++		UWORD       patpos;      /* current row number */
++		SWORD       sngpos;      /* current song position */
++		ULONG       sngtime;     /* current song time in 2^-10 seconds */
++
++		SWORD       relspd;      /* relative speed factor */
++
++	/* internal module representation */
++		UWORD       numtrk;      /* number of tracks */
++		UBYTE**     tracks;      /* array of numtrk pointers to tracks */
++		UWORD*      patterns;    /* array of Patterns */
++		UWORD*      pattrows;    /* array of number of rows for each pattern */
++		UWORD*      positions;   /* all positions */
++
++		BOOL        forbid;      /* if true, no player update! */
++		UWORD       numrow;      /* number of rows on current pattern */
++		UWORD       vbtick;      /* tick counter (counts from 0 to sngspd) */
++		UWORD       sngremainder;/* used for song time computation */
++
++struct MP_CONTROL*  control;     /* Effects Channel info (size pf->numchn) */
++struct MP_VOICE*    voice;       /* Audio Voice information (size md_numchn) */
++
++		UBYTE       globalslide; /* global volume slide rate */
++		UBYTE       pat_repcrazy;/* module has just looped to position -1 */
++		UWORD       patbrk;      /* position where to start a new pattern */
++		UBYTE       patdly;      /* patterndelay counter (command memory) */
++		UBYTE       patdly2;     /* patterndelay counter (real one) */
++		SWORD       posjmp;      /* flag to indicate a jump is needed... */
++		UWORD		bpmlimit;	 /* threshold to detect bpm or speed values */
++} MODULE;
++
++/*
++ *	========== Module loaders
++ */
++
++struct MLOADER;
++
++MIKMODAPI extern CHAR*   MikMod_InfoLoader(void);
++MIKMODAPI extern void    MikMod_RegisterAllLoaders(void);
++MIKMODAPI extern void    MikMod_RegisterLoader(struct MLOADER*);
++
++MIKMODAPI extern struct MLOADER load_669; /* 669 and Extended-669 (by Tran/Renaissance) */
++MIKMODAPI extern struct MLOADER load_amf; /* DMP Advanced Module Format (by Otto Chrons) */
++MIKMODAPI extern struct MLOADER load_dsm; /* DSIK internal module format */
++MIKMODAPI extern struct MLOADER load_far; /* Farandole Composer (by Daniel Potter) */
++MIKMODAPI extern struct MLOADER load_gdm; /* General DigiMusic (by Edward Schlunder) */
++MIKMODAPI extern struct MLOADER load_it;  /* Impulse Tracker (by Jeffrey Lim) */
++MIKMODAPI extern struct MLOADER load_imf; /* Imago Orpheus (by Lutz Roeder) */
++MIKMODAPI extern struct MLOADER load_med; /* Amiga MED modules (by Teijo Kinnunen) */
++MIKMODAPI extern struct MLOADER load_m15; /* Soundtracker 15-instrument */
++MIKMODAPI extern struct MLOADER load_mod; /* Standard 31-instrument Module loader */
++MIKMODAPI extern struct MLOADER load_mtm; /* Multi-Tracker Module (by Renaissance) */
++MIKMODAPI extern struct MLOADER load_okt; /* Amiga Oktalyzer */
++MIKMODAPI extern struct MLOADER load_stm; /* ScreamTracker 2 (by Future Crew) */
++MIKMODAPI extern struct MLOADER load_stx; /* STMIK 0.2 (by Future Crew) */
++MIKMODAPI extern struct MLOADER load_s3m; /* ScreamTracker 3 (by Future Crew) */
++MIKMODAPI extern struct MLOADER load_ult; /* UltraTracker (by MAS) */
++MIKMODAPI extern struct MLOADER load_uni; /* MikMod and APlayer internal module format */
++MIKMODAPI extern struct MLOADER load_xm;  /* FastTracker 2 (by Triton) */
++
++/*
++ *	========== Module player
++ */
++
++MIKMODAPI extern MODULE* Player_Load(CHAR*,int,BOOL);
++MIKMODAPI extern MODULE* Player_LoadFP(FILE*,int,BOOL);
++MIKMODAPI extern MODULE* Player_LoadGeneric(MREADER*,int,BOOL);
++MIKMODAPI extern CHAR*   Player_LoadTitle(CHAR*);
++MIKMODAPI extern CHAR*   Player_LoadTitleFP(FILE*);
++MIKMODAPI extern void    Player_Free(MODULE*);
++MIKMODAPI extern void    Player_Start(MODULE*);
++MIKMODAPI extern BOOL    Player_Active(void);
++MIKMODAPI extern void    Player_Stop(void);
++MIKMODAPI extern void    Player_TogglePause(void);
++MIKMODAPI extern BOOL    Player_Paused(void);
++MIKMODAPI extern void    Player_NextPosition(void);
++MIKMODAPI extern void    Player_PrevPosition(void);
++MIKMODAPI extern void    Player_SetPosition(UWORD);
++MIKMODAPI extern BOOL    Player_Muted(UBYTE);
++MIKMODAPI extern void    Player_SetVolume(SWORD);
++MIKMODAPI extern MODULE* Player_GetModule(void);
++MIKMODAPI extern void    Player_SetSpeed(UWORD);
++MIKMODAPI extern void    Player_SetTempo(UWORD);
++MIKMODAPI extern void    Player_Unmute(SLONG,...);
++MIKMODAPI extern void    Player_Mute(SLONG,...);
++MIKMODAPI extern void    Player_ToggleMute(SLONG,...);
++MIKMODAPI extern int     Player_GetChannelVoice(UBYTE);
++MIKMODAPI extern UWORD   Player_GetChannelPeriod(UBYTE);
++
++typedef void (MikMod_player)(void);
++typedef MikMod_player *MikMod_player_t;
++
++MIKMODAPI extern MikMod_player_t MikMod_RegisterPlayer(MikMod_player_t);
++
++#define MUTE_EXCLUSIVE  32000
++#define MUTE_INCLUSIVE  32001
++
++/*
++ *	========== Drivers
++ */
++
++enum {
++	MD_MUSIC = 0,
++	MD_SNDFX
++};
++
++enum {
++	MD_HARDWARE = 0,
++	MD_SOFTWARE
++};
++
++/* Mixing flags */
++
++/* These ones take effect only after MikMod_Init or MikMod_Reset */
++#define DMODE_16BITS     0x0001 /* enable 16 bit output */
++#define DMODE_STEREO     0x0002 /* enable stereo output */
++#define DMODE_SOFT_SNDFX 0x0004 /* Process sound effects via software mixer */
++#define DMODE_SOFT_MUSIC 0x0008 /* Process music via software mixer */
++#define DMODE_HQMIXER    0x0010 /* Use high-quality (slower) software mixer */
++/* These take effect immediately. */
++#define DMODE_SURROUND   0x0100 /* enable surround sound */
++#define DMODE_INTERP     0x0200 /* enable interpolation */
++#define DMODE_REVERSE    0x0400 /* reverse stereo */
++
++struct SAMPLOAD;
++typedef struct MDRIVER {
++struct MDRIVER* next;
++	CHAR*       Name;
++	CHAR*       Version;
++
++	UBYTE       HardVoiceLimit; /* Limit of hardware mixer voices */
++	UBYTE       SoftVoiceLimit; /* Limit of software mixer voices */
++
++	CHAR*       Alias;
++
++	void        (*CommandLine)      (CHAR*);
++	BOOL        (*IsPresent)        (void);
++	SWORD       (*SampleLoad)       (struct SAMPLOAD*,int);
++	void        (*SampleUnload)     (SWORD);
++	ULONG       (*FreeSampleSpace)  (int);
++	ULONG       (*RealSampleLength) (int,struct SAMPLE*);
++	BOOL        (*Init)             (void);
++	void        (*Exit)             (void);
++	BOOL        (*Reset)            (void);
++	BOOL        (*SetNumVoices)     (void);
++	BOOL        (*PlayStart)        (void);
++	void        (*PlayStop)         (void);
++	void        (*Update)           (void);
++	void		    (*Pause)			      (void);
++	void        (*VoiceSetVolume)   (UBYTE,UWORD);
++	UWORD       (*VoiceGetVolume)   (UBYTE);
++	void        (*VoiceSetFrequency)(UBYTE,ULONG);
++	ULONG       (*VoiceGetFrequency)(UBYTE);
++	void        (*VoiceSetPanning)  (UBYTE,ULONG);
++	ULONG       (*VoiceGetPanning)  (UBYTE);
++	void        (*VoicePlay)        (UBYTE,SWORD,ULONG,ULONG,ULONG,ULONG,UWORD);
++	void        (*VoiceStop)        (UBYTE);
++	BOOL        (*VoiceStopped)     (UBYTE);
++	SLONG       (*VoiceGetPosition) (UBYTE);
++	ULONG       (*VoiceRealVolume)  (UBYTE);
++} MDRIVER;
++
++/* These variables can be changed at ANY time and results will be immediate */
++MIKMODAPI extern UBYTE md_volume;      /* global sound volume (0-128) */
++MIKMODAPI extern UBYTE md_musicvolume; /* volume of song */
++MIKMODAPI extern UBYTE md_sndfxvolume; /* volume of sound effects */
++MIKMODAPI extern UBYTE md_reverb;      /* 0 = none;  15 = chaos */
++MIKMODAPI extern UBYTE md_pansep;      /* 0 = mono;  128 == 100% (full left/right) */
++
++/* The variables below can be changed at any time, but changes will not be
++   implemented until MikMod_Reset is called. A call to MikMod_Reset may result
++   in a skip or pop in audio (depending on the soundcard driver and the settings
++   changed). */
++MIKMODAPI extern UWORD md_device;      /* device */
++MIKMODAPI extern UWORD md_mixfreq;     /* mixing frequency */
++MIKMODAPI extern UWORD md_mode;        /* mode. See DMODE_? flags above */
++
++/* The following variable should not be changed! */
++MIKMODAPI extern MDRIVER* md_driver;   /* Current driver in use. */
++
++/* Known drivers list */
++
++MIKMODAPI extern struct MDRIVER drv_nos;    /* no sound */
++MIKMODAPI extern struct MDRIVER drv_pipe;   /* piped output */
++MIKMODAPI extern struct MDRIVER drv_raw;    /* raw file disk writer [music.raw] */
++MIKMODAPI extern struct MDRIVER drv_stdout; /* output to stdout */
++MIKMODAPI extern struct MDRIVER drv_wav;    /* RIFF WAVE file disk writer [music.wav] */
++
++MIKMODAPI extern struct MDRIVER drv_ultra;  /* Linux Ultrasound driver */
++MIKMODAPI extern struct MDRIVER drv_sam9407;	/* Linux sam9407 driver */
++
++MIKMODAPI extern struct MDRIVER drv_AF;     /* Dec Alpha AudioFile */
++MIKMODAPI extern struct MDRIVER drv_aix;    /* AIX audio device */
++MIKMODAPI extern struct MDRIVER drv_alsa;   /* Advanced Linux Sound Architecture (ALSA) */
++MIKMODAPI extern struct MDRIVER drv_esd;    /* Enlightened sound daemon (EsounD) */
++MIKMODAPI extern struct MDRIVER drv_hp;     /* HP-UX audio device */
++MIKMODAPI extern struct MDRIVER drv_oss;    /* OpenSound System (Linux,FreeBSD...) */
++MIKMODAPI extern struct MDRIVER drv_sgi;    /* SGI audio library */
++MIKMODAPI extern struct MDRIVER drv_sun;    /* Sun/NetBSD/OpenBSD audio device */
++
++MIKMODAPI extern struct MDRIVER drv_dart;   /* OS/2 Direct Audio RealTime */
++MIKMODAPI extern struct MDRIVER drv_os2;    /* OS/2 MMPM/2 */
++
++MIKMODAPI extern struct MDRIVER drv_ds;     /* Win32 DirectSound driver */
++MIKMODAPI extern struct MDRIVER drv_win;    /* Win32 multimedia API driver */
++
++MIKMODAPI extern struct MDRIVER drv_mac;    /* Macintosh Sound Manager driver */
++
++MIKMODAPI extern struct MDRIVER drv_psp;    /* PSP Sound driver */
++
++/*========== Virtual channel mixer interface (for user-supplied drivers only) */
++
++MIKMODAPI extern BOOL  VC_Init(void);
++MIKMODAPI extern void  VC_Exit(void);
++MIKMODAPI extern BOOL  VC_SetNumVoices(void);
++MIKMODAPI extern ULONG VC_SampleSpace(int);
++MIKMODAPI extern ULONG VC_SampleLength(int,SAMPLE*);
++
++MIKMODAPI extern BOOL  VC_PlayStart(void);
++MIKMODAPI extern void  VC_PlayStop(void);
++
++MIKMODAPI extern SWORD VC_SampleLoad(struct SAMPLOAD*,int);
++MIKMODAPI extern void  VC_SampleUnload(SWORD);
++
++MIKMODAPI extern ULONG VC_WriteBytes(SBYTE*,ULONG);
++MIKMODAPI extern ULONG VC_SilenceBytes(SBYTE*,ULONG);
++
++MIKMODAPI extern void  VC_VoiceSetVolume(UBYTE,UWORD);
++MIKMODAPI extern UWORD VC_VoiceGetVolume(UBYTE);
++MIKMODAPI extern void  VC_VoiceSetFrequency(UBYTE,ULONG);
++MIKMODAPI extern ULONG VC_VoiceGetFrequency(UBYTE);
++MIKMODAPI extern void  VC_VoiceSetPanning(UBYTE,ULONG);
++MIKMODAPI extern ULONG VC_VoiceGetPanning(UBYTE);
++MIKMODAPI extern void  VC_VoicePlay(UBYTE,SWORD,ULONG,ULONG,ULONG,ULONG,UWORD);
++
++MIKMODAPI extern void  VC_VoiceStop(UBYTE);
++MIKMODAPI extern BOOL  VC_VoiceStopped(UBYTE);
++MIKMODAPI extern SLONG VC_VoiceGetPosition(UBYTE);
++MIKMODAPI extern ULONG VC_VoiceRealVolume(UBYTE);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif
++
++/* ex:set ts=4: */
+diff -Naur Makefile Makefile
+--- Makefile	1970-01-01 01:00:00.000000000 +0100
++++ Makefile	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,54 @@
++PSPSDK=$(shell psp-config --pspsdk-path)
++PSPDIR=$(shell psp-config --psp-prefix)
++
++TARGET_LIB = ./libmikmod/libmikmod.a
++
++OBJS = 	drivers/drv_psp_thread.o		\
++	mmio/mmalloc.o			\
++	mmio/mmerror.o			\
++	mmio/mmio.o			\
++	loaders/load_669.o		\
++	loaders/load_amf.o		\
++	loaders/load_dsm.o		\
++	loaders/load_far.o		\
++	loaders/load_gdm.o		\
++	loaders/load_imf.o		\
++	loaders/load_it.o		\
++	loaders/load_m15.o		\
++	loaders/load_med.o		\
++	loaders/load_mod.o		\
++	loaders/load_mtm.o		\
++	loaders/load_okt.o		\
++	loaders/load_s3m.o		\
++	loaders/load_stm.o		\
++	loaders/load_stx.o		\
++	loaders/load_ult.o		\
++	loaders/load_uni.o		\
++	loaders/load_xm.o		\
++	playercode/mdreg.o		\
++	playercode/mdriver.o		\
++	playercode/mdulaw.o		\
++	playercode/mloader.o		\
++	playercode/mlreg.o		\
++	playercode/mlutil.o		\
++	playercode/mplayer.o		\
++	playercode/munitrk.o		\
++	playercode/mwav.o		\
++	playercode/npertab.o		\
++	playercode/sloader.o		\
++	playercode/virtch2.o		\
++	playercode/virtch.o		\
++	playercode/virtch_common.o	
++	
++
++
++INCDIR = ./include
++
++CFLAGS = -G0 -DHAVE_CONFIG_H -g -O2
++
++include $(PSPSDK)/lib/build.mak
++
++install:
++	@mkdir -p $(PSPDIR)/include $(PSPDIR)/lib
++	@cp include/mikmod_build.h $(PSPDIR)/include/mikmod.h
++	@cp libmikmod/libmikmod.a  $(PSPDIR)/lib
+diff -Naur Makefile.psp Makefile.psp
+--- Makefile.psp	1970-01-01 01:00:00.000000000 +0100
++++ Makefile.psp	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,45 @@
++PSPSDK                 = $(shell psp-config --pspsdk-path)
++PSPDIR                 = $(shell psp-config --psp-prefix)
++
++DEFINES                := DRV_PSP HAVE_FCNTL_H HAVE_MALLOC_H HAVE_UNISTD_H
++DEFINEFLAGS            := $(addprefix -D,$(DEFINES))
++INCDIR                 := ./include $(PSPDIR)/include
++CFLAGS                 = -G0 -Wall -O2 -fno-strict-aliasing $(DEFINEFLAGS)
++MIKMOD_LIB_FILE        = ./libmikmod/libmikmod.a
++
++MMIO_OBJS              = mmio/mmio.o mmio/mmalloc.o mmio/mmerror.o
++
++MIKMOD_PLAYERCODE_OBJS = playercode/mdreg.o playercode/mdriver.o playercode/mdulaw.o playercode/mloader.o playercode/mlreg.o \
++playercode/mlutil.o playercode/mplayer.o playercode/munitrk.o playercode/mwav.o playercode/npertab.o playercode/sloader.o \
++playercode/virtch.o playercode/virtch2.o playercode/virtch_common.o 
++
++MIKMOD_LOADER_OBJS     = loaders/load_669.o loaders/load_amf.o loaders/load_dsm.o loaders/load_far.o loaders/load_gdm.o loaders/load_imf.o \
++loaders/load_it.o loaders/load_m15.o loaders/load_med.o loaders/load_mod.o loaders/load_mtm.o loaders/load_okt.o loaders/load_s3m.o \
++loaders/load_stm.o loaders/load_stx.o loaders/load_ult.o loaders/load_uni.o loaders/load_xm.o
++
++MIKMOD_DRIVER_OBJS     = drivers/drv_nos.o drivers/drv_raw.o drivers/drv_wav.o drivers/drv_stdout.o drivers/drv_psp.o
++
++OBJS                   = $(MIKMOD_PLAYERCODE_OBJS) $(MIKMOD_LOADER_OBJS) $(MIKMOD_DRIVER_OBJS) $(MMIO_OBJS)
++
++TARGET_LIB             = $(MIKMOD_LIB_FILE)
++
++include $(PSPSDK)/lib/build.mak
++
++
++
++####################
++## Makefile rules ##
++####################
++
++install: $(MIKMOD_LIB_FILE)
++	@echo ""
++	@echo "**********************************************************************"
++	@echo "Installing libmikmod into $(PSPDIR)"
++	@mkdir -p $(PSPDIR)/include $(PSPDIR)/lib
++	@cp include/mikmod_build.h $(PSPDIR)/include/mikmod.h
++	@cp libmikmod/libmikmod.a $(PSPDIR)/lib
++	@echo "Done"
++	@echo "**********************************************************************"
++	@echo ""
++
++  
+diff -Naur Makefile.psp.example Makefile.psp.example
+--- Makefile.psp.example	1970-01-01 01:00:00.000000000 +0100
++++ Makefile.psp.example	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,19 @@
++PSPSDK                 = $(shell psp-config --pspsdk-path)
++PSPDIR                 = $(shell psp-config --psp-prefix)
++
++INCDIR                 := ./include
++CFLAGS                 = -G0 -Wall -O2 -fno-strict-aliasing
++LIBS                   = -lmikmod -lpspaudio
++
++OBJS                   = example.o
++
++TARGET                 = libmikmodtest
++EXTRA_TARGETS          = EBOOT.PBP
++PSP_EBOOT_TITLE        = libmikmodtest
++EXTRA_CLEAN            = clean_kxploit
++
++include $(PSPSDK)/lib/build.mak
++
++clean_kxploit:
++	rm -rf $(TARGET)
++	rm -rf "$(TARGET)%"
+\ No newline at end of file
+diff -Naur playercode/mdreg.c playercode/mdreg.c
+--- playercode/mdreg.c	2004-01-21 18:43:53.000000000 +0100
++++ playercode/mdreg.c	2010-08-16 20:40:17.000000000 +0200
+@@ -81,6 +81,9 @@
+ #ifdef DRV_MAC
+ 	_mm_registerdriver(&drv_mac);
+ #endif
++#ifdef DRV_PSP
++	_mm_registerdriver(&drv_psp);
++#endif
+ 
+ 	/* Register disk writers */
+ 	_mm_registerdriver(&drv_raw);
+diff -Naur README.PSP README.PSP
+--- README.PSP	1970-01-01 01:00:00.000000000 +0100
++++ README.PSP	2010-08-16 20:40:18.000000000 +0200
+@@ -0,0 +1,87 @@
++MikMod 3.1.11 originally ported by tmator@gmail.com
++modifications made by sweetlilmre to change psp_drv (see details below).
++- Original port will compile with Makefile
++- Fixed driver with Makefile.psp
++
++
++UPDATED README.PSP
++
++12th November 2005
++
++INTRO:
++
++MikMod 3.1.11 brings many bug fixes, a cleaner API and some additional functionality to libmikmod.
++Also, this paves the way for future MikMod updates (ver 3.2 etc). 
++Well I got beaten to the port by tmator! Bummer. But I have added and changed some functionality, see below.
++
++As mikmodlib is already in the svn tree, conflicts will occur if you are using both libs.
++I would suggest removing mikmod.h from your include dir and libmikmod.a and libmmio.a 
++(no longer a separate lib) from you lib dir and then building the 3.1.11 version.
++
++PSP DRIVER:
++
++The PSP driver in this release has been written using Jim Shaw's as a basis with a lot of code borrowed from pspaudiolib.
++
++The original PSP driver and the one modified by shazz for the initial 3.1.11 check in use an internal thread
++(via pspaudiolib) to handle sound processing, while this works (very well), MikMod does not behave as expected
++unless the MikMod_Update() function is honoured. I have tried to write this driver in the spirit of the other MikMod drivers, 
++i.e. you have to call MikMod_Update() to process the sound. This allows a little more flexibility and also allows
++MikMod to behave as expected.
++
++To be completely honest, there is a significant lack of consistency among the various drivers which results in 
++differing behaviour depending on platform. I would like to update the PSP, Windows and Linux drivers to a common
++level of consistency in the near future.
++
++
++Please be aware: if you are calling MikMod_Update() from another thread on the PSP, you MUST yeild after
++the call to MikMod_Update():
++  sceKernelDelayThread(1);
++will be sufficient. From what I understand, the PSP uses co-operative multitasking and as the MikMod_Update()
++call effectively becomes a busy wait loop after MikMod_DisableOutput() is called, your main thread will be starved
++if you don't do this.
++
++The example.c file contains the code for this.
++  
++
++EXAMPLE CODE:
++
++The PSP example code was originally written by Nevyn, I have made some changes and updates.
++A lot more still needs to be done to show off the newer mikmod features.
++(note: music.xm and sound.wav are now loaded from "ms0:/")
++
++Included are makefiles for the PSP and Windows (cygwin) libraries, as well as makefiles for
++the example programs:
++
++Makefile.psp                 PSP library makefile (make, make install)
++Makefile.psp.example         PSP example program makefile (includes kxploit target via SDK build.mak)
++
++Makefile.windows             Cygwin library makefile (make, make install)
++Makefile.windows.example     Cygwin example program makefile
++
++A complete build can be made by executing:
++  make -f Makefile.psp clean install && make -f Makefile.psp.example clean all kxploit
++or
++  make -f Makefile.windows clean install && make -f Makefile.windows.example clean all
++for the cygwin build.
++
++
++Please report bugs, issues, requests etc. to sweetlilmre@gmail.com or via the forums at: forums.ps2dev.org
++
++-sweetlilmre
++
++
++ORIGINAL README.PSP:
++
++libmikmod 3.1.11 for PSP,
++
++is the lastest libmikmod satble, not the same as mikmodlib in svn
++use psp driver from pspdev modified by shazz
++to compile run :
++
++make
++make install
++
++tmator@gmail.com
++froggies Team http://psxdev.org
++Thanks to shazz, dingofr, evilo, pixel, gawd and all froggies and ps2dev/pspdev teams...
++
