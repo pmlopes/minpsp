@@ -53,7 +53,7 @@ function download {
     if [ $CREATE_TARGET == 1 ]; then
       cd ..
     fi
-    cd $TARGET_DIR || cd `echo "$TARGET_DIR"|cut -d_ -f1` || cd `echo "$TARGET_DIR"|cut -d- -f1` || cd $LIBNAME-$VERSION
+    cd $TARGET_DIR || cd `echo "$TARGET_DIR"|cut -d_ -f1` || cd `echo "$TARGET_DIR"|cut -d- -f1` || cd $LIBNAME-$VERSION || cd `echo "$LIBNAME-$VERSION"|cut -d_ -f1` || cd `echo "$LIBNAME-$VERSION"|cut -d- -f1`
     if [ -f ../patches/$3-PSP.patch ]; then
       patch -p1 < ../patches/$3-PSP.patch
     fi
