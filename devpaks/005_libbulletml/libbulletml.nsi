@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME libbulletml
-!define VERSION 0.0.5
+!define VERSION 0.0.6
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

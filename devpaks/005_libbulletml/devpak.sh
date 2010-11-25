@@ -2,10 +2,10 @@
 set -e
 . ../util/util.sh
 
-LIBNAME=libbulletml
-VERSION=0.0.5
+LIBNAME=bulletml
+VERSION=0.0.6
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://shinh.skr.jp/libbulletml" lib$LIBNAME-$VERSION "tar.bz2"
 
 cd build/$LIBNAME/src
 make
@@ -22,7 +22,6 @@ cp libbulletml.a ../../target/psp/lib
 cp ../README.en ../../target/doc/libbulletml.txt
 cd ../../..
 
-makeInstaller $LIBNAME $VERSION
+makeInstaller $LIBNAME $VERSION tinyxml 2.6.1
 
 echo "Done!"
-
