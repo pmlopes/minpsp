@@ -5,21 +5,15 @@ set -e
 LIBNAME=sqlite
 VERSION=3.3.17
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
-export PSPDEV=$(psp-config --pspdev-path)
+download build "http://mirrors.isc.org/pub/MidnightBSD/distfiles" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp
 
-make
-
+PSPDEV=$(psp-config --pspdev-path) make
 make install
-rm -fR ../target/psp/lib/pkgconfig
 
 cd ../..
 
 makeInstaller $LIBNAME $VERSION
 
-unset PSPDEV
 echo "Done!"
-

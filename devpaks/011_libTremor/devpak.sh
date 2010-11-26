@@ -19,6 +19,6 @@ cp doc/*.css $(pwd)/../target/doc/$LIBNAME
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION
+makeInstaller lib$LIBNAME $VERSION
 
 echo "Done!"
