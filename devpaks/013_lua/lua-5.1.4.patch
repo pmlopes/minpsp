@@ -1,0 +1,281 @@
+diff -Naur Makefile.psp Makefile.psp
+--- Makefile.psp	1970-01-01 01:00:00.000000000 +0100
++++ Makefile.psp	2010-08-16 20:42:51.000000000 +0200
+@@ -0,0 +1,19 @@
++LUA = .
++
++PSPSDK = $(shell psp-config --pspsdk-path)
++TARGET = $(shell psp-config --psp-prefix)
++
++CFLAGS = -O2 -G0 -Wall -I$(LUA)/include -D__PSP__
++
++LIBLUA_OBJS = src/lapi.o src/lcode.o src/ldebug.o src/ldo.o src/ldump.o src/lfunc.o src/lgc.o src/llex.o src/lmem.o src/lobject.o src/lopcodes.o src/lparser.o src/lstate.o src/lstring.o src/ltable.o src/ltm.o src/lundump.o src/lvm.o src/lzio.o src/lauxlib.o src/lbaselib.o src/ldblib.o src/liolib.o src/lmathlib.o src/loslib.o src/ltablib.o src/lstrlib.o src/loadlib.o src/linit.o
++
++OBJS = $(LIBLUA_OBJS)
++TARGET_LIB = liblua.a
++
++include $(PSPSDK)/lib/build.mak
++
++install: all
++	mkdir -p $(TARGET)/include $(TARGET)/lib $(TARGET)/sample
++	cp src/lua.h src/luaconf.h src/lualib.h src/lauxlib.h etc/lua.hpp $(TARGET)/include
++	cp *.a $(TARGET)/lib
++	cp sample/* $(TARGET)/sample
+diff -Naur sample/main.c sample/main.c
+--- sample/main.c	1970-01-01 01:00:00.000000000 +0100
++++ sample/main.c	2010-11-26 12:47:06.547628993 +0100
+@@ -0,0 +1,176 @@
++// Lua test program by Frank Buss (aka Shine)
++
++#include <pspkernel.h>
++#include <pspdebug.h>
++#include <pspdisplay.h>
++#include <pspctrl.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "lua.h"
++#include "lualib.h"
++#include "lauxlib.h"
++
++/* Define the module info section */
++PSP_MODULE_INFO("LUATEST", 0, 1, 1);
++
++/* Define the main thread's attribute value (optional) */
++PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER | THREAD_ATTR_VFPU);
++
++/* Define printf, just to make typing easier */
++#define printf	pspDebugScreenPrintf
++
++/* Exit callback */
++int exit_callback(void)
++{
++	sceKernelExitGame();
++
++	return 0;
++}
++
++/* Callback thread */
++int CallbackThread(SceSize args, void *argp)
++{
++	int cbid;
++
++	cbid = sceKernelCreateCallback("Exit Callback", (void *) exit_callback, NULL);
++	sceKernelRegisterExitCallback(cbid);
++
++	sceKernelSleepThreadCB();
++
++	return 0;
++}
++
++/* Sets up the callback thread and returns its thread id */
++int SetupCallbacks(void)
++{
++	int thid = 0;
++
++	thid = sceKernelCreateThread("update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
++	if(thid >= 0)
++	{
++		sceKernelStartThread(thid, 0, 0);
++	}
++
++	return thid;
++}
++
++int lua_ctrlRead(lua_State *L)
++{
++	// number of passed arguments
++	int argc = lua_gettop(L);
++	if (argc != 0) return luaL_error(L, "wrong number of arguments");
++	
++	SceCtrlData pad;
++	sceCtrlReadBufferPositive(&pad, 1); 
++	
++	// push return value (multiple return values are possible)
++	lua_pushnumber(L, (int)pad.Buttons);
++
++	// number of returned arguments
++	return 1;
++}
++
++#define CHECK_CTRL(name, bit) \
++int name(lua_State *L) \
++{ \
++	int argc = lua_gettop(L); \
++	if (argc != 1) return luaL_error(L, "wrong number of arguments"); \
++\
++	/* get first argument as int */ \
++	int argument = luaL_checkint(L, 1); \
++\
++	/* push result */ \
++	lua_pushboolean(L, (argument & bit) == bit); \
++	return 1; \
++}
++
++CHECK_CTRL(lua_isCtrlSelect, PSP_CTRL_SELECT)
++CHECK_CTRL(lua_isCtrlStart, PSP_CTRL_START)
++CHECK_CTRL(lua_isCtrlUp, PSP_CTRL_UP)
++CHECK_CTRL(lua_isCtrlRight, PSP_CTRL_RIGHT)
++CHECK_CTRL(lua_isCtrlDown, PSP_CTRL_DOWN)
++CHECK_CTRL(lua_isCtrlLeft, PSP_CTRL_LEFT)
++CHECK_CTRL(lua_isCtrlLTrigger, PSP_CTRL_LTRIGGER)
++CHECK_CTRL(lua_isCtrlRTrigger, PSP_CTRL_RTRIGGER)
++CHECK_CTRL(lua_isCtrlTriangle, PSP_CTRL_TRIANGLE)
++CHECK_CTRL(lua_isCtrlCircle, PSP_CTRL_CIRCLE)
++CHECK_CTRL(lua_isCtrlCross, PSP_CTRL_CROSS)
++CHECK_CTRL(lua_isCtrlSquare, PSP_CTRL_SQUARE)
++CHECK_CTRL(lua_isCtrlHome, PSP_CTRL_HOME)
++CHECK_CTRL(lua_isCtrlHold, PSP_CTRL_HOLD)
++
++int lua_waitVblankStart(lua_State *L)
++{
++	if (lua_gettop(L) != 0) return luaL_error(L, "wrong number of arguments");
++	sceDisplayWaitVblankStart();
++	return 0;
++}
++
++// print all arguments, converted to strings
++int lua_print(lua_State *L)
++{
++	int argc = lua_gettop(L);
++	int n;
++	for (n=1; n <= argc; n++) printf("%s\n", lua_tostring(L, n));
++	return 0;
++}
++
++int main(int argc, char** argv)
++{
++	pspDebugScreenInit();
++	SetupCallbacks();
++
++	// script file must be in the same directory where the program started
++	const char* scriptName = "script.lua";
++	char* scriptFilename = (char*) malloc(strlen(argv[0]) + strlen(scriptName));
++	strcpy(scriptFilename, argv[0]);
++	char* end = strrchr(scriptFilename, '/');
++	end++;
++	*end = 0;
++	strcat(scriptFilename, scriptName);
++
++	// init Lua and load all libraries
++	lua_State *L = lua_open();
++	luaL_openlibs(L);
++	
++	// register our own functions
++	lua_register(L, "ctrlRead", lua_ctrlRead);
++	lua_register(L, "isCtrlSelect", lua_isCtrlSelect);
++	lua_register(L, "isCtrlStart", lua_isCtrlStart);
++	lua_register(L, "isCtrlUp", lua_isCtrlUp);
++	lua_register(L, "isCtrlRight", lua_isCtrlRight);
++	lua_register(L, "isCtrlDown", lua_isCtrlDown);
++	lua_register(L, "isCtrlLeft", lua_isCtrlLeft);
++	lua_register(L, "isCtrlUp", lua_isCtrlUp);
++	lua_register(L, "isCtrlLTrigger", lua_isCtrlLTrigger);
++	lua_register(L, "isCtrlRTrigger", lua_isCtrlRTrigger);
++	lua_register(L, "isCtrlTriangle", lua_isCtrlTriangle);
++	lua_register(L, "isCtrlCircle", lua_isCtrlCircle);
++	lua_register(L, "isCtrlCross", lua_isCtrlCross);
++	lua_register(L, "isCtrlSquare", lua_isCtrlSquare);
++	lua_register(L, "isCtrlHome", lua_isCtrlHome);
++	lua_register(L, "isCtrlHold", lua_isCtrlHold);
++	lua_register(L, "print", lua_print);
++	lua_register(L, "waitVblankStart", lua_waitVblankStart);
++
++	// load script
++	int status = luaL_loadfile(L, scriptFilename);
++	
++	// call script
++	if (status == 0) status = lua_pcall(L, 0, LUA_MULTRET, 0);
++	
++	// show error, if any
++	if (status != 0) {
++		printf("error: %s\n", lua_tostring(L, -1));
++		lua_pop(L, 1);  // remove error message
++	}
++	
++	// cleanup
++	lua_close(L);
++	free(scriptFilename);
++
++	sceKernelExitGame();
++
++	return 0;
++}
+diff -Naur sample/Makefile sample/Makefile
+--- sample/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ sample/Makefile	2010-11-26 12:47:06.547628993 +0100
+@@ -0,0 +1,17 @@
++TARGET = luatest
++OBJS = main.o
++
++INCDIR = 
++CFLAGS = -O2 -G0 -Wall
++CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
++ASFLAGS = $(CFLAGS)
++
++LIBDIR =
++LIBS = -llualib -llua -lm
++LDFLAGS =
++
++EXTRA_TARGETS = EBOOT.PBP
++PSP_EBOOT_TITLE = Lua test program
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++include $(PSPSDK)/lib/build.mak
+diff -Naur sample/README sample/README
+--- sample/README	1970-01-01 01:00:00.000000000 +0100
++++ sample/README	2010-11-26 12:47:06.547628993 +0100
+@@ -0,0 +1,2 @@
++Compile the EBOOT.PBP with "make EBOOT.PBP" and copy
++"script.lua" into the same directory on memory stick.
+diff -Naur sample/script.lua sample/script.lua
+--- sample/script.lua	1970-01-01 01:00:00.000000000 +0100
++++ sample/script.lua	2010-11-26 12:47:06.547628993 +0100
+@@ -0,0 +1,16 @@
++-- A simple test script
++print("Lua test program by Shine", "Press circle for testing and cross for exit")
++
++lastPad = 0
++while true do
++	waitVblankStart();
++	pad = ctrlRead()
++	if lastPad ~= pad then
++		lastPad = pad
++		if isCtrlCircle(pad) then
++			print("circle pressed")
++		elseif isCtrlCross(pad) then
++			break
++		end
++	end
++end
+diff -Naur src/lobject.c src/lobject.c
+--- src/lobject.c	2007-12-27 14:02:25.000000000 +0100
++++ src/lobject.c	2010-08-16 20:42:50.000000000 +0200
+@@ -136,7 +136,7 @@
+         break;
+       }
+       case 'f': {
++        setnvalue(L->top, cast_num(va_arg(argp, double)));
+-        setnvalue(L->top, cast_num(va_arg(argp, l_uacNumber)));
+         incr_top(L);
+         break;
+       }
+diff -Naur src/luaconf.h src/luaconf.h
+--- src/luaconf.h	2008-02-11 17:25:08.000000000 +0100
++++ src/luaconf.h	2010-11-26 12:45:37.547628996 +0100
+@@ -502,13 +502,13 @@
+ */
+ 
+ #define LUA_NUMBER_DOUBLE
+-#define LUA_NUMBER	double
++#define LUA_NUMBER	float
+ 
+ /*
+ @@ LUAI_UACNUMBER is the result of an 'usual argument conversion'
+ @* over a number.
+ */
+-#define LUAI_UACNUMBER	double
++#define LUAI_UACNUMBER	float
+ 
+ 
+ /*

@@ -16,12 +16,12 @@ mkdir -p ../../target/psp/include/boost/config/stdlib
 mkdir -p ../../target/psp/include/boost/config/compiler
 mkdir -p ../../target/psp/include/boost/config/platform
 mkdir -p ../../target/psp/include/boost/detail
-cp bulletml*.h formula.h tree.h tinyxml/tinyxml.h ../../target/psp/include/bulletml
+cp bulletml*.h formula.h tree.h ../../target/psp/include/bulletml
 find boost -name *.hpp -exec cp -R {} ../../target/psp/include/{} \;
 cp libbulletml.a ../../target/psp/lib
-cp ../README.en ../../target/doc/libbulletml.txt
+cp ../README.en ../../target/doc/bulletml.txt
 cd ../../..
 
-makeInstaller $LIBNAME $VERSION tinyxml 2.6.1
+makeInstaller lib$LIBNAME $VERSION tinyxml 2.6.1
 
 echo "Done!"

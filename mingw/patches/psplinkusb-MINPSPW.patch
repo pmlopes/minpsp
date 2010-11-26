@@ -1,18 +1,18 @@
-Index: psplinkusb/psplink/decodeaddr.c                                                          
+Index: psplinkusb/psplink/decodeaddr.c
 ===================================================================                  
---- psplinkusb/psplink/decodeaddr.c        (revision 2494)                                      
-+++ psplinkusb/psplink/decodeaddr.c        (working copy)                                       
-@@ -43,6 +43,10 @@                                                                   
-        { 0x44000000, (2 * 1024 * 1024), MEM_ATTRIB_ALL, "VRAM (uncached)", 0 },     
-        { 0x08800000, (24 * 1024 * 1024), MEM_ATTRIB_ALL, "User memory", 0 },        
-        { 0x48800000, (24 * 1024 * 1024), MEM_ATTRIB_ALL, "User memory (uncached)", 0 },
-+       { 0x08000000, (8 * 1024 * 1024), MEM_ATTRIB_ALL, "P5", 0 },
-+       { 0x48000000, (8 * 1024 * 1024), MEM_ATTRIB_ALL, "P5 (uncached)", 0 },
-+       { 0x0A000000, (32 * 1024 * 1024), MEM_ATTRIB_ALL, "Extended memory", 0 },
-+       { 0x4A000000, (32 * 1024 * 1024), MEM_ATTRIB_ALL, "Extended memory (uncached)", 0 },
-        { 0x88000000, (4 * 1024 * 1024), MEM_ATTRIB_ALL, "Kernel memory (low)", 0 },
-        { 0xA8000000, (4 * 1024 * 1024), MEM_ATTRIB_ALL, "Kernel memory (low uncached)", 0 },
-        /* Don't use the following 2 on a 1.5, just crashes the psp */
+--- psplinkusb/psplink/decodeaddr.c	(revision 2494)
++++ psplinkusb/psplink/decodeaddr.c	(working copy)
+@@ -43,6 +43,10 @@
+ 	{ 0x44000000, (2 * 1024 * 1024), MEM_ATTRIB_ALL, "VRAM (uncached)", 0 },
+ 	{ 0x08800000, (24 * 1024 * 1024), MEM_ATTRIB_ALL, "User memory", 0 },
+ 	{ 0x48800000, (24 * 1024 * 1024), MEM_ATTRIB_ALL, "User memory (uncached)", 0 },
++	{ 0x08000000, (8 * 1024 * 1024), MEM_ATTRIB_ALL, "P5", 0 },
++	{ 0x48000000, (8 * 1024 * 1024), MEM_ATTRIB_ALL, "P5 (uncached)", 0 },
++	{ 0x0A000000, (32 * 1024 * 1024), MEM_ATTRIB_ALL, "Extended memory", 0 },
++	{ 0x4A000000, (32 * 1024 * 1024), MEM_ATTRIB_ALL, "Extended memory (uncached)", 0 },
+ 	{ 0x88000000, (4 * 1024 * 1024), MEM_ATTRIB_ALL, "Kernel memory (low)", 0 },
+ 	{ 0xA8000000, (4 * 1024 * 1024), MEM_ATTRIB_ALL, "Kernel memory (low uncached)", 0 },
+ 	/* Don't use the following 2 on a 1.5, just crashes the psp */
 Index: psplinkusb/Makefile.oe
 ===================================================================
 --- psplinkusb/Makefile.oe	(revision 2494)

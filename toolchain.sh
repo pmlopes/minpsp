@@ -20,11 +20,11 @@ GMP_VER=4.2.4
 # minimal is 2.3.2
 MPFR_VER=2.4.1
 ## for gcc >= 4.4 (graphite)
-PPL_VER=0.10.2
-CLOOG_PPL_VER=0.15.7
-MPC_VER=0.7
-# for gcc >= 4.5 (lto)
-LIBELF_VER=0.8.12
+#PPL_VER=0.10.2
+#CLOOG_PPL_VER=0.15.7
+#MPC_VER=0.7
+## for gcc >= 4.5 (lto)
+#LIBELF_VER=0.8.12
 
 # gdb + pspusbsh + etc...
 ZLIB_VER=1.2.5
@@ -123,7 +123,7 @@ function prepare {
     # GCC specific
     installGMP
     installMPFR
-    # not needed right now
+#    # not needed right now
 #    installPPL
 #    installCLOOGPPL
 #    installMPC
@@ -320,86 +320,86 @@ function installMPFR {
   fi
 }
 
-function installPPL {
-  if [ ! -f /usr/local/include/ppl_c.h ]
-  then
-    download deps "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER "ppl-"$PPL_VER "tar.bz2"
-    cd deps/"ppl-"$PPL_VER
-    ./configure $EXTRA_BUILD_CFG \
-      --prefix=/usr/local \
-      --with-libgmp-prefix=$GMP_PREFIX \
-      --with-libgmpxx-prefix=$GMP_PREFIX
-    make
-    make check
-    make install
-    cd ../..
-  fi
-}
+#function installPPL {
+#  if [ ! -f /usr/local/include/ppl_c.h ]
+#  then
+#    download deps "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER "ppl-"$PPL_VER "tar.bz2"
+#    cd deps/"ppl-"$PPL_VER
+#    ./configure $EXTRA_BUILD_CFG \
+#      --prefix=/usr/local \
+#      --with-libgmp-prefix=$GMP_PREFIX \
+#      --with-libgmpxx-prefix=$GMP_PREFIX
+#    make
+#    make check
+#    make install
+#    cd ../..
+#  fi
+#}
 
-function installCLOOGPPL {
-  if [ ! -f /usr/local/include/cloog/cloog.h ]
-  then
-    download deps "ftp://gcc.gnu.org/pub/gcc/infrastructure" "cloog-ppl-"$CLOOG_PPL_VER "tar.gz"
-    cd deps/"cloog-ppl-"$CLOOG_PPL_VER
-    ./configure $EXTRA_BUILD_CFG \
-      --prefix=/usr/local \
-      --with-gmp-include=$GMP_INCLUDE \
-      --with-gmp-library=$GMP_LIB \
-      --with-ppl=$PPL_PREFIX
-    make
-    make check
-    make install
-    cd ../..
-  fi
-}
+#function installCLOOGPPL {
+#  if [ ! -f /usr/local/include/cloog/cloog.h ]
+#  then
+#    download deps "ftp://gcc.gnu.org/pub/gcc/infrastructure" "cloog-ppl-"$CLOOG_PPL_VER "tar.gz"
+#    cd deps/"cloog-ppl-"$CLOOG_PPL_VER
+#    ./configure $EXTRA_BUILD_CFG \
+#      --prefix=/usr/local \
+#      --with-gmp-include=$GMP_INCLUDE \
+#      --with-gmp-library=$GMP_LIB \
+#      --with-ppl=$PPL_PREFIX
+#    make
+#    make check
+#    make install
+#    cd ../..
+#  fi
+#}
 
-function installMPC {
-  if [ ! -f /usr/local/include/mpc.h ]
-  then
-    download deps "http://www.multiprecision.org/mpc/download" "mpc-"$MPC_VER "tar.gz"
-    cd deps/"mpc-"$MPC_VER
-    ./configure $EXTRA_BUILD_CFG \
-      --prefix=/usr/local \
-      --enable-static \
-      --disable-shared \
-      --with-gmp-include=$GMP_INCLUDE \
-      --with-gmp-lib=$GMP_LIB \
-      --with-mpfr-include=$MPFR_INCLUDE \
-      --with-mpfr-lib=$MPFR_LIB
-    make
-    make check
-    make install
-    cd ../..
-  fi
-}
+#function installMPC {
+#  if [ ! -f /usr/local/include/mpc.h ]
+#  then
+#    download deps "http://www.multiprecision.org/mpc/download" "mpc-"$MPC_VER "tar.gz"
+#    cd deps/"mpc-"$MPC_VER
+#    ./configure $EXTRA_BUILD_CFG \
+#      --prefix=/usr/local \
+#      --enable-static \
+#      --disable-shared \
+#      --with-gmp-include=$GMP_INCLUDE \
+#      --with-gmp-lib=$GMP_LIB \
+#      --with-mpfr-include=$MPFR_INCLUDE \
+#      --with-mpfr-lib=$MPFR_LIB
+#    make
+#    make check
+#    make install
+#    cd ../..
+#  fi
+#}
 
-function installLIBELF {
-  if [ ! -f /usr/local/include/libelf.h ]
-  then
-    download deps "http://www.mr511.de/software" "libelf-"$LIBELF_VER "tar.gz"
-    cd deps/"libelf-"$LIBELF_VER
-    ./configure \
-      --prefix=/usr/local \
-      --disable-shared
-    make
-    make install
-    cd ../..
-  fi
-}
+#function installLIBELF {
+#  if [ ! -f /usr/local/include/libelf.h ]
+#  then
+#    download deps "http://www.mr511.de/software" "libelf-"$LIBELF_VER "tar.gz"
+#    cd deps/"libelf-"$LIBELF_VER
+#    ./configure \
+#      --prefix=/usr/local \
+#      --disable-shared
+#    make
+#    make install
+#    cd ../..
+#  fi
+#}
 
-function installPDCURSES {
-  if [ ! -f /mingw/include/curses.h ]
-  then
-    download deps "http://downloads.sourceforge.net/pdcurses" "PDCurses-"$LIBPDCURSES_VER "tar.gz"
-    cd deps/"PDCurses-"$LIBPDCURSES_VER/win32
-    make -f mingwin32.mak DLL=n
-    cp pdcurses.a /mingw/lib/libcurses.a
-    cp pdcurses.a /mingw/lib/libpanel.a
-    cp ../curses.h /mingw/include
-    cp ../panel.h /mingw/include
-    cd ../../..
-  fi
-}
+#function installPDCURSES {
+#  if [ ! -f /mingw/include/curses.h ]
+#  then
+#    download deps "http://downloads.sourceforge.net/pdcurses" "PDCurses-"$LIBPDCURSES_VER "tar.gz"
+#    cd deps/"PDCurses-"$LIBPDCURSES_VER/win32
+#    make -f mingwin32.mak DLL=n
+#    cp pdcurses.a /mingw/lib/libcurses.a
+#    cp pdcurses.a /mingw/lib/libpanel.a
+#    cp ../curses.h /mingw/include
+#    cp ../panel.h /mingw/include
+#    cd ../../..
+#  fi
+#}
 
 function installREADLINE {
   if [ ! -f /mingw/include/readline/readline.h ]
@@ -671,32 +671,37 @@ function buildGDB {
 }
 
 function installExtraBinaries {
-  UNXUTILS_DIR="UnxUtils"
-  download deps "http://downloads.sourceforge.net/unxutils" "UnxUtils" "zip" $UNXUTILS_DIR
+  if [ "$OS" == "MINGW32_NT" ]; then
+    UNXUTILS_DIR="UnxUtils"
+    download deps "http://downloads.sourceforge.net/unxutils" "UnxUtils" "zip" $UNXUTILS_DIR
 
-  cd deps/$UNXUTILS_DIR
-  cp usr/local/wbin/cp.exe $INSTALLDIR/bin
-  cp usr/local/wbin/rm.exe $INSTALLDIR/bin
-  cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
-  cp usr/local/wbin/sed.exe $INSTALLDIR/bin
-  cd ../..
+    cd deps/$UNXUTILS_DIR
+    cp usr/local/wbin/cp.exe $INSTALLDIR/bin
+    cp usr/local/wbin/rm.exe $INSTALLDIR/bin
+    cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
+    cp usr/local/wbin/sed.exe $INSTALLDIR/bin
+    cd ../..
 
-  MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
-  download deps "http://downloads.sourceforge.net/mingw" "make-"$MINGW32_MAKE_VER "tar.gz" $MINGW32_MAKE_DIR
+    MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
+    download deps "http://downloads.sourceforge.net/mingw" "make-"$MINGW32_MAKE_VER "tar.gz" $MINGW32_MAKE_DIR
 
-  cd deps/$MINGW32_MAKE_DIR
-  cp make.exe $INSTALLDIR/bin
-  cp -Rf info $INSTALLDIR/info
-  cd ../..
+    cd deps/$MINGW32_MAKE_DIR
+    cp make.exe $INSTALLDIR/bin
+    cp -Rf info $INSTALLDIR/info
+    cd ../..
 
-  # true for some samples (namely minifire asm demo)
-  gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
-  # visual studio support
-  cp mingw/bin/vsmake.bat $INSTALLDIR/bin
+    # true for some samples (namely minifire asm demo)
+    gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
+    # visual studio support
+    cp mingw/bin/vsmake.bat $INSTALLDIR/bin
 
-  # in case any win32 native bin was linked with threads we
-  # add the dll to the output install dir too
-  cp /mingw/bin/pthreadGC2.dll $INSTALLDIR/bin
+    # in case any win32 native bin was linked with threads we
+    # add the dll to the output install dir too
+    cp /mingw/bin/pthreadGC2.dll $INSTALLDIR/bin
+  fi
+
+  # need to have psp-pkg-config hack for building some packages
+  gcc -s -Wall -O3 -o $INSTALLDIR/bin/psp-pkg-config mingw/psp-pkg-config.c
 }
 
 function installPSPLinkUSB {
@@ -844,80 +849,77 @@ function prepareDistro {
   # add release notes
   cp readme.txt $INSTALLDIR/readme.txt
 
-  [ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
+  if [ "$OS" == "MINGW32_NT" ]; then
+    [ ! -z "$INSTALLERDIR" ] && mkdir -p $INSTALLERDIR && touch $INSTALLERDIR/nonexistantfile && rm $INSTALLERDIR/nonexistantfile || exit 1;
 
-  mkdir -p $INSTALLERDIR/base
-  mkdir -p $INSTALLERDIR/eclipse/bin
-  mkdir -p $INSTALLERDIR/vstudio/bin
-  mkdir -p $INSTALLERDIR/psplink/bin
-  mkdir -p $INSTALLERDIR/documentation/pspdoc
-  mkdir -p $INSTALLERDIR/documentation/man_info
-  mkdir -p $INSTALLERDIR/samples/psp/sdk
-  # clone the base installation
-  cp -fR $INSTALLDIR/* $INSTALLERDIR/base
-  # copy visual studio tools
-  mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
-  mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
-  # move binary psplinkusb
-  mv $INSTALLERDIR/base/bin/driver $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/driver_x64 $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/pspsh.exe $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/usbhostfs_pc.exe $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/cygncurses-8.dll $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/cygreadline6.dll $INSTALLERDIR/psplink/bin/
-  mv $INSTALLERDIR/base/bin/cygwin1.dll $INSTALLERDIR/psplink/bin/
-  # move psp psplink
-  mv $INSTALLERDIR/base/psplink $INSTALLERDIR/psplink
-  # move the docs
-  mv $INSTALLERDIR/base/man $INSTALLERDIR/documentation/man_info/man
+    mkdir -p $INSTALLERDIR/base
+    mkdir -p $INSTALLERDIR/eclipse/bin
+    mkdir -p $INSTALLERDIR/vstudio/bin
+    mkdir -p $INSTALLERDIR/psplink/bin
+    mkdir -p $INSTALLERDIR/documentation/pspdoc
+    mkdir -p $INSTALLERDIR/documentation/man_info
+    mkdir -p $INSTALLERDIR/samples/psp/sdk
+    # clone the base installation
+    cp -fR $INSTALLDIR/* $INSTALLERDIR/base
+    # copy visual studio tools
+    mv $INSTALLERDIR/base/bin/sed.exe $INSTALLERDIR/vstudio/bin/sed.exe
+    mv $INSTALLERDIR/base/bin/vsmake.bat $INSTALLERDIR/vstudio/bin/vsmake.bat
+    # move binary psplinkusb
+    mv $INSTALLERDIR/base/bin/driver $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/driver_x64 $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/pspsh.exe $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/usbhostfs_pc.exe $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/cygncurses-8.dll $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/cygreadline6.dll $INSTALLERDIR/psplink/bin/
+    mv $INSTALLERDIR/base/bin/cygwin1.dll $INSTALLERDIR/psplink/bin/
+    # move psp psplink
+    mv $INSTALLERDIR/base/psplink $INSTALLERDIR/psplink
+    # move the docs
+    mv $INSTALLERDIR/base/man $INSTALLERDIR/documentation/man_info/man
 
-  mkdir -p $INSTALLERDIR/documentation/man_info/bin
-  mkdir -p $INSTALLERDIR/documentation/man_info/share
+    mkdir -p $INSTALLERDIR/documentation/man_info/bin
+    mkdir -p $INSTALLERDIR/documentation/man_info/share
 
-  mv $INSTALLERDIR/base/share/font $INSTALLERDIR/documentation/man_info/share/font
-  mv $INSTALLERDIR/base/share/tmac $INSTALLERDIR/documentation/man_info/share/tmac
+    mv $INSTALLERDIR/base/share/font $INSTALLERDIR/documentation/man_info/share/font
+    mv $INSTALLERDIR/base/share/tmac $INSTALLERDIR/documentation/man_info/share/tmac
 
-  mv $INSTALLERDIR/base/bin/groff.exe $INSTALLERDIR/documentation/man_info/bin/groff.exe
-  mv $INSTALLERDIR/base/bin/grotty.exe $INSTALLERDIR/documentation/man_info/bin/grotty.exe
-  mv $INSTALLERDIR/base/bin/less.exe $INSTALLERDIR/documentation/man_info/bin/less.exe
-  mv $INSTALLERDIR/base/bin/man.bat $INSTALLERDIR/documentation/man_info/bin/man.bat
-  mv $INSTALLERDIR/base/bin/pcre3.dll $INSTALLERDIR/documentation/man_info/bin/pcre3.dll
-  mv $INSTALLERDIR/base/bin/troff.exe $INSTALLERDIR/documentation/man_info/bin/troff.exe
-  # create info stuff and add info viewer
-  mv $INSTALLERDIR/base/info $INSTALLERDIR/documentation/man_info/info
+    mv $INSTALLERDIR/base/bin/groff.exe $INSTALLERDIR/documentation/man_info/bin/groff.exe
+    mv $INSTALLERDIR/base/bin/grotty.exe $INSTALLERDIR/documentation/man_info/bin/grotty.exe
+    mv $INSTALLERDIR/base/bin/less.exe $INSTALLERDIR/documentation/man_info/bin/less.exe
+    mv $INSTALLERDIR/base/bin/man.bat $INSTALLERDIR/documentation/man_info/bin/man.bat
+    mv $INSTALLERDIR/base/bin/pcre3.dll $INSTALLERDIR/documentation/man_info/bin/pcre3.dll
+    mv $INSTALLERDIR/base/bin/troff.exe $INSTALLERDIR/documentation/man_info/bin/troff.exe
+    # create info stuff and add info viewer
+    mv $INSTALLERDIR/base/info $INSTALLERDIR/documentation/man_info/info
 
-  mv $INSTALLERDIR/base/bin/info.bat $INSTALLERDIR/documentation/man_info/bin/info.bat
-  mv $INSTALLERDIR/base/bin/ginfo.exe $INSTALLERDIR/documentation/man_info/bin/info.exe
+    mv $INSTALLERDIR/base/bin/info.bat $INSTALLERDIR/documentation/man_info/bin/info.bat
+    mv $INSTALLERDIR/base/bin/ginfo.exe $INSTALLERDIR/documentation/man_info/bin/info.exe
 
-  # generate doxygen docs
-  cd psp/build/pspsdk
-  make doxygen-doc
-  cp -fR doc $INSTALLERDIR/documentation/pspdoc
-  cd ../../..
-  rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
-  rm -rf $INSTALLERDIR/documentation/pspdoc/doc/.svn
-  rm -f $INSTALLERDIR/documentation/pspdoc/doc/html/*.dot
-  mv $INSTALLERDIR/documentation/pspdoc/doc/html $INSTALLERDIR/documentation/pspdoc/doc/pspsdk
+    # generate doxygen docs
+    cd psp/build/pspsdk
+    make doxygen-doc
+    cp -fR doc $INSTALLERDIR/documentation/pspdoc
+    cd ../../..
+    rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
+    rm -rf $INSTALLERDIR/documentation/pspdoc/doc/.svn
+    rm -f $INSTALLERDIR/documentation/pspdoc/doc/html/*.dot
+    mv $INSTALLERDIR/documentation/pspdoc/doc/html $INSTALLERDIR/documentation/pspdoc/doc/pspsdk
 
-  # move samples
-  mv $INSTALLERDIR/base/psp/sdk/samples $INSTALLERDIR/samples/psp/sdk/samples
+    # move samples
+    mv $INSTALLERDIR/base/psp/sdk/samples $INSTALLERDIR/samples/psp/sdk/samples
 
-  # copy nsis scripts to the installer folder
-  cp installer/AddToPath.nsh $INSTALLERDIR
-  cp installer/licenses.txt $INSTALLERDIR
-  sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup.nsi > $INSTALLERDIR/setup.nsi
-}
-
-function prepareDistroNIX {
-  # add release notes
-  cp readme.txt $INSTALLDIR/readme.txt
-
-  # generate doxygen docs
-  cd psp/build/pspsdk
-  make doxygen-doc
-  mkdir -p $INSTALLDIR/doc
-  cp -fR doc $INSTALLDIR/doc/pspsdk
-  cd ../../..
+    # copy nsis scripts to the installer folder
+    cp installer/AddToPath.nsh $INSTALLERDIR
+    cp installer/licenses.txt $INSTALLERDIR
+    sed s/@MINPSPW_VERSION@/$PSPSDK_VERSION/ < installer/setup.nsi > $INSTALLERDIR/setup.nsi
+  else
+    # generate doxygen docs
+    cd psp/build/pspsdk
+    make doxygen-doc
+    mkdir -p $INSTALLDIR/doc
+    cp -fR doc $INSTALLDIR/doc/pspsdk
+    cd ../../..
+  fi
 }
 
 function buildBaseDevpaks {
@@ -942,6 +944,8 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+  # bulletml deppends on tinyxml
+  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
@@ -972,7 +976,6 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
   #buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
@@ -1024,26 +1027,24 @@ buildGDB
 #---------------------------------------------------------------------------------
 installPSPLinkUSB
 #---------------------------------------------------------------------------------
-# Distro + Docs
+# Extra binaries such as psp-pkg-config hack, true, etc...
+#---------------------------------------------------------------------------------
+installExtraBinaries
+#---------------------------------------------------------------------------------
+# Man and Info so windows users can read all documentation
 #---------------------------------------------------------------------------------
 if [ "$OS" == "MINGW32_NT" ]; then
-  installExtraBinaries
   installMan
   installInfo
   #---------------------------------------------------------------------------------
   # patch SDK to run without msys
   #---------------------------------------------------------------------------------
   patchCMD
-  #---------------------------------------------------------------------------------
-  # prepare distro
-  #---------------------------------------------------------------------------------
-  prepareDistro
-else
-  #---------------------------------------------------------------------------------
-  # prepare distro for *nix
-  #---------------------------------------------------------------------------------
-  prepareDistroNIX
 fi
+#---------------------------------------------------------------------------------
+# prepare distro
+#---------------------------------------------------------------------------------
+prepareDistro
 #---------------------------------------------------------------------------------
 # Build base devpaks
 #---------------------------------------------------------------------------------

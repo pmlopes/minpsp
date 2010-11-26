@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME lua
-!define VERSION 5.1
+!define VERSION 5.1.4
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -31,7 +31,7 @@ OutFile ${UNIX_NAME}-${VERSION}-pspdevpak.exe
 CRCCheck on
 XPStyle on
 ShowInstDetails hide
-VIProductVersion ${VERSION}.0.0
+VIProductVersion ${VERSION}.0
 VIAddVersionKey ProductName "${NAME}"
 VIAddVersionKey ProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "${COMPANY}"

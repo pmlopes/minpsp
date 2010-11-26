@@ -1,0 +1,58 @@
+diff -Naur config.sub config.sub
+--- config.sub	2006-08-10 17:17:12.000000000 +0200
++++ config.sub	2010-11-26 12:22:41.657629001 +0100
+@@ -267,6 +267,7 @@
+ 	| mipsisa64sb1 | mipsisa64sb1el \
+ 	| mipsisa64sr71k | mipsisa64sr71kel \
+ 	| mipstx39 | mipstx39el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mn10200 | mn10300 \
+ 	| mt \
+ 	| msp430 \
+@@ -347,6 +348,7 @@
+ 	| mipsisa64sb1-* | mipsisa64sb1el-* \
+ 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
+ 	| mipstx39-* | mipstx39el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mmix-* \
+ 	| mt-* \
+ 	| msp430-* \
+@@ -875,6 +877,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32
+diff -Naur configure configure
+--- configure	2010-11-01 20:30:14.000000000 +0100
++++ configure	2010-11-26 12:22:16.487628994 +0100
+@@ -11955,6 +11955,10 @@
+ 		DEBUG="-g -Wall -W -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+ 		CFLAGS="-O20 -Wall -W -ffast-math -D_REENTRANT -fsigned-char"
+ 		PROFILE="-pg -g -O20 -ffast-math -D_REENTRANT -fsigned-char";;
++	mipsallegrex*-*-*)
++		DEBUG="-g -Wall -fsigned-char"
++		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char";;
+  	*)
+ 		DEBUG="-g -Wall -Wextra -D__NO_MATH_INLINES -fsigned-char"
+ 		CFLAGS="-O20 -Wall -Wextra -D__NO_MATH_INLINES -fsigned-char"
+diff -Naur configure.ac configure.ac
+--- configure.ac	2010-11-01 20:27:12.000000000 +0100
++++ configure.ac	2010-11-26 12:22:21.777629000 +0100
+@@ -206,6 +206,10 @@
+ 		DEBUG="-g -Wall -W -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+ 		CFLAGS="-O20 -Wall -W -ffast-math -D_REENTRANT -fsigned-char"
+ 		PROFILE="-pg -g -O20 -ffast-math -D_REENTRANT -fsigned-char";;
++	mipsallegrex*-*-*)
++		DEBUG="-g -Wall -fsigned-char"
++		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char";;
+  	*)
+ 		DEBUG="-g -Wall -Wextra -D__NO_MATH_INLINES -fsigned-char"
+ 		CFLAGS="-O20 -Wall -Wextra -D__NO_MATH_INLINES -fsigned-char"

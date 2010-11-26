@@ -3,28 +3,26 @@ set -e
 . ../util/util.sh
 
 LIBNAME=libvorbis
-VERSION=1.1.2
+VERSION=1.3.2
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
+download build "http://downloads.xiph.org/releases/vorbis" $LIBNAME-$VERSION "tar.bz2"
+cd build/$LIBNAME-$VERSION
 
-cd build/$LIBNAME
-
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host=psp --prefix=$(pwd)/../target/psp
-
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 make
 
 make install
 
 cd doc
-make install || true
+make install
 cd ..
 
 mkdir -p ../target/doc
-mv ../target/psp/share/doc/libvorbis-1.1.1 ../target/doc/libvorbis-1.1.2
+mv ../target/psp/share/doc/libvorbis-1.3.2 ../target/doc/libvorbis-1.3.2
 rm -fR ../target/psp/share
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION libogg 1.1.2
+makeInstaller $LIBNAME $VERSION libogg 1.2.1
 
 echo "Done!"
