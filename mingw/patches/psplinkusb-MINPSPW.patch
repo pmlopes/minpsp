@@ -198,7 +198,52 @@ Index: psplinkusb/pspsh/pspsh.C
  #include "parse_args.h"
  #include "pspkerror.h"
  #include "disasm.h"
-@@ -59,10 +53,10 @@
+@@ -38,6 +32,44 @@
+ #define HISTORY_FILE ".pspsh.hist"
+ #define DEFAULT_IP     "localhost"
+ 
++#if defined(__MINGW32__)
++
++static int is_pipe = 0;
++static HANDLE input_handle = 0;
++
++int input_available()
++{
++   DWORD nchars;
++
++   /* When using Standard C input functions, also check if there
++   is anything in the buffer. After a call to such functions,
++   the input waiting in the pipe will be copied to the buffer,
++   and the call to PeekNamedPipe can indicate no input available.
++   Setting stdin to unbuffered was not enough, IIRC */
++
++   if (stdin->_cnt > 0)
++      return 1;
++
++   if (is_pipe)
++   {
++      /* When running under a GUI, you will end here. */
++
++      if (!PeekNamedPipe(input_handle, NULL, 0, NULL, &nchars, NULL))
++
++         /* Something went wrong. Probably the parent program exited.
++            Could call exit() here. Returning 1 will make the next call
++            to the input function return EOF, where this should be
++            catched then. */
++
++         return 1;
++
++      return (nchars != 0);
++   }
++   else
++      return _kbhit() != 0; /* In "text-mode" without GUI */
++}
++#endif
++
+ struct Args
+ {
+ 	const char *ip;
+@@ -59,10 +91,10 @@
  	int exit;
  	int conn_sanity;
  	fd_set readsave;
@@ -213,7 +258,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	char history_file[PATH_MAX];
  	char currpath[PATH_MAX];
  	char currcmd[PATH_MAX];
-@@ -152,7 +146,7 @@
+@@ -152,7 +184,7 @@
  }
  
  
@@ -222,7 +267,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	int written = 0;
  
-@@ -160,12 +154,12 @@
+@@ -160,12 +192,12 @@
  	{
  		int ret;
  
@@ -237,7 +282,7 @@ Index: psplinkusb/pspsh/pspsh.C
  				written = -1;
  				break;
  			}
-@@ -252,8 +246,8 @@
+@@ -252,8 +284,8 @@
  			len = fixed_write(g_context.sock, args, binlen);
  			if(len < 0)
  			{
@@ -248,7 +293,16 @@ Index: psplinkusb/pspsh/pspsh.C
  				return -1;
  			}
  			strcpy(g_context.currcmd, args);
-@@ -573,12 +567,12 @@
+@@ -436,7 +468,7 @@
+ {
+ 	char val[32];
+ 
+-	snprintf(val, sizeof(val), "%d", strlen(argv[0]));
++	snprintf(val, sizeof(val), "%d", (int) strlen(argv[0]));
+ 	setenv("?", val, 1);
+ 
+ 	return 0;
+@@ -573,12 +605,12 @@
  				snprintf(prompt, PATH_MAX, "%s> ", g_context.currpath);
  				rl_callback_handler_install(prompt, cli_handler);
  			}
@@ -263,7 +317,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			}
  
  			return;
-@@ -643,9 +637,9 @@
+@@ -643,9 +675,9 @@
  		}
  		else if(buf[0] == '@')
  		{
@@ -275,7 +329,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			}
  			return;
  		}
-@@ -816,7 +810,7 @@
+@@ -816,7 +848,7 @@
  			curr += strlen(curr)+1;
  		}
  		*curr++ = 1;
@@ -284,7 +338,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		pEntry = read_tab_completion();
  		if(pEntry == NULL)
  		{
-@@ -880,7 +874,7 @@
+@@ -880,7 +912,7 @@
  		strcpy(curr, text);
  		curr += strlen(curr)+1;
  		*curr++ = 1;
@@ -293,16 +347,25 @@ Index: psplinkusb/pspsh/pspsh.C
  		pEntry = read_tab_completion();
  	}
  
-@@ -1138,7 +1132,7 @@
+@@ -971,7 +1003,7 @@
+ 	rl_attempted_completion_function = shell_completion;
+ 	rl_callback_handler_install("", cli_handler);
+ 	rl_basic_word_break_characters = "\t\n ";
+-	rl_completer_word_break_characters = "\t\n ";
++	rl_completer_word_break_characters = (char*) "\t\n ";
+ 
+ 	return 1;
+ }
+@@ -1138,7 +1170,7 @@
  
  void print_help(void)
  {
 -	fprintf(stderr, "PSPSH Help (c) TyRaNiD\n");
 +	fprintf(stderr, "PSPSH Help (c) TyRaNiD, Heimdall\n");
- 	fprintf(stderr, "Built %s %s - $Revision: 2200 $\n", __DATE__, __TIME__);
+ 	fprintf(stderr, "Built %s %s - $Revision$\n", __DATE__, __TIME__);
  	fprintf(stderr, "Usage: pspsh [options] [script args...]\n");
  	fprintf(stderr, "Options:\n");
-@@ -1284,7 +1278,7 @@
+@@ -1284,7 +1316,7 @@
  
  		if(setenv(name, value, 1) < 0)
  		{
@@ -311,7 +374,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  	}
-@@ -1494,7 +1488,7 @@
+@@ -1494,7 +1526,7 @@
  	return 1;
  }
  
@@ -320,7 +383,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	static unsigned char linebuf[16*1024];
  	static int pos = 0;
-@@ -1502,10 +1496,10 @@
+@@ -1502,10 +1534,10 @@
  	unsigned char *curr;
  	int len;
  
@@ -333,7 +396,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1550,15 +1544,15 @@
+@@ -1550,15 +1582,15 @@
  	return len;
  }
  
@@ -352,7 +415,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1576,15 +1570,15 @@
+@@ -1576,15 +1608,15 @@
  	return len;
  }
  
@@ -371,7 +434,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1602,15 +1596,15 @@
+@@ -1602,15 +1634,15 @@
  	return len;
  }
  
@@ -390,7 +453,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1627,9 +1621,9 @@
+@@ -1627,9 +1659,9 @@
  	return len;
  }
  
@@ -402,7 +465,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	int success = 0;
  	struct sockaddr_in name;
  
-@@ -1640,15 +1634,15 @@
+@@ -1640,15 +1672,15 @@
  			break;
  		}
  		sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -421,7 +484,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  		else
-@@ -1662,17 +1656,17 @@
+@@ -1662,17 +1694,17 @@
  
  	if(!success)
  	{
@@ -443,7 +506,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	static unsigned char linebuf[16*1024];
  	static int pos = 0;
-@@ -1694,10 +1688,10 @@
+@@ -1694,10 +1726,10 @@
  		tabcurr = tabcurr->pNext;
  	}
  
@@ -456,7 +519,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1776,7 +1770,7 @@
+@@ -1776,7 +1808,7 @@
  	struct timeval tv;
  	struct TabEntry head;
  
@@ -465,7 +528,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	{
  		return NULL;
  	}
-@@ -1800,7 +1794,7 @@
+@@ -1800,7 +1832,7 @@
  				continue;
  			}
  
@@ -474,7 +537,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  		else if(ret == 0)
-@@ -1826,6 +1820,13 @@
+@@ -1826,6 +1858,13 @@
  
  int shell(void)
  {
@@ -488,7 +551,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	fd_set readset;
  	FD_ZERO(&g_context.readsave);
  
-@@ -1834,25 +1835,25 @@
+@@ -1834,25 +1873,25 @@
  		fprintf(stderr, "Opening connection to %s port %d\n", g_context.args.ip, g_context.args.port);
  	}
  
@@ -518,7 +581,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	{
  		fprintf(stderr, "Could not connect to fs admin channel\n");
  	}
-@@ -1863,8 +1864,9 @@
+@@ -1863,8 +1902,9 @@
  		init_readline();
  		read_history(g_context.history_file);
  		history_set_pos(history_length);
@@ -529,7 +592,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	}
  
  	/* Change to the current directory, should return our path */
-@@ -1875,6 +1877,13 @@
+@@ -1875,6 +1915,13 @@
  		int ret;
  
  		readset = g_context.readsave;
@@ -543,7 +606,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		ret = select(FD_SETSIZE, &readset, NULL, NULL, NULL);
  		if(ret < 0)
  		{
-@@ -1883,15 +1892,26 @@
+@@ -1883,15 +1930,24 @@
  				continue;
  			}
  
@@ -556,10 +619,8 @@ Index: psplinkusb/pspsh/pspsh.C
 +#if defined(__MINGW32__)
 +			if(!g_context.args.script)
 +			{
-+				if (_kbhit() != 0)
-+				{
++				if (input_available())
 +					rl_callback_read_char();
-+				}
 +			}
 +#else
  			continue;
@@ -571,7 +632,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			if(!g_context.args.script)
  			{
  				if(FD_ISSET(STDIN_FILENO, &readset))
-@@ -1899,44 +1919,44 @@
+@@ -1899,44 +1955,44 @@
  					rl_callback_read_char();
  				}
  			}
@@ -628,7 +689,7 @@ Index: psplinkusb/pspsh/pspsh.C
  				}
  			}
  					
-@@ -1954,25 +1974,25 @@
+@@ -1954,25 +2010,25 @@
  
  void shutdown_app(void)
  {
@@ -666,10 +727,15 @@ Index: psplinkusb/pspsh/pspsh.C
  	}
  
  	if(!g_context.args.script)
-@@ -2016,13 +2036,15 @@
+@@ -2016,13 +2072,20 @@
  
  int main(int argc, char **argv)
  {
++#if defined(__MINGW32__)
++   DWORD dw;
++   input_handle = GetStdHandle(STD_INPUT_HANDLE);
++   is_pipe = !GetConsoleMode(input_handle, &dw);
++#endif
 +	jc_socket_startup;
 +	
  	int ret = 1;
