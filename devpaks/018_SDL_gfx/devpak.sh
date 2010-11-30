@@ -3,26 +3,19 @@ set -e
 . ../util/util.sh
 
 LIBNAME=SDL_gfx
-VERSION=2.0.13
+VERSION=2.0.22
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
-
-sh autogen.sh
-AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp --disable-mmx --disable-shared
-
-make
-
-make install
-mkdir -p ../target/doc
+download build "http://downloads.sourceforge.net/sdlgfx" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
+make -f Makefile.psp
+mkdir -p ../target/psp/include/SDL ../target/psp/lib ../target/doc
+cp libSDL_gfx.a ../target/psp/lib
+cp SDL_framerate.h SDL_gfxPrimitives.h SDL_imageFilter.h SDL_rotozoom.h ../target/psp/include/SDL
 cp -R Docs ../target/doc/SDL_gfx
-rm -fR ../target/doc/SDL_gfx/Screenshots/.svn
-rm -fR ../target/doc/SDL_gfx/.svn
+rm ../target/doc/SDL_gfx/html.doxyfile
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION SDL 1.2.9
+makeInstaller $LIBNAME $VERSION SDL 1.2.14
 
 echo "Done!"
-

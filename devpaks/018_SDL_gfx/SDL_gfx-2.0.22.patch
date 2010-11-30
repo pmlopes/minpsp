@@ -1,0 +1,58 @@
+--- Makefile.psp	2010-11-30 09:03:30.352863996 +0100
++++ Makefile.psp	2010-11-30 17:00:10.885637023 +0100
+@@ -0,0 +1,55 @@
++CC = psp-gcc
++AR = psp-ar cru
++RANLIB = psp-ranlib
++
++PSPSDK=$(shell psp-config --pspsdk-path)
++
++CFLAGS = -g -O3 -G0 -Wall -I$(PSPSDK)/../include/SDL
++LIBS = -L$(PSPSDK)/../lib -lSDL
++
++OBJS = SDL_framerate.o SDL_gfxPrimitives.o SDL_imageFilter.o SDL_rotozoom.o
++
++STATIC_LIB=libSDL_gfx.a
++
++all: $(STATIC_LIB)
++
++$(STATIC_LIB): $(OBJS)
++	$(AR) $@ $^
++	$(RANLIB) $@
++
++test: $(STATIC_LIB) Test/TestFramerate.elf Test/TestFonts.elf Test/TestGfxPrimitives.elf Test/TestImageFilter.elf Test/TestRotozoom.elf
++
++Test/TestFramerate.elf: Test/TestFramerate.c
++	$(CC) -c $^ -o Test/TestFramerate.o -O3 -I$(PSPSDK)/../include/SDL
++	$(CC) -o $@ Test/TestFramerate.o $(CFLAGS) -L$(PSPSDK)/../lib -lSDL_gfx -lSDLmain -lSDL -lm -lGL -lpspvfpu -L$(PSPSDK)/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet
++
++Test/TestFonts.elf: Test/TestFonts.c
++	$(CC) -c $^ -o Test/TestFonts.o -O3 -I$(PSPSDK)/../include/SDL
++	$(CC) -o $@ Test/TestFonts.o $(CFLAGS) -L$(PSPSDK)/../lib -lSDL_gfx -lSDLmain -lSDL -lm -lGL -lpspvfpu -L$(PSPSDK)/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet
++
++Test/TestGfxPrimitives.elf: Test/TestGfxPrimitives.c
++	$(CC) -c $^ -o Test/TestGfxPrimitives.o -O3 -I$(PSPSDK)/../include/SDL
++	$(CC) -o $@ Test/TestGfxPrimitives.o $(CFLAGS) -L$(PSPSDK)/../lib -lSDL_gfx -lSDLmain -lSDL -lm -lGL -lpspvfpu -L$(PSPSDK)/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet
++
++Test/TestImageFilter.elf: Test/TestImageFilter.c
++	$(CC) -c $^ -o Test/TestImageFilter.o -O3 -I$(PSPSDK)/../include/SDL
++	$(CC) -o $@ Test/TestImageFilter.o $(CFLAGS) -L$(PSPSDK)/../lib -lSDL_gfx -lSDLmain -lSDL -lm -lGL -lpspvfpu -L$(PSPSDK)/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet
++
++Test/TestRotozoom.elf: Test/TestRotozoom.c
++	$(CC) -c $^ -o Test/TestRotozoom.o -O3 -I$(PSPSDK)/../include/SDL
++	$(CC) -o $@ Test/TestRotozoom.o $(CFLAGS) -L$(PSPSDK)/../lib -lSDL_gfx -lSDLmain -lSDL -lm -lGL -lpspvfpu -L$(PSPSDK)/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet
++
++install: $(STATIC_LIB)
++	cp $(STATIC_LIB) $(PSPSDK)/../lib
++	cp SDL_framerate.h SDL_gfxPrimitives.h SDL_imageFilter.h SDL_rotozoom.h $(PSPSDK)/../include/SDL
++
++uninstall:
++	rm -f $(PSPSDK)/../lib/$(STATIC_LIB)
++	rm -f $(PSPSDK)/../include/SDL/SDL_framerate.h
++	rm -f $(PSPSDK)/../include/SDL/SDL_gfxPrimitives.h
++	rm -f $(PSPSDK)/../include/SDL/SDL_imageFilter.h
++	rm -f $(PSPSDK)/../include/SDL/SDL_rotozoom.h
++
++clean:
++	rm -f *.o *.a
++	rm -f Test/*.o Test/*.elf
