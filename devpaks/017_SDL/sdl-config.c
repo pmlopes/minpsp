@@ -255,13 +255,13 @@ void print_path(char *name)
 		switch(g_configmode)
 		{
 			case SDL_CONFIG_PREFIX :
-				printf(pspdev_env);
+				puts(pspdev_env);
 				if(strlen(PREFIX) > 0)
 					printf("%c%s", DIR_SEP, PREFIX);
 				printf("\n");
 				exit(0);
 			case SDL_CONFIG_EXEC_PREFIX :
-				printf(pspdev_env);
+				puts(pspdev_env);
 				if(strlen(PREFIX) > 0)
 					printf("%c%s", DIR_SEP, EXEC_PREFIX);
 				printf("\n");
