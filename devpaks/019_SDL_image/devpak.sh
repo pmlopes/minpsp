@@ -3,15 +3,11 @@ set -e
 . ../util/util.sh
 
 LIBNAME=SDL_image
-VERSION=1.2.4
+VERSION=1.2.10
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
-
-sh autogen.sh
-AR=psp-ar LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host psp --with-sdl-prefix=$(psp-config --pspdev-path) --prefix=$(pwd)/../target/psp
-
+download build "http://www.libsdl.org/projects/SDL_image/release" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
+CFLAGS="-g -O2 -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 make
 
 make install
@@ -20,7 +16,6 @@ cp README ../target/doc/SDL_image.txt
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 jpeg 6.2 SDL 1.2.9
+makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4 jpeg 6.2 SDL 1.2.14
 
 echo "Done!"
-
