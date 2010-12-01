@@ -15,7 +15,7 @@ cp screenshot/* ../target/psp/sdk/samples/libpng/screenshot
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.2
+makeInstaller $LIBNAME $VERSION zlib 1.2.5
 
 echo "Done!"
 

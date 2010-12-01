@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME SDL_image
-!define VERSION 1.2.4
+!define VERSION 1.2.10
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -50,26 +50,26 @@ Section -Main SEC0000
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" zlib
     # check for core dependency
-    StrCmp $1 '1.2.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak ZLib (1.2.2) missing'
+    StrCmp $1 '1.2.5' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak ZLib (1.2.5) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libpng
     # check for core dependency
-    StrCmp $1 '1.2.8' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak PNG (1.2.8) missing'
+    StrCmp $1 '1.4.4' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak PNG (1.4.4) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" jpeg
     # check for core dependency
-    StrCmp $1 '6.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak JPEG (6.2) missing'
+    StrCmp $1 '8.0' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak JPEG (8.0) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" SDL
     # check for core dependency
-    StrCmp $1 '1.2.9' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak SDL (1.2.9) missing'
+    StrCmp $1 '1.2.14' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak SDL (1.2.14) missing'
     Quit
     # install
     SetOutPath $0

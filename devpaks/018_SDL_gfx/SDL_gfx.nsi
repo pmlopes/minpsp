@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME SDL_gfx
-!define VERSION 2.0.13
+!define VERSION 2.0.22
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -50,8 +50,8 @@ Section -Main SEC0000
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" SDL
     # check for core dependency
-    StrCmp $1 '1.2.9' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak SDL (1.2.9) missing'
+    StrCmp $1 '1.2.14' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak SDL (1.2.14) missing'
     Quit
     # install
     SetOutPath $0

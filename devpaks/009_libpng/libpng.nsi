@@ -50,8 +50,8 @@ Section -Main SEC0000
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" zlib
     # check for core dependency
-    StrCmp $1 '1.2.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak zlib (1.2.2) missing'
+    StrCmp $1 '1.2.5' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak zlib (1.2.5) missing'
     Quit
     # install
     SetOutPath $0

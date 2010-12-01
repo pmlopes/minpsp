@@ -16,6 +16,6 @@ cp README ../target/doc/SDL_image.txt
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4 jpeg 6.2 SDL 1.2.14
+makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4 jpeg 8.0 SDL 1.2.14
 
 echo "Done!"

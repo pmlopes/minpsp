@@ -5,7 +5,7 @@ set -e
 LIBNAME=smpeg-psp
 VERSION=0.4.5
 
-svnGet build http://smpeg-psp.googlecode.com/svn trunk
+svnGet build "http://smpeg-psp.googlecode.com/svn" "trunk"
 
 cd build/trunk
 
@@ -24,6 +24,6 @@ gcc -s -o target/bin/smpeg-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$
 
 cd ..
 
-makeInstaller $LIBNAME $VERSION SDL 1.2.9
+makeInstaller $LIBNAME $VERSION SDL 1.2.14
 
 echo "Done!"

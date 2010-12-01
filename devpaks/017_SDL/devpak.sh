@@ -24,6 +24,6 @@ gcc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VE
 
 cd ..
 
-makeInstaller $LIBNAME $VERSION pspgl 2264
+makeInstaller $LIBNAME $VERSION pspgl 2264 pspirkeyb 0.0.4
 
 echo "Done!"

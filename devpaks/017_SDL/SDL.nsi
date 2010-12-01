@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME SDL
-!define VERSION 1.2.9
+!define VERSION 1.2.14
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

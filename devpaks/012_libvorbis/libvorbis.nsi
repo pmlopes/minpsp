@@ -50,8 +50,8 @@ Section -Main SEC0000
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libogg
     # check for core dependency
-    StrCmp $1 '1.1.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak OGG (1.1.2) missing'
+    StrCmp $1 '1.2.1' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak OGG (1.2.1) missing'
     Quit
     # install
     SetOutPath $0
