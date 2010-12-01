@@ -59,19 +59,21 @@ enum ConfigMode
 //  CONFIG_LIST_ALL,
 //  CONFIG_PRINT_PROVIDES,
 //  CONFIG_PRINT_REQUIRES,
-//  CONFIG_PRINT_REQUIRES_PRIVATE
+//  CONFIG_PRINT_REQUIRES_PRIVATE,
+  CONFIG_ERRORS_TO_STDOUT
 };
 
 /* action */
 static enum ConfigMode g_configmode;
 /* flags */
 static int g_printerrors;
+static int g_errors_to_stdout;
 /* libs to analyze */
 static char **g_libraries;
 static int g_librariesc;
 
 void print_help(int);
-int process_exists(char *);
+int process_exists();
 int process_cflags(char *);
 int process_libs(char *);
 /* helpers */
@@ -84,6 +86,7 @@ int process_args(int argc, char **argv)
   int ret = 0;
   
   g_printerrors = FALSE;
+  g_errors_to_stdout = FALSE;
   g_configmode = CONFIG_UNKNOWN;
   g_librariesc = 0;
 
@@ -123,33 +126,40 @@ int process_args(int argc, char **argv)
       g_configmode = CONFIG_LIBS;
       continue;
     }
+    if(strcmp("--errors-to-stdout", argv[i]) == 0) {
+      g_printerrors = TRUE;
+      g_errors_to_stdout = TRUE;
+      continue;
+    }
     /* Ignore version checks */
     if(strcmp("--atleast-version", argv[i]) == 0) {
-      return 0;
+      return EXIT_SUCCESS;
+    }
+    if(strcmp("--atleast-pkgconfig-version", argv[i]) == 0) {
+      return EXIT_SUCCESS;
     }
     if(strcmp("--exact-version", argv[i]) == 0) {
-      return 0;
+      return EXIT_SUCCESS;
     }
     if(strcmp("--max-version", argv[i]) == 0) {
-      return 0;
+      return EXIT_SUCCESS;
     }
     g_librariesc++;
   }
   
   g_libraries = argv + (argc - g_librariesc);
-  
   char *pspdev_env = find_path(psp_config_path);
   
   switch(g_configmode)
   {
     case CONFIG_EXISTS:
-      return process_exists(pspdev_env);
+      return process_exists();
     case CONFIG_CFLAGS:
       return process_cflags(pspdev_env);
     case CONFIG_LIBS:
       return process_libs(pspdev_env);
     default :
-      return 1;
+      return EXIT_FAILURE;
   }
         
   return ret;
@@ -157,31 +167,37 @@ int process_args(int argc, char **argv)
 
 void print_help(int err)
 {
-  FILE * file;
-
-  if(err) {
-    file = stderr;
-  } else {
-    file = stdout;
-  }
-  fprintf(file, "Usage: psp-pkg-config [OPTION...]\nThis ia hack for the minpspw-project it is not complete and may break other projects.\n");
+  fprintf((err ? stdout : stderr), "Usage: psp-pkg-config [OPTION...]\nThis ia hack for the minpspw-project it is not complete and may break other projects.\n");
 }
 
-int process_exists(char *pspdev_env) {
+void print_error(const char* fmt, void* arg) {
+  if(g_printerrors)
+  {
+    fprintf((g_errors_to_stdout ? stdout : stderr), fmt, arg);
+  }
+}
+
+int process_exists() {
   int i;
   for(i=0; i<g_librariesc; i++)
   {
     if(strstr(g_libraries[i], "ogg"))
     {
-      return 0;
+      return EXIT_SUCCESS;
     }
-    if(g_printerrors) {
-      fprintf(stderr, "Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
-      fprintf(stderr, "No package '%s' found\n", g_libraries[i]);
+    if(strstr(g_libraries[i], "sdl"))
+    {
+      return EXIT_SUCCESS;
     }
-    return 1;
+    if(strstr(g_libraries[i], "libpng"))
+    {
+      return EXIT_SUCCESS;
+    }
+    print_error("Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
+    print_error("No package '%s' found\n", g_libraries[i]);
+    return EXIT_FAILURE;
   }
-  return 1;
+  return EXIT_FAILURE;
 }
 
 int process_cflags(char *pspdev_env) {
@@ -191,13 +207,19 @@ int process_cflags(char *pspdev_env) {
     if(strstr(g_libraries[i], "ogg"))
     {
       printf("-I%s/psp/include\n", pspdev_env);
-      return 0;
+      return EXIT_SUCCESS;
     }
-    fprintf(stderr, "Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
-    fprintf(stderr, "No package '%s' found\n", g_libraries[i]);
-    return 1;
+    if(strstr(g_libraries[i], "sdl"))
+    {
+      printf("-I%s/psp/include/SDL -Dmain=SDL_main\n", pspdev_env);
+      return EXIT_SUCCESS;
+    }
+
+    print_error("Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
+    print_error("No package '%s' found\n", g_libraries[i]);
+    return EXIT_FAILURE;
   }
-  return 1;
+  return EXIT_FAILURE;
 }
 
 int process_libs(char *pspdev_env) {
@@ -207,13 +229,18 @@ int process_libs(char *pspdev_env) {
     if(strstr(g_libraries[i], "ogg"))
     {
       printf("-L%s/psp/lib -logg\n", pspdev_env);
-      return 0;
+      return EXIT_SUCCESS;
     }
-    fprintf(stderr, "Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
-    fprintf(stderr, "No package '%s' found\n", g_libraries[i]);
-    return 1;
+    if(strstr(g_libraries[i], "sdl"))
+    {
+      printf("-L%s/psp/lib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet\n", pspdev_env, pspdev_env);
+      return EXIT_SUCCESS;
+    }
+    print_error("Package %s was not found in the pkg-config search path.\n", g_libraries[i]);
+    print_error("No package '%s' found\n", g_libraries[i]);
+    return EXIT_FAILURE;
   }
-  return 1;
+  return EXIT_FAILURE;
 }
 
 void normalize_path (char *out)
@@ -337,7 +364,7 @@ char *find_path(char *name)
     }
     else
     {
-      fprintf(stderr, "Error, path not large enough for creating the SDL path\n");
+      fprintf(stderr, "Error, path not large enough for creating the path variable\n");
     }
 
   }
