@@ -276,7 +276,7 @@ char *find_path(char *name)
 		}
 		else
 		{
-			fprintf(stderr, "Error, path not large enough for creating the SDL path\n");
+			fprintf(stderr, "Error, path not large enough for creating the curl path\n");
 		}
 
 	}
@@ -298,7 +298,7 @@ void print_path(char *name)
 				printf("");
 				break;
 			case CURL_CONFIG_CFLAGS :
-				printf("-I%s%cpsp%cinclude ", pspdev_env, DIR_SEP, DIR_SEP);
+				printf("-I%s/psp/include ", pspdev_env);
 				break;
 			case CURL_CONFIG_FEATURES :
 				printf("");
@@ -317,13 +317,13 @@ void print_path(char *name)
 				print_help(0);
 				exit(0);
 			case CURL_CONFIG_LIBS :
-				printf("-L%s%cpsp%clib -lcurl -L%s%cpsp%csdk%clib -lc -lpspnet_inet -lpspnet_resolver -lpspuser ", pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-L%s/psp/lib -lcurl -L%s/psp/sdk/lib -lc -lpspnet_inet -lpspnet_resolver -lpspuser ", pspdev_env, pspdev_env);
 				break;
 			case CURL_CONFIG_PREFIX :
 				printf("%s\n", pspdev_env);
 				exit(0);
 			case CURL_CONFIG_VERSION :
-				printf("libcurl 7.15.1\n");
+				printf("libcurl %s\n", __CURL_VERSION);
 				exit(0);
 			case CURL_CONFIG_VERNUM :
 				printf("070f01\n");

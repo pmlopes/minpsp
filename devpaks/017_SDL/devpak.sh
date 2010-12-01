@@ -7,10 +7,10 @@ VERSION=1.2.14
 
 download build "http://www.libsdl.org/release" $LIBNAME-$VERSION "tar.gz"
 cd build/$LIBNAME-$VERSION
-make -f Makefile.psp
-mkdir -p ../target/lib ../target/include/SDL ../target/doc/$LIBNAME-$VERSION
-cp libSDL*.a ../target/lib/
-cp include/*.h ../target/include/SDL/
+make -f Makefile.psp GL=1
+mkdir -p ../target/psp/lib ../target/psp/include/SDL ../target/doc/$LIBNAME-$VERSION
+cp libSDL*.a ../target/psp/lib/
+cp include/*.h ../target/psp/include/SDL/
 cp -fR docs/man3 ../target/man
 cp README.PSP ../target/doc/$LIBNAME.txt
 cp -fR docs/html ../target/doc/$LIBNAME-$VERSION

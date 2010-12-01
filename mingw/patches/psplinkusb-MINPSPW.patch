@@ -362,7 +362,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
 -	fprintf(stderr, "PSPSH Help (c) TyRaNiD\n");
 +	fprintf(stderr, "PSPSH Help (c) TyRaNiD, Heimdall\n");
- 	fprintf(stderr, "Built %s %s - $Revision$\n", __DATE__, __TIME__);
+	fprintf(stderr, "Built %s %s - $Revision: 2200 $\n", __DATE__, __TIME__);
  	fprintf(stderr, "Usage: pspsh [options] [script args...]\n");
  	fprintf(stderr, "Options:\n");
 @@ -1284,7 +1316,7 @@

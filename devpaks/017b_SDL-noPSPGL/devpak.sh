@@ -1,23 +1,21 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 . ../util/util.sh
 
 LIBNAME=SDL
-VERSION=1.2.9
+VERSION=1.2.14
 
-svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
-
-cd build/$LIBNAME
-sh autogen.sh
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host psp --prefix=$(pwd)/../target/psp --disable-video-opengl
-
-make
-
-make install
-mkdir -p ../target ../target/doc
-mv ../target/psp/share/man ../target
-rm -fR ../target/psp/share
+download build "http://www.libsdl.org/release" $LIBNAME-$VERSION "tar.gz"
+cd build/$LIBNAME-$VERSION
+make -f Makefile.psp
+mkdir -p ../target/psp/lib ../target/psp/include/SDL ../target/doc/$LIBNAME-$VERSION
+cp libSDL*.a ../target/psp/lib/
+cp include/*.h ../target/psp/include/SDL/
+cp -fR docs/man3 ../target/man
 cp README.PSP ../target/doc/$LIBNAME.txt
+cp -fR docs/html ../target/doc/$LIBNAME-$VERSION
+cp -fR docs/images ../target/doc/$LIBNAME-$VERSION
+cp docs/index.html ../target/doc/$LIBNAME-$VERSION
 
 cd ..
 
@@ -26,6 +24,6 @@ gcc -s -o target/bin/sdl-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VE
 
 cd ..
 
-makeInstaller $LIBNAME-noPSPGL $VERSION
+makeInstaller $LIBNAME $VERSION pspirkeyb 0.0.4
 
 echo "Done!"

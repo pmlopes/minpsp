@@ -53,6 +53,12 @@ Section -Main SEC0000
     StrCmp $1 '2264' +3 +1
     MessageBox MB_OK|MB_ICONSTOP 'Required devpak pspgl (2264) missing'
     Quit
+    # check for internal dependencies
+    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" pspirkeyb
+    # check for core dependency
+    StrCmp $1 '0.0.4' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak pspirkeyb (0.0.4) missing'
+    Quit
     # install
     SetOutPath $0
     SetOverwrite on

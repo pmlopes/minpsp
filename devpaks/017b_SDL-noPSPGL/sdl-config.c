@@ -1,4 +1,6 @@
+#ifdef __WIN32
 #include <windows.h>
+#endif
 
 #include <stdio.h>
 #include <getopt.h>
@@ -18,7 +20,11 @@
 #define DIR_SEP_STR "/"
 
 /* The suffix to the path to strip off, if this is not there then we have an error */
+#ifdef __WIN32
 #define PATH_SUFFIX "/bin/sdl-config.exe"
+#else
+#define PATH_SUFFIX "/bin/sdl-config"
+#endif
 /************************/
 
 enum SDLConfigMode
@@ -59,13 +65,17 @@ int process_args(int argc, char **argv)
 	// this will store the fully-qualified path
 	char psp_config_path[MAX_PATH] = "";
 
+#ifdef __WIN32
 	// fetch the path of the executable
 	if(GetModuleFileName(0, psp_config_path, sizeof(psp_config_path) - 1) == 0)
 	{
 		// fall back
 		strcpy(psp_config_path, argv[0]);
 	}
-	
+#else
+	strcpy(psp_config_path, argv[0]);
+#endif
+
 	ch = getopt_long(argc, argv, "pevclL", arg_opts, NULL);
 	while(ch != -1)
 	{
@@ -245,26 +255,26 @@ void print_path(char *name)
 		switch(g_configmode)
 		{
 			case SDL_CONFIG_PREFIX :
-				printf(pspdev_env);
+				puts(pspdev_env);
 				if(strlen(PREFIX) > 0)
-					printf("%c%s", DIR_SEP, PREFIX);
+					printf("/%s", PREFIX);
 				printf("\n");
 				exit(0);
 			case SDL_CONFIG_EXEC_PREFIX :
-				printf(pspdev_env);
+				puts(pspdev_env);
 				if(strlen(PREFIX) > 0)
-					printf("%c%s", DIR_SEP, EXEC_PREFIX);
+					printf("/%s", EXEC_PREFIX);
 				printf("\n");
 				exit(0);
 			case SDL_CONFIG_VERSION :
 				printf("%s\n", VERSION);
 				exit(0);
 			case SDL_CONFIG_CFLAGS :
-				printf("-I%s%cpsp%cinclude%cSDL -Dmain=SDL_main ", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-I%s/psp/include/SDL -Dmain=SDL_main ", pspdev_env);
 				break;
 			case SDL_CONFIG_LIB:
 			case SDL_CONFIG_STATIC_LIB :
-				printf("-L%s%cpsp%clib -lSDLmain -lSDL -lm -L%s%cpsp%csdk%clib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, DIR_SEP, DIR_SEP, pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-L%s/psp/lib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspirkeyb -lpsppower -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, pspdev_env);
 				break;
 			default : fprintf(stderr, "Error, invalida configuration mode\n");
 					  break;

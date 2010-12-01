@@ -258,7 +258,7 @@ char *find_path(char *name)
 		}
 		else
 		{
-			fprintf(stderr, "Error, path not large enough for creating the SDL path\n");
+			fprintf(stderr, "Error, path not large enough for creating the freetype path\n");
 		}
 
 	}
@@ -277,13 +277,13 @@ void print_path(char *name)
 			case FT_CONFIG_PREFIX :
 				printf(pspdev_env);
 				if(strlen(PREFIX) > 0)
-					printf("%c%s", DIR_SEP, PREFIX);
+					printf("/%s", PREFIX);
 				printf("\n");
 				exit(0);
 			case FT_CONFIG_EXEC_PREFIX :
 				printf(pspdev_env);
 				if(strlen(PREFIX) > 0)
-					printf("%c%s", DIR_SEP, EXEC_PREFIX);
+					printf("/%s", EXEC_PREFIX);
 				printf("\n");
 				exit(0);
 			case FT_CONFIG_VERSION :
@@ -293,13 +293,13 @@ void print_path(char *name)
 				printf("%s\n", FTVERSION);
 				exit(0);
 			case FT_CONFIG_LIB:
-				printf("-L%s%cpsp%clib -lfreetype ", pspdev_env, DIR_SEP, DIR_SEP);
+				printf("-L%s/psp/lib -lfreetype ", pspdev_env);
 				break;
 			case FT_CONFIG_LIBTOOL :
-				printf("-L%s%cpsp%clib%clibfreetype.la ", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-L%s/psp/lib/libfreetype.la ", pspdev_env);
 				break;
 			case FT_CONFIG_CFLAGS :
-				printf("-I%s%cpsp%cinclude%cfreetype2 ", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
+				printf("-I%s/psp/include/freetype2 ", pspdev_env);
 				break;
 			default : fprintf(stderr, "Error, invalida configuration mode\n");
 					  break;

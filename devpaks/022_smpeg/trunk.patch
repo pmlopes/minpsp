@@ -1,0 +1,32 @@
+Index: audio/mpegtoraw.cpp
+===================================================================
+--- audio/mpegtoraw.cpp	(revision 3)
++++ audio/mpegtoraw.cpp	(working copy)
+@@ -28,8 +28,6 @@
+ #define _KEY 3
+ #endif
+ 
+-static __inline__ Uint16 SDL_Swap16(Uint16 x) { return ((x<<8)|(x>>8)); }
+-
+ int MPEGaudio::getbits( int bits )
+ {
+     union
+Index: Makefile
+===================================================================
+--- Makefile	(revision 3)
++++ Makefile	(working copy)
+@@ -5,12 +5,12 @@
+ PSPSDK=$(shell psp-config --pspsdk-path)
+ 
+ INCDIR = 
+-CFLAGS = $(GLOBAL_CFLAGS) -O2 -Wall -g `$(PSPDEV)/psp/bin/sdl-config --cflags`
++CFLAGS = $(GLOBAL_CFLAGS) -O2 -Wall -g `$(PSPDEV)/bin/sdl-config --cflags`
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
+ ASFLAGS = $(CFLAGS)
+ 
+ LDFLAGS = 
+-LIBS = `$(PSPDEV)/psp/bin/sdl-config --libs`
++LIBS = `$(PSPDEV)/bin/sdl-config --libs`
+ 
+ include $(PSPSDK)/lib/build.mak
+ 

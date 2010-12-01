@@ -206,12 +206,17 @@ int process_cflags(char *pspdev_env) {
   {
     if(strstr(g_libraries[i], "ogg"))
     {
-      printf("-I%s/psp/include\n", pspdev_env);
+      printf("-I%s%cpsp%cinclude\n", pspdev_env, DIR_SEP, DIR_SEP);
+      return EXIT_SUCCESS;
+    }
+    if(strstr(g_libraries[i], "libpng"))
+    {
+      printf("-I%s%cpsp%cinclude\n", pspdev_env, DIR_SEP, DIR_SEP);
       return EXIT_SUCCESS;
     }
     if(strstr(g_libraries[i], "sdl"))
     {
-      printf("-I%s/psp/include/SDL -Dmain=SDL_main\n", pspdev_env);
+      printf("-I%s%cpsp%cinclude%cSDL -Dmain=SDL_main\n", pspdev_env, DIR_SEP, DIR_SEP, DIR_SEP);
       return EXIT_SUCCESS;
     }
 
@@ -231,9 +236,14 @@ int process_libs(char *pspdev_env) {
       printf("-L%s/psp/lib -logg\n", pspdev_env);
       return EXIT_SUCCESS;
     }
+    if(strstr(g_libraries[i], "libpng"))
+    {
+      printf("-L%s/psp/lib -lpng\n", pspdev_env);
+      return EXIT_SUCCESS;
+    }
     if(strstr(g_libraries[i], "sdl"))
     {
-      printf("-L%s/psp/lib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet\n", pspdev_env, pspdev_env);
+      printf("-L%s/psp/lib -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspirkeyb -lpsppower -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet\n", pspdev_env, pspdev_env);
       return EXIT_SUCCESS;
     }
     print_error("Package %s was not found in the pkg-config search path.\n", g_libraries[i]);

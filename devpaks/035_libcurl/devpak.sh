@@ -17,7 +17,7 @@ make install
 cd ..
 
 mkdir -p target/bin
-gcc -s -o target/bin/curl-config ../curl-config.c
+gcc -D__CURL_VERSION="\"$VERSION\"" -s -o target/bin/curl-config ../curl-config.c
 
 cd ..
 

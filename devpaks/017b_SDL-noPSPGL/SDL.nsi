@@ -3,8 +3,8 @@ Name "SDL DevPak"
 SetCompressor /SOLID lzma
 
 # Defines
-!define UNIX_NAME SDL-noPSPGL
-!define VERSION 1.2.9
+!define UNIX_NAME SDL
+!define VERSION 1.2.14
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -27,7 +27,7 @@ SetCompressor /SOLID lzma
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile ${UNIX_NAME}-${VERSION}-pspdevpak.exe
+OutFile ${UNIX_NAME}_nogl-${VERSION}-pspdevpak.exe
 CRCCheck on
 XPStyle on
 ShowInstDetails hide
