@@ -7,7 +7,7 @@ VERSION=0.11.1
 
 download build "http://downloads.sourceforge.net/opende" $LIBNAME-$VERSION "tar.bz2"
 cd build/$LIBNAME-$VERSION
-CFLAGS="-G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc" LIBS="-lc -lpspuser" ./configure --host=psp --with-drawstuff=none --disable-demos --prefix=$(pwd)/../target/psp
+CFLAGS="-G0 -Wall -g -O2 -fomit-frame-pointer -ffast-math -fsingle-precision-constant" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc" LIBS="-lc -lpspuser" ./configure --host=psp --with-drawstuff=none --disable-demos --prefix=$(pwd)/../target/psp
 make
 make install
 
@@ -18,7 +18,7 @@ gcc -Wall -s -o target/bin/ode-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION
 
 cd ..
 
-# disabled since we need to patch extra stuff pspgl 2264
+# disabled (pspgl 2264) since we need to patch libdrawstuff
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
