@@ -1,0 +1,30 @@
+diff -Naur build-scripts/config.sub build-scripts/config.sub
+--- build-scripts/config.sub	2009-10-13 01:06:52.000000000 +0200
++++ build-scripts/config.sub	2010-12-02 09:30:30.125610005 +0100
+@@ -270,6 +270,7 @@
+ 	| mips64vr4300 | mips64vr4300el \
+ 	| mips64vr5000 | mips64vr5000el \
+ 	| mips64vr5900 | mips64vr5900el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mipsisa32 | mipsisa32el \
+ 	| mipsisa32r2 | mipsisa32r2el \
+ 	| mipsisa64 | mipsisa64el \
+@@ -363,6 +364,7 @@
+ 	| mipsisa64sb1-* | mipsisa64sb1el-* \
+ 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
+ 	| mipstx39-* | mipstx39el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mmix-* \
+ 	| mt-* \
+ 	| msp430-* \
+@@ -942,6 +944,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32

@@ -267,7 +267,7 @@ void print_path(char *name)
 				printf("-I%s/psp/include/smpeg -I%s/psp/include/SDL -Dmain=SDL_main ", pspdev_env, pspdev_env);
 				break;
 			case CONFIG_LIB:
-				printf("-L%s/psp/lib -lsmpeg -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspirkeyb -lpsppower -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, pspdev_env);
+				printf("-L%s/psp/lib -lsmpeg -lstdc++ -lSDLmain -lSDL -lm -lGL -lpspvfpu -L%s/psp/sdk/lib -lpspirkeyb -lpsppower -lpspdebug -lpspgu -lpspctrl -lpspge -lpspdisplay -lpsphprm -lpspsdk -lpsprtc -lpspaudio -lc -lpspuser -lpsputility -lpspkernel -lpspnet_inet ", pspdev_env, pspdev_env);
 				break;
 			default : fprintf(stderr, "Error, invalida configuration mode\n");
 					  break;

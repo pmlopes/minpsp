@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME ode
-!define VERSION 0.5
+!define VERSION 0.11.1
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -47,12 +47,12 @@ Section -Main SEC0000
     StrCmp $0 '' +1 +3
     MessageBox MB_OK|MB_ICONSTOP 'PSP DevKit missing'
     Quit
-    # check for core dependency
-    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" pspgl
-    # check for core dependency
-    StrCmp $1 '2264' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak pspgl (SVN r2264) missing'
-    Quit
+#    # check for core dependency
+#    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" pspgl
+#    # check for core dependency
+#    StrCmp $1 '2264' +3 +1
+#    MessageBox MB_OK|MB_ICONSTOP 'Required devpak pspgl (SVN r2264) missing'
+#    Quit
     # install
     SetOutPath $0
     SetOverwrite on

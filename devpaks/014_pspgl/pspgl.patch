@@ -1,0 +1,17 @@
+Index: glColor.c
+===================================================================
+--- glColor.c	(revision 2494)
++++ glColor.c	(working copy)
+@@ -26,6 +26,12 @@
+ }
+ 
+ 
++void glColor3fv (const GLfloat *color)
++{
++	update_color(COLOR3(color));
++}
++
++
+ void glColor3f (GLfloat red, GLfloat green, GLfloat blue)
+ {
+ 	glColor4f(red, green, blue, 1.0);

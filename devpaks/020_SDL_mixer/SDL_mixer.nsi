@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME SDL_mixer
-!define VERSION 1.2.6
+!define VERSION 1.2.11
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 
@@ -50,14 +50,20 @@ Section -Main SEC0000
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libogg
     # check for core dependency
-    StrCmp $1 '1.1.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak OGG (1.1.2) missing'
+    StrCmp $1 '1.2.1' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak OGG (1.2.1) missing'
+    Quit
+    # check for internal dependencies
+    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libTremor
+    # check for core dependency
+    StrCmp $1 '1.0.2' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak Tremor (1.0.2) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libvorbis
     # check for core dependency
-    StrCmp $1 '1.1.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak Vorbis (1.1.2) missing'
+    StrCmp $1 '1.3.2' +3 +1
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak Vorbis (1.3.2) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" SDL

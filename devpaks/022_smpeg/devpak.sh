@@ -20,7 +20,7 @@ cd ..
 
 mkdir -p target/bin
 
-gcc -s -o target/bin/smpeg-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VERSION\" ../smpeg-config.c
+gcc -Wall -s -o target/bin/smpeg-config -DPREFIX=\"\" -DEXEC_PREFIX=\"\" -DVERSION=\"$VERSION\" ../smpeg-config.c
 
 cd ..
 
