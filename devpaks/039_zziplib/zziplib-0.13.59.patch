@@ -1,0 +1,58 @@
+diff -Naur Makefile.am Makefile.am
+--- Makefile.am	2010-03-29 21:32:36.000000000 +0200
++++ Makefile.am	2010-12-03 11:29:44.215610008 +0100
+@@ -3,8 +3,8 @@
+ WANT_AUTOMAKE = 1.7
+ WANT_AUTOCONF = 2.57
+ 
+-DIST_SUBDIRS = zzip zzipwrap bins test docs  SDL
+-SUBDIRS =      zzip zzipwrap bins test docs @SDL@
++DIST_SUBDIRS = zzip zzipwrap test docs  SDL
++SUBDIRS =      zzip zzipwrap test docs @SDL@
+ 
+ rpm: dist-bzip2 $(PACKAGE).spec
+ 	rpmbuild -ta $(PACKAGE)-$(VERSION).tar.bz2
+diff -Naur Makefile.in Makefile.in
+--- Makefile.in	2010-03-29 21:40:51.000000000 +0200
++++ Makefile.in	2010-12-03 11:29:44.205610007 +0100
+@@ -279,8 +279,8 @@
+ ACLOCAL_AMFLAGS = -I m4
+ WANT_AUTOMAKE = 1.7
+ WANT_AUTOCONF = 2.57
+-DIST_SUBDIRS = zzip zzipwrap bins test docs  SDL
+-SUBDIRS = zzip zzipwrap bins test docs @SDL@
++DIST_SUBDIRS = zzip zzipwrap test docs  SDL
++SUBDIRS = zzip zzipwrap test docs @SDL@
+ OSC_ROOT = /my/own/osc
+ OSC_SRCDIR = $(OSC_ROOT)
+ OSC_PROJECT = home:guidod:zziplib-13
+diff -Naur uses/config.sub uses/config.sub
+--- uses/config.sub	2009-08-23 13:38:18.000000000 +0200
++++ uses/config.sub	2010-12-03 11:29:44.205610007 +0100
+@@ -267,6 +267,7 @@
+ 	| mipsisa64sb1 | mipsisa64sb1el \
+ 	| mipsisa64sr71k | mipsisa64sr71kel \
+ 	| mipstx39 | mipstx39el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mn10200 | mn10300 \
+ 	| mt \
+ 	| msp430 \
+@@ -348,6 +349,7 @@
+ 	| mipsisa64sb1-* | mipsisa64sb1el-* \
+ 	| mipsisa64sr71k-* | mipsisa64sr71kel-* \
+ 	| mipstx39-* | mipstx39el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mmix-* \
+ 	| mt-* \
+ 	| msp430-* \
+@@ -714,6 +716,10 @@
+ 		basic_machine=m68k-atari
+ 		os=-mint
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	mips3*-*)
+ 		basic_machine=`echo $basic_machine | sed -e 's/mips3/mips64/'`
+ 		;;
