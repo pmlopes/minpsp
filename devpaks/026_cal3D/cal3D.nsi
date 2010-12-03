@@ -4,7 +4,7 @@ SetCompressor /SOLID lzma
 
 # Defines
 !define UNIX_NAME cal3D
-!define VERSION 0.10.0
+!define VERSION 0.11.0
 !define COMPANY jetdrone
 !define URL http://www.jetdrone.com
 

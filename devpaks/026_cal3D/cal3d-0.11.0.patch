@@ -1,0 +1,101 @@
+diff -Naur config.sub config.sub
+--- config.sub	2006-02-25 16:29:12.000000000 +0100
++++ config.sub	2010-08-16 20:50:47.000000000 +0200
+@@ -258,6 +258,7 @@
+ 	| mips64vr4300 | mips64vr4300el \
+ 	| mips64vr5000 | mips64vr5000el \
+ 	| mips64vr5900 | mips64vr5900el \
++	| mipsallegrex | mipsallegrexel \
+ 	| mipsisa32 | mipsisa32el \
+ 	| mipsisa32r2 | mipsisa32r2el \
+ 	| mipsisa64 | mipsisa64el \
+@@ -341,6 +342,7 @@
+ 	| mips64vr4300-* | mips64vr4300el-* \
+ 	| mips64vr5000-* | mips64vr5000el-* \
+ 	| mips64vr5900-* | mips64vr5900el-* \
++	| mipsallegrex-* | mipsallegrexel-* \
+ 	| mipsisa32-* | mipsisa32el-* \
+ 	| mipsisa32r2-* | mipsisa32r2el-* \
+ 	| mipsisa64-* | mipsisa64el-* \
+@@ -878,6 +880,10 @@
+ 	ps2)
+ 		basic_machine=i386-ibm
+ 		;;
++	psp)
++		basic_machine=mipsallegrexel-psp
++		os=-elf
++		;;
+ 	pw32)
+ 		basic_machine=i586-unknown
+ 		os=-pw32
+diff -Naur src/cal3d/hardwaremodel.cpp src/cal3d/hardwaremodel.cpp
+--- src/cal3d/hardwaremodel.cpp	2010-12-03 10:07:00.245610007 +0100
++++ src/cal3d/hardwaremodel.cpp	2010-12-03 10:07:03.135610008 +0100
+@@ -12,6 +12,7 @@
+ #include "config.h"
+ #endif
+ 
++#include <string.h>
+ 
+ #include "cal3d/error.h"
+ #include "cal3d/hardwaremodel.h"
+diff -Naur src/cal3d/platform.cpp src/cal3d/platform.cpp
+--- src/cal3d/platform.cpp	2010-12-03 10:07:00.245610007 +0100
++++ src/cal3d/platform.cpp	2010-12-03 10:07:05.015610004 +0100
+@@ -16,6 +16,8 @@
+ // Includes                                                                   //
+ //****************************************************************************//
+ 
++#include <string.h>
++
+ #include "cal3d/platform.h"
+ 
+  /*****************************************************************************/
+diff -Naur src/cal3d/renderer.cpp src/cal3d/renderer.cpp
+--- src/cal3d/renderer.cpp	2010-12-03 10:07:00.245610007 +0100
++++ src/cal3d/renderer.cpp	2010-12-03 10:07:06.815610002 +0100
+@@ -16,6 +16,8 @@
+ // Includes                                                                   //
+ //****************************************************************************//
+ 
++#include <string.h>
++
+ #include "cal3d/error.h"
+ #include "cal3d/renderer.h"
+ #include "cal3d/coremodel.h"
+diff -Naur src/cal3d/submesh.cpp src/cal3d/submesh.cpp
+--- src/cal3d/submesh.cpp	2010-12-03 10:07:00.255610008 +0100
++++ src/cal3d/submesh.cpp	2010-12-03 10:07:08.695610022 +0100
+@@ -12,6 +12,8 @@
+ #include "config.h"
+ #endif
+ 
++#include <string.h>
++
+ #include "cal3d/submesh.h"
+ #include "cal3d/error.h"
+ #include "cal3d/coresubmesh.h"
+diff -Naur src/cal3d_converter.cpp src/cal3d_converter.cpp
+--- src/cal3d_converter.cpp	2010-12-03 10:07:00.245610007 +0100
++++ src/cal3d_converter.cpp	2010-12-03 10:07:10.645610004 +0100
+@@ -11,6 +11,8 @@
+ 
+ #include "cal3d/cal3d.h"
+ 
++#include <string.h>
++
+ #define SKELETON 0
+ #define MESH 1
+ #define ANIMATION 2
+diff -Naur src/Makefile.in src/Makefile.in
+--- src/Makefile.in	2010-12-03 11:01:28.815610006 +0100
++++ src/Makefile.in	2010-12-03 11:01:50.945610013 +0100
+@@ -76,7 +76,7 @@
+ 	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+ 	$(AM_CXXFLAGS) $(CXXFLAGS)
+ CXXLD = $(CXX)
+-CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
++CXXLINK = $(LIBTOOL) --tag=CXX --mode=link --preserve-dup-deps $(CXXLD) $(AM_CXXFLAGS) \
+ 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+ SOURCES = $(cal3d_converter_SOURCES)
+ DIST_SOURCES = $(cal3d_converter_SOURCES)

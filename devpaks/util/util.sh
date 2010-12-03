@@ -19,7 +19,7 @@ function download {
   cd $1
   if [ ! -f ../../../offline/$DOWNLOAD_DIR/$3.$4 ]; then
     mkdir -p ../../../offline/$DOWNLOAD_DIR
-    wget -c -O ../../../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4
+    wget -c -O ../../../offline/$DOWNLOAD_DIR/$3.$4 $2/$3.$4 || rm ../../../offline/$DOWNLOAD_DIR/$3.$4
   fi
   if [ "$5" == "" ]; then
     TARGET_DIR=$3
