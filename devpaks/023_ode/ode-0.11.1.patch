@@ -28,6 +28,25 @@ diff -Naur config.sub config.sub
  	pw32)
  		basic_machine=i586-unknown
  		os=-pw32
+diff -Naur ode/src/memory.cpp ode/src/memory.cpp
+--- ode/src/memory.cpp	2010-12-03 12:17:34.725610011 +0100
++++ ode/src/memory.cpp	2010-12-03 12:17:36.285610013 +0100
+@@ -39,6 +39,15 @@
+ #undef realloc
+ #endif
+ 
++#ifdef __psp__
++/* 
++   this is a guard against AC_FUNC_MALLOC and AC_FUNC_REALLOC
++   which break cross compilation, no issues in native MSYS.
++*/
++#undef malloc
++#undef realloc
++#endif
++
+ void dSetAllocHandler (dAllocFunction *fn)
+ {
+   allocfn = fn;
 diff -Naur drawstuff/src/psp.cpp drawstuff/src/psp.cpp
 --- drawstuff/src/psp.cpp	1970-01-01 01:00:00.000000000 +0100
 +++ drawstuff/src/psp.cpp	2010-08-16 20:49:33.000000000 +0200
