@@ -7,7 +7,8 @@ VERSION=0.11.1
 
 download build "http://downloads.sourceforge.net/opende" $LIBNAME-$VERSION "tar.bz2"
 cd build/$LIBNAME-$VERSION
-CFLAGS="-G0 -Wall -g -O2 -fomit-frame-pointer -ffast-math -fsingle-precision-constant" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc" LIBS="-lc -lpspuser" ./configure --host=psp --with-drawstuff=none --disable-demos --prefix=$(pwd)/../target/psp
+CFLAGS="-G0 -Wall -g -O0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc" LIBS="-lc -lpspuser" ./configure --host=psp --with-trimesh=gimpact --with-drawstuff=none --disable-demos --prefix=$(pwd)/../target/psp
+exit
 make
 make install
 

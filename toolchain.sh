@@ -969,7 +969,7 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
   #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 026 cal3D $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
