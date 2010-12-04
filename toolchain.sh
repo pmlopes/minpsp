@@ -132,6 +132,17 @@ function prepare {
     installSDL
   fi
 
+  if [ "$OS" == "Darwin" ]; then
+    EXTRA_BUILD_CFG=""
+    INSTALLDIR="$(pwd)/../pspsdk"
+    GMP_INCLUDE=/opt/local/include
+    MPFR_INCLUDE=/opt/local/include
+    GMP_LIB=/opt/local/lib
+    MPFR_LIB=/opt/local/lib
+    GMP_PREFIX=/opt/local
+    PPL_PREFIX=/opt/local
+  fi
+
   checkTool svn
   checkTool wget
   checkTool make
@@ -966,7 +977,8 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+# disabled at the moment, although it builds it doesn't work as expected
+#  buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
   #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
