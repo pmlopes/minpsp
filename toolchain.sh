@@ -59,6 +59,7 @@ function prepare {
     MPFR_LIB=/usr/lib
     GMP_PREFIX=/usr
     PPL_PREFIX=/usr
+    ICONV_PREFIX=/usr
 
     if [ ! -e compat ]; then
       mkdir -p compat
@@ -81,6 +82,7 @@ function prepare {
     MPFR_LIB=/usr/lib
     GMP_PREFIX=/usr
     PPL_PREFIX=/usr
+    ICONV_PREFIX=/usr
   fi
 
   # --- XP 32 bits
@@ -109,6 +111,7 @@ function prepare {
     MPFR_LIB=/usr/local/lib
     GMP_PREFIX=/usr/local
     PPL_PREFIX=/usr/local
+    ICONV_PREFIX=/usr
 
     #-----------------------------------------------------------------------------
     # pre requisites
@@ -141,6 +144,7 @@ function prepare {
     MPFR_LIB=/opt/local/lib
     GMP_PREFIX=/opt/local
     PPL_PREFIX=/opt/local
+    ICONV_PREFIX=/opt/local
   fi
 
   checkTool svn
@@ -206,17 +210,19 @@ function download {
     if [ $CREATE_TARGET == 1 ]; then
       cd ..
     fi
-    cd $TARGET_DIR
-    if [ -f ../patches/$3-PSP.patch ]; then
-      patch -p1 < ../patches/$3-PSP.patch
+    if [ -d $TARGET_DIR ]; then
+      cd $TARGET_DIR
+      if [ -f ../patches/$3-PSP.patch ]; then
+        patch -p1 < ../patches/$3-PSP.patch
+      fi
+      if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+        patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+      fi
+      if [ -f $3.patch ]; then
+        patch -p1 < $3.patch
+      fi
+      cd ..
     fi
-    if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
-      patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
-    fi
-    if [ -f $3.patch ]; then
-      patch -p1 < $3.patch
-    fi
-    cd ..
   fi
   cd ..
 }
@@ -471,6 +477,28 @@ function installSDL {
   fi
 }
 
+function installPremake {
+    download deps "http://sourceforge.net/projects/premake/files/Premake/4.3" "premake-4.3-src" "zip"
+    if [ "$OS" == "MINGW32_NT" ]; then
+      cd deps/premake-4.3/build/gmake.windows
+    fi
+    if [ "$OS" == "Linux" ]; then
+      cd deps/premake-4.3/build/gmake.unix
+    fi
+    if [ "$OS" == "SunOS" ]; then
+      cd deps/premake-4.3/build/gmake.unix
+    fi
+    if [ "$OS" == "Darwin" ]; then
+      cd deps/premake-4.3/build/gmake.macosx
+    fi
+    make
+
+    mkdir -p $INSTALLDIR/bin
+    cp ../../bin/release/* $INSTALLDIR/bin
+
+    cd ../../../..
+}
+
 function downloadPatches {
   svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
 }
@@ -528,6 +556,7 @@ function buildXGCC {
         --disable-libssp \
         --disable-win32-registry \
         --disable-nls \
+        --with-libiconv-prefix=$ICONV_PREFIX \
         --with-gmp-include=$GMP_INCLUDE \
         --with-gmp-lib=$GMP_LIB \
         --with-mpfr-include=$MPFR_INCLUDE \
@@ -617,6 +646,7 @@ function buildGCC {
         --disable-nls \
         --enable-c99 \
         --enable-long-long \
+        --with-libiconv-prefix=$ICONV_PREFIX \
         --with-gmp-include=$GMP_INCLUDE \
         --with-gmp-lib=$GMP_LIB \
         --with-mpfr-include=$MPFR_INCLUDE \
@@ -1019,6 +1049,7 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
+installPremake
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
