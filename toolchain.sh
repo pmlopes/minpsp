@@ -111,7 +111,7 @@ function prepare {
     MPFR_LIB=/usr/local/lib
     GMP_PREFIX=/usr/local
     PPL_PREFIX=/usr/local
-    ICONV_PREFIX=/usr
+    ICONV_PREFIX=/mingw
 
     #-----------------------------------------------------------------------------
     # pre requisites
@@ -155,6 +155,9 @@ function prepare {
   checkTool python
   checkTool flex
   checkTool bison
+
+#  # nice to have
+#  installPremake
 
   TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
   [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
@@ -217,6 +220,9 @@ function download {
       fi
       if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
         patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+      fi
+      if [ -f ../../mingw/patches/$3-$OS.patch ]; then
+        patch -p1 < ../../mingw/patches/$3-$OS.patch
       fi
       if [ -f $3.patch ]; then
         patch -p1 < $3.patch
@@ -477,27 +483,27 @@ function installSDL {
   fi
 }
 
-function installPremake {
-    download deps "http://sourceforge.net/projects/premake/files/Premake/4.3" "premake-4.3-src" "zip"
-    if [ "$OS" == "MINGW32_NT" ]; then
-      cd deps/premake-4.3/build/gmake.windows
-    fi
-    if [ "$OS" == "Linux" ]; then
-      cd deps/premake-4.3/build/gmake.unix
-    fi
-    if [ "$OS" == "SunOS" ]; then
-      cd deps/premake-4.3/build/gmake.unix
-    fi
-    if [ "$OS" == "Darwin" ]; then
-      cd deps/premake-4.3/build/gmake.macosx
-    fi
-    make
-
-    mkdir -p $INSTALLDIR/bin
-    cp ../../bin/release/* $INSTALLDIR/bin
-
-    cd ../../../..
-}
+#function installPremake {
+#    download deps "http://sourceforge.net/projects/premake/files/Premake/4.3" "premake-4.3-src" "zip"
+#    if [ "$OS" == "MINGW32_NT" ]; then
+#      cd deps/premake-4.3/build/gmake.windows
+#    fi
+#    if [ "$OS" == "Linux" ]; then
+#      cd deps/premake-4.3/build/gmake.unix
+#    fi
+#    if [ "$OS" == "SunOS" ]; then
+#      cd deps/premake-4.3/build/gmake.unix
+#    fi
+#    if [ "$OS" == "Darwin" ]; then
+#      cd deps/premake-4.3/build/gmake.macosx
+#    fi
+#    make
+#
+#    mkdir -p $INSTALLDIR/bin
+#    cp ../../bin/release/* $INSTALLDIR/bin
+#
+#    cd ../../../..
+#}
 
 function downloadPatches {
   svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
@@ -1049,7 +1055,6 @@ function buildBaseDevpaks {
 # main
 #---------------------------------------------------------------------------------
 prepare
-installPremake
 #---------------------------------------------------------------------------------
 # gather patches in a single place
 #---------------------------------------------------------------------------------
