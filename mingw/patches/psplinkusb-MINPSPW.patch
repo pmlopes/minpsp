@@ -628,7 +628,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		}
  		else
  		{
-+#if defined(__MINGW32__)
++#if !defined(__MINGW32__)
  			if(!g_context.args.script)
  			{
  				if(FD_ISSET(STDIN_FILENO, &readset))

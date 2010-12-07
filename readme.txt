@@ -32,6 +32,30 @@ Portable handheld videogame system.
 0.10.1
 * fixed pspmath.h file for C++
 * Added D support to GDB
+* Fix pspsh for windows to run within eclipse
+* Lib updates:
+  - zlib updated to 1.2.5
+  - bzip2 updated to 1.0.6
+  - freetype updated to 2.4.3
+  - jpeg updated to 8b
+  - bulletml updated to 0.0.6
+  - libmad updated to 0.15.1b
+  - libmikmod updated to 3.1.11
+  - libogg updated to 1.2.1
+  - libpng updated to 1.4.4
+  - libvorbis updated to 1.3.2
+  - lua updated to 5.1.4
+  - SDL updated to 1.2.14
+  - SDL_gfx updated to 2.0.22
+  - SDL_image updated to 1.2.10
+  - SDL_mixer updated to 1.2.11
+  - SDL_ttf updated to 2.0.10
+  - cal3d updated to 0.11.0
+  - tinyxml updated to 2.6.1
+* Initial support for linux 64bit
+* Initial support for building under MacOSX
+* Fix pspsh under linux (readline was disabled by mistake)
+
 
 0.10.0
 * new devpaks

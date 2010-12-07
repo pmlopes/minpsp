@@ -615,6 +615,7 @@ function buildNewlib {
     mkdir -p psp/build/$NEWLIB_SRCDIR
     cd psp/build/$NEWLIB_SRCDIR
 
+    # --enable-newlib-hw-fp
     ../../$NEWLIB_SRCDIR/configure \
         --target=psp \
         --disable-nls \
