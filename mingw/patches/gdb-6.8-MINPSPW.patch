@@ -710,3 +710,16 @@ diff -Naur gdb-6.8.orig/gdb/symtab.c gdb-6.8/gdb/symtab.c
    else if (lang == language_java)
      {
        demangled_name = cplus_demangle (name, 
+diff -Naur gdb-6.8.orig/sim/mips/interp.c gdb-6.8/sim/mips/interp.c
+--- gdb-6.8.orig//sim/mips/interp.c	2010-12-08 09:10:50.264843006 +0100
++++ gdb-6.8//sim/mips/interp.c	2010-12-08 09:12:57.414842997 +0100
+@@ -64,7 +64,9 @@
+ #include "gdb/callback.h"   /* GDB simulator callback interface */
+ #include "gdb/remote-sim.h" /* GDB simulator interface */
+ 
++#ifndef __APPLE__
+ #include "sysdep.h"
++#endif
+ 
+ #ifndef PARAMS
+ #define PARAMS(x) 

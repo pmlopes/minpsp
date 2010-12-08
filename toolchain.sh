@@ -43,132 +43,8 @@ MINGW32_LESS_VER=394
 # functions
 #---------------------------------------------------------------------------------
 
-function prepare {
-
-  mkdir -p psp/build
-  mkdir -p deps
-
-  export OS=$(uname -s)
-
-  if [ "$OS" == "SunOS" ]; then
-    EXTRA_BUILD_CFG=""
-    INSTALLDIR="$(pwd)/../pspsdk"
-    GMP_INCLUDE=/usr/include/gmp
-    MPFR_INCLUDE=/usr/include/mpfr
-    GMP_LIB=/usr/lib
-    MPFR_LIB=/usr/lib
-    GMP_PREFIX=/usr
-    PPL_PREFIX=/usr
-    ICONV_PREFIX=/usr
-
-    if [ ! -e compat ]; then
-      mkdir -p compat
-      ln -s `which gcc-4.3.2` compat/gcc
-      ln -s `which g++-4.3.2` compat/g++
-      ln -s /opt/SunStudioExpress/bin/cc compat/cc
-      ln -s /opt/SunStudioExpress/bin/CC compat/CC
-      ln -s /usr/bin/automake-1.10 compat/automake
-      ln -s /usr/bin/aclocal-1.10 compat/aclocal
-    fi
-    export PATH=`pwd`/compat:$PATH
-  fi
-
-  if [ "$OS" == "Linux" ]; then
-    EXTRA_BUILD_CFG=""
-    INSTALLDIR="$(pwd)/../pspsdk"
-    GMP_INCLUDE=/usr/include
-    MPFR_INCLUDE=/usr/include
-    GMP_LIB=/usr/lib
-    MPFR_LIB=/usr/lib
-    GMP_PREFIX=/usr
-    PPL_PREFIX=/usr
-    ICONV_PREFIX=/usr
-  fi
-
-  # --- XP 32 bits
-  if [ "$OS" == "MINGW32_NT-5.1" ]; then
-    OS=MINGW32_NT
-  fi
-  # --- Vista 32 bits
-  if [ "$OS" == "MINGW32_NT-6.0" ]; then
-    OS=MINGW32_NT
-  fi
-  # --- Windows 7 32 bits
-  if [ "$OS" == "MINGW32_NT-6.1" ]; then
-    OS=MINGW32_NT
-  fi
-
-  if [ "$OS" == "MINGW32_NT" ]; then
-    # since I'm running this under a Xeon processor, I don't want it to be
-    # build that cpu, so I must instruct mingw to target a i686
-    EXTRA_BUILD_CFG="--build=i686-pc-mingw32"
-    # GDC has a bug that forces the install to be hardcoded
-    INSTALLDIR="/pspsdk"
-    INSTALLERDIR="/c/pspsdk-installer"
-    GMP_INCLUDE=/usr/local/include
-    MPFR_INCLUDE=/usr/local/include
-    GMP_LIB=/usr/local/lib
-    MPFR_LIB=/usr/local/lib
-    GMP_PREFIX=/usr/local
-    PPL_PREFIX=/usr/local
-    ICONV_PREFIX=/mingw
-
-    #-----------------------------------------------------------------------------
-    # pre requisites
-    #-----------------------------------------------------------------------------
-    # generic
-    installZlib
-    installICONV
-    installPTHREADS
-    # disbled since the patch for readline fixes the termcap missing features
-    # installPDCURSES
-    installREADLINE
-    # GCC specific
-    installGMP
-    installMPFR
-#    # not needed right now
-#    installPPL
-#    installCLOOGPPL
-#    installMPC
-#    installLIBELF
-    # nice to have
-    installSDL
-  fi
-
-  if [ "$OS" == "Darwin" ]; then
-    EXTRA_BUILD_CFG=""
-    INSTALLDIR="$(pwd)/../pspsdk"
-    GMP_INCLUDE=/opt/local/include
-    MPFR_INCLUDE=/opt/local/include
-    GMP_LIB=/opt/local/lib
-    MPFR_LIB=/opt/local/lib
-    GMP_PREFIX=/opt/local
-    PPL_PREFIX=/opt/local
-    ICONV_PREFIX=/opt/local
-  fi
-
-  checkTool svn
-  checkTool wget
-  checkTool make
-  checkTool gawk
-  checkTool makeinfo
-  checkTool python
-  checkTool flex
-  checkTool bison
-
-#  # nice to have
-#  installPremake
-
-  TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
-  [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
-  export PATH=$TOOLPATH/bin:$PATH
-}
-
 function checkTool {
-  if [ ! -f `which $1` ]; then
-    echo "Please make sure you have '"$1"' installed."
-    exit 1
-  fi
+  type -P $1 &> /dev/null || { echo  "Please make sure you have '"$1"' installed."; exit 1; }
 }
 
 # arg1 target-build
@@ -281,6 +157,112 @@ function svnGet {
   cd ..
 }
 
+function prepare {
+
+  mkdir -p psp/build
+  mkdir -p deps
+
+  export OS=$(uname -s)
+
+  if [ "$OS" == "SunOS" ]; then
+    EXTRA_BUILD_CFG=""
+    INSTALLDIR="$(pwd)/../pspsdk"
+    GMP_INCLUDE=/usr/include/gmp
+    MPFR_INCLUDE=/usr/include/mpfr
+    GMP_LIB=/usr/lib
+    MPFR_LIB=/usr/lib
+    GMP_PREFIX=/usr
+    PPL_PREFIX=/usr
+    ICONV_PREFIX=/usr
+
+    if [ ! -e compat ]; then
+      mkdir -p compat
+      ln -s `which gcc-4.3.2` compat/gcc
+      ln -s `which g++-4.3.2` compat/g++
+      ln -s /opt/SunStudioExpress/bin/cc compat/cc
+      ln -s /opt/SunStudioExpress/bin/CC compat/CC
+      ln -s /usr/bin/automake-1.10 compat/automake
+      ln -s /usr/bin/aclocal-1.10 compat/aclocal
+    fi
+    export PATH=`pwd`/compat:$PATH
+  fi
+
+  if [ "$OS" == "Linux" ]; then
+    EXTRA_BUILD_CFG=""
+    INSTALLDIR="$(pwd)/../pspsdk"
+    GMP_INCLUDE=/usr/include
+    MPFR_INCLUDE=/usr/include
+    GMP_LIB=/usr/lib
+    MPFR_LIB=/usr/lib
+    GMP_PREFIX=/usr
+    PPL_PREFIX=/usr
+    ICONV_PREFIX=/usr
+  fi
+
+  # --- XP 32 bits
+  if [ "$OS" == "MINGW32_NT-5.1" ]; then
+    OS=MINGW32_NT
+  fi
+  # --- Vista 32 bits
+  if [ "$OS" == "MINGW32_NT-6.0" ]; then
+    OS=MINGW32_NT
+  fi
+  # --- Windows 7 32 bits
+  if [ "$OS" == "MINGW32_NT-6.1" ]; then
+    OS=MINGW32_NT
+  fi
+
+  if [ "$OS" == "MINGW32_NT" ]; then
+    # since I'm running this under a Xeon processor, I don't want it to be
+    # build that cpu, so I must instruct mingw to target a i686
+    EXTRA_BUILD_CFG="--build=i686-pc-mingw32"
+    # GDC has a bug that forces the install to be hardcoded
+    INSTALLDIR="/pspsdk"
+    INSTALLERDIR="/c/pspsdk-installer"
+    GMP_INCLUDE=/usr/local/include
+    MPFR_INCLUDE=/usr/local/include
+    GMP_LIB=/usr/local/lib
+    MPFR_LIB=/usr/local/lib
+    GMP_PREFIX=/usr/local
+    PPL_PREFIX=/usr/local
+    ICONV_PREFIX=/mingw
+
+    #-----------------------------------------------------------------------------
+    # pre requisites
+    #-----------------------------------------------------------------------------
+    . ../mingw/dependencies-MINGW32_NT.sh
+  fi
+
+  if [ "$OS" == "Darwin" ]; then
+    EXTRA_BUILD_CFG=""
+    INSTALLDIR="$(pwd)/../pspsdk"
+    GMP_INCLUDE=/opt/local/include
+    MPFR_INCLUDE=/opt/local/include
+    GMP_LIB=/opt/local/lib
+    MPFR_LIB=/opt/local/lib
+    GMP_PREFIX=/opt/local
+    PPL_PREFIX=/opt/local
+    ICONV_PREFIX=/opt/local
+  fi
+
+  checkTool svn
+  checkTool wget
+  checkTool make
+  checkTool awk
+  checkTool makeinfo
+  checkTool python
+  checkTool flex
+  checkTool bison
+  checkTool cmake
+
+#  # nice to have
+#  installPremake
+
+  TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
+  [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
+  export PATH=$TOOLPATH/bin:$PATH
+}
+
 #arg1 base path
 #arg2 devpak folder number
 #arg3 devpak
@@ -293,193 +275,6 @@ function buildAndInstallDevPak {
   # only install if we are on windows
   if [ "$OS" == "MINGW32_NT" ]; then
     tar -C $4 -xjf $1/$2_$3/build/$3-*.tar.bz2
-  fi
-}
-
-function installZlib {
-  if [ ! -f /mingw/include/zlib.h ]
-  then
-    download deps "http://www.zlib.net" "zlib-"$ZLIB_VER "tar.gz"
-    cd deps/"zlib-"$ZLIB_VER
-#    ./configure --prefix=/mingw --static
-#    make
-#    make install
-    # version 1.2.5 seems another hack
-    make -f win32/Makefile.gcc
-    install zlib.h /mingw/include
-    install zconf.h /mingw/include
-    install libz.a /mingw/lib
-    cd ../..
-  fi
-}
-
-function installGMP {
-  if [ ! -f /usr/local/include/gmp.h ]
-  then
-    download deps "http://ftp.gnu.org/gnu/gmp" "gmp-"$GMP_VER "tar.bz2"
-    cd deps/"gmp-"$GMP_VER
-    ./configure $EXTRA_BUILD_CFG \
-      --prefix=/usr/local --enable-cxx
-    make
-    make check
-    make install
-    cd ../..
-  fi
-}
-
-function installMPFR {
-  if [ ! -f /usr/local/include/mpfr.h ]
-  then
-    download deps "http://www.mpfr.org/mpfr-"$MPFR_VER "mpfr-"$MPFR_VER "tar.bz2"
-    cd deps/"mpfr-"$MPFR_VER
-    ./configure $EXTRA_BUILD_CFG \
-      --prefix=/usr/local \
-      --with-gmp-include=$GMP_INCLUDE \
-      --with-gmp-lib=$GMP_LIB
-    make
-    make check
-    make install
-    cd ../..
-  fi
-}
-
-#function installPPL {
-#  if [ ! -f /usr/local/include/ppl_c.h ]
-#  then
-#    download deps "http://www.cs.unipr.it/ppl/Download/ftp/releases/"$PPL_VER "ppl-"$PPL_VER "tar.bz2"
-#    cd deps/"ppl-"$PPL_VER
-#    ./configure $EXTRA_BUILD_CFG \
-#      --prefix=/usr/local \
-#      --with-libgmp-prefix=$GMP_PREFIX \
-#      --with-libgmpxx-prefix=$GMP_PREFIX
-#    make
-#    make check
-#    make install
-#    cd ../..
-#  fi
-#}
-
-#function installCLOOGPPL {
-#  if [ ! -f /usr/local/include/cloog/cloog.h ]
-#  then
-#    download deps "ftp://gcc.gnu.org/pub/gcc/infrastructure" "cloog-ppl-"$CLOOG_PPL_VER "tar.gz"
-#    cd deps/"cloog-ppl-"$CLOOG_PPL_VER
-#    ./configure $EXTRA_BUILD_CFG \
-#      --prefix=/usr/local \
-#      --with-gmp-include=$GMP_INCLUDE \
-#      --with-gmp-library=$GMP_LIB \
-#      --with-ppl=$PPL_PREFIX
-#    make
-#    make check
-#    make install
-#    cd ../..
-#  fi
-#}
-
-#function installMPC {
-#  if [ ! -f /usr/local/include/mpc.h ]
-#  then
-#    download deps "http://www.multiprecision.org/mpc/download" "mpc-"$MPC_VER "tar.gz"
-#    cd deps/"mpc-"$MPC_VER
-#    ./configure $EXTRA_BUILD_CFG \
-#      --prefix=/usr/local \
-#      --enable-static \
-#      --disable-shared \
-#      --with-gmp-include=$GMP_INCLUDE \
-#      --with-gmp-lib=$GMP_LIB \
-#      --with-mpfr-include=$MPFR_INCLUDE \
-#      --with-mpfr-lib=$MPFR_LIB
-#    make
-#    make check
-#    make install
-#    cd ../..
-#  fi
-#}
-
-#function installLIBELF {
-#  if [ ! -f /usr/local/include/libelf.h ]
-#  then
-#    download deps "http://www.mr511.de/software" "libelf-"$LIBELF_VER "tar.gz"
-#    cd deps/"libelf-"$LIBELF_VER
-#    ./configure \
-#      --prefix=/usr/local \
-#      --disable-shared
-#    make
-#    make install
-#    cd ../..
-#  fi
-#}
-
-#function installPDCURSES {
-#  if [ ! -f /mingw/include/curses.h ]
-#  then
-#    download deps "http://downloads.sourceforge.net/pdcurses" "PDCurses-"$LIBPDCURSES_VER "tar.gz"
-#    cd deps/"PDCurses-"$LIBPDCURSES_VER/win32
-#    make -f mingwin32.mak DLL=n
-#    cp pdcurses.a /mingw/lib/libcurses.a
-#    cp pdcurses.a /mingw/lib/libpanel.a
-#    cp ../curses.h /mingw/include
-#    cp ../panel.h /mingw/include
-#    cd ../../..
-#  fi
-#}
-
-function installREADLINE {
-  if [ ! -f /mingw/include/readline/readline.h ]
-  then
-    download deps "ftp://ftp.gnu.org/gnu/readline" "readline-"$LIBREADLINE_VER "tar.gz"
-    cd deps/"readline-"$LIBREADLINE_VER
-    ./configure \
-      --prefix=/mingw \
-      --without-curses \
-      --disable-shared
-    make
-    make install
-    cd ../..
-  fi
-}
-
-function installICONV {
-  if [ ! -f /mingw/include/iconv.h ]
-  then
-    download deps "ftp://ftp.gnu.org/gnu/libiconv" "libiconv-"$LIBICONV_VER "tar.gz"
-    cd deps/"libiconv-"$LIBICONV_VER
-    ./configure \
-      --prefix=/mingw \
-      --disable-shared \
-      --enable-static
-    make
-    make install
-    cd ../..
-  fi
-}
-
-function installPTHREADS {
-  if [ ! -f /mingw/include/pthread.h ]
-  then
-    download deps "ftp://sourceware.org/pub/pthreads-win32" "pthreads-w32-"$PTHREADS_VER"-release" "tar.gz"
-    cd deps/"pthreads-w32-"$PTHREADS_VER"-release"
-    make clean GC
-    cp pthreadGC2.dll /mingw/lib/pthreadGC2.dll
-    cp pthreadGC2.dll /mingw/bin/pthreadGC2.dll
-    cp pthreadGC2.dll /mingw/lib/pthread.dll
-    cp pthread.h sched.h /mingw/include
-    cd ../..
-  fi
-}
-
-function installSDL {
-  if [ ! -f /usr/local/include/SDL/SDL.h ]
-  then
-    download deps "http://www.libsdl.org/release" "SDL-"$SDL_VER "tar.gz"
-    cd deps/"SDL-"$SDL_VER
-    ./configure \
-      --prefix=/usr/local \
-      --disable-shared \
-      --enable-static
-    make
-    make install
-    cd ../..
   fi
 }
 
@@ -529,7 +324,6 @@ function buildBinutils {
         --disable-nls
   else
     cd psp/build/$BINUTILS_SRCDIR
-    make clean
   fi
 
   make LDFLAGS="-s"
@@ -569,7 +363,6 @@ function buildXGCC {
         --with-mpfr-lib=$MPFR_LIB
   else
     cd psp/build/x$GCC_SRCDIR
-    make clean
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
@@ -599,7 +392,6 @@ function bootstrapSDK {
     ../../pspsdk/configure --with-pspdev="$INSTALLDIR"
   else
     cd build/pspsdk
-    make clean
   fi
 
   make install-data
@@ -615,14 +407,13 @@ function buildNewlib {
     mkdir -p psp/build/$NEWLIB_SRCDIR
     cd psp/build/$NEWLIB_SRCDIR
 
-    # --enable-newlib-hw-fp
     ../../$NEWLIB_SRCDIR/configure \
         --target=psp \
+        --enable-newlib-hw-fp \
         --disable-nls \
         --prefix=$INSTALLDIR
   else
     cd psp/build/$NEWLIB_SRCDIR
-    make clean
   fi
 
   make LDFLAGS="-s"
@@ -660,7 +451,6 @@ function buildGCC {
         --with-mpfr-lib=$MPFR_LIB
   else
     cd psp/build/$GCC_SRCDIR
-    make clean
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
@@ -675,7 +465,6 @@ function buildGCC {
 
 function buildSDK {
   cd psp/build/pspsdk
-  make clean
   make LDFLAGS="-s"
   make install
   cd ../../..
@@ -710,7 +499,6 @@ function buildGDB {
         --disable-werror
   else
     cd psp/build/$GDB_SRCDIR
-    make clean
   fi
 
   make LDFLAGS="-s"
@@ -853,44 +641,49 @@ function installPSPLinkUSB {
 }
 
 function installMan {
+  if [ "$OS" == "MINGW32_NT" ]; then
+    MINGW32_GROFF_DIR="groff-"$MINGW32_GROFF_VER
+    download deps "http://downloads.sourceforge.net/gnuwin32" "groff-"$MINGW32_GROFF_VER"-bin" "zip" "groff-"$MINGW32_GROFF_VER
 
-  MINGW32_GROFF_DIR="groff-"$MINGW32_GROFF_VER
-  download deps "http://downloads.sourceforge.net/gnuwin32" "groff-"$MINGW32_GROFF_VER"-bin" "zip" "groff-"$MINGW32_GROFF_VER
+    cd deps
+    cp $MINGW32_GROFF_DIR/bin/groff.exe $INSTALLDIR/bin
+    cp $MINGW32_GROFF_DIR/bin/grotty.exe $INSTALLDIR/bin
+    cp $MINGW32_GROFF_DIR/bin/troff.exe $INSTALLDIR/bin
+    mkdir -p $INSTALLDIR/share
+    cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font $INSTALLDIR/share
+    cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac $INSTALLDIR/share
+    cd ..
 
-  cd deps
-  cp $MINGW32_GROFF_DIR/bin/groff.exe $INSTALLDIR/bin
-  cp $MINGW32_GROFF_DIR/bin/grotty.exe $INSTALLDIR/bin
-  cp $MINGW32_GROFF_DIR/bin/troff.exe $INSTALLDIR/bin
-  mkdir -p $INSTALLDIR/share
-  cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/font $INSTALLDIR/share
-  cp -Rf $MINGW32_GROFF_DIR/share/groff/$MINGW32_GROFF_VER/tmac $INSTALLDIR/share
-  cd ..
+    MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
+    download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER"-bin"
+    download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER"-dep"
 
-  MINGW32_LESS_DIR="less-"$MINGW32_LESS_VER
-  download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-bin" "zip" "less-"$MINGW32_LESS_VER"-bin"
-  download deps "http://downloads.sourceforge.net/gnuwin32" "less-"$MINGW32_LESS_VER"-dep" "zip" "less-"$MINGW32_LESS_VER"-dep"
-
-  cd deps
-  cp $MINGW32_LESS_DIR"-bin"/bin/less.exe $INSTALLDIR/bin
-  cp $MINGW32_LESS_DIR"-dep"/bin/pcre3.dll $INSTALLDIR/bin
-  cp ../mingw/bin/man.bat $INSTALLDIR/bin
-  cd ..
+    cd deps
+    cp $MINGW32_LESS_DIR"-bin"/bin/less.exe $INSTALLDIR/bin
+    cp $MINGW32_LESS_DIR"-dep"/bin/pcre3.dll $INSTALLDIR/bin
+    cp ../mingw/bin/man.bat $INSTALLDIR/bin
+    cd ..
+  fi
 }
 
 function installInfo {
-  cp mingw/bin/info.bat $INSTALLDIR/bin
-  cp mingw/bin/ginfo.exe $INSTALLDIR/bin
+  if [ "$OS" == "MINGW32_NT" ]; then
+    cp mingw/bin/info.bat $INSTALLDIR/bin
+    cp mingw/bin/ginfo.exe $INSTALLDIR/bin
+  fi
 }
 
 function patchCMD {
-  # make sure the line endings are correct (UNIX style)
-  awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build.mak > $INSTALLDIR/psp/sdk/lib/build.mak.unix
-  mv -f $INSTALLDIR/psp/sdk/lib/build.mak.unix $INSTALLDIR/psp/sdk/lib/build.mak
+  if [ "$OS" == "MINGW32_NT" ]; then
+    # make sure the line endings are correct (UNIX style)
+    awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build.mak > $INSTALLDIR/psp/sdk/lib/build.mak.unix
+    mv -f $INSTALLDIR/psp/sdk/lib/build.mak.unix $INSTALLDIR/psp/sdk/lib/build.mak
 
-  awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build_prx.mak > $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix
-  mv -f $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix $INSTALLDIR/psp/sdk/lib/build_prx.mak
+    awk '{ sub("\r$", ""); print }' $INSTALLDIR/psp/sdk/lib/build_prx.mak > $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix
+    mv -f $INSTALLDIR/psp/sdk/lib/build_prx.mak.unix $INSTALLDIR/psp/sdk/lib/build_prx.mak
 
-  patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/mingw/patches/pspsdk-CMD.patch
+    patch -p1 -d $INSTALLDIR/psp/sdk -i $(pwd)/mingw/patches/pspsdk-CMD.patch
+  fi
 }
 
 function prepareDistro {
@@ -1082,14 +875,12 @@ installExtraBinaries
 #---------------------------------------------------------------------------------
 # Man and Info so windows users can read all documentation
 #---------------------------------------------------------------------------------
-if [ "$OS" == "MINGW32_NT" ]; then
-  installMan
-  installInfo
-  #---------------------------------------------------------------------------------
-  # patch SDK to run without msys
-  #---------------------------------------------------------------------------------
-  patchCMD
-fi
+installMan
+installInfo
+#---------------------------------------------------------------------------------
+# patch SDK to run without msys
+#---------------------------------------------------------------------------------
+patchCMD
 #---------------------------------------------------------------------------------
 # prepare distro
 #---------------------------------------------------------------------------------

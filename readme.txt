@@ -411,10 +411,14 @@ To build run the toolchain script:
  How to build it myself (Ubuntu 64bit)?
 ===============================================================================
 
-For some unknown reason GCC 4.3 fails to build the cross compiler in a 64bit
-mode, in order to overcome this we can use the 32bit support from Linux to
-build a working compiler. Initially I used a virtual machine but I've now moved
-to a chroot environment since it is lightweight and enough for the task.
+It just works as with 32bit Ubuntu.
+
+===============================================================================
+ How to build it myself (Ubuntu 64bit targetting 32bit Ubuntu)?
+===============================================================================
+
+If you really need this, say you only have a 64bit machine but want to make a
+32bit sdk say to run on your netbook.
 
 1st install required packages:
  sudo apt-get install dchroot debootstrap
@@ -448,6 +452,7 @@ to a chroot environment since it is lightweight and enough for the task.
   sudo schroot -c maverick32
   sudo apt-get install ...
   ./toolchain.sh
+
 ===============================================================================
  How to build it myself (OpenSolaris)?
 ===============================================================================
@@ -460,6 +465,37 @@ the pspsh, usbhostfs_pc and remotejoy
 
 I've uploaded a working readline lib to jucr.opensolaris.org so if I get
 enough votes it will become available on the contrib repository.
+
+===============================================================================
+ How to build it myself (MacOSX)?
+===============================================================================
+
+Install required packages using macports.org:
+ * autoconf
+ * automake
+ * bison
+ * flex
+ * ncurses
+ * readline
+ * libusb
+ * texinfo
+ * libgmp3
+ * libmpfr
+ * subversion
+ * doxygen
+ * graphviz
+ * libtool
+ * unrar
+ * unzip
+ * cmake
+ * wget
+
+Once you have all these dependencies installed just run the toolchain script.
+
+Note: I don't own a Mac or have access to one, so all this info is provided
+"as is". The script has been tested by the community and updated with the
+community feedback. A special thanks for Diogo Autilio the tester of these
+changes.
 
 ===============================================================================
  Utils commands
