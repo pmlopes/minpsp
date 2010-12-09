@@ -255,8 +255,8 @@ function prepare {
   checkTool bison
   checkTool cmake
 
-#  # nice to have
-#  installPremake
+  # nice to have
+  installPremake
 
   TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
   [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
@@ -278,27 +278,35 @@ function buildAndInstallDevPak {
   fi
 }
 
-#function installPremake {
-#    download deps "http://sourceforge.net/projects/premake/files/Premake/4.3" "premake-4.3-src" "zip"
-#    if [ "$OS" == "MINGW32_NT" ]; then
-#      cd deps/premake-4.3/build/gmake.windows
-#    fi
-#    if [ "$OS" == "Linux" ]; then
-#      cd deps/premake-4.3/build/gmake.unix
-#    fi
-#    if [ "$OS" == "SunOS" ]; then
-#      cd deps/premake-4.3/build/gmake.unix
-#    fi
-#    if [ "$OS" == "Darwin" ]; then
-#      cd deps/premake-4.3/build/gmake.macosx
-#    fi
-#    make
-#
-#    mkdir -p $INSTALLDIR/bin
-#    cp ../../bin/release/* $INSTALLDIR/bin
-#
-#    cd ../../../..
-#}
+function installPremake {
+  PREMAKE_BIN=premake4
+
+  if [ "$OS" == "MINGW32_NT" ]; then
+    PREMAKE_BIN=$PREMAKE_BIN.exe
+  fi
+
+  if [ ! -f mingw/bin/$PREMAKE_BIN ]; then
+    download deps "http://downloads.sourceforge.net/premake" "premake-4.3-src" "zip"
+    if [ "$OS" == "MINGW32_NT" ]; then
+      cd deps/premake-4.3/build/gmake.windows
+    fi
+    if [ "$OS" == "Linux" ]; then
+      cd deps/premake-4.3/build/gmake.unix
+    fi
+    if [ "$OS" == "SunOS" ]; then
+      cd deps/premake-4.3/build/gmake.unix
+    fi
+    if [ "$OS" == "Darwin" ]; then
+      cd deps/premake-4.3/build/gmake.macosx
+    fi
+    make
+
+    mkdir -p $INSTALLDIR/bin
+    cp ../../bin/release/* $INSTALLDIR/bin
+
+    cd ../../../..
+  fi
+}
 
 function downloadPatches {
   svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
@@ -318,15 +326,13 @@ function buildBinutils {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-install-libbfd \
-        --disable-shared \
-        --with-stabs \
         --disable-werror \
         --disable-nls
   else
     cd psp/build/$BINUTILS_SRCDIR
   fi
 
-  make LDFLAGS="-s"
+  make
   make install
   cd ../../..
 }
@@ -349,11 +355,8 @@ function buildXGCC {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-languages="c" \
-        --disable-multilib \
-        --disable-shared \
         --with-newlib \
         --without-headers \
-        --disable-libssp \
         --disable-win32-registry \
         --disable-nls \
         --with-libiconv-prefix=$ICONV_PREFIX \
@@ -366,9 +369,9 @@ function buildXGCC {
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
-    make CFLAGS="-D__USE_MINGW_ACCESS" LDFLAGS="-s" all-gcc
+    make CFLAGS="-D__USE_MINGW_ACCESS" all-gcc
   else
-    make LDFLAGS="-s" all-gcc
+    make all-gcc
   fi
 
   make install-gcc
@@ -416,7 +419,7 @@ function buildNewlib {
     cd psp/build/$NEWLIB_SRCDIR
   fi
 
-  make LDFLAGS="-s"
+  make
   make install
   cd ../../..
 }
@@ -435,15 +438,11 @@ function buildGCC {
         --prefix=$INSTALLDIR \
         --target=psp \
         --enable-languages="c,c++,objc,obj-c++,d" \
-        --disable-multilib \
-        --disable-shared \
         --enable-cxx-flags="-G0" \
         --with-newlib \
         --with-headers \
         --disable-win32-registry \
         --disable-nls \
-        --enable-c99 \
-        --enable-long-long \
         --with-libiconv-prefix=$ICONV_PREFIX \
         --with-gmp-include=$GMP_INCLUDE \
         --with-gmp-lib=$GMP_LIB \
@@ -454,9 +453,9 @@ function buildGCC {
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
-    make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s"
+    make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0"
   else
-    make CFLAGS_FOR_TARGET="-G0 -O2" LDFLAGS="-s"
+    make CFLAGS_FOR_TARGET="-G0"
   fi
 
   make install
@@ -465,7 +464,7 @@ function buildGCC {
 
 function buildSDK {
   cd psp/build/pspsdk
-  make LDFLAGS="-s"
+  make
   make install
   cd ../../..
 }
@@ -495,13 +494,12 @@ function buildGDB {
         --prefix=$INSTALLDIR \
         --target=psp \
         --disable-nls \
-        --disable-shared \
         --disable-werror
   else
     cd psp/build/$GDB_SRCDIR
   fi
 
-  make LDFLAGS="-s"
+  make
   make install
   cd ../../..
 }
@@ -637,6 +635,30 @@ function installPSPLinkUSB {
   install -m 644 psplink/usbgdb.prx $INSTALLDIR/psplink/psp/oe/psplink/usbgdb.prx
   install -m 644 psplink/usbhostfs.prx $INSTALLDIR/psplink/psp/oe/psplink/usbhostfs.prx
 
+  cd ../../..
+}
+
+function buildPRXTool {
+  svnGet psp "http://psp.jim.sh/svn/psp/trunk" "prxtool"
+  cd psp
+  if [ ! -f prxtool/configure ]
+  then
+    cd prxtool
+    ./bootstrap || true
+    cd ..
+  fi
+
+  if [ ! -d build/prxtool ]
+  then
+    mkdir -p build/prxtool
+    cd build/prxtool
+    ../../prxtool/configure --prefix=$INSTALLDIR
+  else
+    cd build/prxtool
+  fi
+
+  make
+  make install
   cd ../../..
 }
 
@@ -867,6 +889,7 @@ buildGDB
 #---------------------------------------------------------------------------------
 # PSPLink
 #---------------------------------------------------------------------------------
+buildPRXTool
 installPSPLinkUSB
 #---------------------------------------------------------------------------------
 # Extra binaries such as psp-pkg-config hack, true, etc...
