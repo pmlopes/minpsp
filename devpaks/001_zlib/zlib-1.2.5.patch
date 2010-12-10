@@ -8,7 +8,7 @@ diff -Naur psp/Makefile psp/Makefile
 +OBJS = adler32.o compress.o crc32.o deflate.o gzclose.o gzlib.o gzread.o \
 +       gzwrite.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
 +
-+CFLAGS = -O2 -G0
++CFLAGS = -Wall -O2 -G0
 +
 +include $(PSPSDK)/lib/build.mak
 +

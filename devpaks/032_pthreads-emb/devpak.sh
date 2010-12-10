@@ -6,11 +6,9 @@ LIBNAME=pthreads-emb
 VERSION=1.0
 
 download build "http://downloads.sourceforge.net/pthreads-emb" $LIBNAME-$VERSION "tar.gz"
-
 cd build/$LIBNAME-$VERSION
-
 cd platform/psp
-make
+make -s
 cd ../..
 
 mkdir -p ../target/psp/lib ../target/psp/include ../target/doc/$LIBNAME

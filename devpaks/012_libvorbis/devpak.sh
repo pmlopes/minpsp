@@ -9,12 +9,12 @@ download build "http://downloads.xiph.org/releases/vorbis" $LIBNAME-$VERSION "ta
 cd build/$LIBNAME-$VERSION
 
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
-make
+make -s
 
-make install
+make -s install
 
 cd doc
-make install
+make -s install
 cd ..
 
 mkdir -p ../target/doc

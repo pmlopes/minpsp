@@ -7,7 +7,7 @@ VERSION=0.15.1b
 
 download build "http://downloads.sourceforge.net/mad" $LIBNAME-$VERSION "tar.gz"
 cd build/$LIBNAME-$VERSION
-make
+make -s
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 cp README ../target/doc/$LIBNAME.txt

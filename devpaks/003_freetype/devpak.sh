@@ -9,11 +9,11 @@ download build "http://download.savannah.gnu.org/releases/freetype" $LIBNAME-$VE
 
 cd build/$LIBNAME-$VERSION
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
-make
+make -s
 
-make install
+make -s install
 rm -fR $(pwd)/../target/psp/share
-make refdoc
+make -s refdoc
 mkdir -p $(pwd)/../target/doc/$LIBNAME
 cp docs/reference/*.html $(pwd)/../target/doc/$LIBNAME
 cd ..

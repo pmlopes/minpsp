@@ -9,7 +9,7 @@ svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
 cd build/$LIBNAME
 
-make
+make -s
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 mkdir -p ../target/psp/include/GL ../target/psp/include/GLES

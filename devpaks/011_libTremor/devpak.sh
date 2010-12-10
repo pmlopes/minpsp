@@ -10,8 +10,8 @@ svnGet build http://svn.xiph.org/trunk $LIBNAME
 cd build/$LIBNAME
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./autogen.sh --host=psp --prefix=$(pwd)/../target/psp
 
-make
-make install
+make -s
+make -s install
 
 mkdir -p $(pwd)/../target/doc/$LIBNAME
 cp doc/*.html $(pwd)/../target/doc/$LIBNAME

@@ -8,9 +8,9 @@ VERSION=1.0.6
 download build "http://bzip.org/$VERSION" $LIBNAME-$VERSION "tar.gz"
 
 cd build/$LIBNAME-$VERSION
-make
+make -s
 
-make PREFIX=$(pwd)/../target/psp install
+make -s PREFIX=$(pwd)/../target/psp install
 mkdir -p $(pwd)/../target/doc
 cp manual.html  $(pwd)/../target/doc/$LIBNAME.html
 

@@ -8,7 +8,7 @@ VERSION=0.0.6
 download build "http://shinh.skr.jp/libbulletml" lib$LIBNAME-$VERSION "tar.bz2"
 
 cd build/$LIBNAME/src
-make
+make -s
 
 mkdir -p ../../target/psp/include/bulletml ../../target/psp/lib ../../target/doc
 mkdir -p ../../target/psp/include/boost/config

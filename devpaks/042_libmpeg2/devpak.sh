@@ -5,15 +5,12 @@ set -e
 LIBNAME=libmpeg2
 VERSION=0.5.1
 
-download build http://libmpeg2.sourceforge.net/files $LIBNAME-$VERSION tar.gz
+download build "http://libmpeg2.sourceforge.net/files" $LIBNAME-$VERSION tar.gz
 
 cd build/$LIBNAME-$VERSION
-
 CFLAGS="-G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --disable-sdl --host=psp --prefix=$(pwd)/../target/psp
-
-make
-
-make install
+make -s
+make -s install
 mv ../target/psp/share/man ../target
 rm -rf ../target/psp/share
 mkdir -p ../target/doc/$LIBNAME

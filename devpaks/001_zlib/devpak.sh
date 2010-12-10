@@ -7,7 +7,7 @@ VERSION=1.2.5
 
 download build "http://www.zlib.net" $LIBNAME-$VERSION "tar.bz2"
 cd build/$LIBNAME-$VERSION
-make -f psp/Makefile
+make -s -f psp/Makefile
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/man/man3
 cp zlib.h zconf.h ../target/psp/include

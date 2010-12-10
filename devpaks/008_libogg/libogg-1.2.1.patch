@@ -37,8 +37,8 @@ diff -Naur configure configure
  		;;
 +	mipsallegrex*-*-*)
 +		DEBUG="-g -Wall -fsigned-char"
-+		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
-+		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char"
++		CFLAGS="-O2 -Wall -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -Wall -O2 -G0 -ffast-math -fsigned-char"
 +		;;
          *)
                  DEBUG="-g -Wall -fsigned-char"
@@ -52,8 +52,8 @@ diff -Naur configure.in configure.in
  		;;
 +	mipsallegrex*-*-*)
 +		DEBUG="-g -Wall -fsigned-char"
-+		CFLAGS="-O20 -G0 -ffast-math -fsigned-char"
-+		PROFILE="-Wall -W -pg -g -O20 -G0 -ffast-math -fsigned-char"
++		CFLAGS="-O2 -Wall -G0 -ffast-math -fsigned-char"
++		PROFILE="-Wall -W -pg -g -Wall -O2 -G0 -ffast-math -fsigned-char"
 +		;;
          *)
                  DEBUG="-g -Wall -fsigned-char"

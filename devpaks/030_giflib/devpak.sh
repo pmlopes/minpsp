@@ -11,9 +11,9 @@ cd build/$LIBNAME-$VERSION
 
 CFLAGS="-ffast-math -fsigned-char -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 cd lib
-make
+make -s
 
-make install
+make -s install
 mkdir -p ../../target/doc/$LIBNAME
 cp ../doc/* ../../target/doc/$LIBNAME
 rm ../../target/doc/$LIBNAME/Makefile.*

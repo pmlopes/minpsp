@@ -9,8 +9,8 @@ download build "http://mirrors.isc.org/pub/MidnightBSD/distfiles" $LIBNAME-$VERS
 cd build/$LIBNAME-$VERSION
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --disable-readline --disable-tcl --prefix=$(pwd)/../target/psp
 
-PSPDEV=$(psp-config --pspdev-path) make
-make install
+PSPDEV=$(psp-config --pspdev-path) make -s
+make -s install
 
 cd ../..
 

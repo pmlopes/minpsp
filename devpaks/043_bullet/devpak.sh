@@ -5,11 +5,11 @@ set -e
 LIBNAME=bullet
 VERSION=2.70
 
-download build http://bullet.googlecode.com/files $LIBNAME-$VERSION tgz
+download build "http://bullet.googlecode.com/files" $LIBNAME-$VERSION tgz
 
 cd build/$LIBNAME-$VERSION
 cd src
-make
+make -s
 install -d ../../target/psp/lib
 install -d ../../target/psp/include/bullet
 install -d ../../target/psp/include/bullet/BulletCollision

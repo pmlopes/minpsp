@@ -5,12 +5,9 @@ set -e
 LIBNAME=oslibmod
 VERSION=2.10
 
-svnGet build http://tools.assembla.com/svn/oslibmod trunk
-
+svnGet build "http://tools.assembla.com/svn/oslibmod" trunk
 cd build/trunk
-
-make lib
-
+make -s lib
 mkdir -p ../target/psp/include/oslib
 mkdir -p ../target/psp/include/oslib/intraFont
 mkdir -p ../target/psp/include/oslib/libpspmath
@@ -53,6 +50,6 @@ cp -fR OSLib_MOD_Documentation/html ../target/doc/oslibmod
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 mikmodlib 3.0 libpspmath 4 intraFont 0.31 
+makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4 mikmodlib 3.0 libpspmath 4 intraFont 0.31 
 
 echo "Done!"

@@ -55,7 +55,7 @@ diff -Naur Makefile Makefile
 +# These objectfiles are included in libjpeg.a
 +OBJS = $(CLIBOBJECTS) $(DLIBOBJECTS) $(COMOBJECTS)
 +
-+CFLAGS = -O2 -G0
++CFLAGS = -Wall -O2 -G0 -g
 +
 +include $(PSPSDK)/lib/build.mak
 +

@@ -11,9 +11,7 @@ cp -R ../libpspmath libpspmath
 cp -R ../sample sample
 
 cd $LIBNAME
-
-make
-
+make -s
 mkdir -p ../target/psp/sdk/lib ../target/psp/sdk/include ../target/psp/sdk/samples/pspmath
 cp libpspmath.a ../target/psp/sdk/lib
 cp pspmath.h ../target/psp/sdk/include

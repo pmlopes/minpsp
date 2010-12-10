@@ -174,6 +174,7 @@ function prepare {
     GMP_PREFIX=/usr
     PPL_PREFIX=/usr
     ICONV_PREFIX=/usr
+    MAKE_CMD=make
 
     if [ ! -e compat ]; then
       mkdir -p compat
@@ -197,6 +198,7 @@ function prepare {
     GMP_PREFIX=/usr
     PPL_PREFIX=/usr
     ICONV_PREFIX=/usr
+    MAKE_CMD="make -s"
   fi
 
   # --- XP 32 bits
@@ -226,6 +228,7 @@ function prepare {
     GMP_PREFIX=/usr/local
     PPL_PREFIX=/usr/local
     ICONV_PREFIX=/mingw
+    MAKE_CMD=make
 
     #-----------------------------------------------------------------------------
     # pre requisites
@@ -243,6 +246,7 @@ function prepare {
     GMP_PREFIX=/opt/local
     PPL_PREFIX=/opt/local
     ICONV_PREFIX=/opt/local
+    MAKE_CMD=make
   fi
 
   checkTool svn
@@ -299,7 +303,7 @@ function installPremake {
     if [ "$OS" == "Darwin" ]; then
       cd deps/premake-4.3/build/gmake.macosx
     fi
-    make
+    $MAKE_CMD
 
     mkdir -p $INSTALLDIR/bin
     cp ../../bin/release/* $INSTALLDIR/bin
@@ -332,8 +336,8 @@ function buildBinutils {
     cd psp/build/$BINUTILS_SRCDIR
   fi
 
-  make
-  make install
+  $MAKE_CMD
+  $MAKE_CMD install
   cd ../../..
 }
 
@@ -369,12 +373,12 @@ function buildXGCC {
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
-    make CFLAGS="-D__USE_MINGW_ACCESS" all-gcc
+    $MAKE_CMD CFLAGS="-D__USE_MINGW_ACCESS" all-gcc
   else
-    make all-gcc
+    $MAKE_CMD all-gcc
   fi
 
-  make install-gcc
+  $MAKE_CMD install-gcc
   cd ../../..
 }
 
@@ -392,12 +396,12 @@ function bootstrapSDK {
   then
     mkdir -p build/pspsdk
     cd build/pspsdk
-    ../../pspsdk/configure --with-pspdev="$INSTALLDIR"
+    ../../pspsdk/configure --with-pspdev="$INSTALLDIR" --enable-werror
   else
     cd build/pspsdk
   fi
 
-  make install-data
+  $MAKE_CMD install-data
   cd ../../..
 }
 
@@ -419,8 +423,8 @@ function buildNewlib {
     cd psp/build/$NEWLIB_SRCDIR
   fi
 
-  make
-  make install
+  $MAKE_CMD
+  $MAKE_CMD install
   cd ../../..
 }
 
@@ -453,19 +457,19 @@ function buildGCC {
   fi
 
   if [ "$OS" == "MINGW32_NT" ]; then
-    make CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0"
+    $MAKE_CMD CFLAGS="-D__USE_MINGW_ACCESS" CFLAGS_FOR_TARGET="-G0"
   else
-    make CFLAGS_FOR_TARGET="-G0"
+    $MAKE_CMD CFLAGS_FOR_TARGET="-G0"
   fi
 
-  make install
+  $MAKE_CMD install
   cd ../../..
 }
 
 function buildSDK {
   cd psp/build/pspsdk
-  make
-  make install
+  $MAKE_CMD
+  $MAKE_CMD install
   cd ../../..
 }
 
@@ -499,8 +503,8 @@ function buildGDB {
     cd psp/build/$GDB_SRCDIR
   fi
 
-  make
-  make install
+  $MAKE_CMD
+  $MAKE_CMD install
   cd ../../..
 }
 
@@ -543,8 +547,8 @@ function installPSPLinkUSB {
   cd psp
   if [ "$OS" == "MINGW32_NT" ]; then
     cd psplinkusb
-    CC=gcc CXX=g++ BUILD_WIN32=1 make -C pspsh install
-    CC=gcc CXX=g++ BUILD_WIN32=1 make -C tools/remotejoy/pcsdl install
+    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C pspsh install
+    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C tools/remotejoy/pcsdl install
     cd ..
     # usbhostfs_pc (not yet ported to native win32)
     cp ../mingw/bin/usbhostfs_pc.exe $INSTALLDIR/bin
@@ -576,13 +580,19 @@ function installPSPLinkUSB {
       cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
     fi
 
-    make -f Makefile.clients install
+    if [ "$OS" == "Darwin" ]; then
+      cp -f ../../mingw/macosx/Makefile.pspsh pspsh/Makefile
+      cp -f ../../mingw/macosx/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
+      # remotejoy should just work, since it does not deppend on readline
+    fi
+
+    $MAKE_CMD -f Makefile.clients install
     cd ..
   fi
 
   cd psplinkusb
-  make -f Makefile.psp clean
-  make -f Makefile.psp release
+  $MAKE_CMD -f Makefile.psp clean
+  $MAKE_CMD -f Makefile.psp release
   cd release
 
   install -d $INSTALLDIR/psplink/psp
@@ -622,8 +632,8 @@ function installPSPLinkUSB {
   install -m 644 README $INSTALLDIR/psplink
 
   cd ..
-  make -f Makefile.oe clean
-  make -f Makefile.oe release
+  $MAKE_CMD -f Makefile.oe clean
+  $MAKE_CMD -f Makefile.oe release
 
   cd release_oe
   install -d $INSTALLDIR/psplink/psp/oe
@@ -657,8 +667,8 @@ function buildPRXTool {
     cd build/prxtool
   fi
 
-  make
-  make install
+  $MAKE_CMD
+  $MAKE_CMD install
   cd ../../..
 }
 
@@ -760,7 +770,7 @@ function prepareDistro {
 
     # generate doxygen docs
     cd psp/build/pspsdk
-    make doxygen-doc
+    $MAKE_CMD doxygen-doc
     cp -fR doc $INSTALLERDIR/documentation/pspdoc
     cd ../../..
     rm $INSTALLERDIR/documentation/pspdoc/doc/pspsdk.tag
@@ -778,7 +788,7 @@ function prepareDistro {
   else
     # generate doxygen docs
     cd psp/build/pspsdk
-    make doxygen-doc
+    $MAKE_CMD doxygen-doc
     mkdir -p $INSTALLDIR/doc
     cp -fR doc $INSTALLDIR/doc/pspsdk
     cd ../../..

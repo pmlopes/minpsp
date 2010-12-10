@@ -9,8 +9,7 @@ svnGet build svn://svn.ps2dev.org/psp/trunk $LIBNAME
 
 cd build/$LIBNAME
 
-make
-
+make -s
 make install
 rm -fR ../target/psp/sdk/samples/irkeyb/keymap/.svn
 
@@ -19,4 +18,3 @@ cd ../..
 makeInstaller $LIBNAME $VERSION
 
 echo "Done!"
-

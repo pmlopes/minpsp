@@ -8,7 +8,7 @@ VERSION=8b
 download build "http://www.ijg.org/files" jpegsrc.v$VERSION "tar.gz"
 
 cd build/$LIBNAME-$VERSION
-make
+make -s
 
 mkdir -p ../target/psp/include ../target/psp/lib ../target/doc
 cp jconfig.h jpeglib.h jmorecfg.h jerror.h ../target/psp/include

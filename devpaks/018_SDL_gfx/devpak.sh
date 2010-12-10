@@ -7,7 +7,7 @@ VERSION=2.0.22
 
 download build "http://downloads.sourceforge.net/sdlgfx" $LIBNAME-$VERSION "tar.gz"
 cd build/$LIBNAME-$VERSION
-make -f Makefile.psp
+make -s -f Makefile.psp
 mkdir -p ../target/psp/include/SDL ../target/psp/lib ../target/doc
 cp libSDL_gfx.a ../target/psp/lib
 cp SDL_framerate.h SDL_gfxPrimitives.h SDL_imageFilter.h SDL_rotozoom.h ../target/psp/include/SDL

@@ -8,9 +8,8 @@ VERSION=0.13.59
 download build "http://downloads.sourceforge.net/zziplib" $LIBNAME-$VERSION "tar.bz2"
 cd build/$LIBNAME-$VERSION
 LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
-make
-
-make install
+make -s
+make -s install
 mkdir -p ../target/doc
 cp -Rf docs ../target/doc/$LIBNAME
 mkdir -p ../target/man

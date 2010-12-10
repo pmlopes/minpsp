@@ -11,15 +11,15 @@ cd build/$LIBNAME-$VERSION
 
 CFLAGS="-ffast-math -fsigned-char -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib -lc -lpspuser" ./configure --enable-maintainer-mode --host=psp --prefix=$(pwd)/../target/psp --with-ogg=$(psp-config --psp-prefix)
 cd src/libFLAC
-make
+make -s
 cd ../../include/FLAC
-make
+make -s
 cd ../..
 
 cd src/libFLAC
-make install
+make -s install
 cd ../../include/FLAC
-make install
+make -s install
 cd ../..
 mkdir -p ../target/doc/$LIBNAME
 cp -fR doc/html/* ../target/doc/$LIBNAME

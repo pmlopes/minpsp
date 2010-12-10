@@ -9,8 +9,8 @@ download build "http://www.libsdl.org/projects/SDL_mixer/release" $LIBNAME-$VERS
 cd build/$LIBNAME-$VERSION
 # disable flac because the build script cannot run cross compiled binaries on the host
 CFLAGS="-G0 -g -O2" LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lvorbis -logg -lm -lc -lpspuser" ./configure --host=psp --disable-music-flac --enable-music-ogg-tremor --disable-music-cmd --prefix=$(pwd)/../target/psp
-make
-make install
+make -s
+make -s install
 mkdir -p ../target/doc
 cp README ../target/doc/SDL_mixer.txt
 

@@ -1731,7 +1731,7 @@ diff -Naur configure.in configure.in
  
 +        mipsallegrex*-*-*)
 +                DEBUG="-g -W -fsigned-char"
-+                CFLAGS="-O2 -G0 -fsigned-char -DLITTLE_ENDIAN=1 -DBYTE_ORDER=LITTLE_ENDIAN -D_LOW_ACCURACY_"
++                CFLAGS="-O2 -Wall -G0 -fsigned-char -DLITTLE_ENDIAN=1 -DBYTE_ORDER=LITTLE_ENDIAN -D_LOW_ACCURACY_"
 +                PROFILE="-W -pg -g -O2 -G0 -fsigned-char -fno-inline-functions";;
          *)
                  DEBUG="-g -Wall -D__NO_MATH_INLINES -fsigned-char"

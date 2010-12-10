@@ -8,9 +8,9 @@ VERSION=1.2.10
 download build "http://www.libsdl.org/projects/SDL_image/release" $LIBNAME-$VERSION "tar.gz"
 cd build/$LIBNAME-$VERSION
 CFLAGS="-g -O2 -G0" LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
-make
+make -s
 
-make install
+make -s install
 mkdir -p ../target/doc
 cp README ../target/doc/SDL_image.txt
 
