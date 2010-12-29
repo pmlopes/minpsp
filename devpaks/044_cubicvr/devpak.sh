@@ -13,7 +13,6 @@ mkdir -p build/$LIBNAME
 mv build/cubicvr_src build/$LIBNAME/cubicvr
 mv build/psp build/$LIBNAME/psp
 cd build/$LIBNAME/psp
-cp -f ../../../Makefile .
 make -s
 make -s install
 cd ../../..

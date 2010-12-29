@@ -1,0 +1,14 @@
+Index: include/CubicVR/BITSET.h
+===================================================================
+--- include/CubicVR/BITSET.h	(revision 1237)
++++ include/CubicVR/BITSET.h	(working copy)
+@@ -12,7 +12,9 @@
+ #ifndef BITSET_H
+ #define BITSET_H
+ 
++#ifndef __psp__
+ #include "memory.h"
++#endif
+ #include <stdio.h>
+ #include <string.h>
+ #include <CubicVR/Logger.h>

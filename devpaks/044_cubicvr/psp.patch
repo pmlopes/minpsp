@@ -1,0 +1,1002 @@
+Index: samples/vehicle/main.cpp
+===================================================================
+--- samples/vehicle/main.cpp	(revision 1237)
++++ samples/vehicle/main.cpp	(working copy)
+@@ -88,7 +88,7 @@
+ 	// clear screen
+ 	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
+                 
+-	camera.target = carObj.controller().position;
++	camera.target = carObj.getPosition();
+ 
+ 	scene.render();
+ 	
+@@ -135,8 +135,8 @@
+ 	scene.bind(light);
+ 
+ 	// make the ground
+-	ground.controller().scale = XYZ(60,1,60);
+-	ground.controller().position = XYZ(0,-0.5,0);
++	ground.setScale(XYZ(60,1,60));
++	ground.setPosition(XYZ(0,-0.5,0));
+ 	// keep it static
+ 	ground.setMass(0); 
+ 	scene.bind(ground);
+@@ -149,12 +149,12 @@
+ 	// scene.bind(dropBox);         
+ 		
+ 
+-	carObj.controller().position = XYZ(0,40,0);
+-	carObj.controller().rotation = XYZ(36,0,20);
++	carObj.setPosition(XYZ(0,40,0));
++	carObj.setRotation(XYZ(36,0,20));
+ 	scene.bind(carObj);
+ 	
+-	car = new Vehicle(&meshObj,NULL,&meshCollisionObj);
+-	car->controller().position = XYZ(0,5,0);
++	car = new Vehicle(meshObj,meshCollisionObj);
++	car->setPosition(XYZ(0,5,0));
+ 	scene.bind(*car);
+ 
+ //	scene.bind(carObj);
+@@ -352,9 +352,9 @@
+ 		{
+ 			RigidBox *myObj = new RigidBox(boxObject);
+ 
+-			myObj->controller().position = XYZ(0,40,0);
+-			myObj->controller().scale = XYZ(2,2,2);
+-			myObj->controller().rotation = XYZ(45,0,45);
++			myObj->setPosition(XYZ(0,40,0));
++			myObj->setScale(XYZ(2,2,2));
++			myObj->setRotation(XYZ(45,0,45));
+ 			myObj->setMass(40);	
+ 
+ 			scene.bind(*myObj); 
+@@ -383,7 +383,7 @@
+  		pspDebugScreenSetOffset( (int)fbp0 );
+ 
+ 		pspDebugScreenSetXY(0,1);
+-		pspDebugScreenPrintf( "drop box: %f %f %f", dropBox.controller().position.x, dropBox.controller().position.y, dropBox.controller().position.z);
++		pspDebugScreenPrintf( "drop box: %f %f %f", dropBox.getPosition().x, dropBox.getPosition().y, dropBox.getPosition().z);
+ 
+ 		pspDebugScreenSetXY(0, 3);
+ 		printf("Analog X = %d ", pad.Lx);
+Index: samples/vehicle/Makefile
+===================================================================
+--- samples/vehicle/Makefile	(revision 1237)
++++ samples/vehicle/Makefile	(working copy)
+@@ -1,27 +1,20 @@
+ TARGET = psp_bullet
+ OBJS = main.o scriptingSystem.o resourceManager.o 
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lbulletdynamics -lbulletcollision -lbulletmath -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua   -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-#-lcubicvr 
+-
+-LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Bullet Physics
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/lua_test/Makefile
+===================================================================
+--- samples/lua_test/Makefile	(revision 1237)
++++ samples/lua_test/Makefile	(working copy)
+@@ -1,23 +1,20 @@
+ TARGET = lua_basic
+ OBJS = main.o scriptingSystem.o resourceManager.o
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-LDFLAGS =
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Lua Gamepad
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/boxland/main.cpp
+===================================================================
+--- samples/boxland/main.cpp	(revision 1237)
++++ samples/boxland/main.cpp	(working copy)
+@@ -116,8 +116,8 @@
+ 	scene.bind(light);
+ 
+ 	// make the ground
+-	ground.controller().scale = XYZ(60,1,60);
+-	ground.controller().position = XYZ(0,-0.5,0);
++	ground.setScale(XYZ(60,1,60));
++	ground.setPosition(XYZ(0,-0.5,0));
+ 	// keep it static
+ 	ground.setMass(0); 
+ 	scene.bind(ground);
+@@ -236,9 +236,9 @@
+ {
+ 	RigidBox *myObj = new RigidBox(boxObject);
+ 
+-	myObj->controller().position = position;
+-	myObj->controller().scale = XYZ(5,5,5);
+-	myObj->controller().rotation = XYZ(0,0,0);
++	myObj->setPosition(position);
++	myObj->setScale(XYZ(5,5,5));
++	myObj->setRotation(XYZ(0,0,0));
+ 	myObj->setMass(30);	
+ 
+ 	scene.bind(*myObj); 	
+Index: samples/boxland/Makefile
+===================================================================
+--- samples/boxland/Makefile	(revision 1237)
++++ samples/boxland/Makefile	(working copy)
+@@ -1,27 +1,21 @@
+ TARGET = psp_bullet
+ OBJS = main.o scriptingSystem.o resourceManager.o 
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua   -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-#-lcubicvr 
++LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lbulletdynamics -lbulletcollision -lbulletmath -lm -lstdc++ -lcubicvr 
+ 
+-LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Bullet Physics
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/landscape/Makefile
+===================================================================
+--- samples/landscape/Makefile	(revision 1237)
++++ samples/landscape/Makefile	(working copy)
+@@ -1,7 +1,8 @@
+ TARGET = CubicVR_Landscape
+ OBJS = main.o Gamepad.o
+ 
+-INCDIR = ../../../cubicvr/include ../../../dependencies/product/include/bullet
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -Wall -O3
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+@@ -11,9 +12,7 @@
+ PSP_FW_VERSION = 390
+ PSP_LARGE_MEMORY = 1
+ 
+-LIBDIR = ../../ ../../pspbullet/
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+-LDFLAGS =
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+ 
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Landscape Builder
+@@ -27,7 +26,6 @@
+ debug:	all debugfolder
+ 		
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/gamepad/Makefile
+===================================================================
+--- samples/gamepad/Makefile	(revision 1237)
++++ samples/gamepad/Makefile	(working copy)
+@@ -1,23 +1,20 @@
+ TARGET = ex_gamepad
+ OBJS = main.o scriptingSystem.o resourceManager.o
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/ ../../../cubicvr/include/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/ ../../
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-LDFLAGS =
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Gamepad Example
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/lua_wifi/Makefile
+===================================================================
+--- samples/lua_wifi/Makefile	(revision 1237)
++++ samples/lua_wifi/Makefile	(working copy)
+@@ -1,23 +1,20 @@
+ TARGET = lua_wifi
+ OBJS = main.o scriptingSystem.o resourceManager.o
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-LDFLAGS =
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Lua Wifi
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/courtyard_lws/Makefile
+===================================================================
+--- samples/courtyard_lws/Makefile	(revision 1237)
++++ samples/courtyard_lws/Makefile	(working copy)
+@@ -1,24 +1,21 @@
+ TARGET = CubicVR_Courtyard
+ OBJS = main.o Gamepad.o
+ 
+-INCDIR = ../../../dependencies/product/include/bullet/ ../../../cubicvr/include/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
+ 
+-LIBDIR = ../../pspbullet ../../
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+-LDFLAGS =
+-# -lmad
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+ 
+ LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+ 
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - LWSC - Courtyard
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/torus_lws/Makefile
+===================================================================
+--- samples/torus_lws/Makefile	(revision 1237)
++++ samples/torus_lws/Makefile	(working copy)
+@@ -1,7 +1,8 @@
+ TARGET = CubicVR_Torus
+ OBJS = main.o Gamepad.o
+ 
+-INCDIR = ../../../cubicvr/include/ ../../../dependencies/product/include/bullet/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+@@ -11,17 +12,11 @@
+ PSP_FW_VERSION = 390
+ PSP_LARGE_MEMORY = 1
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+ 
+-LIBDIR = ../../ ../../pspbullet
+-LIBS = -lcubicvr  -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - LWSC - Torus
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/font/Makefile
+===================================================================
+--- samples/font/Makefile	(revision 1237)
++++ samples/font/Makefile	(working copy)
+@@ -2,15 +2,14 @@
+ OBJS = font.c main.o
+ #TO-DO: OBJS = main.o scriptingSystem.o resourceManager.o
+ 	
+-INCDIR = ./ ../../../dependencies/pspbullet/src/ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ CFLAGS = -G0 -Wall -O2
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti  -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
+-LIBDIR =
+ LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+-LIBS= -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-#-lpspbulletdynamics -lpspbulletcollision -lpspbulletmath 
++LIBS= -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Font
+@@ -19,7 +18,6 @@
+ 
+ CVR_OMIT_FOLDERS = -rvc --exclude=".svn"
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/metacube_lws/Makefile
+===================================================================
+--- samples/metacube_lws/Makefile	(revision 1237)
++++ samples/metacube_lws/Makefile	(working copy)
+@@ -1,7 +1,8 @@
+ TARGET = CubicVR_MetaCube
+ OBJS = main.o Gamepad.o
+ 
+-INCDIR = ./ ../../../dependencies/product/include/bullet ../../../cubicvr/include/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -Wall -O3
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+@@ -11,11 +12,8 @@
+ PSP_FW_VERSION = 390
+ PSP_LARGE_MEMORY = 1
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lstdc++ -lm -lpsprtc
+ 
+-LIBDIR = ../../ ../../pspbullet
+-LDFLAGS =
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lstdc++ -lm -lpsprtc
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR Metacube
+ 
+@@ -29,7 +27,6 @@
+ debug:	all debugfolder
+ 		
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/multitexture_test/main.cpp
+===================================================================
+--- samples/multitexture_test/main.cpp	(revision 1237)
++++ samples/multitexture_test/main.cpp	(working copy)
+@@ -122,11 +122,11 @@
+ 	loadLWS(myScene, sceneName);	
+ 	
+ 	printf("Caching CVR scene: %s\n", sceneName);
+-	myScene.cache(true);
++	//myScene.cache(true);
+ 
+ 	
+-	printf("Retrieving scene motion controller: %iu\n", myScene.getMotionId(sceneName));
+-	mySceneMotion = &myScene.motion(myScene.getMotionId(sceneName));
++	printf("Retrieving scene motion controller: %s\n", sceneName);
++	mySceneMotion = &myScene.motion(sceneName);
+ 	
+ 	///////////////////////////////////////////////////
+ 	// END Load Resources
+Index: samples/multitexture_test/Makefile
+===================================================================
+--- samples/multitexture_test/Makefile	(revision 1237)
++++ samples/multitexture_test/Makefile	(working copy)
+@@ -1,23 +1,18 @@
+ TARGET = CubicVR_MultiTexTest
+ OBJS = main.o Gamepad.o
+ 
+-INCDIR = 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lbulletdynamics -lbulletcollision -lbulletmath -lm -lstdc++
+ 
+-LIBDIR =
+-LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - LWSC - Multitexture
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/pspbullet/Makefile
+===================================================================
+--- samples/pspbullet/Makefile	(revision 1237)
++++ samples/pspbullet/Makefile	(working copy)
+@@ -1,27 +1,20 @@
+ TARGET = psp_bullet
+ OBJS = main.o scriptingSystem.o resourceManager.o 
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lbulletdynamics -lbulletcollision -lbulletmath -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua   -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-#-lcubicvr 
+-
+-LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Bullet Physics
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/box_drop/Makefile
+===================================================================
+--- samples/box_drop/Makefile	(revision 1237)
++++ samples/box_drop/Makefile	(working copy)
+@@ -1,7 +1,8 @@
+ TARGET = psp_bullet
+ OBJS = main.o scriptingSystem.o resourceManager.o 
+ 
+-INCDIR = ./ ../../../cubicvr/include/ ../../../dependencies/product/include/bullet/ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ 
+ #CFLAGS = -G0 -Wall
+@@ -14,13 +15,8 @@
+ PSP_FW_VERSION = 390
+ PSP_LARGE_MEMORY = 1
+ 
++LIBS = -lcubicvr -lbulletsoftbody -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++ -lcubicvr
+ 
+-LIBDIR = ../../pspbullet ../../
+-LIBS = -lcubicvr -lpspbulletsoftbody -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-#-lcubicvr 
+-
+ LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+ 
+ EXTRA_TARGETS = EBOOT.PBP
+@@ -38,7 +34,6 @@
+ debug:	all debugfolder
+ 		
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/cube/main.cpp
+===================================================================
+--- samples/cube/main.cpp	(revision 1237)
++++ samples/cube/main.cpp	(working copy)
+@@ -17,12 +17,12 @@
+ 
+ Camera myCamera = Camera(SCR_WIDTH, SCR_HEIGHT, 72, 0.5, 1000.0, CAMERA_TARGET);
+ unsigned int myTex;
+-unsigned int myMat;
++Material* myMat;
+ Object myObj;
+ ObjectShader myShader;
+ Light myLight(0);
+ 
+-void makeBox(Object &boxObj, float box_size, unsigned int box_mat)
++void makeBox(Object &boxObj, float box_size, Material* box_mat)
+ {
+ 	float half_box = box_size/2.0;
+ 	
+@@ -236,9 +236,9 @@
+ 	}
+ 	texture.Swizzle();*/
+ 
+-	myMat = Material::create();
++	myMat = new Material();
+ 	myTex = Texture::create("textures/crate.tga");
+-	Material::getMaterial(myMat).bindTexture(myTex);
++	myMat->bindTexture(myTex);
+ 
+ 	makeBox(myObj,2,myMat);
+ 
+Index: samples/cube/main.h
+===================================================================
+--- samples/cube/main.h	(revision 1237)
++++ samples/cube/main.h	(working copy)
+@@ -1,8 +1,8 @@
+ #ifndef MAIN_H
+ #define MAIN_H
+ 
++#include <pspkernel.h>
+ #include <psptypes.h>
+-#include <pspkernel.h>
+ #include <pspdebug.h>
+ #include <pspdisplay.h>
+ #include <pspctrl.h>
+Index: samples/cube/Makefile
+===================================================================
+--- samples/cube/Makefile	(revision 1237)
++++ samples/cube/Makefile	(working copy)
+@@ -2,27 +2,20 @@
+ OBJS = main.o Gamepad.o ScriptLua.o ScriptLuaExports.o  
+ #mp3player.o
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-LDFLAGS =
+-# -lmad
+-
+-LDFLAGS  := $(addprefix -L,$(LIBDIR)) $(LDFLAGS)
+-
+-
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Crate
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: samples/lua_host/Makefile
+===================================================================
+--- samples/lua_host/Makefile	(revision 1237)
++++ samples/lua_host/Makefile	(working copy)
+@@ -1,23 +1,21 @@
+ TARGET = CVRDEMOS
+ OBJS = main.o scriptingSystem.o resourceManager.o
+ 
+-INCDIR = ./ ../../../dependencies/pspbullet/src/
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet
+ 
+ CFLAGS = -G0 -Wall
+ CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -DARCH_PSP
+ ASFLAGS = $(CFLAGS)
+ 
+ 
+-LIBDIR = ../../../dependencies/pspbullet/
+-LIBS = -lcubicvr -lpspbulletdynamics -lpspbulletcollision -lpspbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llualib -llua -lm -lstdc++
+-LDFLAGS =
++LIBS = -lcubicvr -lbulletdynamics -lbulletcollision -lbulletmath -lpspgum -lpspgu -lpspaudiolib -lpspaudio -lpsppower -lpsprtc -llua -lm -lstdc++
+ 
+ EXTRA_TARGETS = EBOOT.PBP
+ PSP_EBOOT_TITLE = CubicVR - Demo Launcher
+ PSP_EBOOT_ICON = ICON0.PNG
+ PSP_EBOOT_PIC1 = PIC1.PNG
+ 
+-PSPSDK=$(shell psp-config --pspsdk-path)
+ include $(PSPSDK)/lib/build.mak
+ 
+ delete:
+Index: Makefile
+===================================================================
+--- Makefile	(revision 1237)
++++ Makefile	(working copy)
+@@ -1,265 +1,83 @@
+-INCDIR = ../cubicvr/include/ ../dependencies/product/include/bullet/ ./ $(PSPSDK)/psp/include
+-OFLAGS = -funroll-loops -fauto-inc-dec -fcprop-registers -fdce -fdefer-pop -fdelayed-branch \
+--fdse -fguess-branch-probability -fif-conversion2 -fif-conversion -fipa-pure-const \
+--fipa-reference -fmerge-constants -fsplit-wide-types -ftree-ccp -ftree-ch \
+--ftree-copyrename -ftree-dce -ftree-dominator-opts -ftree-dse -ftree-fre \
+--ftree-sra -ftree-ter -funit-at-a-time \
+--fthread-jumps -falign-functions -falign-jumps -falign-loops  -falign-labels -fcaller-saves -fcrossjumping -fcse-follow-jumps  -fcse-skip-blocks \
+--fdelete-null-pointer-checks -fexpensive-optimizations -fgcse -fgcse-lm  -finline-small-functions -foptimize-sibling-calls \
+--fpeephole2 -fregmove -freorder-blocks -freorder-functions -frerun-cse-after-loop -fsched-interblock -fsched-spec -fschedule-insns  -fschedule-insns2 \
+-
+-
+-#CFLAGS = $(OFLAGS)
+-#CFLAGS = -O2
+-#CFLAGS = -g -Wall
+-CXXFLAGS = -fexceptions -DARCH_PSP  -pipe -Wno-unknown-pragmas -fomit-frame-pointer -ffast-math
++TARGET_LIB = libcubicvr.a
++CUBICVR_OBJS = ../cubicvr/src/Gamepad.o			\
++		../cubicvr/src/Envelope.o		\
++		../cubicvr/src/Face.o			\
++		../cubicvr/src/IFFReader.o		\
++		../cubicvr/src/lodepng.o		\
++		../cubicvr/src/Matrix.o			\
++		../cubicvr/src/Motion.o			\
++		../cubicvr/src/RGB.o			\
++		../cubicvr/src/RGBA.o 			\
++		../cubicvr/src/Timer.o			\
++		../cubicvr/src/Transform.o		\
++		../cubicvr/src/psp/TGALoader.o		\
++		../cubicvr/src/Vector.o			\
++		../cubicvr/src/XYZ.o			\
++		../cubicvr/src/XYZRGB.o			\
++		../cubicvr/src/SectorMap.o		\
++		../cubicvr/src/BITSET.o			\
++		../cubicvr/src/math/MATRIX4X4.o		\
++		../cubicvr/src/math/PLANE.o		\
++		../cubicvr/src/math/VECTOR3D.o		\
++		../cubicvr/src/Resource.o		\
++		../cubicvr/src/ResourcePool.o		\
++		../cubicvr/src/ResourceManager.o	\
++		../cubicvr/src/Logger.o			\
++		../cubicvr/src/StringUtil.o		\
++		../cubicvr/src/tinyxml/tinystr.o	\
++		../cubicvr/src/tinyxml/tinyxml.o	\
++		../cubicvr/src/tinyxml/tinyxmlparser.o	\
++		../cubicvr/src/tinyxml/tinyxmlerror.o
++ 
++CUBICVR_GL_OBJS = ../cubicvr/src/Camera.o		\
++		../cubicvr/src/GLExt.o			\
++		../cubicvr/src/Texture.o		\
++		../cubicvr/src/Light.o			\
++		../cubicvr/src/Material.o		\
++		../cubicvr/src/Object.o			\
++		../cubicvr/src/objectLWO.o		\
++		../cubicvr/src/UV.o			\
++		../cubicvr/src/UVMapper.o		\
++		../cubicvr/src/SceneObject.o		\
++		../cubicvr/src/ObjectController.o	\
++		../cubicvr/src/Scene.o			\
++		../cubicvr/src/sceneLWS.o		\
++		../cubicvr/src/Shader.o			\
++		../cubicvr/src/CollisionMap.o		\
++		../cubicvr/src/datatree/DataTree.o	\
++		../cubicvr/src/FRUSTUM.o
++ 
++CUBICVR_DYNAMICS_OBJS = ../cubicvr/src/RigidScene.o		\
++		../cubicvr/src/SceneObjects/RigidSceneObject.o	\
++		../cubicvr/src/SceneObjects/Landscape.o		\
++		../cubicvr/src/SceneObjects/Vehicle.o		\
++		../cubicvr/src/SceneObjects//RigidBox.o		\
++		../cubicvr/src/SceneObjects/RigidSphere.o	\
++		../cubicvr/src/SoftScene.o			\
++		../cubicvr/src/SceneObjects/SoftSceneObject.o
++ 
++# Particle.o ParticleEmitter.o ParticleSystem.o systemfont.o   CollisionMap.o Bone.o 
++# not used: Bitmap.o Font.o
++ 
++OBJS = $(CUBICVR_OBJS) $(CUBICVR_GL_OBJS) $(CUBICVR_DYNAMICS_OBJS)
++ 
++PSPSDK=$(shell psp-config --pspsdk-path)
++INCDIR = $(PSPSDK)/../include/bullet ../cubicvr/include .
++CFLAGS = -O2 -G0 -Wall
++CXXFLAGS = $(CFLAGS) -fexceptions -DARCH_PSP -pipe -Wno-unknown-pragmas -fomit-frame-pointer -ffast-math
+ ASFLAGS = $(CFLAGS)
+-
+-LIBDIR = ../dependencies/product/lib/bullet/psp/
++ 
++LIBDIR =
+ LDFLAGS =
+-//BULLET_LIBS = libpspbulletdynamics.a ../dependencies/pspbullet/libpspbulletcollision.a ../dependencies/pspbullet/libpspbulletmath.a
+-//BULLET_LIBS = pspbullet/*.o
+-
+-PSPSDK=$(shell psp-config --pspsdk-path)
+-
+-ifeq ($(PSPSDK),)
+-$(error $$(PSPSDK) is undefined.  Use "PSPSDK := $$(shell psp-config --pspsdk-path)" in your Makefile)
+-endif
+-
+-CC       = psp-gcc
+-CXX      = psp-g++
+-AS       = psp-gcc
+-LD       = psp-gcc
+-AR       = psp-ar
+-RANLIB   = psp-ranlib
+-STRIP    = psp-strip
+-MKSFO    = mksfo
+-PACK_PBP = pack-pbp
+-FIXUP    = psp-fixup-imports
+-
+-# Add in PSPSDK includes and libraries.
+-INCDIR   := $(INCDIR) . $(PSPSDK)/include
+-LIBDIR   := $(LIBDIR) . $(PSPSDK)/lib
+-
+-
+-
+-CFLAGS   := $(addprefix -I,$(INCDIR)) $(CFLAGS)
+-CXXFLAGS := $(CFLAGS) $(CXXFLAGS)
+-ASFLAGS  := $(CFLAGS) $(ASFLAGS)
+-
+-
+-#CVRBUILD=@echo Compiling $^ && $(CC) $(CFLAGS) $(CXXFLAGS) -c -o 1>/dev/null 2>cubicvr_compiler.err
+-CVRBUILD=$(CC) $(OFLAGS) $(CFLAGS) $(CXXFLAGS) -c -o 
+-#CVRBUILD_ALT=$(CC) -O2 $(CXXFLAGS) -c -o
+-CvRBUILD_ALT=$(CC) $(OFLAGS) $(CFLAGS) $(CXXFLAGS) -c -o 
+-
+-CUBICVR_OBJS = Gamepad.o Envelope.o Face.o IFFReader.o lodepng.o Matrix.o Motion.o RGB.o RGBA.o Timer.o Transform.o TGALoader.o Vector.o XYZ.o XYZRGB.o SectorMap.o BITSET.o MATRIX4X4.o PLANE.o VECTOR3D.o Resource.o ResourcePool.o ResourceManager.o Logger.o StringUtil.o tinystr.o tinyxml.o tinyxmlparser.o tinyxmlerror.o
+-CUBICVR_GL_OBJS = Camera.o  GLExt.o Texture.o Light.o Material.o Object.o objectLWO.o UV.o UVMapper.o SceneObject.o ObjectController.o Scene.o sceneLWS.o Shader.o CollisionMap.o DataTree.o FRUSTUM.o 
+-CUBICVR_DYNAMICS_OBJS = RigidScene.o RigidScene.o RigidSceneObject.o Landscape.o Vehicle.o RigidBox.o RigidSphere.o SoftScene.o SoftSceneObject.o
+-#   Particle.o ParticleEmitter.o ParticleSystem.o systemfont.o   CollisionMap.o Bone.o 
+-
+-# not used: Bitmap.o Font.o
+-
+-all: bullet cubicvr
+-
+-bullet:
+-	cd pspbullet && make
+-
+-Bitmap.o: ../cubicvr/src/Bitmap.cpp
+-	$(CVRBUILD) Bitmap.o $^
+-Camera.o: ../cubicvr/src/Camera.cpp
+-	$(CVRBUILD) Camera.o $^ 
+-CollisionMap.o: ../cubicvr/src/CollisionMap.cpp
+-	$(CVRBUILD) CollisionMap.o $^
+-Envelope.o: ../cubicvr/src/Envelope.cpp					
+-	$(CVRBUILD) Envelope.o $^
+-Face.o: ../cubicvr/src/Face.cpp
+-	$(CVRBUILD) Face.o $^
+-Font.o: ../cubicvr/src/Font.cpp
+-	$(CVRBUILD) Font.o $^
+-Gamepad.o: ../cubicvr/src/Gamepad.cpp
+-	$(CVRBUILD) Gamepad.o $^
+-GLExt.o: ../cubicvr/src/GLExt.cpp
+-	$(CVRBUILD) GLExt.o $^
+-IFFReader.o: ../cubicvr/src/IFFReader.cpp
+-	$(CVRBUILD) IFFReader.o $^
+-Light.o: ../cubicvr/src/Light.cpp
+-	$(CVRBUILD) Light.o $^
+-lodepng.o: ../cubicvr/src/lodepng.cpp
+-	$(CVRBUILD) lodepng.o $^
+-Material.o: ../cubicvr/src/Material.cpp
+-	$(CVRBUILD) Material.o $^
+-Matrix.o: ../cubicvr/src/Matrix.cpp
+-	$(CVRBUILD) Matrix.o $^
+-Motion.o: ../cubicvr/src/Motion.cpp
+-	$(CVRBUILD) Motion.o $^
+-Object.o: ../cubicvr/src/Object.cpp
+-	$(CVRBUILD) Object.o $^
+-ObjectController.o: ../cubicvr/src/ObjectController.cpp
+-	$(CVRBUILD) ObjectController.o $^
+-objectLWO.o: ../cubicvr/src/objectLWO.cpp
+-	$(CVRBUILD) objectLWO.o $^
+-Particle.o: ../cubicvr/src/Particle.cpp
+-	$(CVRBUILD) Particle.o $^
+-ParticleEmitter.o: ../cubicvr/src/ParticleEmitter.cpp
+-	$(CVRBUILD) ParticleEmitter.o $^
+-ParticleSystem.o: ../cubicvr/src/ParticleSystem.cpp
+-	$(CVRBUILD) ParticleSystem.o $^
+-RGB.o: ../cubicvr/src/RGB.cpp
+-	$(CVRBUILD) RGB.o $^
+-RGBA.o: ../cubicvr/src/RGBA.cpp
+-	$(CVRBUILD) RGBA.o $^
+-Scene.o: ../cubicvr/src/Scene.cpp
+-	$(CVRBUILD) Scene.o $^
+-sceneLWS.o: ../cubicvr/src/sceneLWS.cpp
+-	$(CVRBUILD) sceneLWS.o $^
+-SceneObject.o: ../cubicvr/src/SceneObject.cpp
+-	$(CVRBUILD) SceneObject.o $^
+-Shader.o: ../cubicvr/src/Shader.cpp
+-	$(CVRBUILD) Shader.o $^
+-systemfont.o: ../cubicvr/src/systemfont.cpp
+-	$(CVRBUILD) systemfont.o $^
+-Texture.o: ../cubicvr/src/Texture.cpp
+-	$(CVRBUILD) Texture.o $^
+-Timer.o: ../cubicvr/src/Timer.cpp
+-	$(CVRBUILD) Timer.o $^
+-Transform.o: ../cubicvr/src/Transform.cpp
+-	$(CVRBUILD) Transform.o $^
+-UV.o: ../cubicvr/src/UV.cpp
+-	$(CVRBUILD) UV.o $^
+-UVMapper.o: ../cubicvr/src/UVMapper.cpp
+-	$(CVRBUILD) UVMapper.o $^
+-Vector.o: ../cubicvr/src/Vector.cpp
+-	$(CVRBUILD) Vector.o $^
+-XYZ.o: ../cubicvr/src/XYZ.cpp
+-	$(CVRBUILD) XYZ.o $^
+-XYZRGB.o: ../cubicvr/src/XYZRGB.cpp
+-	$(CVRBUILD) XYZRGB.o $^
+-TGALoader.o: ../cubicvr/src/psp/TGALoader.cpp
+-	$(CVRBUILD) TGALoader.o $^
+-SectorMap.o: ../cubicvr/src/SectorMap.cpp
+-	$(CVRBUILD) SectorMap.o $^
+-
+-
+-# dynamics
+-RigidScene.o: ../cubicvr/src/RigidScene.cpp
+-	$(CVRBUILD) RigidScene.o $^
+-RigidSceneObject.o: ../cubicvr/src/SceneObjects/RigidSceneObject.cpp
+-	$(CVRBUILD) RigidSceneObject.o $^
+-Landscape.o: ../cubicvr/src/SceneObjects/Landscape.cpp
+-	$(CVRBUILD) Landscape.o $^
+-Vehicle.o: ../cubicvr/src/SceneObjects/Vehicle.cpp
+-	$(CVRBUILD) Vehicle.o $^
+-RigidBox.o: ../cubicvr/src/SceneObjects/RigidBox.cpp
+-	$(CVRBUILD) RigidBox.o $^
+-RigidSphere.o: ../cubicvr/src/SceneObjects/RigidSphere.cpp
+-	$(CVRBUILD) RigidSphere.o $^
+-SoftSceneObject.o: ../cubicvr/src/SceneObjects/SoftSceneObject.cpp
+-	$(CVRBUILD) SoftSceneObject.o $^
+-SoftScene.o: ../cubicvr/src/SoftScene.cpp
+-	$(CVRBUILD) SoftScene.o $^
+-
+-
+-#new
+-
+-BITSET.o: ../cubicvr/src/BITSET.cpp
+-	$(CVRBUILD) BITSET.o $^
+-
+-
+-Bone.o: ../cubicvr/src/Bone.cpp
+-	$(CVRBUILD) Bone.o $^
+-
+-
+-BSP.o: ../cubicvr/src/BSP.cpp
+-	$(CVRBUILD) BSP.o $^
+-
+-
+-DataTree.o: ../cubicvr/src/datatree/DataTree.cpp
+-	$(CVRBUILD) DataTree.o $^
+-
+-
+-FRUSTUM.o: ../cubicvr/src/FRUSTUM.cpp
+-	$(CVRBUILD) FRUSTUM.o $^
+-
+-IMAGE.o: ../cubicvr/src/IMAGE.cpp
+-	$(CVRBUILD) IMAGE.o $^
+-
+-
+-MATRIX4X4.o: ../cubicvr/src/math/MATRIX4X4.cpp
+-	$(CVRBUILD) MATRIX4X4.o $^
+-
+-PLANE.o: ../cubicvr/src/math/PLANE.cpp
+-	$(CVRBUILD) PLANE.o $^
+-
+-#VECTOR2D.o: ../cubicvr/src/math/VECTOR2D.cpp
+-#	$(CVRBUILD) VECTOR2D.o $^
+-
+-VECTOR3D.o: ../cubicvr/src/math/VECTOR3D.cpp
+-	$(CVRBUILD) VECTOR3D.o $^
+-
+-#VECTOR4D.o: ../cubicvr/src/math/VECTOR4D.cpp
+-#	$(CVRBUILD) VECTOR4D.o $^
+-
+-#RigidSceneDebug.o: ../cubicvr/src/RigidSceneDebug.cpp
+-#	$(CVRBUILD) RigidSceneDebug.o $^
+-
+-textureTGA.o: ../cubicvr/src/textureTGA.cpp
+-	$(CVRBUILD) textureTGA.o $^
+-
+-Resource.o: ../cubicvr/src/Resource.cpp
+-	$(CVRBUILD) Resource.o $^
+-
+-ResourceManager.o: ../cubicvr/src/ResourceManager.cpp
+-	$(CVRBUILD) ResourceManager.o $^
+-
+-
+-ResourcePool.o: ../cubicvr/src/ResourcePool.cpp
+-	$(CVRBUILD) ResourcePool.o $^
+-
+-
+-Logger.o: ../cubicvr/src/Logger.cpp
+-	$(CVRBUILD) Logger.o $^
+-
+-
+-StringUtil.o: ../cubicvr/src/StringUtil.cpp
+-	$(CVRBUILD) StringUtil.o $^
+-
+-
+-tinyxml.o: ../cubicvr/src/tinyxml/tinyxml.cpp
+-	$(CVRBUILD) tinyxml.o $^
+-
+-
+-tinyxmlerror.o: ../cubicvr/src/tinyxml/tinyxmlerror.cpp
+-	$(CVRBUILD) tinyxmlerror.o $^
+-
+-
+-tinyxmlparser.o: ../cubicvr/src/tinyxml/tinyxmlparser.cpp
+-	$(CVRBUILD) tinyxmlparser.o $^
+-
+-
+-tinystr.o: ../cubicvr/src/tinyxml/tinystr.cpp
+-	$(CVRBUILD) tinystr.o $^
+-
+-
+-
+-
+-	
+-cubicvr: libcubicvr.a
+-
+-libcubicvr.a: $(CUBICVR_OBJS) $(CUBICVR_GL_OBJS) $(CUBICVR_DYNAMICS_OBJS)
+-	$(AR) cru $@ $^ 
+-	$(RANLIB) $@
+-
+-install: libcubicvr.a
+-	cp libcubicvr.a $(PSPDEV)/psp/lib/
+-	test -d $(PSPDEV)/psp/include/CubicVR || mkdir $(PSPDEV)/psp/include/CubicVR/
+-	cp -R ../cubicvr/include/CubicVR/* $(PSPDEV)/psp/include/CubicVR/ || true
+-	cd pspbullet && make install
+-	cp lua/include/* $(PSPDEV)/psp/include/
+-	cp lua/lib/* $(PSPDEV)/psp/lib/
+-
+-clean: 
+-	rm *.o || true
+-	rm libcubicvr.a || true
+-
+-rebuild: clean all
++ 
++include $(PSPSDK)/lib/build.mak
++ 
++install: $(TARGET_LIB)
++	mkdir -p ../../target/psp/lib
++	mkdir -p ../../target/psp/include
++	cp $(TARGET_LIB) ../../target/psp/lib
++	cp -R ../cubicvr/include/CubicVR  ../../target/psp/include
++	rm -Rf `find ../../target/psp/include | grep .svn`
++	mkdir -p ../../target/psp/sdk/samples
++	cp -R samples ../../target/psp/sdk/samples/cubicvr
++	rm -Rf `find ../../target/psp/sdk/samples/cubicvr | grep .svn`
