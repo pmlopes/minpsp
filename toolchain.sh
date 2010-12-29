@@ -8,6 +8,10 @@ set -e
 # package version
 PSPSDK_VERSION=0.10.1
 
+# supported languages
+#LANGUAGES="c,c++"
+LANGUAGES="c,c++,objc,obj-c++,d"
+
 # sdk versions
 BINUTILS_VER=2.18
 GCC_VER=4.3.5
@@ -350,7 +354,9 @@ function buildXGCC {
   if [ ! -d psp/build/x$GCC_SRCDIR ]
   then
     # the patch does not keep the exec bit
-    chmod a+x psp/$GCC_SRCDIR/libphobos/config/x3
+    if [ -f psp/$GCC_SRCDIR/libphobos/config/x3 ]; then
+      chmod a+x psp/$GCC_SRCDIR/libphobos/config/x3
+    fi
 
     mkdir -p psp/build/x$GCC_SRCDIR
     cd psp/build/x$GCC_SRCDIR
@@ -441,7 +447,7 @@ function buildGCC {
     ../../$GCC_SRCDIR/configure $EXTRA_BUILD_CFG \
         --prefix=$INSTALLDIR \
         --target=psp \
-        --enable-languages="c,c++,objc,obj-c++,d" \
+        --enable-languages=$LANGUAGES \
         --enable-cxx-flags="-G0" \
         --with-newlib \
         --with-headers \
@@ -894,7 +900,12 @@ bootstrapSDK
 buildNewlib
 buildGCC
 buildSDK
-validateSDK
+if [ "$LANGUAGES" == "c,c++,objc,obj-c++,d" ]; then
+  # this is because samples include D and ObjC examples
+  # if you do not build all languages the script will fail
+  # here
+  validateSDK
+fi
 buildGDB
 #---------------------------------------------------------------------------------
 # PSPLink

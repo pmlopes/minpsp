@@ -10202,3 +10202,392 @@ diff -Naur newlib-1.18.0.orig/newlib/Makefile.in newlib-1.18.0/newlib/Makefile.i
  	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/sys; \
  	  for i in $(srcdir)/libc/include/sys/*.h; do \
  	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
+diff -Naur newlib-1.18.0.orig/newlib/libc/include/machine/fastmath.h newlib-1.18.0/newlib/libc/include/machine/fastmath.h
+--- newlib-1.18.0.orig/newlib/libc/include/machine/fastmath.h	2010-12-29 10:43:35.868579999 +0100
++++ newlib-1.18.0/newlib/libc/include/machine/fastmath.h	2010-12-29 13:54:22.038579999 +0100
+@@ -98,3 +98,33 @@
+ /* Override the functions defined in math.h */
+ #endif /* __sysvnecv70_target */
+ 
++#ifdef __psp__
++#ifdef __cplusplus
++extern "C" {
++#endif
++float _EXFUN(fast_sinf,(float));
++float _EXFUN(fast_cosf,(float));
++
++float _EXFUN(fast_asinf,(float));
++float _EXFUN(fast_acosf,(float));
++float _EXFUN(fast_atanf,(float));
++
++float _EXFUN(fast_absf,(float));
++float _EXFUN(fast_sqrtf,(float));
++float _EXFUN(fast_expef,(float));
++float _EXFUN(fast_logef,(float));
++#ifdef __cplusplus
++}
++#endif
++
++#define	sinf(x)		fast_sinf(x)
++#define	cosf(x)		fast_cosf(x)
++#define	asinf(x)	fast_asinf(x)
++#define	acosf(x)	fast_acosf(x)
++#define	atanf(x)	fast_atanf(x)
++#define	absf(x)		fast_absf(x)
++#define	sqrtf(x)	fast_sqrtf(x)
++#define	expef(x)	fast_expef(x)
++#define	logef(x)	fast_logef(x)
++/* Override the functions defined in math.h */
++#endif /* __psp__ */
+diff -Naur newlib-1.18.0.orig/newlib/libc/include/stdint.h newlib-1.18.0/newlib/libc/include/stdint.h
+--- newlib-1.18.0.orig/newlib/libc/include/stdint.h	2010-12-29 10:43:35.868579999 +0100
++++ newlib-1.18.0/newlib/libc/include/stdint.h	2010-12-29 10:58:34.948580007 +0100
+@@ -33,7 +33,7 @@
+ /* Check if "long" is 64bit or 32bit wide */
+ #if __STDINT_EXP(LONG_MAX) > 0x7fffffff
+ #define __have_long64 1
+-#elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
++#elif __STDINT_EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__) && !defined(__psp__)
+ #define __have_long32 1
+ #endif
+ 
+diff -Naur newlib-1.18.0.orig/newlib/libc/machine/mips/fastmath.c newlib-1.18.0/newlib/libc/machine/mips/fastmath.c
+--- newlib-1.18.0.orig/newlib/libc/machine/mips/fastmath.c	1970-01-01 01:00:00.000000000 +0100
++++ newlib-1.18.0/newlib/libc/machine/mips/fastmath.c	2010-12-29 14:03:43.768580002 +0100
+@@ -0,0 +1,277 @@
++#include <fastmath.h>
++
++#define PSP_MATH_PI             3.14159265358979323846
++#define PSP_MATH_TWOPI          (PSP_MATH_PI * 2.0)
++#define PSP_MATH_SQRT2          1.41421356237309504880
++#define PSP_MATH_LN2            0.69314718055994530942
++#define PSP_MATH_LOG2E          1.4426950408889634074
++#define COS_SIN_DIV             0.208
++
++static const float logPoly[] = {
++	 4194305.0 / (1024.0 * 1024.0 *  2.0), /* arround 2.0 */
++	 5590817.0 / (1024.0 * 1024.0 *  8.0), /* arround 2.0/3.0 */
++	13890687.0 / (1024.0 * 1024.0 * 32.0), /* arround 2.0/5.0 */
++};
++
++static const float triPoly[] = {
++	(float)(2.0*PSP_MATH_PI),
++	(float)(1.0),
++	(float)(-0xAAAA98/(1024.0*1024*64)),
++	(float)( 0x88801C/(1024.0*1024*1024)),
++	(float)(-0xCB9F27/(1024.0*1024*1024*64)),
++
++	(float)(-0xFFFFF9/(1024.0*1024*32)),
++	(float)( 0xAAA6FB/(1024.0*1024*256)),
++	(float)(-0xB3D431/(1024.0*1024*1024*8)),
++
++	(float)(-0xAAAAAA/(1024.0*1024*32)),
++	(float)( 0xCCCCCD/(1024.0*1024*64)),
++	(float)(-0x8F5C29/(1024.0*1024*64)),
++};
++
++static float _pspFpuSinMain(float x)
++{
++	float y = x*x;
++	return x * (((triPoly[4] * y
++				+ triPoly[3]) * y
++				+ triPoly[2]) * y
++				+ triPoly[1]);
++}
++
++static float _pspFpuCosMain(float x)
++{
++	float y = x*x;
++	return ((triPoly[7] * y
++			+ triPoly[6]) * y
++			+ triPoly[5]) * y
++			+ triPoly[1];
++}
++
++static float _pspFpuAtanMain(float x)
++{
++	float y = x*x;
++	return x * (((triPoly[10] * y
++				+ triPoly[9]) * y
++				+ triPoly[8]) * y
++				+ triPoly[1]);
++}
++
++static float _atanf(float x)
++{
++	if (x < 0.19890f) {
++		return _pspFpuAtanMain(x);
++	}
++	if (x < 0.668106f) {
++		return (float)(PSP_MATH_PI / 8)
++			+ _pspFpuAtanMain((x - (float)(PSP_MATH_SQRT2 - 1)) / (1.0f + ((float)(PSP_MATH_SQRT2 - 1)*x)));
++	}
++	return ((float)PSP_MATH_PI / 4) + _pspFpuAtanMain((x - 1.0f) / (x + 1.0f));
++}
++
++float fast_absf(float fs)
++{
++	register float fd;
++	asm (
++		"abs.s %0, %1\n"
++		: "=f"(fd)
++		: "f"(fs)
++	);
++	return (fd);
++}
++
++float fast_sinf(float x)
++{
++	float pi2;
++	int sign = 1;
++
++	/* NaN */
++	if (x != x) {
++		return x;
++	}
++
++	pi2 = triPoly[0];
++	if (x < 0.0f) {
++		sign = -1;
++		x = -x;
++	}
++
++	if (x > pi2) {
++		float y = x / pi2;
++		x -= (float)((int)y) * pi2;
++	}
++
++	pi2 *= 0.5f;
++	if (x > pi2) {
++		x -= pi2;
++		sign = -sign;
++	}
++
++	if (x > pi2*0.5f) {
++		x = pi2 - x;
++	}
++	if (x > (float)(PSP_MATH_PI * (0.5 - COS_SIN_DIV))) {
++		return _pspFpuCosMain(pi2*0.5f - x) * sign;
++	}
++
++	return _pspFpuSinMain(x) * sign;
++}
++
++float fast_cosf(float x)
++{
++	float pi2;
++	int sign = 1;
++
++	/* NaN */
++	if (x != x) {
++		return x;
++	}
++
++	pi2 = triPoly[0];
++	if (x < 0.0f) {
++		x = -x;
++	}
++
++	if (x > pi2) {
++		float y = x / pi2;
++		x -= (float)((int)y) * pi2;
++	}
++
++	pi2 *= 0.5f; // pi2 = PI
++	if (x > pi2) {
++		x -= pi2;
++		sign = -1;
++	}
++
++	if (x > pi2*0.5f) {
++		sign = -sign;
++		x = pi2 - x;
++	}
++	if (x > (float) (PSP_MATH_PI * COS_SIN_DIV)) {
++		return _pspFpuSinMain(pi2*0.5f - x) * sign;
++	}
++
++	return _pspFpuCosMain(x) * sign;
++}
++
++float fast_atanf(float x)
++{
++	int sign = 1;
++
++	/* NaN */
++	if (x != x) {
++		return x;
++	}
++
++	if (x < 0.0f) {
++		x = -x;
++		sign = -1;
++	}
++	if (x >= 1.0f) {
++		/*J atan(x) = pi/2 - atan(1/x) */
++		x = 1.0f / x;
++		x = ((float)(PSP_MATH_PI / 2)) - _atanf(x);
++	} else {
++		x = _atanf(x);
++	}
++	return x * (float)sign;
++}
++
++float fast_asinf(float x)
++{
++	x = x*x;
++	return fast_atanf(__builtin_allegrex_sqrt_s(x/(1.0f-x)));
++}
++
++float fast_acosf(float x)
++{
++	x = x*x;
++	return fast_atanf(__builtin_allegrex_sqrt_s((1.0f-x)/x));
++}
++
++float fast_sqrtf(float fs)
++{
++	return (__builtin_allegrex_sqrt_s(fs));
++}
++
++float fast_logef(float x)
++{
++	union {
++		float f;
++		int i;
++	} fi;
++	int a, b, exponent;
++	float y, z;
++	fi.f = x;
++	if (fi.i <= 0) {
++		if ((fi.i & 0x7fffffff) == 0) {
++			fi.i = 0xff800000; /* -INF */
++			return fi.f;
++		}
++		fi.i = 0xff80ffff; /* Quiet NaN */
++		return fi.f;
++	}
++
++	b = (fi.i & 0x007fffff);
++	a = b - (1<<23);
++	exponent = fi.i;
++	if (b <= 0x3504F3) {
++		a = b;
++		b = b - (1 << 23);
++		exponent -= (1<<23);
++	}
++	b = b - (1 << 23) + (1<<25);
++
++	x = (float)(a) / (float)(b);
++	z = (((exponent>>23)-126) * 0xB17218) * (float)(1.0/(1<<24));
++	y = x * x;
++	return z + x * (((logPoly[2] * y + logPoly[1]) * y) + logPoly[0]);
++}
++
++float fast_expef(float x)
++{
++	/*
++	 * exp(x)=e^x=e^(y * log2)=2^Y
++	 *  =2^z * 2^y
++	 *  =2^z * (2^(y/2))^2
++	 *  =2^z * (e^(f/2))^2
++	 *  =2^z * (e^(f/4))^4
++	 * where y=x/log 2
++	 * z=nearest(y) , -0.5 <= f=y-z < 0.5
++	 */
++	union {
++		float f;
++		int i;
++	} fi;
++	float z, f;
++
++	fi.f = x;
++	fi.i &= 0x7fffffff;
++	if (fi.i >= 0x42b00f34) {/* arround 88.03 */
++		/* overflow */
++		if (x != x) {
++			return x; /* NaN */
++		}
++		if (fi.i < 0) {
++			return 0.0; /* underflow */
++		}
++		fi.i = 0x7f800000;
++		return fi.f; /* +INF */
++	}
++
++	f = fi.f * (float)PSP_MATH_LOG2E;
++
++	z = __builtin_allegrex_round_w_s(f);
++	f = f-z;
++	fi.i = z;
++	if (x < 0)
++		fi.i = -fi.i;
++	fi.i = (fi.i+127) << 23;
++
++	/* use Pade aprox. */
++	f = (6.0f + (float)(4.0*PSP_MATH_LN2 * 0.25)*f
++	     + (float)(0.9996*PSP_MATH_LN2*0.25*PSP_MATH_LN2*0.25)*f*f)
++	    / (6.0f - (float)(2.0*PSP_MATH_LN2 * 0.25)*f);
++	f *= f;
++	fi.f *= f*f;
++	return fi.f;
++}
+diff -Naur newlib-1.18.0.orig/newlib/libc/machine/mips/Makefile.am newlib-1.18.0/newlib/libc/machine/mips/Makefile.am
+--- newlib-1.18.0.orig/newlib/libc/machine/mips/Makefile.am	2010-12-29 10:43:36.018579994 +0100
++++ newlib-1.18.0/newlib/libc/machine/mips/Makefile.am	2010-12-29 11:33:26.938579999 +0100
+@@ -8,7 +8,7 @@
+ 
+ noinst_LIBRARIES = lib.a
+ 
+-lib_a_SOURCES = setjmp.S strlen.c strcmp.c strncpy.c memset.c memcpy.c
++lib_a_SOURCES = setjmp.S strlen.c strcmp.c strncpy.c memset.c memcpy.c fastmath.c
+ lib_a_CCASFLAGS=$(AM_CCASFLAGS)
+ lib_a_CFLAGS=$(AM_CFLAGS)
+ 
+diff -Naur newlib-1.18.0.orig/newlib/libc/machine/mips/Makefile.in newlib-1.18.0/newlib/libc/machine/mips/Makefile.in
+--- newlib-1.18.0.orig/newlib/libc/machine/mips/Makefile.in	2010-12-29 10:43:36.018579994 +0100
++++ newlib-1.18.0/newlib/libc/machine/mips/Makefile.in	2010-12-29 11:37:20.088579999 +0100
+@@ -54,7 +54,8 @@
+ lib_a_LIBADD =
+ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-strlen.$(OBJEXT) \
+ 	lib_a-strcmp.$(OBJEXT) lib_a-strncpy.$(OBJEXT) \
+-	lib_a-memset.$(OBJEXT) lib_a-memcpy.$(OBJEXT)
++	lib_a-memset.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
++	lib_a-fastmath.$(OBJEXT)
+ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
+ DEFAULT_INCLUDES = -I.@am__isrc@
+ depcomp =
+@@ -173,7 +174,7 @@
+ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+ AM_CCASFLAGS = $(INCLUDES)
+ noinst_LIBRARIES = lib.a
+-lib_a_SOURCES = setjmp.S strlen.c strcmp.c strncpy.c memset.c memcpy.c
++lib_a_SOURCES = setjmp.S strlen.c strcmp.c strncpy.c memset.c memcpy.c fastmath.c
+ lib_a_CCASFLAGS = $(AM_CCASFLAGS)
+ lib_a_CFLAGS = $(AM_CFLAGS)
+ ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
+@@ -278,6 +279,12 @@
+ lib_a-memcpy.obj: memcpy.c
+ 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.c'; then $(CYGPATH_W) 'memcpy.c'; else $(CYGPATH_W) '$(srcdir)/memcpy.c'; fi`
+ 
++lib_a-fastmath.o: fastmath.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fastmath.o `test -f 'fastmath.c' || echo '$(srcdir)/'`fastmath.c
++
++lib_a-fastmath.obj: fastmath.c
++	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fastmath.obj `if test -f 'fastmath.c'; then $(CYGPATH_W) 'fastmath.c'; else $(CYGPATH_W) '$(srcdir)/fastmath.c'; fi`
++
+ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
+ 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
+ 	unique=`for i in $$list; do \
+diff -Naur newlib-1.18.0.orig/newlib/libc/machine/mips/strlen.c newlib-1.18.0/newlib/libc/machine/mips/strlen.c
+--- newlib-1.18.0.orig/newlib/libc/machine/mips/strlen.c	2010-12-29 10:43:36.018579994 +0100
++++ newlib-1.18.0/newlib/libc/machine/mips/strlen.c	2010-12-29 11:10:39.248580000 +0100
+@@ -20,7 +20,7 @@
+ 
+ /* MIPS16 needs to come first.  */
+ 
+-#if defined(__mips16)
++#if defined(__mips16) || defined(__psp__)
+ size_t
+ strlen (const char *str)
+ {
