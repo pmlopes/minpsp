@@ -577,22 +577,20 @@ function installPSPLinkUSB {
     cp ../mingw/bin/usb/driver_x64/libusb0_x64.dll $INSTALLDIR/bin/driver_x64
     cp ../mingw/bin/usb/driver_x64/libusb0_x64.sys $INSTALLDIR/bin/driver_x64
     cp ../mingw/bin/usb/driver_x64/psp_x64.cat $INSTALLDIR/bin/driver_x64
-  else
+  fi
+  if [ "$OS" == "SunOS" ]; then
     cd psplinkusb
-
-    if [ "$OS" == "SunOS" ]; then
-      cp -f ../../mingw/solaris/Makefile.pspsh pspsh/Makefile
-      cp -f ../../mingw/solaris/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
-      cp -f ../../mingw/solaris/Makefile.remotejoy tools/remotejoy/pcsdl/Makefile
-    fi
-
-    if [ "$OS" == "Darwin" ]; then
-      cp -f ../../mingw/macosx/Makefile.pspsh pspsh/Makefile
-      cp -f ../../mingw/macosx/Makefile.usbhostfs_pc usbhostfs_pc/Makefile
-      # remotejoy should just work, since it does not deppend on readline
-    fi
-
-    $MAKE_CMD -f Makefile.clients install
+    CC=cc CXX=CC BUILD_SOLARIS=1 $MAKE_CMD -f Makefile.clients install
+    cd ..
+  fi
+  if [ "$OS" == "Darwin" ]; then
+    cd psplinkusb
+    BUILD_MACOSX=1 BUILD_LIBUSB10=1 $MAKE_CMD -f Makefile.clients install
+    cd ..
+  fi
+  if [ "$OS" == "Linux" ]; then
+    cd psplinkusb
+    BUILD_LIBUSB10=1 $MAKE_CMD -f Makefile.clients install
     cd ..
   fi
 
@@ -868,6 +866,7 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 046 tri $DEVPAK_TARGET
 
   # restore
   if [ "$OS" == "MINGW32_NT" ]; then
