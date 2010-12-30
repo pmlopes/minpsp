@@ -1,0 +1,565 @@
+Index: src/Makefile
+===================================================================
+--- src/Makefile	(revision 45)
++++ src/Makefile	(working copy)
+@@ -32,9 +32,17 @@
+ release: clean install
+ 
+ install: $(TARGET_LIB)
+-	@echo Installing libtri to "$(PSPDIR)/lib"
+-	@$(CP) libtri.a $(PSPDIR)/lib
+-	@echo Installing headers to "$(PSPDIR)/include/openTri"
+-	@$(MKDIR) -p $(PSPDIR)/include/openTri
+-	@$(CP) *.h $(PSPDIR)/include/openTri
++	@echo Installing libtri to "../../target/psp/lib"
++	@mkdir -p ../../target/psp/lib
++	@cp libtri.a ../../target/psp/lib
++	@echo Installing headers to "../../target/psp/include/openTri"
++	@mkdir -p ../../target/psp/include/openTri
++	@cp *.h ../../target/psp/include/openTri
++	@echo Installing sample to "../../target/psp/sdk/samples/openTri"
++	@mkdir -p ../../target/psp/sdk/samples/openTri/data
++	@cp game/gameBase.c ../../target/psp/sdk/samples/openTri
++	@cp game/gameMain.c ../../target/psp/sdk/samples/openTri
++	@cp game/gameTypes.h ../../target/psp/sdk/samples/openTri
++	@cp game/Makefile ../../target/psp/sdk/samples/openTri
++	@cp game/data/cars.trim ../../target/psp/sdk/samples/openTri/data
+ 	@echo Done.
+Index: src/triImage.c
+===================================================================
+--- src/triImage.c	(revision 45)
++++ src/triImage.c	(working copy)
+@@ -2,8 +2,8 @@
+  * triImage.c: Code for image loading/saving
+  * This file is part of the "tri Engine".
+  *
+- * Copyright (C) 2007 tri
+- * Copyright (C) 2007 Alexander Berl 'Raphael' <raphael@fx-world.org>
++ * Copyright (C) 2007 tri
++ * Copyright (C) 2007 Alexander Berl 'Raphael' <raphael@fx-world.org>
+  *
+  * $Id: $
+  *
+@@ -19,7 +19,7 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+ #include <pspkernel.h>
+@@ -253,20 +253,20 @@
+ 	}
+ }
+ 
+-static triVoid swizzle_fast(const triU8 *dest, const triU8 *source, const triS32 width, const triS32 height)
++static triVoid swizzle_fast(const triU8 *dest, const triU8 *source, const triS32 width, const triS32 height)
+ {
+-	triS32 i,j;
++	triS32 i,j;
+ 	triS32 rowblocks = (width / 16);
+ 	triS32 rowblocks_add = (rowblocks-1)*128;
+ 	triU32 block_address = 0;
+-	triU32 *src = (triU32*)source;
++	triU32 *src = (triU32*)source;
+ 
+ 	// (j-blocky*8)*16 + (i-blockx*16) + (blockx + blocky*rowblocks)*16*8 =
+ 	// j*16 + (blocky*rowblocks-blocky)*16*8 + i + (blockx*8-blockx)*16 =   | blocky8 := j/8*8 = j&~0x7, blockx16 := i/16*16 = i&~0xf
+ 	// j*16 + blocky8*(rowblocks-1)*16 + i + blockx16*8-blockx16 =   | k = 0..15, rowmul := (rowblocks-1)*16
+ 	// j*16 + blocky8*rowmul + k + blockx16 + blockx16*8-blockx16 =
+-	//sceKernelDcacheWritebackAll();
+-	for (j = 0; j < height; j++,block_address+=16)
++	//sceKernelDcacheWritebackAll();
++	for (j = 0; j < height; j++,block_address+=16)
+ 	{
+ 		triU32 *block;
+ 		/*if ((triU32)dest <= 0x04200000)
+@@ -284,14 +284,14 @@
+ 
+ 		if ((j&0x7)==0x7)
+ 			block_address += rowblocks_add;
+-	}
++	}
+ }
+-
+ 
+-triVoid triImageSwizzleToVRAM( triImage *img )
++
++triVoid triImageSwizzleToVRAM( triImage *img )
+ {
+ 	if (img == 0 || img->width==0 || img->height==0 || img->data==0 || (triU32)img->data<=0x4200000) return;
+-	
++	
+ 	triU32* dst = (triU32*)triVAlloc(img->size);
+ 	if (dst==0) return;
+ 	triS32 bytewidth = img->stride*(img->bits>>3);
+@@ -313,14 +313,14 @@
+ 			lev->data = dst;
+ 		}
+ 		lev = lev->next;
+-	}
++	}
+ }
+ 
+ 
+-triVoid triImageSwizzle( triImage *img )
++triVoid triImageSwizzle( triImage *img )
+ {
+ 	if (img == 0 || img->swizzled==1 || img->width==0 || img->height==0 || img->data==0) return;
+-	
++	
+ 	triU32* dst = (triU32*)triMalloc(img->size);
+ 	if (dst==0) return;
+ 	triS32 bytewidth = img->stride*(img->bits>>3);
+@@ -343,14 +343,14 @@
+ 		}
+ 		lev = lev->next;
+ 	}
+-	sceKernelDcacheWritebackAll();
++	sceKernelDcacheWritebackAll();
+ }
+ 
+ 
+-triVoid triImageUnswizzle( triImage *img )
++triVoid triImageUnswizzle( triImage *img )
+ {
+ 	if (img == 0 || img->swizzled==0 || img->width==0 || img->height==0 || img->data==0) return;
+-	
++	
+ 	triU32* dst = (triU32*)triMalloc(img->size);
+ 	if (dst==0) return;
+ 	triS32 bytewidth = img->stride*(img->bits>>3);
+@@ -358,14 +358,14 @@
+ 	triFree(img->data);
+ 	img->data = dst;
+ 	img->swizzled = 0;
+-	sceKernelDcacheWritebackAll();
++	sceKernelDcacheWritebackAll();
+ }
+ 
+ 
+-triVoid triImageToVRAM( triImage *img )
++triVoid triImageToVRAM( triImage *img )
+ {
+ 	if (img == 0 || img->width==0 || img->height==0 || img->data==0 || (triU32)img->data<=0x4200000) return;
+-	
++	
+ 	triU32* dst = (triU32*)triVAlloc(img->size);
+ 	if (dst==0) return;
+ 	memcpy( (triU8*)((triU32)dst|0x40000000), img->data, img->size );
+@@ -384,14 +384,14 @@
+ 			lev->data = dst;
+ 		}
+ 		lev = lev->next;
+-	}
++	}
+ }
+ 
+ 
+-triVoid triImageToRAM( triImage *img )
++triVoid triImageToRAM( triImage *img )
+ {
+ 	if (img == 0 || img->width==0 || img->height==0 || img->data==0 || (triU32)img->data>=0x4200000) return;
+-	
++	
+ 	triU32* dst = (triU32*)triMalloc(img->size);
+ 	if (dst==0) return;
+ 	memcpy( dst, (triU8*)((triU32)img->data|0x40000000), img->size );
+@@ -411,7 +411,7 @@
+ 		}
+ 		lev = lev->next;
+ 	}
+-	sceKernelDcacheWritebackAll();
++	sceKernelDcacheWritebackAll();
+ }
+ 
+ 
+@@ -465,8 +465,8 @@
+ 	img->stride = next_pow2(width);
+ 	img->size = img->stride*next_mul8(img->height)*(img->bits>>3);
+ 	img->data = triMalloc(img->size);
+-	if (img->data==0)
+-		return(0);
++	if (img->data==0)
++		return(0);
+ 
+ 	triU8* src = (triU8*)(((triU32)triFramebuffer) + (x + y*FRAME_BUFFER_WIDTH)*triBpp);
+ 	triU8* dst = (triU8*)img->data;
+@@ -507,16 +507,16 @@
+ 
+ 
+ #ifdef TRI_SUPPORT_PNG
+-triVoid user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
+-{
+-	// ignore PNG warnings
++triVoid user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
++{
++	// ignore PNG warnings
+ }
+ 
+-
+-triVoid user_read_fn(png_structp png_ptr, png_bytep ptr, png_size_t size)
+-{
++
++triVoid user_read_fn(png_structp png_ptr, png_bytep ptr, png_size_t size)
++{
+ 	stream* s = (stream*)png_get_io_ptr( png_ptr );
+-	stream_read( s, ptr, size );
++	stream_read( s, ptr, size );
+ }
+ 
+ 
+@@ -527,11 +527,11 @@
+ 	
+ 	img->data = img->palette = 0;
+ 	
+-	png_structp png_ptr;
+-	png_infop info_ptr;
+-	triU32 sig_read = 0;
+-	png_uint_32 width, height;
+-	png_uint_32 bit_depth, color_type, interlace_type, y;
++	png_structp png_ptr;
++	png_infop info_ptr;
++	triU32 sig_read = 0;
++	png_uint_32 width, height;
++	png_uint_32 bit_depth, color_type, interlace_type, y;
+ 
+ 	triU8 magic[8];
+ 	sig_read = stream_read( s, magic, 8 );
+@@ -539,27 +539,27 @@
+ 	{
+ 		return("Not a png file!.");
+ 	}*/
+-	
+-	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
++	
++	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+ 	if (png_ptr == NULL)
+-	{
+-		return("png_create_read_struct failed.");
++	{
++		return("png_create_read_struct failed.");
+ 	}
+-	
+-	png_set_error_fn(png_ptr, (png_voidp) NULL, (png_error_ptr) NULL, user_warning_fn);
+-	info_ptr = png_create_info_struct(png_ptr);
++	
++	png_set_error_fn(png_ptr, (png_voidp) NULL, (png_error_ptr) NULL, user_warning_fn);
++	info_ptr = png_create_info_struct(png_ptr);
+ 	if (info_ptr == NULL)
+-	{
+-		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+-		return("png_create_info_struct failed.");
++	{
++		png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
++		return("png_create_info_struct failed.");
+ 	}
+ 	
+-	png_set_read_fn(png_ptr, (png_voidp)s, user_read_fn);
+-	png_set_sig_bytes(png_ptr, sig_read);
++	png_set_read_fn(png_ptr, (png_voidp)s, user_read_fn);
++	png_set_sig_bytes(png_ptr, sig_read);
+ 	png_read_info(png_ptr, info_ptr);
+-	png_set_strip_16(png_ptr);
+-	png_set_packing(png_ptr);
+-	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, int_p_NULL, int_p_NULL);
++	png_set_strip_16(png_ptr);
++	png_set_packing(png_ptr);
++	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, (int*) NULL, (int*) NULL);
+ 	
+ 	triS32 passes = 1;
+ 	if (interlace_type)
+@@ -571,12 +571,12 @@
+ 		case PNG_COLOR_TYPE_GRAY:
+ 			img->format = IMG_FORMAT_T8;
+ 			img->bits = 8;
+-			if (bit_depth<8) png_set_gray_1_2_4_to_8(png_ptr);
++			if (bit_depth<8) png_set_expand_gray_1_2_4_to_8(png_ptr);
+ 			img->palette = triMalloc(256*4);
+ 			img->palformat = IMG_FORMAT_8888;
+ 			if (img->palette==0)
+ 			{
+-				png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
++				png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
+ 				return("malloc failed on palette.");
+ 			}
+ 			for (i=0;i<256;i++)
+@@ -590,7 +590,7 @@
+ 			img->palformat = IMG_FORMAT_8888;
+ 			if (img->palette==0)
+ 			{
+-				png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
++				png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
+ 				return("malloc failed on palette.");
+ 			}
+ 			
+@@ -626,10 +626,10 @@
+ 			img->bits = 32;
+ 			break;
+ 	
+-		default:
+-			png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
++		default:
++			png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
+ 			return("Unknown color type.");
+-	}
++	}
+ 
+ 	img->level = 0;
+ 	img->levels = 0;
+@@ -642,23 +642,23 @@
+ 	img->size = img->stride*next_mul8(img->height)*(img->bits>>3);
+ 	img->data = triMalloc(img->size);
+ 	if (img->data==0)
+-	{
+-		png_destroy_read_struct(&png_ptr, png_infopp_NULL, png_infopp_NULL);
+-		return("malloc failed on img->data.");
++	{
++		png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
++		return("malloc failed on img->data.");
+ 	}
+ 	
+ 	for (i = 0; i < passes; i++)
+ 	{
+-		triU8* dst = (triU8*)img->data;
++		triU8* dst = (triU8*)img->data;
+ 		for (y = 0; y < height; y++)
+-		{
+-			png_read_row(png_ptr, (triU8*)dst, png_bytep_NULL);
+-			dst += (img->stride)*(img->bits>>3);
++		{
++			png_read_row(png_ptr, (triU8*)dst, (png_bytep) NULL);
++			dst += (img->stride)*(img->bits>>3);
+ 		}
+-	}
+-
+-//	png_read_end(png_ptr, info_ptr);
+-	png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
++	}
++
++//	png_read_end(png_ptr, info_ptr);
++	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
+ 	strncpy( img->filename, stream_name( s ), 64 );
+ 	return(0);
+ }
+@@ -721,14 +721,14 @@
+ 	img->data = triMalloc( img->size );
+ 
+ 	if (img->data==0)
+-	{
+-		return("malloc failed on img->data.");
++	{
++		return("malloc failed on img->data.");
+ 	}
+ 
+ 	img->palette = 0;
+ 	img->palformat = 0;
+ 	img->level = 0;
+-	img->levels = 0;
++	img->levels = 0;
+ 	//img->width = width;
+ 	//img->height = height;
+ 	//img->tex_height = next_pow2(height);
+@@ -982,7 +982,7 @@
+ 	}
+ 
+ 	img->level = 0;
+-	img->levels = 0;
++	img->levels = 0;
+ 	img->width = width;
+ 	img->height = height;
+ 	img->tex_height = next_pow2(height);
+@@ -993,8 +993,8 @@
+ 	img->data = triMalloc(img->size);
+ 	if (img->data==0)
+ 	{
+-		triFree(tdata);
+-		return("malloc failed on img->data.");
++		triFree(tdata);
++		return("malloc failed on img->data.");
+ 	}
+ 	
+ 	triU8* dst = (triU8*)img->data;
+@@ -1516,14 +1516,14 @@
+ 	sceKernelDcacheWritebackAll();
+ 	if ((flags & (TRI_SWIZZLE|TRI_VRAM))==(TRI_SWIZZLE|TRI_VRAM))
+ 		triImageSwizzleToVRAM( img );
+-	else
++	else
+ 	if (flags & TRI_SWIZZLE)
+ 		triImageSwizzle( img );
+ 	else
+ 	if (flags & TRI_VRAM)
+ 		triImageToVRAM( img );
+ 	
+-	return img;
++	return img;
+ }
+ 
+ 
+@@ -2533,7 +2533,7 @@
+ 	#endif
+ 	FILE* fp;
+ 
+-	fp = fopen(name, "wb");
++	fp = fopen(name, "wb");
+ 	if (!fp) return;
+ 
+ 	triImageFileHeader tfh;
+@@ -2575,7 +2575,7 @@
+ 			tch.flags |= TRI_IMG_FLAGS_SWIZZLE;
+ 		else
+ 		if (flags&TRI_IMG_FLAGS_SWIZZLE)
+-		{
++		{
+ 			triU8* dst = triMalloc(img->size);
+ 			if (dst==0)
+ 			{
+@@ -2684,58 +2684,58 @@
+ {
+ 	if (img==0) return;
+ 	if (img->data==0 || img->width==0 || img->height==0) return;
+-	
+-	png_structp png_ptr;
+-	png_infop info_ptr;
+-	FILE* fp;
+-	triU8* line;
+-
+-	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
++	
++	png_structp png_ptr;
++	png_infop info_ptr;
++	FILE* fp;
++	triU8* line;
++
++	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+ 	if (!png_ptr)
+ 		return;
+-	
+-	info_ptr = png_create_info_struct(png_ptr);
++	
++	info_ptr = png_create_info_struct(png_ptr);
+ 	if (!info_ptr)
+-	{
+-		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+-		return;
++	{
++		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
++		return;
+ 	}
+ 	
+ 	triU32 col_type = PNG_COLOR_TYPE_RGB;
+ 	if (saveAlpha!=0)
+ 		col_type = PNG_COLOR_TYPE_RGBA;
+ 
+-	fp = fopen(name, "wb");
++	fp = fopen(name, "wb");
+ 	if (!fp) return;
+-	
+-	png_init_io(png_ptr, fp);
+-	png_set_IHDR(png_ptr, info_ptr, img->width, img->height,
+-		8, col_type, PNG_INTERLACE_NONE,
+-		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
++	
++	png_init_io(png_ptr, fp);
++	png_set_IHDR(png_ptr, info_ptr, img->width, img->height,
++		8, col_type, PNG_INTERLACE_NONE,
++		PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+ 	png_write_info(png_ptr, info_ptr);
+-	
++	
+ 	line = (triU8*) triMalloc(img->width * 4);
+ 	if (line==0)
+-	{
+-		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+-		fclose(fp);
+-		return;
++	{
++		png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
++		fclose(fp);
++		return;
+ 	}
+ 	
+ 	triU8* src = (triU8*)img->data;
+ 	triU8* src8 = (triU8*)src;
+ 	triU16* src16 = (triU16*)src;
+-	triU32* src32 = (triU32*)src;
++	triU32* src32 = (triU32*)src;
+ 
+-	triS32 x,y,i;
++	triS32 x,y,i;
+ 	for (y = 0; y < img->height; y++)
+ 	{
+ 		triU32 swap = 0;
+ 		src8 = (triU8*)src;
+ 		src16 = (triU16*)src;
+-		src32 = (triU32*)src;
++		src32 = (triU32*)src;
+ 		for (i = 0, x = 0; x < img->width; x++)
+-		{
++		{
+ 			triU32 r = 0, g = 0, b = 0, a = 0;
+ 			triU16 col16;
+ 			triU32 col32;
+@@ -2776,19 +2776,19 @@
+ 					col8 = *src8++;
+ 					triImagePaletteGet( img, col8, &r, &g, &b, &a );
+ 					break;
+-			}
+-			line[i++] = r;
+-			line[i++] = g;
++			}
++			line[i++] = r;
++			line[i++] = g;
+ 			line[i++] = b;
+ 			if (saveAlpha!=0)
+-				line[i++] = a;
+-		}
++				line[i++] = a;
++		}
+ 		png_write_row(png_ptr, line);
+-		src += ((img->stride*img->bits) >> 3);
+-	}
+-	triFree(line);
+-	png_write_end(png_ptr, info_ptr);
+-	png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
++		src += ((img->stride*img->bits) >> 3);
++	}
++	triFree(line);
++	png_write_end(png_ptr, info_ptr);
++	png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+ 	fclose(fp);
+ 	
+ }
+@@ -2805,10 +2805,10 @@
+ 	if (img==0) return;
+ 	if (img->data==0 || img->width==0 || img->height==0) return;
+ 	
+-	FILE* fp;
++	FILE* fp;
+ 	triU8* line;
+ 
+-	fp = fopen(name, "wb");
++	fp = fopen(name, "wb");
+ 	if (!fp) return;
+ 
+ 	TGAFILEHEADER tfh;
+@@ -3067,7 +3067,7 @@
+ 	
+ 	FILE* fp;
+ 
+-	fp = fopen(name, "wb");
++	fp = fopen(name, "wb");
+ 	if (!fp) return;
+ 
+ 	flags &= 0xFF;
+@@ -3147,7 +3147,7 @@
+ 			tch.flags |= TRI_IMG_FLAGS_SWIZZLE;
+ 		else
+ 		if (flags&TRI_IMG_FLAGS_SWIZZLE)
+-		{
++		{
+ 			triU8* dst = triMalloc(tic.size);
+ 			if (dst==0)
+ 			{

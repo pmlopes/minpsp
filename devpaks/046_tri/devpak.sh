@@ -2,13 +2,14 @@
 set -e
 . ../util/util.sh
 
-LIBNAME=tri
-VERSION=r93
+LIBNAME=openTRI
+VERSION=r45
 
-svnGet build "http://tools.assembla.com/svn" "tri"
-exit
-cd build/tri
+svnGet build "http://svn2.assembla.com/svn/openTRI" "trunk"
+cd build/trunk/src
+FT=1 PNG=1 make install
+cd ../../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.2 libpng 1.2.8 mikmodlib 3.0 libpspmath 4 intraFont 0.31 
+makeInstaller $LIBNAME $VERSION zlib 1.2.5 freetype 2.4.3 libpng 1.4.4
 
 echo "Done!"
