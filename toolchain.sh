@@ -866,7 +866,7 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 046 tri $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 046 openTRI $DEVPAK_TARGET
 
   # restore
   if [ "$OS" == "MINGW32_NT" ]; then
