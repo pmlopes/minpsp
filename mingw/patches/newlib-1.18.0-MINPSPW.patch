@@ -10591,3 +10591,76 @@ diff -Naur newlib-1.18.0.orig/newlib/libc/machine/mips/strlen.c newlib-1.18.0/ne
  size_t
  strlen (const char *str)
  {
+diff -Naur newlib-1.18.0.orig/newlib/libm/common/sf_isinff.c newlib-1.18.0/newlib/libm/common/sf_isinff.c
+--- newlib-1.18.0.orig/newlib/libm/common/sf_isinff.c	2010-12-31 13:55:56.138580003 +0100
++++ newlib-1.18.0/newlib/libm/common/sf_isinff.c	2010-12-31 14:00:14.038580001 +0100
+@@ -9,10 +9,32 @@
+ _DEFUN (__isinff, (x),
+ 	float x)
+ {
++#ifdef __psp__
++	int v;
++	asm (
++		".set push\n"		
++		".set noreorder\n"	
++		"mfc1 $8, %1\n"			// t0 = f
++		"sll $9, $8, 1\n"		// t1 = t0<<1
++		"sra %0, $8, 30\n"		// v  = t0>>30
++		"srl $9, $9, 24\n"		// t1 = t1>>24
++		"sll $8, $8, 9\n"		// t0 = t0<<9
++		"ori %0, %0, 0x0001\n"		// v  = v | 0x00000001 = (f>=0) ? +1 : -1
++		"sltiu $9, $9, 0x00FF\n"	// t1 = (t1<0xFF)
++		"movn %0, $0, $8\n"		// v  = (t0!=0) ? 0 : v		if (frac!=0) is not Infinity
++		"movn %0, $0, $9\n"		// v  = (t1!=0) ? 0 : v		if (exp!=0xFF) is not Infinity
++		".set pop\n"		
++		: "=r"(v)
++		: "f"(x)
++		: "$8", "$9"
++	);
++	return (v);
++#else
+ 	__int32_t ix;
+ 	GET_FLOAT_WORD(ix,x);
+ 	ix &= 0x7fffffff;
+ 	return FLT_UWORD_IS_INFINITE(ix);
++#endif
+ }
+ 
+ #ifdef _DOUBLE_IS_32BITS
+diff -Naur newlib-1.18.0.orig/newlib/libm/common/sf_isnanf.c newlib-1.18.0/newlib/libm/common/sf_isnanf.c
+--- newlib-1.18.0.orig/newlib/libm/common/sf_isnanf.c	2010-12-31 13:55:56.138580003 +0100
++++ newlib-1.18.0/newlib/libm/common/sf_isnanf.c	2010-12-31 13:58:15.118580009 +0100
+@@ -19,10 +19,33 @@
+ _DEFUN (__isnanf, (x),
+ 	float x)
+ {
++#ifdef __psp__
++	int v;
++	asm (
++		".set push\n"		
++		".set noreorder\n"	
++		"lui %0, 0x807F\n"		//
++		"mfc1 $8, %1\n"			// t0 = f
++		"ori %0, %0, 0xFFFF\n"		// v  = 0x807FFFFF
++		"sll $9, $8, 1\n"		// t1 = t0<<1
++		"and %0, %0, $8\n"		// v  = v & t0
++		"srl $9, $9, 24\n"		// t1 = t1>>24
++		"sll $8, $8, 9\n"		// t0 = t0<<9
++		"sltiu $9, $9, 0x00FF\n"	// t1 = (t1<0xFF)
++		"movz %0, $0, $8\n"		// v  = (t0==0) ? 0 : v		if (frac==0) is not NaN
++		"movn %0, $0, $9\n"		// v  = (t1!=0) ? 0 : v		if (exp!=0xFF) is not NAN
++		".set pop\n"		
++		: "=r"(v)
++		: "f"(x)
++		: "$8", "$9"
++	);
++	return (v);
++#else
+ 	__int32_t ix;
+ 	GET_FLOAT_WORD(ix,x);
+ 	ix &= 0x7fffffff;
+ 	return FLT_UWORD_IS_NAN(ix);
++#endif
+ }
+ 
+ #ifdef _DOUBLE_IS_32BITS
