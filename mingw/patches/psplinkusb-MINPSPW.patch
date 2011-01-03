@@ -159,7 +159,7 @@ Index: psplinkusb/pspsh/Makefile
 +OUTPUT=pspsh
  
 +ifdef BUILD_MACOSX
-+CFLAGS +=-I/opt/local/include
++CXXFLAGS +=-I/opt/local/include
 +LDFLAGS += -L/opt/local/lib
 +endif
 +
