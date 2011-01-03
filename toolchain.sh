@@ -13,7 +13,9 @@ PSPSDK_VERSION=0.10.1
 LANGUAGES="c,c++,objc,obj-c++,d"
 
 # sdk versions
-BINUTILS_VER=2.18
+# Downgraded since there is a bug that is 100% reproducible with Daedalus
+# BINUTILS_VER=2.18
+BINUTILS_VER=2.16.1
 GCC_VER=4.3.5
 NEWLIB_VER=1.18.0
 #debugger version
