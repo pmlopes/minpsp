@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.10.1
+PSPSDK_VERSION=0.11.1
 
 # supported languages
 #LANGUAGES="c,c++"
@@ -342,8 +342,13 @@ function buildBinutils {
     cd psp/build/$BINUTILS_SRCDIR
   fi
 
-  $MAKE_CMD
-  $MAKE_CMD install
+  if [ "$OS" == "Darwin" ]; then
+    $MAKE_CMD -r
+    $MAKE_CMD -r install
+  else
+    $MAKE_CMD
+    $MAKE_CMD install
+  fi
   cd ../../..
 }
 
