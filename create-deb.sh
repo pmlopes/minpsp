@@ -1,12 +1,20 @@
 #!/bin/sh
 set -e
 
+if [ ! "`whoami`" = "root" ]; then
+  echo "This script must be run as root or with fakeroot!"
+  exit
+fi
+
+
 VERSION=`grep PSPSDK_VERSION= toolchain.sh|cut -d= -f2`
 MACHINE=$(uname -m)
-if [ "$MACHINE" == "i386" ]; then
+
+if [ "$MACHINE" = "i386" ]; then
   ARCH=i386
 fi
-if [ "$MACHINE" == "x86_64" ]; then
+
+if [ "$MACHINE" = "x86_64" ]; then
   ARCH=amd64
 fi
 
@@ -30,6 +38,9 @@ cat >> control <<EOF
 Package: minpspw-pspsdk
 Version: $VERSION
 Maintainer: Paulo Lopes <pmlopes@gmail.com>
+Provides: pspsdk
+Conflicts: pspsdk
+Replaces: pspsdk
 Installed-Size: `du -ks opt|cut -f 1`
 Priority: optional
 Architecture: $ARCH

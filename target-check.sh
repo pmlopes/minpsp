@@ -1,50 +1,58 @@
 #!/bin/bash
 
 # tell me your OS name
+echo "OS id -------------------"
 uname -s
 uname -a
-echo "-------------------"
 
 # tell me your compiler
+echo "gcc -------------------"
 which gcc && gcc --version
-echo "-------------------"
+echo "g++ -------------------"
 which g++ && g++ --version
-echo "-------------------"
+echo "ld -------------------"
 which ld && ld --version
-echo "-------------------"
+echo "as -------------------"
 which as && as --version
-echo "-------------------"
 
 # tell me your tools
+echo "svn -------------------"
 which svn && svn --version
-echo "-------------------"
+echo "wget -------------------"
 which wget && wget --version
-echo "-------------------"
+echo "make -------------------"
 which make && make --version
-echo "-------------------"
+echo "awk -------------------"
 which awk && awk --version
-echo "-------------------"
+echo "makeinfo -------------------"
 which makeinfo && makeinfo --version
-echo "-------------------"
+echo "python -------------------"
 which python && python --version
-echo "-------------------"
+echo "flex -------------------"
 which flex && flex --version
-echo "-------------------"
+echo "bison -------------------"
 which bison && bison --version
-echo "-------------------"
+echo "sdl-config -------------------"
+which sdl-config && sdl-config --version
+echo "doxygen -------------------"
+which doxygen && doxygen --version
 
 # tell me your software
+echo "zlib.h -------------------"
 find / -name "zlib.h"
-echo "-------------------"
+echo "gmp.h -------------------"
 find / -name "gmp.h"
-echo "-------------------"
+echo "mpfr.h -------------------"
 find / -name "mpfr.h"
-echo "-------------------"
+echo "readline.h -------------------"
 find / -name "readline.h"
-echo "-------------------"
+echo "iconv.h -------------------"
 find / -name "iconv.h"
-echo "-------------------"
+echo "pthread.h -------------------"
 find / -name "pthread.h"
-echo "-------------------"
+echo "SDL.h -------------------"
 find / -name "SDL.h"
-echo "-------------------"
+echo "usb.h -------------------"
+find / -name "usb.h"
+echo "libusb.h -------------------"
+find / -name "libusb.h"

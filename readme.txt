@@ -489,6 +489,7 @@ Install required packages using macports.org:
  * unzip
  * cmake
  * wget
+ * SDL
 
 Once you have all these dependencies installed just run the toolchain script.
 
