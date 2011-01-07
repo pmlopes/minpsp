@@ -14,6 +14,10 @@ if [ "$MACHINE" = "i386" ]; then
   ARCH=i386
 fi
 
+if [ "$MACHINE" = "i686" ]; then
+  ARCH=i386
+fi
+
 if [ "$MACHINE" = "x86_64" ]; then
   ARCH=amd64
 fi

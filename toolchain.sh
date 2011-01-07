@@ -597,7 +597,7 @@ function installPSPLinkUSB {
   fi
   if [ "$OS" == "Linux" ]; then
     cd psplinkusb
-    BUILD_LIBUSB10=1 $MAKE_CMD -f Makefile.clients install
+    $MAKE_CMD -f Makefile.clients install
     cd ..
   fi
 
