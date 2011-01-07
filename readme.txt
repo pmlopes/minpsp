@@ -24,7 +24,9 @@ Portable handheld videogame system.
  TODO
 ===============================================================================
 0.11 Still to decide....
-
+* Added MacOSX support
+* Reverted Binutils to 2.16.1 since there is a bug with 2.18 that causes
+  bad code for example on Daedalus Project.
 
 ===============================================================================
  Changelog
