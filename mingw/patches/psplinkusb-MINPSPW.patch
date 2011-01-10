@@ -170,7 +170,7 @@ Index: psplinkusb/pspsh/Makefile
 +endif
 +
 +ifdef BUILD_WIN32
-+OUTPUT=$(OUTPUT).exe
++OUTPUT=pspsh.exe
 +LIBS=-lws2_32 -lreadline
 +endif
 +
@@ -777,7 +777,7 @@ Index: psplinkusb/tools/remotejoy/pc/Makefile
 +endif
 +
 +ifdef BUILD_WIN32
-+OUTPUT=$(OUTPUT).exe
++OUTPUT=remotejoy.exe
 +LIBS +=-lws2_32
 +endif
 +
@@ -928,7 +928,7 @@ Index: psplinkusb/tools/remotejoy/pcsdl/Makefile
 +endif
 +
 +ifdef BUILD_WIN32
-+OUTPUT=$(OUTPUT).exe
++OUTPUT=remotejoy.exe
 +LIBS +=-lws2_32
 +endif
 +

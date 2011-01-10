@@ -239,7 +239,7 @@ function prepare {
     #-----------------------------------------------------------------------------
     # pre requisites
     #-----------------------------------------------------------------------------
-    . ../mingw/dependencies-MINGW32_NT.sh
+    . ./mingw/dependencies-MINGW32_NT.sh
   fi
 
   if [ "$OS" == "Darwin" ]; then
@@ -295,25 +295,26 @@ function installPremake {
     PREMAKE_BIN=$PREMAKE_BIN.exe
   fi
 
-  if [ ! -f mingw/bin/$PREMAKE_BIN ]; then
+  if [ ! -f ./mingw/bin/$PREMAKE_BIN ]; then
     download deps "http://downloads.sourceforge.net/premake" "premake-4.3-src" "zip"
     if [ "$OS" == "MINGW32_NT" ]; then
       cd deps/premake-4.3/build/gmake.windows
+      CC=gcc CXX=g++ $MAKE_CMD
     fi
     if [ "$OS" == "Linux" ]; then
       cd deps/premake-4.3/build/gmake.unix
+      $MAKE_CMD
     fi
     if [ "$OS" == "SunOS" ]; then
       cd deps/premake-4.3/build/gmake.unix
+      $MAKE_CMD
     fi
     if [ "$OS" == "Darwin" ]; then
       cd deps/premake-4.3/build/gmake.macosx
+      $MAKE_CMD
     fi
-    $MAKE_CMD
 
-    mkdir -p $INSTALLDIR/bin
-    cp ../../bin/release/* $INSTALLDIR/bin
-
+    cp ../../bin/release/* ./mingw/bin
     cd ../../../..
   fi
 }
