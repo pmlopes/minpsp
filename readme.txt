@@ -392,6 +392,12 @@ get them from the mingw msys project:
  http://www.cmake.org/files/v2.8/cmake-2.8.1-win32-x86.zip
   install to /local
 
+11th Aparently the current bash causes bugs with autotools during SDL_mixer
+build, for this we need to update the following packages into /msys/bin
+  - bash-3.1.17-3-msys-1.0.13-bin.tar.lzma
+  - libregex-1.20090805-2-msys-1.0.13-dll-1.tar.lzma
+  - libtermcap-0.20050421_1-2-msys-1.0.13-dll-0.tar.lzma
+
 To build run the toolchain script:
 
 ./toolchain.sh
