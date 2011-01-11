@@ -8,7 +8,7 @@ VERSION=1.3.2
 download build "http://downloads.xiph.org/releases/vorbis" $LIBNAME-$VERSION "tar.bz2"
 cd build/$LIBNAME-$VERSION
 
-LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
+LDFLAGS="-L$(psp-config --pspsdk-path)/lib" LIBS="-lc -lm -lpspuser" ./configure --host=psp --prefix=$(pwd)/../target/psp
 make -s
 
 make -s install

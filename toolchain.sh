@@ -314,7 +314,7 @@ function installPremake {
       $MAKE_CMD
     fi
 
-    cp ../../bin/release/* ./mingw/bin
+    cp ../../bin/release/* ../../../../mingw/bin/
     cd ../../../..
   fi
 }
@@ -851,8 +851,8 @@ function buildBaseDevpaks {
   buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-# disabled at the moment, although it builds it doesn't work as expected
-#  buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+  #disabled at the moment, although it builds it doesn't work as expected
+  #buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
   #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET

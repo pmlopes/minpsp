@@ -97,6 +97,11 @@ function svnGet {
       awk '{ sub("\r$", ""); print }' src/base/build.mak > tmp
       mv -f tmp src/base/build.mak
     fi
+    if [ -f configure.in ]; then
+      # Tremor get bad line ending on windows
+      awk '{ sub("\r$", ""); print }' configure.in > tmp
+      mv -f tmp configure.in
+    fi
     # normal patching
     if [ -f ../patches/$3-PSP.patch ]; then
       patch -p1 < ../patches/$3-PSP.patch

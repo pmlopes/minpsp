@@ -5,8 +5,8 @@ set -e
 LIBNAME=cubicvr
 VERSION=1237
 
-svnGet build "http://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr" cubicvr
-svnGet build "http://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr" psp
+svnGet build "https://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr" cubicvr
+svnGet build "https://cubicvr.svn.sourceforge.net/svnroot/cubicvr/trunk/cubicvr" psp
 
 mv build/cubicvr build/cubicvr_src
 mkdir -p build/$LIBNAME
