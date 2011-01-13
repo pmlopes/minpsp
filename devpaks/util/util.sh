@@ -54,6 +54,23 @@ function download {
       cd ..
     fi
     cd $TARGET_DIR || cd `echo "$TARGET_DIR"|cut -d_ -f1` || cd `echo "$TARGET_DIR"|cut -d- -f1` || cd $LIBNAME-$VERSION || cd `echo "$LIBNAME-$VERSION"|cut -d_ -f1` || cd `echo "$LIBNAME-$VERSION"|cut -d- -f1`
+
+    # some files are in DOS format, convert to UNIX
+    # intrafont
+    if [ -f samples/GU/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/GU/Makefile > tmp
+      mv -f tmp samples/GU/Makefile
+    fi
+    if [ -f samples/graphics/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/graphics/Makefile > tmp
+      mv -f tmp samples/graphics/Makefile
+    fi
+    # bullet
+    if [ -f src/BulletCollision/BroadphaseCollision/btDbvt.h ]; then
+      awk '{ sub("\r$", ""); print }' src/BulletCollision/BroadphaseCollision/btDbvt.h > tmp
+      mv -f tmp src/BulletCollision/BroadphaseCollision/btDbvt.h
+    fi
+
     if [ -f ../patches/$3-PSP.patch ]; then
       patch -p1 < ../patches/$3-PSP.patch
     fi
@@ -101,6 +118,72 @@ function svnGet {
       # Tremor get bad line ending on windows
       awk '{ sub("\r$", ""); print }' configure.in > tmp
       mv -f tmp configure.in
+    fi
+    # cubicVR
+    if [ -f samples/vehicle/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/vehicle/Makefile > tmp
+      mv -f tmp samples/vehicle/Makefile
+    fi
+    if [ -f samples/boxland/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/boxland/Makefile > tmp
+      mv -f tmp samples/boxland/Makefile
+    fi
+    if [ -f samples/landscape/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/landscape/Makefile > tmp
+      mv -f tmp samples/landscape/Makefile
+    fi
+    if [ -f samples/courtyard_lws/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/courtyard_lws/Makefile > tmp
+      mv -f tmp samples/courtyard_lws/Makefile
+    fi
+    if [ -f samples/torus_lws/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/torus_lws/Makefile > tmp
+      mv -f tmp samples/torus_lws/Makefile
+    fi
+    if [ -f samples/metacube_lws/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/metacube_lws/Makefile > tmp
+      mv -f tmp samples/metacube_lws/Makefile
+    fi
+    if [ -f samples/multitexture_test/main.cpp ]; then
+      awk '{ sub("\r$", ""); print }' samples/multitexture_test/main.cpp > tmp
+      mv -f tmp samples/multitexture_test/main.cpp
+    fi
+    if [ -f samples/multitexture_test/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/multitexture_test/Makefile > tmp
+      mv -f tmp samples/multitexture_test/Makefile
+    fi
+    if [ -f samples/pspbullet/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/pspbullet/Makefile > tmp
+      mv -f tmp samples/pspbullet/Makefile
+    fi
+    if [ -f samples/box_drop/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/box_drop/Makefile > tmp
+      mv -f tmp samples/box_drop/Makefile
+    fi
+    if [ -f samples/cube/main.cpp ]; then
+      awk '{ sub("\r$", ""); print }' samples/cube/main.cpp > tmp
+      mv -f tmp samples/cube/main.cpp
+    fi
+    if [ -f samples/cube/main.h ]; then
+      awk '{ sub("\r$", ""); print }' samples/cube/main.h > tmp
+      mv -f tmp samples/cube/main.h
+    fi
+    if [ -f samples/cube/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/cube/Makefile > tmp
+      mv -f tmp samples/cube/Makefile
+    fi
+    if [ -f samples/lua_host/Makefile ]; then
+      awk '{ sub("\r$", ""); print }' samples/lua_host/Makefile > tmp
+      mv -f tmp samples/lua_host/Makefile
+    fi
+    if [ -f Makefile ]; then
+      awk '{ sub("\r$", ""); print }' Makefile > tmp
+      mv -f tmp Makefile
+    fi
+    #openTRI
+    if [ -f src/triImage.c ]; then
+      awk '{ sub("\r$", ""); print }' src/triImage.c > tmp
+      mv -f tmp src/triImage.c
     fi
     # normal patching
     if [ -f ../patches/$3-PSP.patch ]; then

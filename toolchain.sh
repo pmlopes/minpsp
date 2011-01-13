@@ -204,7 +204,7 @@ function prepare {
     GMP_PREFIX=/usr
     PPL_PREFIX=/usr
     ICONV_PREFIX=/usr
-    MAKE_CMD="make -s"
+    MAKE_CMD="make -s LDFLAGS=\"-s\""
   fi
 
   # --- XP 32 bits
@@ -234,7 +234,7 @@ function prepare {
     GMP_PREFIX=/mingw
     PPL_PREFIX=/mingw
     ICONV_PREFIX=/mingw
-    MAKE_CMD=make
+    MAKE_CMD="make -s LDFLAGS=\"-s\""
 
     #-----------------------------------------------------------------------------
     # pre requisites
@@ -482,8 +482,8 @@ function buildGCC {
 
 function buildSDK {
   cd psp/build/pspsdk
-  $MAKE_CMD
-  $MAKE_CMD install
+  make
+  make install
   cd ../../..
 }
 
@@ -603,8 +603,8 @@ function installPSPLinkUSB {
   fi
 
   cd psplinkusb
-  $MAKE_CMD -f Makefile.psp clean
-  $MAKE_CMD -f Makefile.psp release
+  make -f Makefile.psp clean
+  make -f Makefile.psp release
   cd release
 
   install -d $INSTALLDIR/psplink/psp
@@ -644,8 +644,8 @@ function installPSPLinkUSB {
   install -m 644 README $INSTALLDIR/psplink
 
   cd ..
-  $MAKE_CMD -f Makefile.oe clean
-  $MAKE_CMD -f Makefile.oe release
+  make -f Makefile.oe clean
+  make -f Makefile.oe release
 
   cd release_oe
   install -d $INSTALLDIR/psplink/psp/oe
@@ -825,55 +825,55 @@ function buildBaseDevpaks {
   fi
   BASE=$(pwd)/devpaks
 
-#  buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
-#  # bulletml deppends on tinyxml
-#  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
-#  # according to Luqman Aden smpeg must be build before SDL_mixer
-#  # otherwise there is no MP3 support on SDL mixer
-#  buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-#  #disabled at the moment, although it builds it doesn't work as expected
-#  #buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
-#  #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
-#  #buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
-#  #buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
-#  buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+  # bulletml deppends on tinyxml
+  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+  # according to Luqman Aden smpeg must be build before SDL_mixer
+  # otherwise there is no MP3 support on SDL mixer
+  buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
+  #disabled at the moment, although it builds it doesn't work as expected
+  #buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+  #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
+  #buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
+  #buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
+  buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 046 openTRI $DEVPAK_TARGET
 
   # restore
