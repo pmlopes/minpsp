@@ -44,12 +44,17 @@ cp -f vram_mgr.h ../target/psp/include/oslib/
 cp -f ccc.h ../target/psp/include/oslib/
 cp -f sfont.h ../target/psp/include/oslib/
 
+echo "Copying samples"
+mkdir -p ../target/psp/sdk/samples
+cp -Rf samples ../target/psp/sdk/samples/oslib_mod
+rm -Rf `find ../target/psp/sdk/samples/oslib_mod -name ".svn"` || true
+
 doxygen
 
 cp -fR OSLib_MOD_Documentation/html ../target/doc/oslibmod
 
 cd ../..
 
-makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4 mikmodlib 3.0 libpspmath 4 intraFont 0.31 
+makeInstaller $LIBNAME $VERSION zlib 1.2.5 libpng 1.4.4
 
 echo "Done!"

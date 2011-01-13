@@ -51,17 +51,12 @@ Section -Main SEC0000
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" zlib
     # check for core dependency
     StrCmp $1 '1.2.2' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak ZLib (1.2.2) missing'
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak ZLib (1.2.5) missing'
     Quit
     # check for internal dependencies
     ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" libpng
     StrCmp $1 '1.2.8' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak libpng (1.2.8) missing'
-    Quit
-    # check for internal dependencies
-    ReadRegStr $1 HKLM "SOFTWARE\PSP DevKit\devpak" mikmodlib
-    StrCmp $1 '3.0.0' +3 +1
-    MessageBox MB_OK|MB_ICONSTOP 'Required devpak mikmodlib (3.0) missing'
+    MessageBox MB_OK|MB_ICONSTOP 'Required devpak libpng (1.4.4) missing'
     Quit
     # install
     SetOutPath $0
