@@ -227,12 +227,12 @@ function prepare {
     # GDC has a bug that forces the install to be hardcoded
     INSTALLDIR="/pspsdk"
     INSTALLERDIR="/c/pspsdk-installer"
-    GMP_INCLUDE=/usr/local/include
-    MPFR_INCLUDE=/usr/local/include
-    GMP_LIB=/usr/local/lib
-    MPFR_LIB=/usr/local/lib
-    GMP_PREFIX=/usr/local
-    PPL_PREFIX=/usr/local
+    GMP_INCLUDE=/mingw/include
+    MPFR_INCLUDE=/mingw/include
+    GMP_LIB=/mingw/lib
+    MPFR_LIB=/mingw/lib
+    GMP_PREFIX=/mingw
+    PPL_PREFIX=/mingw
     ICONV_PREFIX=/mingw
     MAKE_CMD=make
 
@@ -266,7 +266,7 @@ function prepare {
   checkTool cmake
 
   # nice to have
-  installPremake
+  #installPremake
 
   TOOLPATH=$(echo $INSTALLDIR | sed -e 's/^\([a-zA-Z]\):/\/\1/')
   [ ! -z "$INSTALLDIR" ] && mkdir -p $INSTALLDIR && touch $INSTALLDIR/nonexistantfile && rm $INSTALLDIR/nonexistantfile || exit 1;
@@ -528,28 +528,28 @@ function installExtraBinaries {
     download deps "http://downloads.sourceforge.net/unxutils" "UnxUtils" "zip" $UNXUTILS_DIR
 
     cd deps/$UNXUTILS_DIR
-    cp usr/local/wbin/cp.exe $INSTALLDIR/bin
-    cp usr/local/wbin/rm.exe $INSTALLDIR/bin
-    cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
-    cp usr/local/wbin/sed.exe $INSTALLDIR/bin
+    /bin/cp usr/local/wbin/cp.exe $INSTALLDIR/bin
+    /bin/cp usr/local/wbin/rm.exe $INSTALLDIR/bin
+    /bin/cp usr/local/wbin/mkdir.exe $INSTALLDIR/bin
+    /bin/cp usr/local/wbin/sed.exe $INSTALLDIR/bin
     cd ../..
 
     MINGW32_MAKE_DIR="make-"$MINGW32_MAKE_VER
     download deps "http://downloads.sourceforge.net/mingw" "make-"$MINGW32_MAKE_VER "tar.gz" $MINGW32_MAKE_DIR
 
     cd deps/$MINGW32_MAKE_DIR
-    cp make.exe $INSTALLDIR/bin
-    cp -Rf info $INSTALLDIR/info
+    /bin/cp make.exe $INSTALLDIR/bin
+    /bin/cp -Rf info $INSTALLDIR/info
     cd ../..
 
     # true for some samples (namely minifire asm demo)
     gcc -s -Wall -O3 -o $INSTALLDIR/bin/true.exe mingw/true.c
     # visual studio support
-    cp mingw/bin/vsmake.bat $INSTALLDIR/bin
+    /bin/cp mingw/bin/vsmake.bat $INSTALLDIR/bin
 
     # in case any win32 native bin was linked with threads we
     # add the dll to the output install dir too
-    cp /mingw/bin/pthreadGC2.dll $INSTALLDIR/bin
+    # cp /mingw/bin/pthreadGC2.dll $INSTALLDIR/bin
   fi
 
   # need to have psp-pkg-config hack for building some packages
@@ -825,55 +825,55 @@ function buildBaseDevpaks {
   fi
   BASE=$(pwd)/devpaks
 
-  buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
-  # bulletml deppends on tinyxml
-  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
-  # according to Luqman Aden smpeg must be build before SDL_mixer
-  # otherwise there is no MP3 support on SDL mixer
-  buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
-  #disabled at the moment, although it builds it doesn't work as expected
-  #buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
-  #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
-  #buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
-  #buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
-  buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 001 zlib $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 002 bzip2 $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 003 freetype $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 004 jpeg $DEVPAK_TARGET
+#  # bulletml deppends on tinyxml
+#  buildAndInstallDevPak $BASE 033 tinyxml $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 005 libbulletml $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 006 libmad $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 007 libmikmod $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 008 libogg $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 009 libpng $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 010 libpspvram $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 011 libTremor $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 012 libvorbis $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 013 lua $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 014 pspgl $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 015 pspirkeyb $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 016 sqlite $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 017 SDL $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 018 SDL_gfx $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 019 SDL_image $DEVPAK_TARGET
+#  # according to Luqman Aden smpeg must be build before SDL_mixer
+#  # otherwise there is no MP3 support on SDL mixer
+#  buildAndInstallDevPak $BASE 022 smpeg $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 020 SDL_mixer $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 021 SDL_ttf $DEVPAK_TARGET
+#  #disabled at the moment, although it builds it doesn't work as expected
+#  #buildAndInstallDevPak $BASE 023 ode $DEVPAK_TARGET
+#  #buildAndInstallDevPak $BASE 024 TinyGL $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 025 libpthreadlite $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 026 cal3d $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 027 mikmodlib $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 028 cpplibs $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 029 flac $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 030 giflib $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 031 libpspmath $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 032 pthreads-emb $DEVPAK_TARGET
+#  #buildAndInstallDevPak $BASE 034 oslib $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 035 libcurl $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 036 intrafont $DEVPAK_TARGET
+#  #buildAndInstallDevPak $BASE 037 libaac $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 038 Jello $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 039 zziplib $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 040 Mini-XML $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 041 allegro $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 042 libmpeg2 $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 043 bullet $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 044 cubicvr $DEVPAK_TARGET
+#  buildAndInstallDevPak $BASE 045 oslibmod $DEVPAK_TARGET
   buildAndInstallDevPak $BASE 046 openTRI $DEVPAK_TARGET
 
   # restore

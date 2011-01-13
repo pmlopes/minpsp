@@ -187,16 +187,20 @@ function installSDL {
 
 # generic
 installZlib
-installICONV
-installPTHREADS
+# Disabled since it is easy with mingw-get install mingw32-libiconv
+#installICONV
+# Disabled since it is easy with mingw-get install mingw32-pthreads-w32
+#installPTHREADS
 
 # disbled since the patch for readline fixes the termcap missing features
 # installPDCURSES
 installREADLINE
 
 # GCC specific
-installGMP
-installMPFR
+# Disabled since it is easy with mingw-get install mingw32-gmp
+#installGMP
+# Disabled since it is easy with mingw-get install mingw32-mpfr
+#installMPFR
 
 # not needed right now
 #installPPL

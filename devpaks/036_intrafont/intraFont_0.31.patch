@@ -1,4 +1,4 @@
-diff -BruN Makefile Makefile
+diff -Naur Makefile Makefile
 --- Makefile	Thu Jan  1 01:00:00 1970
 +++ Makefile	Thu May 15 16:03:27 2008
 @@ -0,0 +1,17 @@
@@ -20,7 +20,7 @@ diff -BruN Makefile Makefile
 +	cp README ../target/doc/intraFont
 +	cp -fR samples/* ../target/psp/sdk/samples/intraFont
 \ No newline at end of file
-diff -BruN samples/GU/Makefile samples/GU/Makefile
+diff -Naur samples/GU/Makefile samples/GU/Makefile
 --- samples/GU/Makefile	Tue Nov 13 23:17:16 2007
 +++ samples/GU/Makefile	Thu May 15 16:02:11 2008
 @@ -1,5 +1,5 @@
@@ -39,7 +39,7 @@ diff -BruN samples/GU/Makefile samples/GU/Makefile
  
  EXTRA_TARGETS = EBOOT.PBP
  PSP_EBOOT_TITLE = intraFont Test
-diff -BruN samples/graphics/Makefile samples/graphics/Makefile
+diff -Naur samples/graphics/Makefile samples/graphics/Makefile
 --- samples/graphics/Makefile	Mon Dec  3 18:35:56 2007
 +++ samples/graphics/Makefile	Thu May 15 16:01:55 2008
 @@ -1,5 +1,5 @@

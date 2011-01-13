@@ -282,9 +282,43 @@ http://forums.ps2dev.org
 My MINGW specific stuff:
 http://www.jetdrone.com
 
+===============================================================================
+ How to build it myself (new way) ?
+===============================================================================
+
+Download mingw-get tool from sourceforge.net/projects/mingw
+
+Once you have it install it to: C:\MinGW\bin, open a DOS box and run:
+
+# update the current reppo info
+mingw-get update
+# install the base system
+mingw-get install gcc g++ msys-base msys-wget msys-unzip \
+  mingw-developer-toolkit mingw32-libiconv mingw32-pthreads-w32 \
+  mingw32-gmp mingw32-mpfr msys-texinfo
+  
+at this point you can start msys console (C:\MinGW\msys\1.0\msys.bat)
+
+Unfortunately not all dependencies are on mingw-get so you need to install
+by hand:
+
+  - doxygen 1.7.3
+    http://ftp.stack.nl/pub/users/dimitri/doxygen-1.7.3.windows.bin.zip
+  - The following are in the wports folder
+    * dot 1.16
+	* unrar
+  - svn 1.6.15
+    http://subversion.apache.org
+
+CMake get it from:
+ http://www.cmake.org/files/v2.8/cmake-2.8.3-win32-x86.zip
+  install to /local
+
+For pkg-config checks to work with autotools you need to copy:
+  cp mingw/pkg.m4 /mingw/share/aclocal
 
 ===============================================================================
- How to build it myself?
+ How to build it myself (Old way) ?
 ===============================================================================
 
 Initial builds were made in a custom Msys/MinGW environment. Keeping this env

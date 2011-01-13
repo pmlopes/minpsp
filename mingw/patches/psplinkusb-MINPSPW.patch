@@ -100,7 +100,7 @@ Index: psplinkusb/pspsh/jetcompat.h
 ===================================================================
 --- psplinkusb/pspsh/jetcompat.h	(revision 0)
 +++ psplinkusb/pspsh/jetcompat.h	(revision 0)
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,43 @@
 +#ifndef __JETDRONE_WIN32_COMPAT
 +#define __JETDRONE_WIN32_COMPAT
 +#include <errno.h>
@@ -130,7 +130,6 @@ Index: psplinkusb/pspsh/jetcompat.h
 +#include <netinet/in.h>
 +#include <netinet/tcp.h>
 +#include <netdb.h>
-+#include <limits.h>
 +
 +#define jc_socket_startup
 +
@@ -188,7 +187,7 @@ Index: psplinkusb/pspsh/pspsh.C
 ===================================================================
 --- psplinkusb/pspsh/pspsh.C	(revision 2494)
 +++ psplinkusb/pspsh/pspsh.C	(working copy)
-@@ -13,18 +13,12 @@
+@@ -13,18 +13,13 @@
  #include <stdio.h>
  #include <unistd.h>
  #include <stdlib.h>
@@ -198,7 +197,7 @@ Index: psplinkusb/pspsh/pspsh.C
 -#include <netinet/in.h>
 -#include <netinet/tcp.h>
 -#include <netdb.h>
--#include <limits.h>
+ #include <limits.h>
  #include <readline/readline.h>
  #include <readline/history.h>
  #include <errno.h>
@@ -858,7 +857,7 @@ Index: psplinkusb/tools/remotejoy/pcsdl/jetcompat.h
 ===================================================================
 --- psplinkusb/tools/remotejoy/pcsdl/jetcompat.h	(revision 0)
 +++ psplinkusb/tools/remotejoy/pcsdl/jetcompat.h	(revision 0)
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,43 @@
 +#ifndef __JETDRONE_WIN32_COMPAT
 +#define __JETDRONE_WIN32_COMPAT
 +#include <errno.h>
@@ -881,8 +880,6 @@ Index: psplinkusb/tools/remotejoy/pcsdl/jetcompat.h
 +#define jc_socket_read(a,b,c) recv(a,(char*)b,c,0)
 +#define jc_socket_close(a) closesocket(a)
 +
-+#define PATH_MAX 255
-+
 +#else
 +#include <sys/select.h>
 +#include <sys/socket.h>
@@ -890,7 +887,6 @@ Index: psplinkusb/tools/remotejoy/pcsdl/jetcompat.h
 +#include <netinet/in.h>
 +#include <netinet/tcp.h>
 +#include <netdb.h>
-+#include <limits.h>
 +
 +#define jc_socket_startup
 +
@@ -944,7 +940,7 @@ Index: psplinkusb/tools/remotejoy/pcsdl/remotejoy.c
 ===================================================================
 --- psplinkusb/tools/remotejoy/pcsdl/remotejoy.c	(revision 2494)
 +++ psplinkusb/tools/remotejoy/pcsdl/remotejoy.c	(working copy)
-@@ -13,14 +13,7 @@
+@@ -13,14 +13,8 @@
  #include <stdio.h>
  #include <unistd.h>
  #include <stdlib.h>
@@ -955,7 +951,7 @@ Index: psplinkusb/tools/remotejoy/pcsdl/remotejoy.c
 -#include <netinet/in.h>
 -#include <netinet/tcp.h>
 -#include <netdb.h>
--#include <limits.h>
+ #include <limits.h>
  #include <errno.h>
  #include <ctype.h>
  #include <signal.h>
