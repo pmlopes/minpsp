@@ -35,7 +35,7 @@ echo 2.0 > debian-binary
 mkdir -p opt
 cp -Rf $(pwd)/../../pspsdk opt
 chown -R root:root ./opt
-GZIP=--best tar czf data.tar.gz ./opt
+tar -c --xz -f data.tar.xz ./opt
 
 # create control file
 cat >> control <<EOF
@@ -74,7 +74,7 @@ chmod a+x postrm
 GZIP=--best tar czf control.tar.gz control preinst postrm
 
 # create deb
-ar -r ../minpspw_$VERSION-1ubuntu0_$ARCH.deb debian-binary control.tar.gz data.tar.gz
+ar -r ../minpspw_$VERSION-1ubuntu0_$ARCH.deb debian-binary control.tar.gz data.tar.xz
 
 cd ..
 rm -Rf minpspw-$VERSION

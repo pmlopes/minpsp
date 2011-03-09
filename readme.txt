@@ -489,11 +489,15 @@ If you really need this, say you only have a 64bit machine but want to make a
  /etc/schroot/mount-defaults and add:
   /home/<username>	/home/<username>	none	rw,bind	0	0
 
-5th enter the chroot environment and install add the software as described
+6th enter the chroot environment and install add the software as described
  above
   sudo schroot -c maverick32
   sudo apt-get install ...
   ./toolchain.sh
+
+7th If you use the encrypted home, you need to build from outside your home
+ because for some unknown reason to me, it does not build from encryptfs
+ home's.
 
 ===============================================================================
  How to build it myself (OpenSolaris)?
