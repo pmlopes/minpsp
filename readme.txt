@@ -442,10 +442,15 @@ To build run the toolchain script:
 
 ## Install the required packages.
  sudo apt-get install build-essential autoconf automake bison flex \
-  libncurses5-dev libreadline-dev libusb-dev texinfo libgmp3-dev libmpfr-dev \
-  subversion doxygen graphviz libtool unrar unzip cmake wget pkg-config
+  libncurses5-dev libreadline-dev libusb-dev texinfo subversion doxygen \
+  graphviz libtool unrar unzip cmake wget pkg-config
 
- ## Build and install the toolchain + sdk.
+## it is required to use the static mpfr and gmp otherwise ubuntu 10.04 LTS
+ binaries are not compatible with 10.10 or above and maybe with other distros.
+ 
+ This means that the toolchain script now builds this 2 dependencies too.
+ 
+## Build and install the toolchain + sdk.
  ./toolchain.sh
 
 

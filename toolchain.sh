@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.11.1
+PSPSDK_VERSION=0.11.2
 
 # supported languages
 #LANGUAGES="c,c++"
@@ -195,16 +195,20 @@ function prepare {
   fi
 
   if [ "$OS" == "Linux" ]; then
-    EXTRA_BUILD_CFG=""
+    EXTRA_BUILD_CFG="--disable-multilib"
     INSTALLDIR="$(pwd)/../pspsdk"
-    GMP_INCLUDE=/usr/include
-    MPFR_INCLUDE=/usr/include
-    GMP_LIB=/usr/lib
-    MPFR_LIB=/usr/lib
-    GMP_PREFIX=/usr
-    PPL_PREFIX=/usr
+    GMP_INCLUDE=$(pwd)/deps/local/include
+    MPFR_INCLUDE=$(pwd)/deps/local/include
+    GMP_LIB=$(pwd)/deps/local/lib
+    MPFR_LIB=$(pwd)/deps/local/lib
+    GMP_PREFIX=$(pwd)/deps/local
+    PPL_PREFIX=$(pwd)/deps/local
     ICONV_PREFIX=/usr
-    MAKE_CMD="make -s LDFLAGS=\"-s\""
+    MAKE_CMD="make -s -j2 LDFLAGS=\"-s\""
+    #-----------------------------------------------------------------------------
+    # pre requisites
+    #-----------------------------------------------------------------------------
+    . ./mingw/dependencies-Linux.sh $(pwd)
   fi
 
   # --- XP 32 bits
