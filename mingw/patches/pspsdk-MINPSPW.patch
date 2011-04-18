@@ -1,3 +1,15 @@
+diff -Naur pspsdk.orig/src/kernel/psploadcore.h pspsdk/src/kernel/psploadcore.h
+--- pspsdk.orig/src/kernel/psploadcore.h
++++ pspsdk/src/kernel/psploadcore.h
+@@ -52,7 +52,7 @@
+ 	unsigned int		nsegment;
+ 	unsigned int		segmentaddr[4];
+ 	unsigned int		segmentsize[4];
+-} SceModule;
++} __attribute__((packed)) SceModule;
+ 
+ /** Defines a library and its exported functions and variables.  Use the len
+     member to determine the real size of the table (size = len * 4). */
 diff -Naur pspsdk.orig/src/atrac3/pspatrac3.h pspsdk/src/atrac3/pspatrac3.h
 --- pspsdk.orig/src/atrac3/pspatrac3.h	2010-11-18 14:05:31.607438192 +0100
 +++ pspsdk/src/atrac3/pspatrac3.h	2010-11-18 09:23:44.347438189 +0100
