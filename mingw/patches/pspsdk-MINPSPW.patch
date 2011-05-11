@@ -1,3 +1,189 @@
+diff -urN pspsdk.orig/src/user/Makefile.am pspsdk/src/user/Makefile.am
+--- pspsdk.orig/src/user/Makefile.am	2009-01-09 03:15:40 +0900
++++ pspsdk/src/user/Makefile.am	2009-02-10 16:24:00 +0900
+@@ -24,7 +24,7 @@
+ 
+ THREADMAN_OBJS = ThreadManForUser_0000.o ThreadManForUser_0001.o ThreadManForUser_0002.o ThreadManForUser_0003.o ThreadManForUser_0004.o ThreadManForUser_0005.o ThreadManForUser_0006.o ThreadManForUser_0007.o ThreadManForUser_0008.o ThreadManForUser_0009.o ThreadManForUser_0010.o ThreadManForUser_0011.o ThreadManForUser_0012.o ThreadManForUser_0013.o ThreadManForUser_0014.o ThreadManForUser_0015.o ThreadManForUser_0016.o ThreadManForUser_0017.o ThreadManForUser_0018.o ThreadManForUser_0019.o ThreadManForUser_0020.o ThreadManForUser_0021.o ThreadManForUser_0022.o ThreadManForUser_0023.o ThreadManForUser_0024.o ThreadManForUser_0025.o ThreadManForUser_0026.o ThreadManForUser_0027.o ThreadManForUser_0028.o ThreadManForUser_0029.o ThreadManForUser_0030.o ThreadManForUser_0031.o ThreadManForUser_0032.o ThreadManForUser_0033.o ThreadManForUser_0034.o ThreadManForUser_0035.o ThreadManForUser_0036.o ThreadManForUser_0037.o ThreadManForUser_0038.o ThreadManForUser_0039.o ThreadManForUser_0040.o ThreadManForUser_0041.o ThreadManForUser_0042.o ThreadManForUser_0043.o ThreadManForUser_0044.o ThreadManForUser_0045.o ThreadManForUser_0046.o ThreadManForUser_0047.o ThreadManForUser_0048.o ThreadManForUser_0049.o ThreadManForUser_0050.o ThreadManForUser_0051.o ThreadManForUser_0052.o ThreadManForUser_0053.o ThreadManForUser_0054.o ThreadManForUser_0055.o ThreadManForUser_0056.o ThreadManForUser_0057.o ThreadManForUser_0058.o ThreadManForUser_0059.o ThreadManForUser_0060.o ThreadManForUser_0061.o ThreadManForUser_0062.o ThreadManForUser_0063.o ThreadManForUser_0064.o ThreadManForUser_0065.o ThreadManForUser_0066.o ThreadManForUser_0067.o ThreadManForUser_0068.o ThreadManForUser_0069.o ThreadManForUser_0070.o ThreadManForUser_0071.o ThreadManForUser_0072.o ThreadManForUser_0073.o ThreadManForUser_0074.o ThreadManForUser_0075.o ThreadManForUser_0076.o ThreadManForUser_0077.o ThreadManForUser_0078.o ThreadManForUser_0079.o ThreadManForUser_0080.o ThreadManForUser_0081.o ThreadManForUser_0082.o ThreadManForUser_0083.o ThreadManForUser_0084.o ThreadManForUser_0085.o ThreadManForUser_0086.o ThreadManForUser_0087.o ThreadManForUser_0088.o ThreadManForUser_0089.o ThreadManForUser_0090.o ThreadManForUser_0091.o ThreadManForUser_0092.o ThreadManForUser_0093.o ThreadManForUser_0094.o ThreadManForUser_0095.o ThreadManForUser_0096.o ThreadManForUser_0097.o ThreadManForUser_0098.o ThreadManForUser_0099.o ThreadManForUser_0100.o ThreadManForUser_0101.o ThreadManForUser_0102.o ThreadManForUser_0103.o ThreadManForUser_0104.o ThreadManForUser_0105.o ThreadManForUser_0106.o ThreadManForUser_0107.o ThreadManForUser_0108.o ThreadManForUser_0109.o ThreadManForUser_0110.o ThreadManForUser_0111.o ThreadManForUser_0112.o ThreadManForUser_0113.o ThreadManForUser_0114.o ThreadManForUser_0115.o ThreadManForUser_0116.o ThreadManForUser_0117.o ThreadManForUser_0118.o ThreadManForUser_0119.o ThreadManForUser_0120.o ThreadManForUser_0121.o ThreadManForUser_0122.o ThreadManForUser_0123.o ThreadManForUser_0124.o ThreadManForUser_0125.o ThreadManForUser_0126.o 
+ 
+-UTILS_OBJS = UtilsForUser_0000.o UtilsForUser_0001.o UtilsForUser_0002.o UtilsForUser_0003.o UtilsForUser_0004.o UtilsForUser_0005.o UtilsForUser_0006.o UtilsForUser_0007.o UtilsForUser_0008.o UtilsForUser_0009.o UtilsForUser_0010.o UtilsForUser_0011.o UtilsForUser_0012.o UtilsForUser_0013.o UtilsForUser_0014.o UtilsForUser_0015.o UtilsForUser_0016.o UtilsForUser_0017.o UtilsForUser_0018.o UtilsForUser_0019.o UtilsForUser_0020.o UtilsForUser_0021.o UtilsForUser_0022.o UtilsForUser_0023.o UtilsForUser_0024.o 
++UTILS_OBJS = UtilsForUser_0000.o UtilsForUser_0001.o UtilsForUser_0002.o UtilsForUser_0003.o UtilsForUser_0004.o UtilsForUser_0005.o UtilsForUser_0006.o UtilsForUser_0007.o UtilsForUser_0008.o UtilsForUser_0009.o UtilsForUser_0010.o UtilsForUser_0011.o UtilsForUser_0012.o UtilsForUser_0013.o UtilsForUser_0014.o UtilsForUser_0015.o UtilsForUser_0016.o UtilsForUser_0017.o UtilsForUser_0018.o UtilsForUser_0019.o UtilsForUser_0020.o UtilsForUser_0021.o UtilsForUser_0022.o UtilsForUser_0023.o UtilsForUser_0024.o UtilsForUser_0025.o UtilsForUser_0026.o 
+ 
+ INTERRUPT_OBJS = InterruptManager_0000.o InterruptManager_0001.o InterruptManager_0002.o InterruptManager_0003.o InterruptManager_0004.o InterruptManager_0005.o InterruptManager_0006.o InterruptManager_0007.o InterruptManager_0008.o InterruptManager_0009.o 
+ 
+diff -urN pspsdk.orig/src/user/UtilsForUser.S pspsdk/src/user/UtilsForUser.S
+--- pspsdk.orig/src/user/UtilsForUser.S	2009-01-09 03:15:40 +0900
++++ pspsdk/src/user/UtilsForUser.S	2009-02-10 16:23:29 +0900
+@@ -77,3 +77,9 @@
+ #ifdef F_UtilsForUser_0024
+ 	IMPORT_FUNC	"UtilsForUser",0xFB05FAD0,sceKernelIcacheReadTag
+ #endif
++#ifdef F_UtilsForUser_0025
++	IMPORT_FUNC	"UtilsForUser",0x920F104A,sceKernelIcacheInvalidateAll
++#endif
++#ifdef F_UtilsForUser_0026
++	IMPORT_FUNC	"UtilsForUser",0xC2DF770E,sceKernelIcacheInvalidateRange
++#endif
+diff -urN pspsdk.orig/src/user/psputils.h pspsdk/src/user/psputils.h
+--- pspsdk.orig/src/user/psputils.h	2009-01-09 03:15:40 +0900
++++ pspsdk/src/user/psputils.h	2009-02-10 16:27:07 +0900
+@@ -58,12 +58,12 @@
+ void sceKernelDcacheWritebackInvalidateAll(void);
+ 
+ /**
+-  * Write back a range of addresses from data cache to memory
++  * Write back a range of addresses from the data cache to memory
+   */
+ void sceKernelDcacheWritebackRange(const void *p, unsigned int size);
+ 
+ /**
+-  * Write back and invalidate a range of addresses in data cache
++  * Write back and invalidate a range of addresses in the data cache
+   */
+ void sceKernelDcacheWritebackInvalidateRange(const void *p, unsigned int size);
+ 
+@@ -72,6 +72,16 @@
+   */
+ void sceKernelDcacheInvalidateRange(const void *p, unsigned int size);
+ 
++/** 
++  * Invalidate the instruction cache
++  */
++void sceKernelIcacheInvalidateAll(void);
++
++/**
++  * Invalidate a range of addresses in the instruction cache
++  */
++void sceKernelIcacheInvalidateRange(const void *p, unsigned int size);
++
+ /** Structure for holding a mersenne twister context */
+ typedef struct _SceKernelUtilsMt19937Context {
+ 	unsigned int 	count;
+diff -urN pspsdk.orig/src/libc/terminate.c pspsdk/src/libc/terminate.c
+--- pspsdk.orig/src/libc/terminate.c	2008-04-12 22:42:26 +0900
++++ pspsdk/src/libc/terminate.c	2008-04-13 01:43:56 +0900
+@@ -20,8 +20,6 @@
+ __attribute__((weak))
+ void abort()
+ {
+-	printf("Program aborted.\n");
+-
+ 	while (1)
+ 		_exit(1);
+ }
+diff -urN pspsdk.orig/src/kernel/Makefile.am pspsdk/src/kernel/Makefile.am
+--- pspsdk.orig/src/kernel/Makefile.am	2010-06-09 00:01:38 +0900
++++ pspsdk/src/kernel/Makefile.am	2010-06-09 01:02:56 +0900
+@@ -34,7 +34,7 @@
+ 
+ LOADEXEC_OBJS = LoadExecForKernel_0000.o LoadExecForKernel_0001.o LoadExecForKernel_0002.o LoadExecForKernel_0003.o LoadExecForKernel_0004.o LoadExecForKernel_0005.o LoadExecForKernel_0006.o LoadExecForKernel_0007.o LoadExecForKernel_0008.o LoadExecForKernel_0009.o LoadExecForKernel_0010.o LoadExecForKernel_0011.o LoadExecForKernel_0012.o LoadExecForKernel_0013.o LoadExecForKernel_0014.o LoadExecForKernel_0015.o LoadExecForKernel_0016.o LoadExecForKernel_0017.o LoadExecForKernel_0018.o LoadExecForKernel_0019.o LoadExecForKernel_0020.o LoadExecForKernel_0021.o LoadExecForKernel_0022.o LoadExecForKernel_0023.o LoadExecForKernel_0024.o LoadExecForKernel_0025.o LoadExecForKernel_0026.o 
+ 
+-SYSMEM_OBJS = SysMemForKernel_0000.o SysMemForKernel_0001.o SysMemForKernel_0002.o SysMemForKernel_0003.o SysMemForKernel_0004.o SysMemForKernel_0005.o SysMemForKernel_0006.o SysMemForKernel_0007.o SysMemForKernel_0008.o SysMemForKernel_0009.o SysMemForKernel_0010.o SysMemForKernel_0011.o SysMemForKernel_0012.o SysMemForKernel_0013.o SysMemForKernel_0014.o SysMemForKernel_0015.o SysMemForKernel_0016.o SysMemForKernel_0017.o SysMemForKernel_0018.o SysMemForKernel_0019.o SysMemForKernel_0020.o SysMemForKernel_0021.o SysMemForKernel_0022.o SysMemForKernel_0023.o SysMemForKernel_0024.o SysMemForKernel_0025.o SysMemForKernel_0026.o SysMemForKernel_0027.o SysMemForKernel_0028.o SysMemForKernel_0029.o SysMemForKernel_0030.o SysMemForKernel_0031.o SysMemForKernel_0032.o SysMemForKernel_0033.o SysMemForKernel_0034.o SysMemForKernel_0035.o SysMemForKernel_0036.o SysMemForKernel_0037.o SysMemForKernel_0038.o SysMemForKernel_0039.o SysMemForKernel_0040.o SysMemForKernel_0041.o SysMemForKernel_0042.o SysMemForKernel_0043.o SysMemForKernel_0044.o SysMemForKernel_0045.o SysMemForKernel_0046.o SysMemForKernel_0047.o SysMemForKernel_0048.o SysMemForKernel_0049.o SysMemForKernel_0050.o SysMemForKernel_0051.o SysMemForKernel_0052.o SysMemForKernel_0053.o SysMemForKernel_0054.o SysMemForKernel_0055.o SysMemForKernel_0056.o SysMemForKernel_0057.o SysMemForKernel_0058.o SysMemForKernel_0059.o SysMemForKernel_0060.o SysMemForKernel_0061.o SysMemForKernel_0062.o SysMemForKernel_0063.o SysMemForKernel_0064.o SysMemForKernel_0065.o SysMemForKernel_0066.o SysMemForKernel_0067.o SysMemForKernel_0068.o
++SYSMEM_OBJS = SysMemForKernel_0000.o SysMemForKernel_0001.o SysMemForKernel_0002.o SysMemForKernel_0003.o SysMemForKernel_0004.o SysMemForKernel_0005.o SysMemForKernel_0006.o SysMemForKernel_0007.o SysMemForKernel_0008.o SysMemForKernel_0009.o SysMemForKernel_0010.o SysMemForKernel_0011.o SysMemForKernel_0012.o SysMemForKernel_0013.o SysMemForKernel_0014.o SysMemForKernel_0015.o SysMemForKernel_0016.o SysMemForKernel_0017.o SysMemForKernel_0018.o SysMemForKernel_0019.o SysMemForKernel_0020.o SysMemForKernel_0021.o SysMemForKernel_0022.o SysMemForKernel_0023.o SysMemForKernel_0024.o SysMemForKernel_0025.o SysMemForKernel_0026.o SysMemForKernel_0027.o SysMemForKernel_0028.o SysMemForKernel_0029.o SysMemForKernel_0030.o SysMemForKernel_0031.o SysMemForKernel_0032.o SysMemForKernel_0033.o SysMemForKernel_0034.o SysMemForKernel_0035.o SysMemForKernel_0036.o SysMemForKernel_0037.o SysMemForKernel_0038.o SysMemForKernel_0039.o SysMemForKernel_0040.o SysMemForKernel_0041.o SysMemForKernel_0042.o SysMemForKernel_0043.o SysMemForKernel_0044.o SysMemForKernel_0045.o SysMemForKernel_0046.o SysMemForKernel_0047.o SysMemForKernel_0048.o SysMemForKernel_0049.o SysMemForKernel_0050.o SysMemForKernel_0051.o SysMemForKernel_0052.o SysMemForKernel_0053.o SysMemForKernel_0054.o SysMemForKernel_0055.o SysMemForKernel_0056.o SysMemForKernel_0057.o SysMemForKernel_0058.o SysMemForKernel_0059.o SysMemForKernel_0060.o SysMemForKernel_0061.o SysMemForKernel_0062.o SysMemForKernel_0063.o SysMemForKernel_0064.o SysMemForKernel_0065.o SysMemForKernel_0066.o SysMemForKernel_0067.o SysMemForKernel_0068.o SysMemForKernel_0069.o SysMemForKernel_0070.o
+ 
+ MODULE_OBJS = ModuleMgrForKernel_0000.o ModuleMgrForKernel_0001.o ModuleMgrForKernel_0002.o ModuleMgrForKernel_0003.o ModuleMgrForKernel_0004.o ModuleMgrForKernel_0005.o ModuleMgrForKernel_0006.o ModuleMgrForKernel_0007.o ModuleMgrForKernel_0008.o ModuleMgrForKernel_0009.o ModuleMgrForKernel_0010.o ModuleMgrForKernel_0011.o ModuleMgrForKernel_0012.o ModuleMgrForKernel_0013.o ModuleMgrForKernel_0014.o ModuleMgrForKernel_0015.o ModuleMgrForKernel_0016.o ModuleMgrForKernel_0017.o ModuleMgrForKernel_0018.o ModuleMgrForKernel_0019.o ModuleMgrForKernel_0020.o ModuleMgrForKernel_0021.o ModuleMgrForKernel_0022.o 
+ 
+diff -urN pspsdk.orig/src/kernel/SysMemForKernel.S pspsdk/src/kernel/SysMemForKernel.S
+--- pspsdk.orig/src/kernel/SysMemForKernel.S	2010-06-09 00:01:37 +0900
++++ pspsdk/src/kernel/SysMemForKernel.S	2010-06-09 01:02:43 +0900
+@@ -211,3 +211,9 @@
+ #ifdef F_SysMemForKernel_0068
+ 	IMPORT_FUNC "SysMemForKernel",0x6373995D,sceKernelGetModel
+ #endif
++#ifdef F_SysMemForKernel_0069
++	IMPORT_FUNC	"SysMemForKernel",0x7591C7DB,sceKernelSetCompiledSdkVersion
++#endif
++#ifdef F_SysMemForKernel_0070
++	IMPORT_FUNC	"SysMemForKernel",0xFC114573,sceKernelGetCompiledSdkVersion
++#endif
+diff -urN pspsdk.orig/src/kernel/pspsysmem_kernel.h pspsdk/src/kernel/pspsysmem_kernel.h
+--- pspsdk.orig/src/kernel/pspsysmem_kernel.h	2010-06-09 00:01:37 +0900
++++ pspsdk/src/kernel/pspsysmem_kernel.h	2010-06-09 01:06:14 +0900
+@@ -201,6 +201,21 @@
+  */
+ int sceKernelGetModel(void);
+ 
++/**
++ * Set the version of the SDK with which the caller was compiled.
++ * Version numbers are as for sceKernelDevkitVersion().
++ *
++ * @return 0 on success, < 0 on error.
++ */
++int sceKernelSetCompiledSdkVersion(int version);
++
++/**
++ * Get the SDK version set with sceKernelSetCompiledSdkVersion().
++ *
++ * @return Version number, or 0 if unset.
++ */
++int sceKernelGetCompiledSdkVersion(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -urN pspsdk.orig/src/user/Makefile.am pspsdk/src/user/Makefile.am
+--- pspsdk.orig/src/user/Makefile.am	2010-06-09 00:01:41 +0900
++++ pspsdk/src/user/Makefile.am	2010-06-09 01:04:26 +0900
+@@ -20,7 +20,7 @@
+ 
+ SUSPEND_OBJS = sceSuspendForUser_0000.o sceSuspendForUser_0001.o sceSuspendForUser_0002.o sceSuspendForUser_0003.o sceSuspendForUser_0004.o sceSuspendForUser_005.o sceSuspendForUser_0006.o
+ 
+-SYSMEM_OBJS = SysMemUserForUser_0000.o SysMemUserForUser_0001.o SysMemUserForUser_0002.o SysMemUserForUser_0003.o SysMemUserForUser_0004.o SysMemUserForUser_0005.o SysMemUserForUser_0006.o SysMemUserForUser_0007.o
++SYSMEM_OBJS = SysMemUserForUser_0000.o SysMemUserForUser_0001.o SysMemUserForUser_0002.o SysMemUserForUser_0003.o SysMemUserForUser_0004.o SysMemUserForUser_0005.o SysMemUserForUser_0006.o SysMemUserForUser_0007.o SysMemUserForUser_0008.o SysMemUserForUser_0009.o
+ 
+ THREADMAN_OBJS = ThreadManForUser_0000.o ThreadManForUser_0001.o ThreadManForUser_0002.o ThreadManForUser_0003.o ThreadManForUser_0004.o ThreadManForUser_0005.o ThreadManForUser_0006.o ThreadManForUser_0007.o ThreadManForUser_0008.o ThreadManForUser_0009.o ThreadManForUser_0010.o ThreadManForUser_0011.o ThreadManForUser_0012.o ThreadManForUser_0013.o ThreadManForUser_0014.o ThreadManForUser_0015.o ThreadManForUser_0016.o ThreadManForUser_0017.o ThreadManForUser_0018.o ThreadManForUser_0019.o ThreadManForUser_0020.o ThreadManForUser_0021.o ThreadManForUser_0022.o ThreadManForUser_0023.o ThreadManForUser_0024.o ThreadManForUser_0025.o ThreadManForUser_0026.o ThreadManForUser_0027.o ThreadManForUser_0028.o ThreadManForUser_0029.o ThreadManForUser_0030.o ThreadManForUser_0031.o ThreadManForUser_0032.o ThreadManForUser_0033.o ThreadManForUser_0034.o ThreadManForUser_0035.o ThreadManForUser_0036.o ThreadManForUser_0037.o ThreadManForUser_0038.o ThreadManForUser_0039.o ThreadManForUser_0040.o ThreadManForUser_0041.o ThreadManForUser_0042.o ThreadManForUser_0043.o ThreadManForUser_0044.o ThreadManForUser_0045.o ThreadManForUser_0046.o ThreadManForUser_0047.o ThreadManForUser_0048.o ThreadManForUser_0049.o ThreadManForUser_0050.o ThreadManForUser_0051.o ThreadManForUser_0052.o ThreadManForUser_0053.o ThreadManForUser_0054.o ThreadManForUser_0055.o ThreadManForUser_0056.o ThreadManForUser_0057.o ThreadManForUser_0058.o ThreadManForUser_0059.o ThreadManForUser_0060.o ThreadManForUser_0061.o ThreadManForUser_0062.o ThreadManForUser_0063.o ThreadManForUser_0064.o ThreadManForUser_0065.o ThreadManForUser_0066.o ThreadManForUser_0067.o ThreadManForUser_0068.o ThreadManForUser_0069.o ThreadManForUser_0070.o ThreadManForUser_0071.o ThreadManForUser_0072.o ThreadManForUser_0073.o ThreadManForUser_0074.o ThreadManForUser_0075.o ThreadManForUser_0076.o ThreadManForUser_0077.o ThreadManForUser_0078.o ThreadManForUser_0079.o ThreadManForUser_0080.o ThreadManForUser_0081.o ThreadManForUser_0082.o ThreadManForUser_0083.o ThreadManForUser_0084.o ThreadManForUser_0085.o ThreadManForUser_0086.o ThreadManForUser_0087.o ThreadManForUser_0088.o ThreadManForUser_0089.o ThreadManForUser_0090.o ThreadManForUser_0091.o ThreadManForUser_0092.o ThreadManForUser_0093.o ThreadManForUser_0094.o ThreadManForUser_0095.o ThreadManForUser_0096.o ThreadManForUser_0097.o ThreadManForUser_0098.o ThreadManForUser_0099.o ThreadManForUser_0100.o ThreadManForUser_0101.o ThreadManForUser_0102.o ThreadManForUser_0103.o ThreadManForUser_0104.o ThreadManForUser_0105.o ThreadManForUser_0106.o ThreadManForUser_0107.o ThreadManForUser_0108.o ThreadManForUser_0109.o ThreadManForUser_0110.o ThreadManForUser_0111.o ThreadManForUser_0112.o ThreadManForUser_0113.o ThreadManForUser_0114.o ThreadManForUser_0115.o ThreadManForUser_0116.o ThreadManForUser_0117.o ThreadManForUser_0118.o ThreadManForUser_0119.o ThreadManForUser_0120.o ThreadManForUser_0121.o ThreadManForUser_0122.o ThreadManForUser_0123.o ThreadManForUser_0124.o ThreadManForUser_0125.o ThreadManForUser_0126.o 
+ 
+diff -urN pspsdk-2494-orig/src/user/SysMemUserForUser.S pspsdk-2494/src/user/SysMemUserForUser.S
+--- pspsdk-2494-orig/src/user/SysMemUserForUser.S	2010-06-09 00:01:41 +0900
++++ pspsdk-2494/src/user/SysMemUserForUser.S	2010-06-09 01:01:40 +0900
+@@ -26,3 +26,9 @@
+ #ifdef F_SysMemUserForUser_0007
+ 	IMPORT_FUNC	"SysMemUserForUser",0x13A5ABEF,sceKernelPrintf
+ #endif
++#ifdef F_SysMemUserForUser_0008
++	IMPORT_FUNC	"SysMemUserForUser",0x7591C7DB,sceKernelSetCompiledSdkVersion
++#endif
++#ifdef F_SysMemUserForUser_0009
++	IMPORT_FUNC	"SysMemUserForUser",0xFC114573,sceKernelGetCompiledSdkVersion
++#endif
+diff -urN pspsdk.orig/src/user/pspsysmem.h pspsdk/src/user/pspsysmem.h
+--- pspsdk.orig/src/user/pspsysmem.h	2010-06-09 00:01:41 +0900
++++ pspsdk/src/user/pspsysmem.h	2010-06-09 01:06:22 +0900
+@@ -115,6 +115,21 @@
+ 
+ #endif
+ 
++/**
++ * Set the version of the SDK with which the caller was compiled.
++ * Version numbers are as for sceKernelDevkitVersion().
++ *
++ * @return 0 on success, < 0 on error.
++ */
++int sceKernelSetCompiledSdkVersion(int version);
++
++/**
++ * Get the SDK version set with sceKernelSetCompiledSdkVersion().
++ *
++ * @return Version number, or 0 if unset.
++ */
++int sceKernelGetCompiledSdkVersion(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff -urN pspsdk.orig/src/libc/stdio.h pspsdk/src/libc/stdio.h
+--- pspsdk.orig/src/libc/stdio.h	2008-04-12 22:42:26 +0900
++++ pspsdk/src/libc/stdio.h	2008-04-13 01:45:19 +0900
+@@ -18,6 +18,10 @@
+ 
+ #include <pspkernel.h>
+ #include <stdarg.h>
++#include <sys/types.h>
++#define STDIN_FILENO  0
++#define STDOUT_FILENO 1
++#define STDERR_FILENO 2
+ 
+ #ifdef __cplusplus
+ extern "C" {
 diff -Naur pspsdk.orig/src/kernel/psploadcore.h pspsdk/src/kernel/psploadcore.h
 --- pspsdk.orig/src/kernel/psploadcore.h
 +++ pspsdk/src/kernel/psploadcore.h

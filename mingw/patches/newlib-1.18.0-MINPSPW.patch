@@ -1,3 +1,14 @@
+diff -Naur newlib-1.18.0.orig/newlib/libc/stdlib/strtod.c newlib-1.18.0/newlib/libc/stdlib/strtod.c
+--- newlib-1.18.0.orig/newlib/libc/stdlib/strtod.c	2007-09-01 06:21:27 +0900
++++ newlib-1.18.0/newlib/libc/stdlib/strtod.c	2010-06-08 14:33:16 +0900
+@@ -1166,6 +1166,7 @@
+   return _strtod_r (_REENT, s00, se);
+ }
+ 
++__attribute__((weak))
+ float
+ _DEFUN (strtof, (s00, se),
+ 	_CONST char *s00 _AND
 diff -Naur newlib-1.18.0.orig/config.sub newlib-1.18.0/config.sub
 --- newlib-1.18.0.orig/config.sub	2009-11-20 11:10:09.000000000 +0100
 +++ newlib-1.18.0/config.sub	2010-01-18 10:32:23.502072311 +0100

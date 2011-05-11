@@ -381,6 +381,7 @@ function buildXGCC {
         --without-headers \
         --disable-win32-registry \
         --disable-nls \
+        --disable-libstdcxx-pch \
         --with-libiconv-prefix=$ICONV_PREFIX \
         --with-gmp-include=$GMP_INCLUDE \
         --with-gmp-lib=$GMP_LIB \
@@ -465,6 +466,7 @@ function buildGCC {
         --with-headers \
         --disable-win32-registry \
         --disable-nls \
+        --disable-libstdcxx-pch \
         --with-libiconv-prefix=$ICONV_PREFIX \
         --with-gmp-include=$GMP_INCLUDE \
         --with-gmp-lib=$GMP_LIB \

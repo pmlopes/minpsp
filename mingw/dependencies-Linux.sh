@@ -10,13 +10,12 @@ function installGMP {
       GMP_BUILD_TARGET="--build=i686-unknown-linux-gnu"
     fi
     cd deps/"gmp-"$GMP_VER
-    ./configure $EXTRA_BUILD_CFG $GMP_BUILD_TARGET \
+    ./configure $GMP_BUILD_TARGET \
       --disable-shared \
       --enable-static \
       --prefix=$1/deps/local --enable-cxx
-    $MAKE_CMD
-    $MAKE_CMD check
-    $MAKE_CMD install
+    make -s
+    make -s install
     cd ../..
   fi
 }
@@ -33,15 +32,14 @@ function installMPFR {
       MPFR_BUILD_TARGET="--build=i686-unknown-linux-gnu"
     fi
     cd deps/"mpfr-"$MPFR_VER
-    ./configure $EXTRA_BUILD_CFG $MPFR_BUILD_TARGET \
+    ./configure $MPFR_BUILD_TARGET \
       --disable-shared \
       --enable-static \
       --prefix=$1/deps/local \
-      --with-gmp-include=$GMP_INCLUDE \
-      --with-gmp-lib=$GMP_LIB
-    $MAKE_CMD
-    $MAKE_CMD check
-    $MAKE_CMD install
+      --with-gmp-include=$1/deps/local/include \
+      --with-gmp-lib=$1/deps/local/lib
+    make -s
+    make -s install
     cd ../..
   fi
 }
@@ -50,4 +48,3 @@ function installMPFR {
 mkdir -p $1/deps/local
 installGMP $1
 installMPFR $1
-
