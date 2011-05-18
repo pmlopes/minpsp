@@ -246,7 +246,7 @@ Index: psplinkusb/pspsh/Makefile
 +
 +ifdef BUILD_WIN32
 +OUTPUT=pspsh.exe
-+LIBS=-lws2_32 -lreadline
++LIBS=-static -lws2_32 -lreadline
 +endif
 +
  PREFIX=$(shell psp-config --pspdev-path 2> /dev/null)

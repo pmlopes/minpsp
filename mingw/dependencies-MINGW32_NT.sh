@@ -142,12 +142,12 @@ function installREADLINE {
 }
 
 function installICONV {
-  if [ ! -f /mingw/include/iconv.h ]
+  if [ ! -f /usr/local/include/iconv.h ]
   then
     download deps "ftp://ftp.gnu.org/gnu/libiconv" "libiconv-"$LIBICONV_VER "tar.gz"
     cd deps/"libiconv-"$LIBICONV_VER
     ./configure \
-      --prefix=/mingw \
+      --prefix=/usr/local \
       --disable-shared \
       --enable-static
     make
@@ -187,20 +187,16 @@ function installSDL {
 
 # generic
 installZlib
-# Disabled since it is easy with mingw-get install mingw32-libiconv
-#installICONV
-# Disabled since it is easy with mingw-get install mingw32-pthreads-w32
-#installPTHREADS
+installICONV
+installPTHREADS
 
 # disbled since the patch for readline fixes the termcap missing features
 # installPDCURSES
 installREADLINE
 
 # GCC specific
-# Disabled since it is easy with mingw-get install mingw32-gmp
-#installGMP
-# Disabled since it is easy with mingw-get install mingw32-mpfr
-#installMPFR
+installGMP
+installMPFR
 
 # not needed right now
 #installPPL

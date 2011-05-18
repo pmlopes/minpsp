@@ -231,13 +231,13 @@ function prepare {
     # GDC has a bug that forces the install to be hardcoded
     INSTALLDIR="/pspsdk"
     INSTALLERDIR="/c/pspsdk-installer"
-    GMP_INCLUDE=/mingw/include
-    MPFR_INCLUDE=/mingw/include
-    GMP_LIB=/mingw/lib
-    MPFR_LIB=/mingw/lib
-    GMP_PREFIX=/mingw
-    PPL_PREFIX=/mingw
-    ICONV_PREFIX=/mingw
+    GMP_INCLUDE=/usr/local/include
+    MPFR_INCLUDE=/usr/local/include
+    GMP_LIB=/usr/local/lib
+    MPFR_LIB=/usr/local/lib
+    GMP_PREFIX=/usr/local
+    PPL_PREFIX=/usr/local
+    ICONV_PREFIX=/usr/local
     MAKE_CMD="make -s LDFLAGS=\"-s\""
 
     #-----------------------------------------------------------------------------
