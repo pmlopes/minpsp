@@ -1,0 +1,12 @@
+diff -Naur gdb-6.8.orig/gdb/configure gdb-6.8/gdb/configure
+--- gdb-6.8.orig/gdb/configure	2011-06-01 05:12:04 -0700
++++ gdb-6.8/gdb/configure	2011-06-01 05:17:02 -0700
+@@ -24797,7 +24797,7 @@
+   fi
+   LIBICONV=
+   if test "$am_cv_lib_iconv" = yes; then
+-    LIBICONV="-liconv"
++    LIBICONV="-L/usr/local/lib -liconv"
+   fi
+ 
+ 

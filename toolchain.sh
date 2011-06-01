@@ -518,7 +518,14 @@ function buildGDB {
         --prefix=$INSTALLDIR \
         --target=psp \
         --disable-nls \
-        --disable-werror
+        --disable-werror \
+		--enable-static \
+		--disable-shared \
+        --with-libiconv-prefix=$ICONV_PREFIX \
+        --with-gmp-include=$GMP_INCLUDE \
+        --with-gmp-lib=$GMP_LIB \
+        --with-mpfr-include=$MPFR_INCLUDE \
+        --with-mpfr-lib=$MPFR_LIB
   else
     cd psp/build/$GDB_SRCDIR
   fi
@@ -680,7 +687,11 @@ function buildPRXTool {
   then
     mkdir -p build/prxtool
     cd build/prxtool
-    ../../prxtool/configure --prefix=$INSTALLDIR
+	if [ "$OS" == "MINGW32_NT" ]; then
+	  LDFLAGS="-static -s" ../../prxtool/configure --prefix=$INSTALLDIR
+	else
+	  ../../prxtool/configure --prefix=$INSTALLDIR
+	fi
   else
     cd build/prxtool
   fi
