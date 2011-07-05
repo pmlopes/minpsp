@@ -31,6 +31,13 @@ Portable handheld videogame system.
 ===============================================================================
  Changelog
 ===============================================================================
+
+0.11.2
+* Added MacOSX support
+* Reverted Binutils to 2.16.1 since there is a bug with 2.18 that causes
+  bad code for example on Daedalus Project.
+* Fixed win32 builds and mingw environment
+
 0.10.1
 * fixed pspmath.h file for C++
 * Added D support to GDB
@@ -443,7 +450,7 @@ To build run the toolchain script:
 ## Install the required packages.
  sudo apt-get install build-essential autoconf automake bison flex \
   libncurses5-dev libreadline-dev libusb-dev texinfo subversion doxygen \
-  graphviz libtool unrar unzip cmake wget pkg-config
+  graphviz libtool unrar unzip cmake wget pkg-config lzma alien
 
 ## it is required to use the static mpfr and gmp otherwise ubuntu 10.04 LTS
  binaries are not compatible with 10.10 or above and maybe with other distros.

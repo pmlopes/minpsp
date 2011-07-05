@@ -35,7 +35,9 @@ echo 2.0 > debian-binary
 mkdir -p opt
 cp -Rf $(pwd)/../../pspsdk opt
 chown -R root:root ./opt
-tar -c --lzma -f data.tar.lzma ./opt
+tar -cf data.tar ./opt
+lzma --best data.tar
+
 
 # create control file
 cat >> control <<EOF

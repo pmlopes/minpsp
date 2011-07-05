@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.11.2
+PSPSDK_VERSION=0.11.3
 
 # supported languages
 #LANGUAGES="c,c++"
@@ -959,7 +959,7 @@ else
   #---------------------------------------------------------------------------------
   # Build base devpaks
   #---------------------------------------------------------------------------------
-  buildBaseDevpaks
+  #buildBaseDevpaks
 
   echo
   echo "Run the NSIS script to build the Installer"
