@@ -2,7 +2,7 @@ Index: psplinkusb/usbgdb/main.c
 ===================================================================
 --- psplinkusb/usbgdb/main.c	(revision 2494)
 +++ psplinkusb/usbgdb/main.c	(working copy)
-@@ -153,6 +153,14 @@
+@@ -141,6 +141,14 @@
  		}
  	}
  
@@ -17,7 +17,7 @@ Index: psplinkusb/usbgdb/main.c
  	if(valid)
  	{
  		*dest = *address;
-@@ -188,6 +196,14 @@
+@@ -176,6 +184,14 @@
  		}
  	}
  

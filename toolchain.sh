@@ -100,6 +100,9 @@ function download {
       if [ -f ../patches/$3-PSP.patch ]; then
         patch -p1 < ../patches/$3-PSP.patch
       fi
+      if [ -f ../psptoolchain/patches/$3-PSP.patch ]; then
+        patch -p1 < ../psptoolchain/patches/$3-PSP.patch
+      fi
       if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
         patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
       fi
@@ -145,6 +148,9 @@ function svnGet {
       mv -f tmp src/base/build.mak
     fi
     # normal patching
+    if [ -f ../psptoolchain/patches/$3-PSP.patch ]; then
+      patch -p1 < ../psptoolchain/patches/$3-PSP.patch
+    fi
     if [ -f ../patches/$3-PSP.patch ]; then
       patch -p1 < ../patches/$3-PSP.patch
     fi
@@ -158,6 +164,48 @@ function svnGet {
   else
     cd $3
     svn up || echo "*** SVN not updated!!! ***"
+    cd ..
+  fi
+  cd ..
+}
+
+# arg1 target
+# arg2 git reppo
+# arg3 name
+function gitClone {
+  DOWNLOAD_DIR=`echo "$2"|cut -d: -f2-|cut -b3-`
+  cd $1
+  if [ ! -d $3 ]
+  then
+    if [ ! -d ../offline/$DOWNLOAD_DIR/$3 ]; then
+      mkdir -p ../offline/$DOWNLOAD_DIR
+      cd ../offline/$DOWNLOAD_DIR
+      git clone $2
+      cd -
+    else
+      cd ../offline/$DOWNLOAD_DIR/$3
+      git pull || echo "*** Git not updated!!! ***"
+      cd -
+    fi
+    cp -Rf ../offline/$DOWNLOAD_DIR/$3 .
+    cd $3
+    # normal patching
+    if [ -f ../patches/$3-PSP.patch ]; then
+      patch -p1 < ../patches/$3-PSP.patch
+    fi
+    if [ -f ../psptoolchain/patches/$3-PSP.patch ]; then
+      patch -p1 < ../psptoolchain/patches/$3-PSP.patch
+    fi
+    if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+      patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
+    fi
+    if [ -f $3.patch ]; then
+      patch -p1 < $3.patch
+    fi
+    cd ..
+  else
+    cd $3
+    git pull || echo "*** Git not updated!!! ***"
     cd ..
   fi
   cd ..
@@ -260,6 +308,7 @@ function prepare {
   fi
 
   checkTool svn
+  checkTool git
   checkTool wget
   checkTool make
   checkTool awk
@@ -325,6 +374,7 @@ function installPremake {
 
 function downloadPatches {
   svnGet psp "svn://svn.ps2dev.org/psp/trunk/psptoolchain" "patches"
+  gitClone psp "https://github.com/pspdev/psptoolchain.git" "psptoolchain"
 }
 
 function buildBinutils {
@@ -402,7 +452,7 @@ function buildXGCC {
 }
 
 function bootstrapSDK {
-  svnGet psp "svn://svn.ps2dev.org/psp/trunk" "pspsdk"
+  gitClone psp "https://github.com/pspdev/pspsdk.git" "pspsdk"
   cd psp
   if [ ! -f pspsdk/configure ]
   then
@@ -570,12 +620,12 @@ function installExtraBinaries {
 }
 
 function installPSPLinkUSB {
-  svnGet psp "svn://svn.ps2dev.org/psp/trunk" "psplinkusb"
+  gitClone psp "https://github.com/pspdev/psplinkusb.git" "psplinkusb"
   cd psp
   if [ "$OS" == "MINGW32_NT" ]; then
     cd psplinkusb
-    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C pspsh install
-    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C tools/remotejoy/pcsdl install
+    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C pspsh clean install
+    CC=gcc CXX=g++ BUILD_WIN32=1 $MAKE_CMD -C tools/remotejoy/pcsdl clean install
     cd ..
     # usbhostfs_pc (not yet ported to native win32)
     cp ../mingw/bin/usbhostfs_pc.exe $INSTALLDIR/bin
@@ -601,17 +651,17 @@ function installPSPLinkUSB {
   fi
   if [ "$OS" == "SunOS" ]; then
     cd psplinkusb
-    CC=cc CXX=CC BUILD_SOLARIS=1 $MAKE_CMD -f Makefile.clients install
+    CC=cc CXX=CC BUILD_SOLARIS=1 $MAKE_CMD -f Makefile.clients clean install
     cd ..
   fi
   if [ "$OS" == "Darwin" ]; then
     cd psplinkusb
-    BUILD_MACOSX=1 BUILD_LIBUSB10=1 $MAKE_CMD -f Makefile.clients install
+    BUILD_MACOSX=1 BUILD_LIBUSB10=1 $MAKE_CMD -f Makefile.clients clean install
     cd ..
   fi
   if [ "$OS" == "Linux" ]; then
     cd psplinkusb
-    $MAKE_CMD -f Makefile.clients install
+    $MAKE_CMD -f Makefile.clients clean install
     cd ..
   fi
 
@@ -674,7 +724,7 @@ function installPSPLinkUSB {
 }
 
 function buildPRXTool {
-  svnGet psp "http://psp.jim.sh/svn/psp/trunk" "prxtool"
+  gitClone psp "https://github.com/pspdev/prxtool.git" "prxtool"
   cd psp
   if [ ! -f prxtool/configure ]
   then
