@@ -432,24 +432,6 @@ Index: psplinkusb/pspsh/pspsh.C
  		pEntry = read_tab_completion();
  	}
  
-@@ -937,7 +970,7 @@ char** shell_completion(const char *text, int start, int end)
- 	{
- 		if(strchr(text, '.') || strchr(text, '/'))
- 		{
--			rl_completion_display_matches_hook = completion_display;
-+			rl_completion_display_matches_hook = (void (*)()) completion_display;
- 			matches = rl_completion_matches(text, filename_gen);
- 		}
- 		else
-@@ -947,7 +980,7 @@ char** shell_completion(const char *text, int start, int end)
- 	}
- 	else
- 	{
--		rl_completion_display_matches_hook = completion_display;
-+		rl_completion_display_matches_hook = (void (*)()) completion_display;
- 		if(text[0] == '@')
- 		{
- 			matches = rl_completion_matches(text, uid_gen);
 @@ -971,7 +1004,7 @@ int init_readline(void)
  	rl_attempted_completion_function = shell_completion;
  	rl_callback_handler_install("", cli_handler);
