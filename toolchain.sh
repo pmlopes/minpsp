@@ -6,7 +6,7 @@ set -e
 #---------------------------------------------------------------------------------
 
 # package version
-PSPSDK_VERSION=0.11.3
+PSPSDK_VERSION=0.13.0
 
 # supported languages
 #LANGUAGES="c,c++"
@@ -95,21 +95,31 @@ function download {
     if [ $CREATE_TARGET == 1 ]; then
       cd ..
     fi
+    echo $3
     if [ -d $TARGET_DIR ]; then
       cd $TARGET_DIR
       if [ -f ../patches/$3-PSP.patch ]; then
+      	echo "1"
         patch -p1 < ../patches/$3-PSP.patch
       fi
       if [ -f ../psptoolchain/patches/$3-PSP.patch ]; then
+      	echo "2"
         patch -p1 < ../psptoolchain/patches/$3-PSP.patch
       fi
+      if [ -f ../../mingw/patches/$3-PSP.patch ]; then
+      	echo "3"
+        patch -p1 < ../../mingw/patches/$3-PSP.patch
+      fi
       if [ -f ../../mingw/patches/$3-MINPSPW.patch ]; then
+      	echo "4"
         patch -p1 < ../../mingw/patches/$3-MINPSPW.patch
       fi
       if [ -f ../../mingw/patches/$3-$OS.patch ]; then
+      	echo "5"
         patch -p1 < ../../mingw/patches/$3-$OS.patch
       fi
       if [ -f $3.patch ]; then
+      	echo "6"
         patch -p1 < $3.patch
       fi
       cd ..
@@ -297,14 +307,18 @@ function prepare {
   if [ "$OS" == "Darwin" ]; then
     EXTRA_BUILD_CFG=""
     INSTALLDIR="$(pwd)/../pspsdk"
-    GMP_INCLUDE=/opt/local/include
-    MPFR_INCLUDE=/opt/local/include
-    GMP_LIB=/opt/local/lib
-    MPFR_LIB=/opt/local/lib
-    GMP_PREFIX=/opt/local
-    PPL_PREFIX=/opt/local
-    ICONV_PREFIX=/opt/local
+    GMP_INCLUDE=$(pwd)/deps/local/include
+    MPFR_INCLUDE=$(pwd)/deps/local/include
+    GMP_LIB=$(pwd)/deps/local/lib
+    MPFR_LIB=$(pwd)/deps/local/lib
+    GMP_PREFIX=$(pwd)/deps/local
+    PPL_PREFIX=$(pwd)/deps/local
+    ICONV_PREFIX=/usr
     MAKE_CMD=make
+    #-----------------------------------------------------------------------------
+    # pre requisites
+    #-----------------------------------------------------------------------------
+    . ./mingw/dependencies-Darwin.sh $(pwd)
   fi
 
   checkTool svn
@@ -557,7 +571,10 @@ function validateSDK {
 function buildGDB {
   GDB_SRCDIR="gdb-"$GDB_VER
 
-  download psp "http://ftp.gnu.org/gnu/gdb" "gdb-"$GDB_VER "tar.bz2"
+  cd psp
+  ln -s "gdb-"$GDB_VER "gdb-"$GDB_VER"a" || true
+  cd ..
+  download psp "http://ftp.gnu.org/gnu/gdb" "gdb-"$GDB_VER"a" "tar.bz2"
 
   if [ ! -d psp/build/$GDB_SRCDIR ]
   then

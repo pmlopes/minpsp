@@ -234,8 +234,8 @@ Index: psplinkusb/pspsh/Makefile
 +OUTPUT=pspsh
  
 +ifdef BUILD_MACOSX
-+CXXFLAGS +=-I/opt/local/include
-+LDFLAGS += -L/opt/local/lib
++CC=gcc
++CXX=g++
 +endif
 +
 +ifdef BUILD_SOLARIS
@@ -283,7 +283,7 @@ Index: psplinkusb/pspsh/pspsh.C
  #include "parse_args.h"
  #include "pspkerror.h"
  #include "disasm.h"
-@@ -38,6 +32,44 @@
+@@ -38,6 +33,44 @@
  #define HISTORY_FILE ".pspsh.hist"
  #define DEFAULT_IP     "localhost"
  
@@ -328,7 +328,7 @@ Index: psplinkusb/pspsh/pspsh.C
  struct Args
  {
  	const char *ip;
-@@ -59,10 +91,10 @@
+@@ -59,10 +92,10 @@ struct GlobalContext
  	int exit;
  	int conn_sanity;
  	fd_set readsave;
@@ -343,7 +343,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	char history_file[PATH_MAX];
  	char currpath[PATH_MAX];
  	char currcmd[PATH_MAX];
-@@ -152,7 +184,7 @@
+@@ -152,7 +185,7 @@ const struct sh_command* find_command(const char *cmd)
  }
  
  
@@ -352,7 +352,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	int written = 0;
  
-@@ -160,12 +192,12 @@
+@@ -160,12 +193,12 @@ int fixed_write(int s, const void *buf, int len)
  	{
  		int ret;
  
@@ -367,7 +367,7 @@ Index: psplinkusb/pspsh/pspsh.C
  				written = -1;
  				break;
  			}
-@@ -252,8 +284,8 @@
+@@ -252,8 +285,8 @@ int execute_line(const char *buf)
  			len = fixed_write(g_context.sock, args, binlen);
  			if(len < 0)
  			{
@@ -378,7 +378,7 @@ Index: psplinkusb/pspsh/pspsh.C
  				return -1;
  			}
  			strcpy(g_context.currcmd, args);
-@@ -436,7 +468,7 @@
+@@ -436,7 +469,7 @@ int strlen_cmd(int argc, char **argv)
  {
  	char val[32];
  
@@ -387,7 +387,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	setenv("?", val, 1);
  
  	return 0;
-@@ -573,12 +605,12 @@
+@@ -573,12 +606,12 @@ void cli_handler(char *buf)
  				snprintf(prompt, PATH_MAX, "%s> ", g_context.currpath);
  				rl_callback_handler_install(prompt, cli_handler);
  			}
@@ -402,7 +402,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			}
  
  			return;
-@@ -643,9 +675,9 @@
+@@ -643,9 +676,9 @@ void cli_handler(char *buf)
  		}
  		else if(buf[0] == '@')
  		{
@@ -414,7 +414,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			}
  			return;
  		}
-@@ -816,7 +848,7 @@
+@@ -816,7 +849,7 @@ char *filename_gen(const char *text, int state)
  			curr += strlen(curr)+1;
  		}
  		*curr++ = 1;
@@ -423,7 +423,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		pEntry = read_tab_completion();
  		if(pEntry == NULL)
  		{
-@@ -880,7 +912,7 @@
+@@ -880,7 +913,7 @@ char *uid_gen(const char *text, int state)
  		strcpy(curr, text);
  		curr += strlen(curr)+1;
  		*curr++ = 1;
@@ -432,7 +432,25 @@ Index: psplinkusb/pspsh/pspsh.C
  		pEntry = read_tab_completion();
  	}
  
-@@ -971,7 +1003,7 @@
+@@ -937,7 +970,7 @@ char** shell_completion(const char *text, int start, int end)
+ 	{
+ 		if(strchr(text, '.') || strchr(text, '/'))
+ 		{
+-			rl_completion_display_matches_hook = completion_display;
++			rl_completion_display_matches_hook = (void (*)()) completion_display;
+ 			matches = rl_completion_matches(text, filename_gen);
+ 		}
+ 		else
+@@ -947,7 +980,7 @@ char** shell_completion(const char *text, int start, int end)
+ 	}
+ 	else
+ 	{
+-		rl_completion_display_matches_hook = completion_display;
++		rl_completion_display_matches_hook = (void (*)()) completion_display;
+ 		if(text[0] == '@')
+ 		{
+ 			matches = rl_completion_matches(text, uid_gen);
+@@ -971,7 +1004,7 @@ int init_readline(void)
  	rl_attempted_completion_function = shell_completion;
  	rl_callback_handler_install("", cli_handler);
  	rl_basic_word_break_characters = "\t\n ";
@@ -441,7 +459,7 @@ Index: psplinkusb/pspsh/pspsh.C
  
  	return 1;
  }
-@@ -1138,7 +1170,7 @@
+@@ -1138,7 +1171,7 @@ int parse_args(int argc, char **argv, struct Args *args)
  
  void print_help(void)
  {
@@ -450,7 +468,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	fprintf(stderr, "Built %s %s - $Revision: 2200 $\n", __DATE__, __TIME__);
  	fprintf(stderr, "Usage: pspsh [options] [script args...]\n");
  	fprintf(stderr, "Options:\n");
-@@ -1284,7 +1316,7 @@
+@@ -1284,7 +1317,7 @@ int set_cmd(int argc, char **argv)
  
  		if(setenv(name, value, 1) < 0)
  		{
@@ -459,7 +477,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  	}
-@@ -1494,7 +1526,7 @@
+@@ -1494,7 +1527,7 @@ int process_cmd(const unsigned char *str)
  	return 1;
  }
  
@@ -468,7 +486,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	static unsigned char linebuf[16*1024];
  	static int pos = 0;
-@@ -1502,10 +1534,10 @@
+@@ -1502,10 +1535,10 @@ int read_socket(int sock)
  	unsigned char *curr;
  	int len;
  
@@ -481,7 +499,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1550,15 +1582,15 @@
+@@ -1550,15 +1583,15 @@ int read_socket(int sock)
  	return len;
  }
  
@@ -500,7 +518,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1576,15 +1608,15 @@
+@@ -1576,15 +1609,15 @@ int read_outsocket(int sock)
  	return len;
  }
  
@@ -519,7 +537,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1602,15 +1634,15 @@
+@@ -1602,15 +1635,15 @@ int read_errsocket(int sock)
  	return len;
  }
  
@@ -538,7 +556,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1627,9 +1659,9 @@
+@@ -1627,9 +1660,9 @@ int read_fssocket(int sock)
  	return len;
  }
  
@@ -550,7 +568,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	int success = 0;
  	struct sockaddr_in name;
  
-@@ -1640,15 +1672,15 @@
+@@ -1640,15 +1673,15 @@ int connect_to(const char *ipaddr, unsigned short port)
  			break;
  		}
  		sock = socket(PF_INET, SOCK_STREAM, 0);
@@ -569,7 +587,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  		else
-@@ -1662,17 +1694,17 @@
+@@ -1662,17 +1695,17 @@ int connect_to(const char *ipaddr, unsigned short port)
  
  	if(!success)
  	{
@@ -591,7 +609,7 @@ Index: psplinkusb/pspsh/pspsh.C
  {
  	static unsigned char linebuf[16*1024];
  	static int pos = 0;
-@@ -1694,10 +1726,10 @@
+@@ -1694,10 +1727,10 @@ int read_tab(int sock, struct TabEntry *head)
  		tabcurr = tabcurr->pNext;
  	}
  
@@ -604,7 +622,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		return -1;
  	}
  
-@@ -1776,7 +1808,7 @@
+@@ -1776,7 +1809,7 @@ struct TabEntry* read_tab_completion(void)
  	struct timeval tv;
  	struct TabEntry head;
  
@@ -613,7 +631,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	{
  		return NULL;
  	}
-@@ -1800,7 +1832,7 @@
+@@ -1800,7 +1833,7 @@ struct TabEntry* read_tab_completion(void)
  				continue;
  			}
  
@@ -622,7 +640,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			break;
  		}
  		else if(ret == 0)
-@@ -1826,6 +1858,13 @@
+@@ -1826,6 +1859,13 @@ struct TabEntry* read_tab_completion(void)
  
  int shell(void)
  {
@@ -636,7 +654,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	fd_set readset;
  	FD_ZERO(&g_context.readsave);
  
-@@ -1834,25 +1873,25 @@
+@@ -1834,25 +1874,25 @@ int shell(void)
  		fprintf(stderr, "Opening connection to %s port %d\n", g_context.args.ip, g_context.args.port);
  	}
  
@@ -666,7 +684,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	{
  		fprintf(stderr, "Could not connect to fs admin channel\n");
  	}
-@@ -1863,8 +1902,9 @@
+@@ -1863,8 +1903,9 @@ int shell(void)
  		init_readline();
  		read_history(g_context.history_file);
  		history_set_pos(history_length);
@@ -677,7 +695,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	}
  
  	/* Change to the current directory, should return our path */
-@@ -1875,6 +1915,13 @@
+@@ -1875,6 +1916,13 @@ int shell(void)
  		int ret;
  
  		readset = g_context.readsave;
@@ -691,7 +709,7 @@ Index: psplinkusb/pspsh/pspsh.C
  		ret = select(FD_SETSIZE, &readset, NULL, NULL, NULL);
  		if(ret < 0)
  		{
-@@ -1883,15 +1930,24 @@
+@@ -1883,15 +1931,24 @@ int shell(void)
  				continue;
  			}
  
@@ -717,7 +735,7 @@ Index: psplinkusb/pspsh/pspsh.C
  			if(!g_context.args.script)
  			{
  				if(FD_ISSET(STDIN_FILENO, &readset))
-@@ -1899,44 +1955,44 @@
+@@ -1899,44 +1956,44 @@ int shell(void)
  					rl_callback_read_char();
  				}
  			}
@@ -774,7 +792,7 @@ Index: psplinkusb/pspsh/pspsh.C
  				}
  			}
  					
-@@ -1954,25 +2010,25 @@
+@@ -1954,25 +2011,25 @@ int shell(void)
  
  void shutdown_app(void)
  {
@@ -812,7 +830,7 @@ Index: psplinkusb/pspsh/pspsh.C
  	}
  
  	if(!g_context.args.script)
-@@ -2016,13 +2072,20 @@
+@@ -2016,13 +2073,20 @@ void build_histfile(void)
  
  int main(int argc, char **argv)
  {
